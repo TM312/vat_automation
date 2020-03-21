@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+
+    nuxt:
+        container_name: nuxt
+        build:
+            context: ./nuxt
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        restart: always
+        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+            - "3000"
+        environment:
+            - HOST: 0.0.0.0
+        depends_on:
+            - api
+        networks:
+            - web
+        command: "npm run start"
+
+    api:
+        container_name: api
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+        image: ${OWNER_NAME}/webapp:${VERSION_NUMBER}
+        restart: always
+        expose:
+            - "80"
+        env_file:
+            ./api/.env
+        depends_on: # depends_on defines the order in which the services are started
+            - postgres
+        networks:
+            - internal
+            - web
+
+    postgres:
+        container_name: postgres
+        image: postgres:${POSTGRES_VERSION}
+        restart: always
+        expose:
+            - "5432"
+        env_file:
+            ./postgres/.env
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+            # - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+        networks:
+            - internal
+
+volumes:
+    pgdata:
+
+networks:
+    internal:
+    web:
+        # external:
+        #     name: nginx_web
