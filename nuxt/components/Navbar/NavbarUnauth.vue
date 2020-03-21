@@ -1,0 +1,38 @@
+<template>
+  <b-navbar toggleable="lg" type="light" variant="light">
+    <b-navbar-brand to="/">
+      <img
+        src="@/assets/img/logos/placeholderlogo.png"
+        class="d-inline-block align-top"
+        height="40"
+      />
+    </b-navbar-brand>
+
+    <b-navbar-toggle target="nav-collapse" />
+
+    <b-collapse id="nav-collapse" is-nav>
+      <!-- <b-navbar-nav>
+        <b-nav-item to="/">
+          <i>Navbar items...</i>
+        </b-nav-item>
+      </b-navbar-nav> -->
+
+      <!-- Right aligned nav items -->
+      <b-navbar-nav class="ml-auto">
+        <!-- Using 'button-content' slot -->
+        <b-button variant="outline-success" to="/login">
+          Sign In
+        </b-button>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
+</template>
+
+<script>
+export default {
+  middleware: 'guest',
+  name: 'NavbarUnauth'
+}
+</script>
+
+<style></style>
