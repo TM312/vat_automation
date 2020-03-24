@@ -3,8 +3,8 @@
 # services:
 #     api:
 #         env_file:
-#             - .test.env
+#             - .stage.env
 
 #     nuxt:
 #         env_file:
-#             - .test.env
+#             - .stage.env

@@ -13,7 +13,7 @@ class Config(object):
     COMPANY_NAME = 'NTAMAZON'
     TOKEN_LIFESPAN_LOGIN = 420 #in minutes
     TOKEN_LIFESPAN_REGISTRATION = 360  # in minutes
-    FRONTEND_HOST = 'http://localhost:3000' #later domain will be put here
+    FRONTEND_HOST = os.getenv('SERVER_ADDRESS')  #domain is put here for production
 
     # mail server settings
     MAIL_SERVER = os.getenv('MAIL_SERVER')

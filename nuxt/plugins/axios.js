@@ -1,5 +1,9 @@
-// import axios from 'axios'
+// import axios from "axios";
 
 // export default axios.create({
-//   baseURL: process.env.apiBaseUrl
-// })
+//   baseURL: process.env.baseUrl,
+//   withCredentials: true,
+//   headers: {
+//     "Content-Type": "application/json"
+//   }
+// });

@@ -32,5 +32,5 @@ def register_api(app):
     from flask_restx import Api
     from app.routes import register_routes
     api = Api(app, title="NT API", version="0.1.2")
-    register_routes(api, app, root='api')
+    register_routes(api, app, root='v1')
     return None

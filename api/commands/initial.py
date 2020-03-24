@@ -12,11 +12,11 @@ def create_initial_users():
         )
         db.session.add(t)
 
-        n = User(
-            email='nico@gmail.com',
-            password='1234'
-        )
-        db.session.add(n)
+        # n = User(
+        #     email='nico@gmail.com',
+        #     password='1234'
+        # )
+        # db.session.add(n)
         try:
             db.session.commit()
         except IntegrityError:
@@ -25,9 +25,8 @@ def create_initial_users():
 class InitialUserCreationCommand(Command):
     """ Seed the DB with Initial Users."""
     def run(self):
-        if (input("Are you sure you want to drop all tables and create the initial profiles? (y/N)\n").lower()== "y"):
-            print("Dropping tables...")
-            db.drop_all()
-            db.create_all()
-            create_initial_users()
-            print("DB seeded with the initial users.")
+        print("Dropping tables...")
+        db.drop_all()
+        db.create_all()
+        create_initial_users()
+        print("DB seeded with the initial users.")
