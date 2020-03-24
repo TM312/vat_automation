@@ -1,6 +1,12 @@
 # NT: BACKEND
 NT Client Repo can be found here: [ hyperlink to be put here ]
 
+
+db sytnax:
+DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name}
+
+
+
 ## TO DOs
 
 ### HTTPS

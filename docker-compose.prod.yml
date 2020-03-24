@@ -1,13 +1,6 @@
 version: '3'
 
 services:
-    api:
-        environment:
-            - FLASK_ENV: 'prod'
-            - TOKEN_HTTPS_META: 'true'
-            - TOKEN_AUDIENCE: 'https://dotnetcoredocker.com'
-            - TOKEN_ISSUER: 'https://api.dotnetcoredocker.com'
-
     proxy:
         container_name: proxy
         build:
@@ -35,6 +28,14 @@ services:
         networks:
         - web
         entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+    api:
+        env_file:
+            - .prod.env
+
+    nuxt:
+        env_file:
+            - .prod.env
 
 networks:
     internal:

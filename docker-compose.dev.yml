@@ -1,16 +1,47 @@
 version: '3'
 
 services:
-    api:
-        environment:
-            - FLASK_ENV=dev
-        command: ['gunicorn', '-w', '1', '--bind', '0.0.0.0:5000', 'wsgi:app']
-
-
-    postgres:
+    proxy:
+        container_name: proxy
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
+        restart: unless-stopped
         ports:
-            - "5432:5432"
+            # - 80:80
+            # - 443:443
+            - 5000:5000
+            - 3000:3000
+        volumes:
+            - ./nginx/development:/etc/nginx/conf.d
+        networks:
+            - web
+        depends_on:
+            - api
+        command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+
+    api:
+        env_file:
+            - .dev.env
+        # ports:
+        #     - 5000:5000
+        # command: [python, wsgi.py]
 
     nuxt:
-        ports:
-            - "3000:3000"
+        env_file:
+            - .dev.env
+        # expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+        #     - "80"
+        # ports:
+        #     - 80:3000
+
+    postgres:
+        env_file:
+            - .dev.env
+        # ports:
+        #     - 5432:5432
+
+# networks:
+#     internal:
+#     web:

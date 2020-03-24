@@ -74,13 +74,14 @@
 </template>
 
 <script>
+// import axios from '~/plugins/axios'
 export default {
   middleware: 'guest',
   data() {
     return {
       showPassword: false,
       form: {
-        email: 'thomas@gmail.com',
+        email: 'thomas.moellers@rwth-aachen.de',
         password: '1234',
         password2: '1234'
       }

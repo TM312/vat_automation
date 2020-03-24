@@ -1,33 +1,33 @@
 export default {
-  mode: 'universal',
+  mode: "universal",
   /*
    ** Headers of the page
    */
   head: {
-    title: 'NT Front',
+    title: "NT Front",
     meta: [
-      { charset: 'utf-8' },
+      { charset: "utf-8" },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1'
+        name: "viewport",
+        content: "width=device-width, initial-scale=1"
       },
       {
-        hid: 'description',
-        name: 'description',
-        content: process.env.npm_package_description || ''
+        hid: "description",
+        name: "description",
+        content: process.env.npm_package_description || ""
       }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
   },
 
   /*
    ** Customize the progress-bar color
    */
   loading: {
-    name: 'chasing-dots',
-    color: '#ff5638',
-    background: 'white',
-    height: '4px'
+    name: "chasing-dots",
+    color: "#ff5638",
+    background: "white",
+    height: "4px"
   },
 
   /*
@@ -42,7 +42,7 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxtjs/eslint-module'],
+  buildModules: ["@nuxtjs/eslint-module"],
   eslint: {
     /* module options */
     /* rules: {
@@ -54,10 +54,10 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    'bootstrap-vue/nuxt',
-    '@nuxtjs/axios',
-    '@nuxtjs/auth',
-    '@nuxtjs/toast'
+    "bootstrap-vue/nuxt",
+    "@nuxtjs/axios",
+    "@nuxtjs/auth",
+    "@nuxtjs/toast"
   ],
   bootstrapVue: {
     icons: true
@@ -65,13 +65,13 @@ export default {
 
   axios: {
     baseURL:
-      process.env.NODE_ENV === 'prod'
-        ? 'https://api.dotnetcoredocker.com'
-        : 'http://127.0.0.1:5000',
-    https: process.env.NODE_ENV === 'prod' ? true : false,
+      process.env.NODE_ENV === "production"
+        ? "http://127.0.0.1:5000/v1"
+        : "http://127.0.0.1:5000/v1",
+    // https: process.env.NODE_ENV === "production" ? true : false,
     withCredentials: true,
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     }
   },
   auth: {
@@ -79,26 +79,26 @@ export default {
       local: {
         endpoints: {
           login: {
-            url: '/auth/login',
-            method: 'post',
-            propertyName: 'token'
+            url: "/auth/login",
+            method: "post",
+            propertyName: "token"
           },
           logout: {
-            url: '/auth/logout',
-            method: 'post'
+            url: "/auth/logout",
+            method: "post"
           },
           user: {
-            url: '/user/self',
-            method: 'get',
-            propertyName: 'data'
+            url: "/user/self",
+            method: "get",
+            propertyName: "data"
           }
         },
         tokenRequired: true,
-        tokenType: ''
+        tokenType: ""
       }
     },
     redirect: {
-      logout: '/login'
+      logout: "/login"
     }
   },
   toast: {
@@ -129,12 +129,30 @@ export default {
       // Run ESLint on save
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
-          enforce: 'pre',
+          enforce: "pre",
           test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
+          loader: "eslint-loader",
           exclude: /(node_modules)/
-        })
+        });
       }
     }
   }
-}
+  // generate: {
+  //   /* I may not need this due to SSR rendering.
+  //    ** The path to the fallback HTML file. It should be set as the error page, so that also unknown routes are rendered via Nuxt.
+  //    ** If set to true, the filename will be 404.html
+  //    ** If working with statically generated pages then it is recommended to use a 404.html for error pages
+  //    */
+  //   fallback: true,
+  //   routes() {
+  //     return axios.get("/users").then(res => {
+  //       return res.data.map(user => {
+  //         return {
+  //           route: "/users  /" + user.public_id,
+  //           payload: user
+  //         };
+  //       });
+  //     });
+  //   }
+  // }
+};
