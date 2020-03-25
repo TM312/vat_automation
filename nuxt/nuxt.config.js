@@ -64,7 +64,7 @@ export default {
   },
 
   axios: {
-    baseURL: "api.tax-automation.com",
+    baseURL: "https://api.tax-automation.com",
     https: true,
     withCredentials: true,
     headers: {
