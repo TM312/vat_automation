@@ -11,10 +11,5 @@ then
     echo "PostgreSQL started"
 fi
 
-# echo "Waiting for postgres upgrade"
-
-# exec python manage.py db upgrade
-
-# echo "PostgreSQL upgraded"
 
 exec "$@"

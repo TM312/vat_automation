@@ -64,11 +64,8 @@ export default {
   },
 
   axios: {
-    baseURL:
-      process.env.NODE_ENV === "production"
-        ? "http://127.0.0.1:5000/v1"
-        : "http://127.0.0.1:5000/v1",
-    // https: process.env.NODE_ENV === "production" ? true : false,
+    baseURL: 'http://127.0.0.1:5000/v1',
+    https: false,
     withCredentials: true,
     headers: {
       "Content-Type": "application/json"
