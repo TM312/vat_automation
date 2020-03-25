@@ -64,8 +64,8 @@ export default {
   },
 
   axios: {
-    baseURL: 'http://127.0.0.1:5000/v1',
-    https: false,
+    baseURL: "api.tax-automation.com",
+    https: true,
     withCredentials: true,
     headers: {
       "Content-Type": "application/json"
