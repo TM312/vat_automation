@@ -2,35 +2,35 @@ version: '3'
 
 services:
     proxy:
-        # container_name: proxy
+        container_name: proxy
         build:
             context: ./nginx
             dockerfile: Dockerfile
-        # image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
+        image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
         restart: unless-stopped
         ports:
             - 80:80
-            - 443:443
+            # - 443:443
         volumes:
             - ./nginx/prod:/etc/nginx/conf.d
-            - ./nginx/prod/certbot/conf:/etc/letsencrypt
-            - ./nginx/prod/certbot/www:/var/www/certbot
+            # - ./nginx/prod/certbot/conf:/etc/letsencrypt
+            # - ./nginx/prod/certbot/www:/var/www/certbot
         depends_on:
             - api
         networks:
             - web
         command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
-    certbot:
-        # container_name: certbot
-        image: certbot/certbot
-        restart: unless-stopped
-        volumes:
-            - ./nginx/prod/certbot/conf:/etc/letsencrypt
-            - ./nginx/prod/certbot/www:/var/www/certbot
-        networks:
-            - web
-        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    # certbot:
+    #     # container_name: certbot
+    #     image: certbot/certbot
+    #     restart: unless-stopped
+    #     volumes:
+    #         - ./nginx/prod/certbot/conf:/etc/letsencrypt
+    #         - ./nginx/prod/certbot/www:/var/www/certbot
+    #     networks:
+    #         - web
+    #     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
     api:
         env_file:
@@ -43,5 +43,5 @@ services:
 networks:
     internal:
     web:
-        external:
-            name: nginx_web
+        # external:
+        #     name: nginx_web
