@@ -12,7 +12,7 @@ services:
             - 5000:5000
             - 80:3000
         volumes:
-            - ./nginx/development:/etc/nginx/conf.d
+            - ./nginx/dev:/etc/nginx/conf.d
         networks:
             - web
         depends_on:
