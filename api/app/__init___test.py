@@ -7,7 +7,7 @@ def test_app_creates(app):  # noqa
 
 def test_app_healthy(app, client):  # noqa
     with client:
-        resp = client.get("/ping")
+        resp = client.get("/ping_3f5ca2711e72a507")
         assert resp.status_code == 200
         assert resp.is_json
-        assert resp.json == "pong"
+        assert resp.json == "pong_3f5ca2711e72a507"

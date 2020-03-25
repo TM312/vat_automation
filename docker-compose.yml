@@ -3,7 +3,7 @@
 
 # DEV SETTINGS:
 ### nuxt.config.js
-#       baseURL: 'http://127.0.0.1:5000/v1',
+#       baseURL: 'http://127.0.0.1:5000',
 #       https: false,
 
 ### .env file
@@ -12,7 +12,7 @@
 # PROD SETTINGS:
 ### nuxt.config.js
 #       baseURL: 'https://api.tax-automation.com',
-#       https: true,
+#       https: false # at the moment false, later --> #true,
 
 ### .env file
 #       API_PORT=80
