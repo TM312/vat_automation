@@ -9,8 +9,6 @@ services:
         image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
         restart: unless-stopped
         ports:
-            # - 80:80
-            # - 443:443
             - 5000:5000
             - 80:3000
         volumes:
@@ -35,6 +33,6 @@ services:
             - .dev.env
 
 
-# networks:
-#     internal:
-#     web:
+networks:
+    internal:
+    web:

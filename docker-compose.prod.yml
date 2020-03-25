@@ -9,16 +9,16 @@ services:
         image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
         restart: unless-stopped
         ports:
-        - 80:80
-        - 443:443
+            - 80:80
+            - 443:443
         volumes:
-        - ./nginx/production:/etc/nginx/conf.d
-        - ./nginx/production/certbot/conf:/etc/letsencrypt
-        - ./nginx/production/certbot/www:/var/www/certbot
+            - ./nginx/production:/etc/nginx/conf.d
+            - ./nginx/production/certbot/conf:/etc/letsencrypt
+            - ./nginx/production/certbot/www:/var/www/certbot
         depends_on:
             - api
         networks:
-        - web
+            - web
         command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
     certbot:
@@ -26,10 +26,10 @@ services:
         image: certbot/certbot
         restart: unless-stopped
         volumes:
-        - ./nginx/production/certbot/conf:/etc/letsencrypt
-        - ./nginx/production/certbot/www:/var/www/certbot
+            - ./nginx/production/certbot/conf:/etc/letsencrypt
+            - ./nginx/production/certbot/www:/var/www/certbot
         networks:
-        - web
+            - web
         entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
     api:

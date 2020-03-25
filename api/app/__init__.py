@@ -1,4 +1,8 @@
 # following http://www.patricksoftwareblog.com/structuring-a-flask-project/
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, jsonify
 from app.extensions import db, migrate, bcrypt, cors, mail
 
@@ -32,5 +36,5 @@ def register_api(app):
     from flask_restx import Api
     from app.routes import register_routes
     api = Api(app, title="NT API", version="0.1.2")
-    register_routes(api, app, root='v1')
+    register_routes(api, app, root=os.getenv('API_ROOT'))
     return None
