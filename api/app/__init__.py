@@ -14,9 +14,9 @@ def create_app(env):
     register_api(app)
 
     # for testing purposes of the client (--> '.__init___test.py')
-    @app.route("/ping")
+    @app.route("/ping_3f5ca2711e72a507")
     def ping():
-        return jsonify("pong")
+        return jsonify("pong_3f5ca2711e72a507")
 
     return app
 
@@ -36,5 +36,6 @@ def register_api(app):
     from flask_restx import Api
     from app.routes import register_routes
     api = Api(app, title="NT API", version="0.1.2")
-    register_routes(api, app, root=os.getenv('API_ROOT'))
+    register_routes(api, app)
+    #register_routes(api, app, root=os.getenv('API_ROOT'))
     return None
