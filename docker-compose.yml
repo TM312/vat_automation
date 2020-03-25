@@ -11,7 +11,7 @@
 
 # PROD SETTINGS:
 ### nuxt.config.js
-#       baseURL: 'api.tax-automation.com',
+#       baseURL: 'https://api.tax-automation.com',
 #       https: true,
 
 ### .env file
