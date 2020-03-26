@@ -13,24 +13,25 @@ services:
             # - 443:443
         volumes:
             - ./nginx/prod:/etc/nginx/conf.d
-            # - ./nginx/prod/certbot/conf:/etc/letsencrypt
-            # - ./nginx/prod/certbot/www:/var/www/certbot
+            - ./nginx/prod/certbot/conf:/etc/letsencrypt
+            - ./nginx/prod/certbot/www:/var/www/certbot
         depends_on:
             - api
         networks:
             - web
         command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
-    # certbot:
-    #     # container_name: certbot
-    #     image: certbot/certbot
-    #     restart: unless-stopped
-    #     volumes:
-    #         - ./nginx/prod/certbot/conf:/etc/letsencrypt
-    #         - ./nginx/prod/certbot/www:/var/www/certbot
-    #     networks:
-    #         - web
-    #     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    certbot:
+        # container_name: certbot
+        image: certbot/certbot
+        restart: unless-stopped
+        volumes:
+            - ./nginx/prod/certbot/conf:/etc/letsencrypt
+            - ./nginx/prod/certbot/www:/var/www/certbot
+        networks:
+            - web
+        #command: certonly --webroot --webroot-path=/var/www/html --email no-reply@tax-automation.com --agree-tos --no-eff-email --staging -d tax-automation.com  -d www.tax-automation.com -d api.tax-automation.com
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
     api:
         env_file:
