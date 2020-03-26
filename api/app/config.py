@@ -26,6 +26,12 @@ class Config(object):
     EMAIL_CONFIRMATION_SALT = os.getenv('EMAIL_CONFIRMATION_SALT')
     EMAIL_CONFIRMATION_MAX_AGE = 10#3600 #in seconds
 
+    # #Database related variables
+    # DATABASE = os.getenv('DATABASE')
+    # POSTGRES_USER = os.getenv('POSTGRES_USER')
+    # POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+    # POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
 
