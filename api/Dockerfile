@@ -25,9 +25,5 @@ RUN pip3 install --upgrade pip && \
 # copy project
 COPY . .
 
-# # The RUN chmod command ensures that this new boot.sh file can be executed by anyone (+x)
-RUN chmod +x ./entrypoint.sh
-
-# # USER tm
-
-ENTRYPOINT ["./entrypoint.sh"]
+# Add wait-for-it
+RUN chmod +x wait-for-it.sh

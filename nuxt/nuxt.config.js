@@ -1,4 +1,8 @@
 export default {
+  server: {
+    port: 3000, // default: 3000
+    host: '0.0.0.0' //default: localhost
+  },
   mode: "universal",
   /*
    ** Headers of the page
@@ -64,7 +68,8 @@ export default {
   },
 
   axios: {
-    baseURL: "http://api.tax-automation.com",
+    baseURL: "http://127.0.0.1:5000",
+    /*"http://api.tax-automation.com", */
     https: false,
     withCredentials: true,
     headers: {
