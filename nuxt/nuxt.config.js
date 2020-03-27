@@ -68,7 +68,9 @@ export default {
   },
 
   axios: {
-    baseURL: "http://api.tax-automation.com",
+    baseURL: "94.237.95.140:5000",
+    /* "94.237.95.140:5000", */
+    /* "http://api.tax-automation.com", */
     /*  "http://127.0.0.1:5000"  */
     https: false,
     withCredentials: true,
