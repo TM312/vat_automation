@@ -18,22 +18,22 @@ version: '3'
 
 services:
 
-    nuxt:
-        container_name: nuxt
-        build:
-            context: ./nuxt
-            dockerfile: Dockerfile
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        image: ${OWNER_NAME}/nuxt:${VERSION_NUMBER}
-        restart: always
-        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-            - "3000"
-        depends_on:
-            - api
-        networks:
-            - web
-        command: "npm run start"
+    # nuxt:
+    #     container_name: nuxt
+    #     build:
+    #         context: ./nuxt
+    #         dockerfile: Dockerfile
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     image: ${OWNER_NAME}/nuxt:${VERSION_NUMBER}
+    #     restart: always
+    #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+    #         - "3000"
+    #     depends_on:
+    #         - api
+    #     networks:
+    #         - web
+    #     command: "npm run start"
 
     api:
         container_name: api
@@ -64,11 +64,6 @@ services:
         restart: always
         environment:
             - DATABASE=postgres
-            - POSTGRES_DB=vat_prod
-            - POSTGRES_PASSWORD=1da16a8805f14406f5ad69de0062465e262654a413ca3b29828bd1c598ec0afb
-            - POSTGRES_USER=tm
-            - POSTGRES_HOST=postgres
-
         expose:
             - "5432"
         volumes:
