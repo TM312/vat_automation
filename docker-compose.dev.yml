@@ -12,11 +12,11 @@ services:
         image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
         restart: unless-stopped
         ports:
-            - 5000:5000
+            # - 5000:5000
             - 80:80
-        volumes:
-            - ./nginx/dev:/etc/nginx/conf.d
-            - ./nginx/testhtml:/usr/share/nginx/html
+        # volumes:
+        #     # - ./nginx/dev:/etc/nginx/conf.d
+        #     - ./nginx/testhtml:/usr/share/nginx/html
         networks:
             - web
         depends_on:
@@ -30,9 +30,9 @@ services:
         env_file:
             - .dev.env
 
-    # nuxt:
-    #     env_file:
-    #         - .dev.env
+    nuxt:
+        env_file:
+            - .dev.env
 
     postgres:
         environment:

@@ -81,9 +81,9 @@ export default {
     return {
       showPassword: false,
       form: {
-        email: 'thomas.moellers@rwth-aachen.de',
-        password: '1234',
-        password2: '1234'
+        email: '',
+        password: '',
+        password2: ''
       }
     }
   },
