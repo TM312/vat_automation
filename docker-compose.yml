@@ -18,22 +18,22 @@ version: '3'
 
 services:
 
-    # nuxt:
-    #     container_name: nuxt
-    #     build:
-    #         context: ./nuxt
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - NODE_VERSION=${NODE_VERSION}
-    #     image: ${OWNER_NAME}/nuxt:${VERSION_NUMBER}
-    #     restart: always
-    #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-    #         - "3000"
-    #     depends_on:
-    #         - api
-    #     networks:
-    #         - web
-    #     command: "npm run start"
+    nuxt:
+        container_name: nuxt
+        build:
+            context: ./nuxt
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        image: ${OWNER_NAME}/nuxt:${VERSION_NUMBER}
+        restart: always
+        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+            - "3000"
+        depends_on:
+            - api
+        networks:
+            - web
+        command: "npm run start"
 
     api:
         container_name: api
