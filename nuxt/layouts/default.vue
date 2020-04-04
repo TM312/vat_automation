@@ -13,7 +13,7 @@ import { Navbar, Footer } from '@/components/'
 export default {
   components: {
     Navbar,
-    Footer
-  }
+    Footer,
+  },
 }
 </script>

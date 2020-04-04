@@ -48,6 +48,8 @@ services:
             - "5000"
         depends_on: # depends_on defines the order in which the services are started
             - postgres
+        volumes:
+             - media_data:/var/lib/media_data/
         networks:
             - internal
             - web
@@ -73,9 +75,8 @@ services:
 
 volumes:
     pgdata:
+    media_data:
 
 networks:
     internal:
     web:
-#         # external:
-#         #     name: nginx_web

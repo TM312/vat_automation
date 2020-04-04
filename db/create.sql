@@ -1,4 +1,0 @@
--- CREATE DATABASE vat_dev;
--- CREATE DATABASE vat_test;
--- CREATE DATABASE vat_stage;
--- CREATE DATABASE vat_prod;

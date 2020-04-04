@@ -6,68 +6,53 @@
       </b-col>
       <b-col lg="6">
         <h1>Register</h1>
-        <div>
-          <b-form @submit.prevent="register">
-            <b-form-group
-              id="input-group-email"
-              label="Email address:"
-              label-for="input-email"
-            >
-              <b-form-input
-                id="input-email"
-                v-model="form.email"
-                type="email"
-                :state="validation_email"
-                required
-              />
-            </b-form-group>
-            <b-form-group
-              id="input-group-password"
-              label="Password:"
-              label-for="input-password"
-            >
-              <b-form-input
-                id="input-password"
-                v-model="form.password"
-                type="password"
-                :state="validation_pw"
-                required
-              />
-              <b-form-invalid-feedback :state="validation_pw">
-                The chosen password is too short.
-              </b-form-invalid-feedback>
-              <b-form-valid-feedback :state="validation_pw">
-                Looks Good.
-              </b-form-valid-feedback>
-            </b-form-group>
-            <b-form-group
-              id="input-group-password"
-              label="Repeat password:"
-              label-for="input-password"
-            >
-              <b-form-input
-                id="input-password2"
-                v-model="form.password2"
-                type="password"
-                :state="validation_repeatpw"
-                required
-              />
-              <b-form-invalid-feedback :state="validation_repeatpw">
-                The two passwords do not match.
-              </b-form-invalid-feedback>
-              <b-form-valid-feedback :state="validation_repeatpw">
-                Looks Good.
-              </b-form-valid-feedback>
-            </b-form-group>
-            <b-button
-              type="submit"
-              variant="primary"
-              :disabled="validation_submit"
-            >
-              Create your account
-            </b-button>
-          </b-form>
-        </div>
+        <b-form @submit.prevent="register">
+          <b-form-group id="input-group-email" label="Email address:" label-for="input-email">
+            <b-form-input
+              id="input-email"
+              v-model="form.email"
+              type="email"
+              :state="validation_email"
+              required
+            />
+          </b-form-group>
+
+          <b-form-group id="input-group-password" label="Password:" label-for="input-password">
+            <b-form-input
+              id="input-password"
+              v-model="form.password"
+              type="password"
+              :state="validation_pw"
+              required
+            />
+            <b-form-invalid-feedback :state="validation_pw">
+              The chosen password is too short.
+            </b-form-invalid-feedback>
+            <b-form-valid-feedback :state="validation_pw">
+              Looks Good.
+            </b-form-valid-feedback>
+          </b-form-group>
+
+          <b-form-group id="input-group-password" label="Repeat password:" label-for="input-password">
+            <b-form-input
+              id="input-password2"
+              v-model="form.password2"
+              type="password"
+              :state="validation_repeatpw"
+              required
+            />
+            <b-form-invalid-feedback :state="validation_repeatpw">
+              The two passwords do not match.
+            </b-form-invalid-feedback>
+            <b-form-valid-feedback :state="validation_repeatpw">
+              Looks Good.
+            </b-form-valid-feedback>
+          </b-form-group>
+
+          <b-button type="submit" variant="primary" :disabled="validation_submit">
+            Create your account
+          </b-button>
+        </b-form>
       </b-col>
     </b-row>
   </b-container>
@@ -83,8 +68,8 @@ export default {
       form: {
         email: '',
         password: '',
-        password2: ''
-      }
+        password2: '',
+      },
     }
   },
   computed: {
@@ -126,7 +111,10 @@ export default {
         password: this.form.password
       }
       try {
-        await this.$axios.post('/user/self', payload)
+        await this.$axios.post(
+          '/user/self',
+          payload
+        )
 
         await this.$auth.loginWith('local', {
           data: payload

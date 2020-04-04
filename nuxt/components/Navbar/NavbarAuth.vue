@@ -28,9 +28,9 @@ export default {
   middleware: 'auth',
   name: 'NavbarAuth',
   components: {
-    NavbarAuthDropdown
+    NavbarAuthDropdown,
     // BIcon
-  }
+  },
 }
 </script>
 

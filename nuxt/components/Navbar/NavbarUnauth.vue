@@ -31,7 +31,7 @@
 <script>
 export default {
   middleware: 'guest',
-  name: 'NavbarUnauth'
+  name: 'NavbarUnauth',
 }
 </script>
 

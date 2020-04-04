@@ -1,13 +1,13 @@
 // import axios from '@/plugins/axios'
 
 export const state = () => ({
-  users: []
+  users: [],
 })
 
 export const mutations = {
   SET_USERS(state, payload) {
     state.users = payload
-  }
+  },
 }
 
 // export const actions = {

@@ -3,7 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from flask_script import Command
 
 from app.extensions import db
-from app.user import User
+from app.namespaces.user import User
+
 
 def create_users(count):
     fake = Faker()
@@ -20,10 +21,12 @@ def create_users(count):
         except IntegrityError:
             db.session.rollback()
 
+
 class FakeUserCreationCommand(Command):
     """ Seed the DB with Fake Users."""
+
     def run(self):
-        if (input("Are you sure you want to drop all tables and create fake profiles? (y/N)\n").lower()== "y"):
+        if (input("Are you sure you want to drop all tables and create fake profiles? (y/N)\n").lower() == "y"):
             print("Dropping tables...")
             db.drop_all()
             db.create_all()
