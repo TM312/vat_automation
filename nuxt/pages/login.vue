@@ -3,47 +3,36 @@
     <b-row class="mt-5" align-h="center">
       <b-col cols="6" md="4">
         <b-card>
-          <!-- <img
-            src="@/assets/img/logos/placeholderlogo.png"
-            class="d-inline-block align-top"
-            height="40"
-          /> -->
           <b-card-title class="text-center text-primary">
             Sign in
           </b-card-title>
-          <b-card-body>
-            <b-form @submit.prevent="login">
-              <b-form-group
-                id="input-group-email"
-                label="Email address:"
-                label-for="input-email"
-              >
-                <b-form-input
-                  id="input-email"
-                  v-model="form.email"
-                  type="email"
-                  required
-                />
-              </b-form-group>
+          <client-only placeholder="Loading...">
+            <b-card-body>
+              <b-form @submit.prevent="login">
+                <b-form-group id="input-group-email" label="Email address:" label-for="input-email">
+                  <b-form-input
+                    id="input-email"
+                    v-model="form.email"
+                    type="email"
+                    required
+                  />
+                </b-form-group>
 
-              <b-form-group
-                id="input-group-password"
-                label="Password:"
-                label-for="input-password"
-              >
-                <b-form-input
-                  id="input-password"
-                  v-model="form.password"
-                  type="password"
-                  required
-                />
-              </b-form-group>
+                <b-form-group id="input-group-password" label="Password:" label-for="input-password">
+                  <b-form-input
+                    id="input-password"
+                    v-model="form.password"
+                    type="password"
+                    required
+                  />
+                </b-form-group>
 
-              <b-button block variant="primary" class="mt-5" type="submit">
-                Continue
-              </b-button>
-            </b-form>
-          </b-card-body>
+                <b-button block variant="primary" class="mt-5" type="submit">
+                  Continue
+                </b-button>
+              </b-form>
+            </b-card-body>
+          </client-only>
         </b-card>
       </b-col>
     </b-row>
@@ -58,32 +47,34 @@ export default {
       showPassword: false,
       form: {
         email: '',
-        password: ''
-      }
+        password: '',
+      },
     }
   },
   methods: {
     async login() {
       const payload = {
         email: this.form.email,
-        password: this.form.password
+        password: this.form.password,
       }
       try {
         await this.$auth.loginWith('local', {
-          data: payload
+          data: payload,
         })
 
         this.$router.push('/dashboard')
 
         await this.$toast.success('Successfully signed in!', {
-          duration: 5000
+          duration: 5000,
         })
       } catch (err) {
         // console.log('ERRRORCODE')
         // console.log(err.response.status)
         const status = err.response.status
         if (status === 401 || status === 404) {
-          this.$toast.error('Invalid password or email.', { duration: 5000 })
+          this.$toast.error('Invalid password or email.', {
+            duration: 5000,
+          })
         } else {
           this.$toast.error(
             'There seems to be a problem. Please try again later.',
@@ -91,7 +82,7 @@ export default {
           )
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>

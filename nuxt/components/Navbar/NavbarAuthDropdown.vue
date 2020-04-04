@@ -39,19 +39,19 @@ export default {
   name: 'NavbarAuthDropdown',
   middleware: 'auth',
   components: {
-    BIcon
+    BIcon,
   },
   data() {
     return {
-      payments: true
+      payments: true,
     }
   },
   methods: {
     async logout() {
       await this.$auth.logout()
       this.$router.push('/logout')
-    }
-  }
+    },
+  },
 }
 </script>
 

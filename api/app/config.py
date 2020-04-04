@@ -9,11 +9,12 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    BCRYPT_LOG_ROUNDS = 4
+    BCRYPT_LOG_ROUNDS = 14
     COMPANY_NAME = 'NTAMAZON'
-    TOKEN_LIFESPAN_LOGIN = 420 #in minutes
+    TOKEN_LIFESPAN_LOGIN = 420  # in minutes
     TOKEN_LIFESPAN_REGISTRATION = 360  # in minutes
-    FRONTEND_HOST = os.getenv('SERVER_ADDRESS')  #domain is put here for production
+    # domain is put here for production
+    FRONTEND_HOST = os.getenv('SERVER_ADDRESS')
 
     # mail server settings
     MAIL_SERVER = os.getenv('MAIL_SERVER')
@@ -24,23 +25,32 @@ class Config(object):
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
     EMAIL_CONFIRMATION_SALT = os.getenv('EMAIL_CONFIRMATION_SALT')
-    EMAIL_CONFIRMATION_MAX_AGE = 10#3600 #in seconds
+    EMAIL_CONFIRMATION_MAX_AGE = 10  # 3600 #in seconds
 
-    # #Database related variables
-    # DATABASE = os.getenv('DATABASE')
-    # POSTGRES_USER = os.getenv('POSTGRES_USER')
-    # POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-    # POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+    # Media
+    # PROFILE_IMAGE_PATH = os.path.join(BASE_PATH_MEDIA, "profile_image")
+    # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+    TAX_DATA_ALLOWED_EXTENSIONS = {'csv'}
+    TAX_DATA_MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
 
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
 
-#environments
+# environments
+
+
 class Development(Config):
     DEBUG = True
     DEVELOPMENT = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_DEV') #structure: dialect+driver://username:password@host:port/database
+    # structure: dialect+driver://username:password@host:port/database
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_DEV')
     SECRET_KEY = os.getenv('SECRET_KEY_DEV')
+    BCRYPT_LOG_ROUNDS = 4
+
+    # Media Uploads
+    BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
+    #BASE_PATH_MEDIA = '/var/lib/media_data/'
 
 
 class Testing(Config):
@@ -48,7 +58,7 @@ class Testing(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_TEST')
     SECRET_KEY = os.getenv('SECRET_KEY_TEST')
     BCRYPT_LOG_ROUNDS = 4
-    CSRF_ENABLED = False # only for testing!!!
+    CSRF_ENABLED = False  # only for testing!!!
 
 
 class Staging(Config):
@@ -61,6 +71,9 @@ class Production(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_PROD')
     SECRET_KEY = os.getenv('SECRET_KEY_PROD')
+
+    # Media Uploads
+    # BASE_PATH_MEDIA = #test_media_uploads
 
 
 app_config = dict(

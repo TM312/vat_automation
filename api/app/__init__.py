@@ -1,10 +1,10 @@
 # following http://www.patricksoftwareblog.com/structuring-a-flask-project/
+from app.extensions import db, migrate, bcrypt, mail, cors
+from flask import Flask, jsonify
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, jsonify
-from app.extensions import db, migrate, bcrypt, cors, mail
 
 def create_app(env):
     from app.config import app_config

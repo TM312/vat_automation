@@ -21,11 +21,11 @@ export default {
     const response = await $axios.$get('/user')
     const users = response.data
     console.log(users)
-    store.commit('SET_USERS', users) //'SET_USERS', users) // try: 'store.commit('user/SET_USERS', …' when using file other than index.js
+    store.commit('SET_USERS', users) // 'SET_USERS', users) // try: 'store.commit('user/SET_USERS', …' when using file other than index.js
   },
 
   computed: {
-    ...mapState(['users'])
-  }
+    ...mapState(['users']),
+  },
 }
 </script>

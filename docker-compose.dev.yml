@@ -9,14 +9,14 @@ services:
             dockerfile: Dockerfile
             args:
                 - NGINX_VERSION=${NGINX_VERSION}
+                - ENVIRONMENT=dev
         image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
         restart: unless-stopped
-        ports:
-            # - 5000:5000
-            - 80:80
         # volumes:
-        #     # - ./nginx/dev:/etc/nginx/conf.d
-        #     - ./nginx/testhtml:/usr/share/nginx/html
+        #       - media_data:/var/lib/media_data:ro
+        ports:
+            - 5000:5000
+            - 80:80
         networks:
             - web
         depends_on:
@@ -39,7 +39,3 @@ services:
             - DATABASE=postgres
         env_file:
             - .dev.env
-
-# networks:
-#     # internal:
-#     web:

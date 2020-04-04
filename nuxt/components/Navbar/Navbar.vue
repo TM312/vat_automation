@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="$auth.loggedIn">
+    <div v-show="$auth.loggedIn">
       <!-- NAVBAR WHEN AUTHENTICATED -->
       <NavbarAuth class="pr-5" />
     </div>
-    <div v-else>
+    <div v-show="!$auth.loggedIn">
       <!-- NAVBAR WHEN NOT AUTHENTICATED -->
       <NavbarUnauth class="pr-5" />
     </div>
@@ -20,8 +20,8 @@ export default {
   name: 'Navbar',
   components: {
     NavbarAuth,
-    NavbarUnauth
-  }
+    NavbarUnauth,
+  },
   // data() {
   //   return {
   //     show_nav: true

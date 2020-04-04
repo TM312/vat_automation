@@ -1,37 +1,37 @@
 export default {
   server: {
     port: 3000, // default: 3000
-    host: '0.0.0.0' //default: localhost
+    host: '0.0.0.0', // default: localhost
   },
-  mode: "universal",
+  mode: 'universal',
   /*
    ** Headers of the page
    */
   head: {
-    title: "NT Front",
+    title: 'NT Front',
     meta: [
-      { charset: "utf-8" },
+      { charset: 'utf-8' },
       {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1"
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1',
       },
       {
-        hid: "description",
-        name: "description",
-        content: process.env.npm_package_description || ""
-      }
+        hid: 'description',
+        name: 'description',
+        content: process.env.npm_package_description || '',
+      },
     ],
-    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
   /*
    ** Customize the progress-bar color
    */
   loading: {
-    name: "chasing-dots",
-    color: "#ff5638",
-    background: "white",
-    height: "4px"
+    name: 'chasing-dots',
+    color: '#ff5638',
+    background: 'white',
+    height: '4px',
   },
 
   /*
@@ -46,64 +46,66 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ["@nuxtjs/eslint-module"],
-  eslint: {
-    /* module options */
-    /* rules: {
-      indent: ["error", 2]
-    } */
-  },
+  // buildModules: ['@nuxtjs/eslint-module'],
+  // eslint: {
+  //   /* module options */
+  //   rules: {
+  //     indent: ['error', 4]
+  //   }
+  // },
 
   /*
    ** Nuxt.js modules
    */
   modules: [
-    "bootstrap-vue/nuxt",
-    "@nuxtjs/axios",
-    "@nuxtjs/auth",
-    "@nuxtjs/toast"
+    'bootstrap-vue/nuxt',
+    '@nuxtjs/axios',
+    '@nuxtjs/proxy',
+    '@nuxtjs/auth',
+    '@nuxtjs/toast',
   ],
   bootstrapVue: {
-    icons: true
+    icons: true,
   },
 
   axios: {
-    baseURL: "http://api.tax-automation.com",
+    // proxy: true,
+    baseURL: 'http://127.0.0.1:5000',
     /* "94.237.95.140:5000", */
     /* "http://api.tax-automation.com", */
     /*  "http://127.0.0.1:5000"  */
+    headers: {
+      'Content-Type': 'application/json',
+    },
     https: false,
     withCredentials: true,
-    headers: {
-      "Content-Type": "application/json"
-    }
   },
   auth: {
     strategies: {
       local: {
         endpoints: {
           login: {
-            url: "/auth/login",
-            method: "post",
-            propertyName: "token"
+            url: '/auth/login',
+            method: 'post',
+            propertyName: 'token',
           },
           logout: {
-            url: "/auth/logout",
-            method: "post"
+            url: '/auth/logout',
+            method: 'post',
           },
           user: {
-            url: "/user/self",
-            method: "get",
-            propertyName: "data"
-          }
+            url: '/user/self',
+            method: 'get',
+            propertyName: 'data',
+          },
         },
         tokenRequired: true,
-        tokenType: ""
-      }
+        tokenType: '',
+      },
     },
     redirect: {
-      logout: "/login"
-    }
+      logout: '/login',
+    },
   },
   toast: {
     register: [
@@ -118,13 +120,19 @@ export default {
       //     position: 'top-right'
       //   }
       // }
-    ]
+    ],
   },
 
   /*
    ** Build configuration
    */
   build: {
+    html: {
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true
+      }
+    },
     /*
      ** You can extend webpack config here
      */
@@ -133,14 +141,17 @@ export default {
       // Run ESLint on save
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
-          enforce: "pre",
+          enforce: 'pre',
           test: /\.(js|vue)$/,
-          loader: "eslint-loader",
-          exclude: /(node_modules)/
-        });
+          loader: 'eslint-loader',
+          exclude: /(node_modules)/,
+          options: {
+            fix: true,
+          },
+        })
       }
-    }
-  }
+    },
+  },
   // generate: {
   //   /* I may not need this due to SSR rendering.
   //    ** The path to the fallback HTML file. It should be set as the error page, so that also unknown routes are rendered via Nuxt.
@@ -159,4 +170,4 @@ export default {
   //     });
   //   }
   // }
-};
+}
