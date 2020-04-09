@@ -1,12 +1,7 @@
 <template>
   <b-nav-item-dropdown right no-caret>
     <template slot="button-content">
-      <b-img
-        src="@/assets/img/avatars/6.jpg"
-        rounded="circle"
-        alt="Profile Image"
-        height="40px"
-      />
+      <b-avatar variant="primary" text="U"></b-avatar>
     </template>
     <b-dropdown-header tag="div" class="text-center" variant="primary">
       <strong>Account</strong>

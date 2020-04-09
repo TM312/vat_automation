@@ -19,6 +19,7 @@
     "@nuxtjs/toast": "^3.3.0",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.9.0",
+    "file-system": "^2.2.2",
     "nuxt": "latest"
   },
   "devDependencies": {

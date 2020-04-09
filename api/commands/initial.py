@@ -9,7 +9,9 @@ def create_initial_users():
     t = User(
         email='thomas.moellers@unisg.ch',
         role='admin',
-        password='1234'
+        password='ad51bd4a1d59e9fe75f7a988dc6c1442',
+        claimed=True,
+        company_name='tax-automation.com'
     )
     db.session.add(t)
 

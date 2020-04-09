@@ -8,7 +8,7 @@ from .interface import EmailInterface
 from ..utils.decorators.auth import login_required
 
 ns = Namespace("email", description="Email Related Operations")  # noqa
-#ns.add_model(email.name, email)
+ns.add_model(email.name, email)
 
 
 @ns.route("/request_confirm")

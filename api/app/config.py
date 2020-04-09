@@ -10,7 +10,7 @@ class Config(object):
     CSRF_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BCRYPT_LOG_ROUNDS = 14
-    COMPANY_NAME = 'NTAMAZON'
+    COMPANY_NAME = 'Tax-Automation.com'
     TOKEN_LIFESPAN_LOGIN = 420  # in minutes
     TOKEN_LIFESPAN_REGISTRATION = 360  # in minutes
     # domain is put here for production
@@ -25,14 +25,14 @@ class Config(object):
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
     EMAIL_CONFIRMATION_SALT = os.getenv('EMAIL_CONFIRMATION_SALT')
-    EMAIL_CONFIRMATION_MAX_AGE = 10  # 3600 #in seconds
+    EMAIL_CONFIRMATION_MAX_AGE = 3600  # 3600 #in seconds
 
     # Media
     # PROFILE_IMAGE_PATH = os.path.join(BASE_PATH_MEDIA, "profile_image")
     # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
     TAX_DATA_ALLOWED_EXTENSIONS = {'csv'}
-    TAX_DATA_MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
+    TAX_DATA_MAX_REQUEST_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
 
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']

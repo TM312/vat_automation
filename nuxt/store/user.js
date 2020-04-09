@@ -29,7 +29,7 @@
 // // 			})
 // // 	},
 // // 	async show({ commit }, params) {
-// // 		await this.$axios.get(`/users/${params.user_id}`)
+// // 		await this.$axios.get(`/users/${params.owner_id}`)
 // // 			.then((res) => {
 // // 				if (res.status === 200) {
 // // 					commit('mergeusers', res.data)

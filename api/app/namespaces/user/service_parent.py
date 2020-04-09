@@ -8,6 +8,9 @@ from app.extensions import db
 from .model import User
 from .schema import user_dto
 
+from ..email.service import EmailService
+from ..auth.service import TokenService
+
 
 
 class UserService:
@@ -32,11 +35,13 @@ class UserService:
         else:
             raise NotFound('This user does not exist.')
 
+
     @staticmethod
-    def update(user: User, data_changes) -> User:
-        user.update(data_changes)
+    def ping(user: User) -> User:
+        user.last_seen()
         db.session.commit()
         return user
+
 
     @staticmethod
     def delete_by_id(public_id: str):
@@ -53,32 +58,3 @@ class UserService:
             return response_object
         else:
             raise NotFound('This user does not exist.')
-
-    def create_user(user_data) -> User:
-        #check if user already exists in db
-        user = User.query.filter_by(email = user_data.get('email')).first()
-        if not user:
-            #create new user based on User model
-            new_user = User(
-                email=user_data.get('email'),
-                password=user_data.get('password')
-            )
-            #add user to db
-            db.session.add(new_user)
-            db.session.commit()
-
-            return new_user
-        else:
-            raise Conflict('A user with this email adress already exists.')
-
-     # def ping(self):
-    #     self.last_seen = datetime.utcnow()
-    #     db.session.add(self)
-
-    def generate_token(public_id: str, token_lifespan):  # : TokenInterface) -> Token:
-        try:
-            auth_token = User.encode_auth_token(public_id, token_lifespan)
-            auth_token_decoded = auth_token.decode()
-            return auth_token_decoded
-        except:
-            raise Unauthorized('Some error occurred during authorization.')

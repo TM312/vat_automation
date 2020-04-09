@@ -1,44 +1,44 @@
 import datetime
 import uuid
 import hashlib
-import jwt
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db  # noqa
 from app.extensions import bcrypt
-from .interface import UserInterface
+
+from ..model_association_tables import clients
+
 
 
 class User(db.Model):  # type: ignore
     """ User model """
     __tablename__ = "user"
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), unique=True,
                           nullable=False, default=uuid.uuid4)
-    email = db.Column(db.String(254), unique=True, nullable=False)
+    email = db.Column(db.String(254), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
+    company_name = db.Column(db.String(120), default=None)
     registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # roles = ['seller', 'admin']
-    role = db.Column(db.String, default='seller')
-    password_hash = db.Column(db.String(128), nullable=False)
+    # roles = ['seller', 'tax_auditor', 'admin']
+    role = db.Column(db.String, nullable=False)
+    password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(32))
     confirmed = db.Column(db.Boolean, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(64))
-    last_seen = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    #addresses = db.relationship('Address', backref='person', lazy=True)
+    last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-        self.avatar_hash = self.gravatar_hash()
-        self.confirmed_on = None
+    discriminator = db.Column('type', db.String(50))
+    __mapper_args__ = {'polymorphic_on': discriminator}
+
 
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute')
+        raise AttributeError('Password is not a readable attribute')
 
     @password.setter
     def password(self, password):
@@ -57,7 +57,7 @@ class User(db.Model):  # type: ignore
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
 
-    def update(self, data_changes: UserInterface):
+    def update(self, data_changes):
         for key, val in data_changes.items():
             if key == 'password':
                 self.password = self.set_password(value)
@@ -65,28 +65,34 @@ class User(db.Model):  # type: ignore
         self.modified_at = datetime.datetime.utcnow()
         return self
 
-    @staticmethod
-    def encode_auth_token(public_id: str, token_lifespan: int):
-        """
-        Generates the Auth Token
-        :return: string
-        """
-        try:
-            payload = {
-                'iss': current_app.config['COMPANY_NAME'].lower(),
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=token_lifespan),
-                'iat': datetime.datetime.utcnow(),
-                'sub': public_id
-            }
-            auth_token = jwt.encode(
-                payload,
-                current_app.config['SECRET_KEY'],
-                algorithm='HS256'
-            )
-            return auth_token
+    def last_seen(self):
+        self.last_seen = datetime.datetime.utcnow()
+        return self
 
-        except Exception as e:
-            return e
 
-    def __repr__(self):
-        return '<User: %r>' % self.email
+
+# clients = db.relationship(
+    #     'User', secondary=clients,
+    #     primaryjoin=(clients.c.tax_auditor_id == id),
+    #     secondaryjoin=(clients.c.client_id == id),
+    #     backref=db.backref('tax_auditors', lazy='dynamic'), lazy='dynamic')
+
+
+
+
+
+
+
+
+
+ # def follow(self, client):
+    #     if not self.is_following(self, client):
+    #         self.clients.append(client)
+
+    # def unfollow(self, client):
+    #     if self.is_following(client):
+    #         self.clients.remove(client)
+
+    # def is_following(self, client):
+    #     return self.clients.filter(
+    #         clients.c.client_id == client.id).count() > 0

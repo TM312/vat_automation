@@ -58,7 +58,7 @@ export default {
         password: this.form.password,
       }
       try {
-        await this.$auth.loginWith('local', {
+        await this.$auth.loginWith('local_seller', {
           data: payload,
         })
 

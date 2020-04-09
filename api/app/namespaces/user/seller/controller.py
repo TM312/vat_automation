@@ -14,14 +14,13 @@ from .model import User
 from .interface import UserInterface
 from ..auth.interface import TokenInterface
 from ..utils.decorators.auth import login_required, accepted_roles, confirmation_required
-from ..email.service import EmailService
-
 
 
 
 ns = Namespace("User", description="User Related Operations")  # noqa
 ns.add_model(user_dto.name, user_dto)
-
+# https://flask-restx.readthedocs.io/en/latest/api.html#flask_restx.Model
+# https://github.com/python-restx/flask-restx/blob/014eb9591e61cd3adbbd29a38b76df6a688f067b/flask_restx/namespace.py
 
 @ns.route("/")
 class AdminUserListResource(Resource):
@@ -75,23 +74,7 @@ class UserResource(Resource):
     def post(self):
         """Create A Single User"""
         user_data: UserInterface = request.json
-        new_user = UserService.create_user(user_data)
-
-        """ Send Confirmation Email to user email """
-        confirmation_link = EmailService.generate_confirmation_url(new_user.email)
-        print(confirmation_link)
-        EmailService.send_email(
-            subject='Registration',
-            recipients = [new_user.email],
-            template='email_confirmation.html',
-            confirmation_link=confirmation_link,
-        )
-
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully registered.'
-        }
-        return response_object, 201
+        return UserService.create_user(user_data)
 
     @login_required
     def delete(self) -> Response:
@@ -106,3 +89,41 @@ class UserResource(Resource):
         data_changes: UserInterface = request.json  # JSON body of a request
         user = g.user
         return UserService.update(user, data_changes)
+
+
+@ns.route("/follow/<string:public_id>")
+@ns.param("public_id", "Public user ID")
+class FollowResource(Resource):
+    @login_required
+    @accepted_roles('admin', 'tax_auditor')
+    #@confirmation_required
+    def get(self, public_id: str) -> User:
+        """Follow One User, i.e. client"""
+        user = g.user
+        client_public_id = public_id
+        return UserService.follow(user, client_public_id)
+
+
+@ns.route("/unfollow/<string:public_id>")
+@ns.param("public_id", "Public user ID")
+class UnfollowResource(Resource):
+    @login_required
+    @accepted_roles('admin', 'tax_auditor')
+    #@confirmation_required
+    def get(self, public_id: str) -> User:
+        """Unfollow One User, i.e. client"""
+        user = g.user
+        client_public_id = public_id
+        return UserService.unfollow(user, client_public_id)
+
+
+@ns.route("/company_clients")
+class TaxAuditorClientListResource(Resource):
+    """Get all Company Clients"""
+    @login_required
+    @accepted_roles('admin', 'tax_auditor')
+    #@confirmation_required
+    @ns.marshal_list_with(user_dto, envelope='data')
+    def get(self) -> List[User]:
+        """List Of Registered Users"""
+        return UserService.get_company_clients()
