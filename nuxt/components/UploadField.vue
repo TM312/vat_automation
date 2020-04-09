@@ -56,8 +56,9 @@
           {{ data.index + 1 }}
         </template>
 
-        <template v-slot:cell(type)="data">
-          {{ data.index + 1 }}
+        <template v-slot:cell(platform)>
+          <p>Amazon</p>
+          <!-- <b-form-select v-model="selected" :options="options"></b-form-select> -->
         </template>
 
         <template v-slot:cell(keep?)="data">
@@ -87,12 +88,18 @@ export default {
   },
   data() {
     return {
+      // selected: null,
+      // options: [
+      //   // { value: null, text: 'Please select an option' },
+      //   // { value: 'Amazon', text: 'Amazon' }
+      // ],
       progress: 0,
       progressBarStyle: 'success',
       files: [],
       fields: [
         '#',
         'name',
+        'platform',
         // {
         //   // A virtual column with custom formatter
         //   key: 'size',
@@ -113,19 +120,6 @@ export default {
     }
   },
   methods: {
-    async sendTestRequest() {
-      try {
-        await this.$axios.get('/media/tax_data')
-
-        await function(res) {
-          console.log(res)
-        }
-      } catch (err) {
-          console.log('NOT SUCCESSFUL')
-          console.log(err)
-      }
-    },
-
     onFilesSelected() {
       let selectedFiles = this.$refs.files.files
       console.log(selectedFiles)
@@ -160,12 +154,22 @@ export default {
 
       // this.$axios.setHeader('Content-Type', 'multipart/form-data', ['post'])
       await this.$axios.post(
-        '/media/tax_data/upload',
+        '/media/tax_record/upload',
         data,
         config
         )
 
-      .then( response => this.$toast.success(response.data.message, {duration: 5000,}))
+      .then( response => {
+        let response_objects = response.data
+        response_objects.map((data) => {
+          if (data.status == 'success') {
+            console.log(data)
+            this.$toast.success(data.message, {duration: 5000,})
+          } else {
+            this.$toast.error(data.message, {duration: 5000,})
+          }
+        })
+      })
 
       .catch (err => {
         console.log(err)

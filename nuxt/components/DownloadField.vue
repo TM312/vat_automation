@@ -10,25 +10,25 @@
       <p class="lead">
         The following tax reports are available for download.
       </p>
-
       <b-card-group
         columns
+        v-for="(tax_record, index) in self_tax_records" :key="index"
       >
         <b-card>
-          <b-card-title>Title</b-card-title>
+          <b-card-title>{{ tax_record.unique_account_identifier}}</b-card-title>
           <b-card-text>
-            <b></b>
+            <b>Platform: </b>{{ tax_record.platform}}
           </b-card-text>
           <b-card-text class="small text-muted">
-            Last updated 3 mins ago
+            <b>Created on: </b>{{ tax_record.created_on }}
           </b-card-text>
           <b-button
             size="sm"
             variant="outline-success"
             class="remove-file"
-            @click="downloadFile()"
+            @click="downloadFile(tax_record.activity_period, tax_record.formatted_input_name)"
           >
-            <b-icon icon="cloud-download" />
+            <b-icon icon="box-arrow-in-down" />
             Download
           </b-button>
         </b-card>
@@ -42,11 +42,12 @@
 import { BIcon } from 'bootstrap-vue'
 import { mapState } from 'vuex'
 
+// import file-system from 'file-system'
+
 export default {
-  name: 'UploadField',
+  name: 'DownloadField',
   components: {
-    BIcon,
-    ...mapState
+    BIcon
   },
   data() {
     return {
@@ -54,23 +55,74 @@ export default {
       progressBarStyle: 'success'
     }
   },
+  computed: {
+    ...mapState(["self_tax_records"])
+  },
   methods: {
-    async downloadFiles() {
-      // this.$axios.setHeader('Content-Type', 'multipart/form-data', ['post'])
-      await this.$axios.get(
-        '/media/tax_data/download',
-        "data"
-        )
+    async downloadFile(activity_period, filename) {
 
-      .then( response => this.$toast.success(response.data.message, {duration: 5000,}))
+    this.$axios(
+      {
+        method: 'GET',
+        url: `/media/tax_record/download/${ activity_period }/${ filename }`,
+        // params: params,
+        responseType: 'blob'
+      }
+    ).then(res => {
+        const blob = new Blob([res.data], { type: res.data.type });
+        let url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const contentDisposition = res.headers['content-disposition'];
+        let fileName = 'unknown';
+        if (contentDisposition) {
+            const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+            if (fileNameMatch.length === 2)
+                fileName = fileNameMatch[1];
+        }
+        link.setAttribute('download', fileName);
 
-      .catch (err => {
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+    }).catch(err => {
         console.log(err)
-        this.$toast.error('An error occured. The requested file is currently unavailable. Please try again later', {duration: 5000,})
-        this.progressBarStyle = 'danger'
-        })
-      // console.log(err))
-      // this.$toast.error(err.message, {duration: 5000,}))
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //   await this.$axios({
+    //     method: 'get',
+    //     url: `/media/tax_record/download/${ activity_period }/${ filename }`,
+    //     responseType: 'stream'
+    //   })
+    //   .then(function (response) {
+    //     response.data.pipe(fs.createWriteStream(filename))
+    //   })
+    //   .catch (err => {
+    //     console.log(err)
+    //     this.$toast.error('An error occured. The requested file is currently unavailable. Please try again later', {duration: 5000,})
+    //     this.progressBarStyle = 'danger'
+    //     // this.$toast.error(err.message, {duration: 5000,}))
+    //   })
     }
   }
 }

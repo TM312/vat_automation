@@ -8,7 +8,7 @@ export default {
    ** Headers of the page
    */
   head: {
-    title: 'NT Front',
+    title: 'Tax-Automation.com',
     meta: [
       { charset: 'utf-8' },
       {
@@ -42,17 +42,9 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
-  /*
-   ** Nuxt.js dev-modules
-   */
-  // buildModules: ['@nuxtjs/eslint-module'],
-  // eslint: {
-  //   /* module options */
-  //   rules: {
-  //     indent: ['error', 4]
-  //   }
-  // },
+  plugins: [
+    // '~/plugins/file-system'
+  ],
 
   /*
    ** Nuxt.js modules
@@ -82,7 +74,8 @@ export default {
   },
   auth: {
     strategies: {
-      local: {
+      local_seller: {
+        _scheme: 'local',
         endpoints: {
           login: {
             url: '/auth/login',
@@ -94,7 +87,28 @@ export default {
             method: 'post',
           },
           user: {
-            url: '/user/self',
+            url: '/seller/self',
+            method: 'get',
+            propertyName: 'data',
+          },
+        },
+        tokenRequired: true,
+        tokenType: '',
+      },
+      local_tax_auditor: {
+        _scheme: 'local',
+        endpoints: {
+          login: {
+            url: '/auth/login',
+            method: 'post',
+            propertyName: 'token',
+          },
+          logout: {
+            url: '/auth/logout',
+            method: 'post',
+          },
+          user: {
+            url: '/tax_auditor/self',
             method: 'get',
             propertyName: 'data',
           },
@@ -127,6 +141,7 @@ export default {
    ** Build configuration
    */
   build: {
+    transpile: ['file-system'],
     html: {
       minify: {
         collapseWhitespace: true,

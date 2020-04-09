@@ -1,10 +1,5 @@
 import datetime
-import uuid
-import jwt
-
-from flask import current_app
 from app.extensions import db
-
 
 class Token(db.Model):
     """ Token model """

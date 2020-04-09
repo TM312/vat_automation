@@ -1,17 +1,22 @@
 from typing import List
 
 from flask import request
-from flask import current_app
+from flask import current_app, g
 
 from flask_restx import Namespace, Resource
 
-from ..user.schema import user_dto
 from .schema import auth_dto
+from ..user.schema_parent import user_dto
+
+
 from .service import TokenService
+
 from .model import Token
-from ..user.interface import UserInterface
-from ..user.model import User
+from ..user.model_parent import User
+
 from .interface import TokenInterface
+from ..user.interface_parent import UserInterface
+
 from ..utils.decorators.auth import login_required, accepted_roles
 
 
@@ -61,6 +66,7 @@ class UserLogout(Resource):
     """
     @login_required
     def post(self):
+        user = g.user
         # get auth token from request header
         auth_token: TokenInterface = request.headers.get('Authorization')
-        return TokenService.logout_user(auth_token)
+        return TokenService.logout_user(user, auth_token)

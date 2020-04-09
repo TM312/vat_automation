@@ -8,12 +8,13 @@ from werkzeug.exceptions import InternalServerError, NotFound, Unauthorized
 from app.extensions import db
 from .model import Token
 from .interface import TokenInterface
-from ..user.model import User
+
+from ..user.model_parent import User
+from ..user.service_parent import UserService
 
 
 
-class TokenService():
-
+class TokenService:
     @staticmethod
     def get_all() -> List[Token]:
         tokens = Token.query.all()
@@ -33,8 +34,10 @@ class TokenService():
         # fetch the user data
         user = User.query.filter_by(email=user_data.get('email')).first()
         if user and user.check_password(user_data.get('password')):
-            auth_token = User.encode_auth_token(public_id = str(user.public_id), token_lifespan=token_lifespan)
+            auth_token = TokenService.encode_auth_token(
+                public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
+                UserService.ping(user)
                 response_object = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
@@ -43,28 +46,6 @@ class TokenService():
                 return response_object
         else:
             raise Unauthorized('Invalid Email or Password.')
-
-
-    @staticmethod
-    def create_token(token_data) -> User:
-        #check if token already exists in db
-        token = User.query.filter_by(email=token_data.get('email')).first()
-        if not token:
-
-            #create new token based on User model
-            new_token = User(
-                email=token_data.get('email'),
-                role=token_data.get('role'),
-                password=token_data.get('password')
-            )
-
-            #add token to db
-            db.session.add(new_token)
-            db.session.commit()
-
-            return new_token
-        else:
-            raise Conflict('A user with this email adress already exists.')
 
     @staticmethod
     def current_user(auth_token):
@@ -78,7 +59,11 @@ class TokenService():
             raise Unauthorized(payload)  # ('Provide a valid auth token.')
 
     @staticmethod
-    def logout_user(auth_token):
+    def logout_user(user, auth_token):
+        # update a user's last_seen attribute
+        UserService.ping(user)
+
+        # actual logout
         payload = TokenService.decode_auth_token(auth_token)
         if isinstance(payload, dict):
             # mark the token as blacklisted
@@ -99,6 +84,28 @@ class TokenService():
         else:
             raise Unauthorized(payload)
 
+    @staticmethod
+    def encode_auth_token(public_id: str, token_lifespan: int):
+        """
+        Generates the Auth Token
+        :return: string
+        """
+        try:
+            payload = {
+                'iss': current_app.config['COMPANY_NAME'].lower(),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=token_lifespan),
+                'iat': datetime.datetime.utcnow(),
+                'sub': public_id
+            }
+            auth_token = jwt.encode(
+                payload,
+                current_app.config['SECRET_KEY'],
+                algorithm='HS256'
+            )
+            return auth_token
+
+        except Exception as e:
+            return e
 
     @staticmethod
     def decode_auth_token(auth_token):
