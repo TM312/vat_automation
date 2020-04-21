@@ -5,12 +5,8 @@ from typing import List
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from app.extensions import db
-from .model import User
+from .model import User, Action
 from .schema import user_dto
-
-from ..email.service import EmailService
-from ..auth.service import TokenService
-
 
 
 class UserService:
@@ -37,8 +33,16 @@ class UserService:
 
 
     @staticmethod
-    def ping(user: User) -> User:
-        user.last_seen()
+    def ping(user: User, method_name: str, service_context: str) -> User:
+        user.update_last_seen()
+
+        new_action = Action(
+            method_name=method_name,
+            service_context=service_context,
+            user_id=user.id)
+
+        #add action to db and commit user changes
+        db.session.add(new_action)
         db.session.commit()
         return user
 

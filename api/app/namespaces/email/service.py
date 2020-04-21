@@ -17,6 +17,7 @@ from ..utils.decorators.asyncd import asyncd
 
 class EmailService:
 
+    # @celery.task #in future
     @asyncd  # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xi-email-support
     def send_async_email(app, msg):
         with app.app_context():
@@ -33,7 +34,7 @@ class EmailService:
         )
         msg.html = render_template(template, **kwargs)
 
-        EmailService.send_async_email(app, msg)
+        EmailService.send_async_email(app, msg) # EmailService.send_async_email.delay(app, msg)
 
     def generate_confirmation_url(user_email):
         confirm_serializer = URLSafeTimedSerializer(secret_key=current_app.config['SECRET_KEY'])

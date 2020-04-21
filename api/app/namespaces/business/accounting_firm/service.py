@@ -1,67 +1,68 @@
-import datetime
-import uuid
 from typing import List
 
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from app.extensions import db
-from .model import Accounting
-from .schema import accounting_dto
+from .model import AccountingFirm
+from .schema import accounting_firm_dto
 
-from ..email.service import EmailService
+from ...user.tax_auditor.model import TaxAuditor
 
 
-
-class AccountingService:
+class AccountingFirmService:
     @staticmethod
-    def get_all() -> List[Accounting]:
-        accountings = Accounting.query.all()
-        return accountings
-
-    @staticmethod
-    def get_by_id(public_id: str) -> Accounting:
-        accounting = Accounting.query.filter(Accounting.public_id == public_id).first()
-        if accounting:
-            return accounting
+    def get_own(tax_auditor: TaxAuditor) -> AccountingFirm:
+        #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
+        accounting_firm = AccountingFirm.query.filter(
+            AccountingFirm.id == tax_auditor.employer.id).first()
+        if accounting_firm:
+            return accounting_firm
         else:
-            raise NotFound('This accounting does not exist.')
+            raise NotFound('This accounting firm does not exist.')
 
     @staticmethod
-    def update(public_id: str, data_changes) -> Accounting:
-        accounting = AccountingService.get_by_id(public_id)
-        accounting.update(data_changes)
-        db.session.commit()
-        return accounting
+    def update_own(tax_auditor: TaxAuditor, data_changes) -> AccountingFirm:
+        #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
+        accounting_firm = AccountingFirm.query.filter(
+            AccountingFirm.id == tax_auditor.employer.id).first()
+        if accounting_firm:
+            accounting_firm.update(data_changes)
+            db.session.commit()
+            return accounting_firm
+        else:
+            raise NotFound('This accounting firm does not exist.')
+
 
     @staticmethod
-    def delete_by_id(public_id: str):
-        #check if accounting exists in db
-        accounting = Accounting.query.filter(Accounting.public_id == public_id).first()
-        if accounting:
-            db.session.delete(accounting)
+    def delete_own(tax_auditor: TaxAuditor):
+        #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
+        accounting_firm = AccountingFirm.query.filter(
+            AccountingFirm.id == tax_auditor.employer.id).first()
+        if accounting_firm:
+            db.session.delete(accounting_firm)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Accounting (Public ID: {}) has been successfully deleted.'.format(public_id)
+                'message': 'Accounting firm (Public ID: {}) has been successfully deleted.'.format(public_id)
             }
             return response_object
         else:
-            raise NotFound('This accounting does not exist.')
+            raise NotFound('This accounting firm does not exist.')
 
     @staticmethod
-    def create_accounting_business(accounting_data) -> Accounting:
-        accounting = Accounting.query.filter_by(
-            company_name=accounting_data.get('company_name')).first()
+    def create_accounting_firm(accounting_firm_data) -> AccountingFirm:
+        accounting_firm = AccountingFirm.query.filter_by(
+            company_name=accounting_firm_data.get('company_name')).first()
 
-        if not accounting:
-            #create new accounting based on Accounting model
-            new_accounting = Accounting(
-                company_name=accounting_data.get('company_name')
-                logo_image_name=accounting_data.get('logo_image_name')
+        if not accounting_firm:
+            #create new accounting based on AccountingFirm model
+            new_accounting_firm = AccountingFirm(
+                company_name=accounting_firm_data.get('company_name')
+                logo_image_name=accounting_firm_data.get('logo_image_name')
             )
-            #add accounting to db
-            db.session.add(new_accounting)
+            #add accounting business to db
+            db.session.add(new_accounting_firm)
             db.session.commit()
 
             response_object = {
@@ -80,13 +81,12 @@ class AccountingService:
 
 
     @staticmethod
-    def get_all_clients(public_id: str) -> List[Accounting]
-        clients = Accounting.query.filter(
-            Accounting.public_id == public_id).clients.all()
-        return clients
-
-
-
+    def get_own_clients(tax_auditor: TaxAuditor):
+        #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
+        accounting_firm=AccountingFirm.query.filter(
+            AccountingFirm.id == tax_auditor.employer.id).first()
+        if accounting_firm:
+            return accounting_firm.clients.all()
 
 
 
@@ -94,23 +94,23 @@ class AccountingService:
     # def create_client(client_data)
 
     #     # checks for existing client
-    #     client = Accounting.query.filter_by(
-    #             tax_auditor_seller_id=accounting_data.get('tax_auditor_seller_id'),
+    #     client = AccountingFirm.query.filter_by(
+    #             tax_auditor_seller_id=accounting_firm_data.get('tax_auditor_seller_id'),
     #             tax_auditor_company=tax_auditor.company_name
     #             ).first()
 
     #             if not client:
-    #                 #create new accounting based on Accounting model
-    #                 new_unclaimed_seller = Accounting(
+    #                 #create new accounting business based on AccountingFirm model
+    #                 new_unclaimed_seller = AccountingFirm(
     #                     claimed = False,
     #                     role = 'seller',
-    #                     tax_auditor_seller_id=accounting_data.get(
+    #                     tax_auditor_seller_id=accounting_firm_data.get(
     #                         'tax_auditor_seller_id'),
     #                     tax_auditor_company=tax_auditor.company_name,
-    #                     company_name = accounting_data.get(
+    #                     company_name = accounting_firm_data.get(
     #                         'company_name'),
     #                 )
-    #                 #add accounting to db
+    #                 #add accounting business to db
     #                 db.session.add(new_unclaimed_seller)
     #                 db.session.commit()
 
