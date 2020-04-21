@@ -17,7 +17,7 @@ from ..user.model_parent import User
 from .interface import TokenInterface
 from ..user.interface_parent import UserInterface
 
-from ..utils.decorators.auth import login_required, accepted_roles
+from ..utils.decorators.auth import login_required, accepted_u_types
 
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
@@ -28,7 +28,7 @@ ns.add_model(auth_dto.name, auth_dto)
 class AdminTokenResource(Resource):
     """Get all tokens"""
     @login_required
-    @accepted_roles('admin')
+    @accepted_u_types('admin')
     @ns.marshal_list_with(auth_dto)
     def get(self) -> List[Token]:
         """List Of Registered Tokens"""
@@ -37,7 +37,7 @@ class AdminTokenResource(Resource):
 @ns.route("/<string:token>")
 class AdminTokenIdResource(Resource):
     @login_required
-    @accepted_roles('admin')
+    @accepted_u_types('admin')
     @ns.marshal_with(auth_dto)
     def get(self, token: str) -> Token:
         """Get One Token"""

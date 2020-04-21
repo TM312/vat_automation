@@ -8,9 +8,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from app.extensions import db  # noqa
 from app.extensions import bcrypt
 
-from ..model_association_tables import clients
-
-
 
 class User(db.Model):  # type: ignore
     """ User model """
@@ -19,20 +16,26 @@ class User(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), unique=True,
                           nullable=False, default=uuid.uuid4)
-    email = db.Column(db.String(254), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
-    company_name = db.Column(db.String(120), default=None)
+    username = db.Column(db.String(32), unique=True, nullable=True)
+    email = db.Column(db.String(32), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
+    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'),
+                        nullable=False)
+
     registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # roles = ['seller', 'tax_auditor', 'admin']
+    # roles = ['employee', '_', 'admin']
     role = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String(128))
-    avatar_hash = db.Column(db.String(32))
+    avatar_hash = db.Column(db.String(40))
     confirmed = db.Column(db.Boolean, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
-    location = db.Column(db.String(64))
+    location = db.Column(db.String(32))
     last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    discriminator = db.Column('type', db.String(50))
+    actions = db.relationship(
+        'Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
+
+    discriminator = db.Column('u_type', db.String(56))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
 
@@ -65,34 +68,21 @@ class User(db.Model):  # type: ignore
         self.modified_at = datetime.datetime.utcnow()
         return self
 
-    def last_seen(self):
+    def update_last_seen(self):
         self.last_seen = datetime.datetime.utcnow()
         return self
 
 
+class Action(db.Model):  # type: ignore
+    """ Action model """
+    __tablename__ = "action"
 
-# clients = db.relationship(
-    #     'User', secondary=clients,
-    #     primaryjoin=(clients.c.tax_auditor_id == id),
-    #     secondaryjoin=(clients.c.client_id == id),
-    #     backref=db.backref('tax_auditors', lazy='dynamic'), lazy='dynamic')
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
+                         nullable=False)
+    method_name = db.Column(db.String(32))
+    service_context = db.Column(db.String(32))
 
-
-
-
-
-
-
-
-
- # def follow(self, client):
-    #     if not self.is_following(self, client):
-    #         self.clients.append(client)
-
-    # def unfollow(self, client):
-    #     if self.is_following(client):
-    #         self.clients.remove(client)
-
-    # def is_following(self, client):
-    #     return self.clients.filter(
-    #         clients.c.client_id == client.id).count() > 0
+    def __init__(self, **kwargs):
+        super(Action, self).__init__(**kwargs)

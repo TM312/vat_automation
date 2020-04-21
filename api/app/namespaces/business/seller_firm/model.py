@@ -1,26 +1,42 @@
 from app.extensions import db  # noqa
 from ..model_parent import Business
+from sqlalchemy.ext.declarative import declared_attr
 
-class Seller_Firm(Business):
+
+
+class SellerFirm(Business):
     __mapper_args__ = {'polymorphic_identity': 'seller_firm'}
 
     claimed = db.Column(db.Boolean, default=False)
+    establishment_country_code = db.Column(db.Integer, db.ForeignKey('establishment_country.code'))
 
-    employees = db.relationship(
-        'Seller', backref='employer', lazy=True)
+    vat_numbers = db.relationship('VATIN', backref='seller_firm', lazy=True)
+
+    # https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/inheritance.html
+    @declared_attr
+    def employees(cls):
+        "Employees column, if not present already."
+        return Business.__table__.c.get('employees', db.relationship(
+            'Seller', backref='employer', lazy=True))
+
+    distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy=True)
+    item_informations = db.relationship('ItemInformation', backref='seller_firm', lazy=True)
 
     # IDs for supported platforms
-    amazon_seller_id = db.Column(db.String(40), default=None)
+    amazon_channel_ids = db.relationship('AmazonChannelID', backref='seller_firm', lazy=True)
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_seller_id = db.Column(db.String(120), default=None)
 
-    tax_records = db.relationship('TaxRecord', backref='owner', lazy=True)
+    # @declared_attr
+    # def tax_records(cls):
+    #     "tax_records column, if not present already."
+    #     return Business.__table__.c.get('tax_records', db.relationship('TaxRecord', backref='owner', order_by="desc(TaxRecord.created_on)", lazy=True))
 
 
     def __init__(self, **kwargs):
-        super(Seller_Firm, self).__init__(**kwargs)
+        super(SellerFirm, self).__init__(**kwargs)
 
     def __repr__(self):
-        return '<Seller_Firm: %r>' % self.company_name
+        return '<SellerFirm: %r>' % self.company_name

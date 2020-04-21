@@ -1,7 +1,7 @@
 <template>
   <b-navbar toggleable="lg" type="light" variant="light">
     <b-navbar-brand to="/">
-      AMZ
+      Tax-Automation
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse" />

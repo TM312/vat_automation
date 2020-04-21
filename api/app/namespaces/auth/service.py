@@ -1,6 +1,7 @@
 from typing import List
 import jwt
 import datetime
+import inspect
 
 from flask import current_app
 from werkzeug.exceptions import InternalServerError, NotFound, Unauthorized
@@ -37,7 +38,8 @@ class TokenService:
             auth_token = TokenService.encode_auth_token(
                 public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
-                UserService.ping(user)
+                UserService.ping(user, method_name=inspect.stack()[0][3],
+                                 service_context=TokenService.__name__)
                 response_object = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
@@ -60,8 +62,10 @@ class TokenService:
 
     @staticmethod
     def logout_user(user, auth_token):
-        # update a user's last_seen attribute
-        UserService.ping(user)
+        # update a user's last_seen attribute & creates a new action object
+        # the inspect module needs to be imported whenever ping is called
+        UserService.ping(user, method_name=inspect.stack()[0][3],
+                         service_context=TokenService.__name__)
 
         # actual logout
         payload = TokenService.decode_auth_token(auth_token)
