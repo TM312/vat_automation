@@ -97,7 +97,7 @@ class Transaction(db.Model):  # type: ignore
     tax_treatment_name = db.Column(db.String(8), db.ForeignKey('tax_treatment.name'),
                                    nullable=False)
 
-    channel_id_id = db.Column(db.Integer, db.ForeignKey('channel_id.id'))
+    unique_account_id_id = db.Column(db.Integer, db.ForeignKey('unique_account_id.id'))
 
     marketplace_name = db.Column(db.Integer, db.ForeignKey('marketplace.name'))
 
@@ -107,7 +107,9 @@ class Transaction(db.Model):  # type: ignore
     shipment_date = db.Column(db.Date)
     tax_date = db.Column(db.Date)
 
-    item_information_id = db.Column(db.String(48), db.ForeignKey('item_information.id'))
+    item_id = db.Column(db.String(48), db.ForeignKey('item.id'))
+
+    quantity = db.Column(db.Integer, default=1)
 
 
     discriminator = db.Column('t_type', db.String(32)) #t_type: transaction_type

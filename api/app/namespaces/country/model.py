@@ -8,7 +8,7 @@ class Country(db.Model):  # type: ignore
     code = db.Column(db.String(4), primary_key=True)
     id = db.Column(db.Integer, autoincrement=True)
     country_name = db.Column(db.String(16), nullable=False)
-    tax_rates = db.relationship('TaxRate', back_populates='country')
+    tax_codes = db.relationship('TaxRate', back_populates='country')
 
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'),
                           nullable=False)

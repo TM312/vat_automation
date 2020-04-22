@@ -21,7 +21,7 @@ class VATIN(db.Model):
                                nullable=False)
 
     def __init__(self, **kwargs):
-        super(ItemInformation, self).__init__(**kwargs)
+        super(Item, self).__init__(**kwargs)
         self.country_code = country_code
         self.number = number
 
