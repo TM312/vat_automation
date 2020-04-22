@@ -20,10 +20,10 @@ class SellerFirm(Business):
             'Seller', backref='employer', lazy=True))
 
     distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy=True)
-    item_informations = db.relationship('ItemInformation', backref='seller_firm', lazy=True)
+    items = db.relationship('Item', backref='seller_firm', lazy=True)
 
     # IDs for supported platforms
-    amazon_channel_ids = db.relationship('AmazonChannelID', backref='seller_firm', lazy=True)
+    amazon_unique_account_ids = db.relationship('AmazonUniqueAccountID', backref='seller_firm', lazy=True)
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))

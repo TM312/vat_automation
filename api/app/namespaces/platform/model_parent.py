@@ -1,6 +1,13 @@
 from app.extensions import db
 
 
+channel_tax_code_AT = db.Table(
+    'channel_tax_code_AT',
+    db.Column('channel_code', db.Integer, db.ForeignKey('channel.code'), primary_key=True),
+    db.Column('tax_code_code', db.Integer, db.ForeignKey('tax_code.code'), primary_key=True)
+    )
+
+
 class Platform(db.Model):
     """ Platform model """
     __tablename__ = "platform"
@@ -23,27 +30,33 @@ class Channel(db.Model):
     platform_name = db.Column(
         db.Integer, db.ForeignKey('platform.name'))
     description = db.Column(db.String(256))
-    channel_ids = db.relationship('ChannelID', backref='channel', lazy=True)
+    unique_account_ids = db.relationship('UniqueAccountID', backref='channel', lazy=True)
     marketplaces = db.relationship('Marketplace', backref='channel', lazy=True)
+    tax_codes = db.relationship(
+        "TaxCode",
+        secondary=channel_tax_code_AT,
+        back_populates="channels"
+    )
 
     def __init__(self, **kwargs):
         super(Channel, self).__init__(**kwargs)
 
 
-class ChannelID(db.Model):
-    """ ChannelID model """
-    __tablename__ = "channel_id"
+class UniqueAccountID(db.Model):
+    """ UniqueAccountID model, e.g. Amazon --> MFN --> A2SC0NLSYTA68B (Unique Account Identifier) """
+    __tablename__ = "unique_account_id"
 
-    id = db.Column(db.String(24), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(24), nullable=False)
     channel_code = db.Column(
         db.Integer, db.ForeignKey('channel.code'))
     seller_firm_id = db.Column(
         db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship(
-        'Transaction', backref='channel_id', lazy=True)
+        'Transaction', backref='unique_account_id', lazy=True)
 
     def __init__(self, **kwargs):
-        super(ChannelID, self).__init__(**kwargs)
+        super(UniqueAccountID, self).__init__(**kwargs)
 
 
 class Marketplace(db.Model):
