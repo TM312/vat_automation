@@ -30,7 +30,7 @@ class Channel(db.Model):
     platform_name = db.Column(
         db.Integer, db.ForeignKey('platform.name'))
     description = db.Column(db.String(256))
-    unique_account_ids = db.relationship('UniqueAccountID', backref='channel', lazy=True)
+    accounts = db.relationship('Account', backref='channel', lazy=True)
     marketplaces = db.relationship('Marketplace', backref='channel', lazy=True)
     tax_codes = db.relationship(
         "TaxCode",
@@ -38,13 +38,14 @@ class Channel(db.Model):
         back_populates="channels"
     )
 
+
     def __init__(self, **kwargs):
         super(Channel, self).__init__(**kwargs)
 
 
-class UniqueAccountID(db.Model):
-    """ UniqueAccountID model, e.g. Amazon --> MFN --> A2SC0NLSYTA68B (Unique Account Identifier) """
-    __tablename__ = "unique_account_id"
+class Account(db.Model):
+    """ Account model, e.g. Amazon --> MFN --> A2SC0NLSYTA68B (Unique Account Identifier) """
+    __tablename__ = "account"
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(24), nullable=False)
@@ -53,10 +54,10 @@ class UniqueAccountID(db.Model):
     seller_firm_id = db.Column(
         db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship(
-        'Transaction', backref='unique_account_id', lazy=True)
+        'Transaction', backref='account', lazy=True)
 
     def __init__(self, **kwargs):
-        super(UniqueAccountID, self).__init__(**kwargs)
+        super(Account, self).__init__(**kwargs)
 
 
 class Marketplace(db.Model):

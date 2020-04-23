@@ -21,14 +21,14 @@ tax_auditor_seller_firm_AT = db.Table(
 class TaxAuditor(User):
     __mapper_args__ = {'polymorphic_identity': 'tax_auditor'}
 
-    tax_records = db.relationship('TaxRecord', backref='creator', order_by="desc(TaxRecord.created_on)", lazy=True)
+    # tax_records = db.relationship('TaxRecord', backref='creator', order_by="desc(TaxRecord.created_on)", lazy=True)
 
-    tax_record_countries = db.relationship(
-        'TaxRecordOutputCountry',
-        secondary=tax_record_output_country_AT,
-        backref="tax_auditors",
-        lazy=True
-        )
+    # tax_record_countries = db.relationship(
+    #     'TaxRecordOutputCountry',
+    #     secondary=tax_record_output_country_AT,
+    #     backref="tax_auditors",
+    #     lazy=True
+    #     )
 
     key_accounts = db.relationship(
         "SellerFirm",

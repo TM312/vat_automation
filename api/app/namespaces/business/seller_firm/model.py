@@ -23,7 +23,7 @@ class SellerFirm(Business):
     items = db.relationship('Item', backref='seller_firm', lazy=True)
 
     # IDs for supported platforms
-    amazon_unique_account_ids = db.relationship('AmazonUniqueAccountID', backref='seller_firm', lazy=True)
+    amazon_accounts = db.relationship('AmazonAccount', backref='seller_firm', lazy=True)
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
