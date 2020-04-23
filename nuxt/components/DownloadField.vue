@@ -15,7 +15,7 @@
         v-for="(tax_record, index) in self_tax_records" :key="index"
       >
         <b-card>
-          <b-card-title>{{ tax_record.unique_account_identifier}}</b-card-title>
+          <b-card-title>{{ tax_record.accountentifier}}</b-card-title>
           <b-card-text>
             <b>Platform: </b>{{ tax_record.platform}}
           </b-card-text>

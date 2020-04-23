@@ -1,5 +1,5 @@
 from app.extensions import db
-
+####################################################################################
 
 class TaxRate(db.Model):  # type: ignore
     """ TaxRate model """
@@ -43,9 +43,10 @@ class TaxCode(db.Model):  # type: ignore
     def __repr__(self):
         return '<TaxCode:{} valid from:{}>'.format(self.code, self.description)
 
+########################################################################
+!!!!!  TAX RATE TYPES NEED TO BE ADAPTED EITHER : R_DE incl. Rate or R excl. rate !!!!!
 
-
-
+############################################################
 class TaxRateType(db.Model):  # type: ignore
     """ TaxRateTypeCountry model, e.g. names: R_DE, R2_DE, Z_GB, S_DE """
     __tablename__ = "tax_rate_type"

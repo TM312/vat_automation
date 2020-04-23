@@ -18,19 +18,21 @@ class User(db.Model):  # type: ignore
                           nullable=False, default=uuid.uuid4)
     username = db.Column(db.String(32), unique=True, nullable=True)
     email = db.Column(db.String(32), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
-    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'),
-                        nullable=False)
+    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
 
     registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # roles = ['employee', '_', 'admin']
-    role = db.Column(db.String, nullable=False)
+
+    role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(40))
     confirmed = db.Column(db.Boolean, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(32))
     last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    transaction_uploads = db.relationship(
+        'Transaction', backref='uploader', order_by="desc(Transaction.added_on)", lazy=True)
 
     actions = db.relationship(
         'Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)

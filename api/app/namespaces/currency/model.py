@@ -9,6 +9,7 @@ class Currency(db.Model):  # type: ignore
     country_codes = db.relationship('Country', backref='currency', lazy=True)
     exchange_rates = db.relationship('ExchangeRatesBase', backref='currency', lazy=True)
     items = db.relationship('Item', backref='currency', lazy=True)
+    transactions = db.relationship('Transaction', backref='currency', lazy=True)
 
 
 
