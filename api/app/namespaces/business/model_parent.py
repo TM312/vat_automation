@@ -13,8 +13,8 @@ class Business(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), unique=True,
                           nullable=False, default=uuid.uuid4)
-    company_name = db.Column(db.String(120), unique=True, nullable=False)
-    company_adress = db.Column(db.String(120))
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    address = db.Column(db.String(120))
     logo_image_name = db.Column(db.String(120), default=None)
     registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)

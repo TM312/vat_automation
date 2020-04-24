@@ -24,4 +24,4 @@ class AccountingFirm(Business):
         super(AccountingFirm, self).__init__(**kwargs)
 
     def __repr__(self):
-        return '<Accounting Firm: %r>' % self.company_name
+        return '<Accounting Firm: %r>' % self.name
