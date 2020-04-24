@@ -96,7 +96,7 @@ class AccountingFirmService:
     #     # checks for existing client
     #     client = AccountingFirm.query.filter_by(
     #             tax_auditor_seller_id=accounting_firm_data.get('tax_auditor_seller_id'),
-    #             tax_auditor_company=tax_auditor.company_name
+    #             tax_auditor_company=tax_auditor.name
     #             ).first()
 
     #             if not client:
@@ -106,7 +106,7 @@ class AccountingFirmService:
     #                     role = 'seller',
     #                     tax_auditor_seller_id=accounting_firm_data.get(
     #                         'tax_auditor_seller_id'),
-    #                     tax_auditor_company=tax_auditor.company_name,
+    #                     tax_auditor_company=tax_auditor.name,
     #                     company_name = accounting_firm_data.get(
     #                         'company_name'),
     #                 )

@@ -83,13 +83,13 @@ class TaxAuditorService:
                 else:
                     response_object = {
                         'status': 'error',
-                        'message': 'You are already following {}'.format(seller_firm.company_name)
+                        'message': 'You are already following {}'.format(seller_firm.name)
                     }
 
             else:
                 response_object = {
                     'status': 'error',
-                    'message': 'You are not authorized to follow {}'.format(seller_firm.company_name)
+                    'message': 'You are not authorized to follow {}'.format(seller_firm.name)
                 }
 
         else:

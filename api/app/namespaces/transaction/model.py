@@ -4,10 +4,10 @@ from app.extensions import db  # noqa
 
 
 class TransactionType(db.Model):  # type: ignore
-    """ Transaction model, i.e. Sale/Refund/Return/Acquisition/Movement """
+    """ Transaction model, i.e. SALE/REFUND/RETURN/ACQUISITION/MOVEMENT """
     __tablename__ = "transaction_type"
 
-    name = db.Column(db.String(16), primary_key=True)
+    code = db.Column(db.String(16), primary_key=True)
     description = db.Column(db.String(256))
     tax_treatments = db.relationship(
         'TaxTreatment', backref='transaction_type', lazy=True)
@@ -118,22 +118,60 @@ class Transaction(db.Model):  # type: ignore
         return '<{}: id:{} – public_id:{} - added_on:{} uploader_id: {}>'.format(self.t_type, self.id, self.public_id, self.added_on, self.uploader_id)
 
 
-"TRANSACTION_EVENT_ID" - -> transaction.public_id
-"ACTIVITY_TRANSACTION_ID" - -> transaction.shipment_id
-"TAX_CALCULATION_DATE" - -> transaction.tax_calculation_date
 
-"TRANSACTION_DEPART_DATE" - -> transaction.shipment_date
-"TRANSACTION_COMPLETE_DATE" - -> transaction.tax_date
+
+
+
+
 
 new_sale_transaction = Sale(
-    shipment_id=user.id,
-    accounting_firm_id=user.employer_id,
-    activity_period=activity_period,
-    owner_id=seller_firm.id,
-    storage_dir=final_dirpath,
+    public_id=public_id,
+    shipment_id=shipment_id,
+    tax_calculation_date=tax_calculation_date,
+    shipment_date=shipment_date,
+    tax_date=tax_date
+
 )
 
-
+new_transaction_calculation_reference = TransactionCalculationReference(
+    export = export,
+    tax_code = tax_code,
+    arrival_seller_vat_number_country = arrival_seller_vat_number_country,
+    arrival_seller_vat_number = arrival_seller_vat_number,
+    departure_seller_vat_number_country = departure_seller_vat_number_country,
+    departure_seller_vat_number = departure_seller_vat_number,
+    gift_wrap_price_discount_net = gift_wrap_price_discount_net,
+    gift_wrap_price_discount_vat = gift_wrap_price_discount_vat,
+    gift_wrap_price_net = gift_wrap_price_net,
+    gift_wrap_price_vat = gift_wrap_price_vat,
+    gift_wrap_price_total_net = gift_wrap_price_total_net,
+    gift_wrap_price_total_vat = gift_wrap_price_total_vat,
+    gift_wrap_price_vat_rate = gift_wrap_price_vat_rate,
+    invoice_amount_vat = invoice_amount_vat,
+    invoice_currency_code = invoice_currency_code,
+    invoice_exchange_rate = invoice_exchange_rate,
+    invoice_exchange_rate_date = invoice_exchange_rate_date,
+    item_price_discount_net = item_price_discount_net,
+    item_price_discount_vat = item_price_discount_vat,
+    item_price_net = item_price_net,
+    item_price_vat = item_price_vat,
+    item_price_total_net = item_price_total_net,
+    item_price_total_vat = item_price_total_vat,
+    seller_vat_number = seller_vat_number,
+    seller_vat_number_country_code = seller_vat_number_country_code,
+    shipment_price_discount_net = shipment_price_discount_net,
+    shipment_price_discount_vat = shipment_price_discount_vat,
+    shipment_price_discount_net = shipment_price_discount_net,
+    shipment_price_discount_vat = shipment_price_discount_vat,
+    shipment_price_discount_net = shipment_price_discount_net,
+    shipment_price_discount_vat = shipment_price_discount_vat,
+    shipment_price_vat_rate = shipment_price_vat_rate,
+    sale_total_value_net = sale_total_value_net,
+    sale_total_value_vat = sale_total_value_vat,
+    tax_jurisdiction = tax_jurisdiction,
+    tax_jurisdiction_level = tax_jurisdiction_level,
+    vat_calculation_imputation_country = vat_calculation_imputation_country
+)
 
 
 class TransactionCalculationReference(db.Model):
@@ -144,6 +182,7 @@ class TransactionCalculationReference(db.Model):
 
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
     transaction = db.relationship("Transaction", back_populates="transaction_calculation_reference")
+
     export = db.Column(db.String(8))
     tax_code = db.Column(db.String(8))
 
@@ -189,7 +228,7 @@ class TransactionCalculationReference(db.Model):
     sale_total_value_vat = db.Column(db.Float())
 
     tax_jurisdiction = db.Column(db.String(40))
-    tax_jurisdiction_level = db.Column(db.String(40))
+    tax_jurisdiction_level = db.Column(db.String(32))
 
     vat_calculation_imputation_country = db.Column(db.String(8))
 

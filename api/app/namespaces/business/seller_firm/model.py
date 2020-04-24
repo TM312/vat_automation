@@ -8,7 +8,7 @@ class SellerFirm(Business):
     __mapper_args__ = {'polymorphic_identity': 'seller_firm'}
 
     claimed = db.Column(db.Boolean, default=False)
-    establishment_country_code = db.Column(db.Integer, db.ForeignKey('establishment_country.code'))
+    establishment_country_code = db.Column(db.Integer, db.ForeignKey('country.code'))
 
     vat_numbers = db.relationship('VATIN', backref='seller_firm', lazy=True)
 
@@ -23,7 +23,7 @@ class SellerFirm(Business):
     items = db.relationship('Item', backref='seller_firm', lazy=True)
 
     # IDs for supported platforms
-    amazon_accounts = db.relationship('AmazonAccount', backref='seller_firm', lazy=True)
+    accounts = db.relationship('Account', backref='seller_firm', lazy=True)
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
@@ -39,4 +39,4 @@ class SellerFirm(Business):
         super(SellerFirm, self).__init__(**kwargs)
 
     def __repr__(self):
-        return '<SellerFirm: %r>' % self.company_name
+        return '<SellerFirm: %r>' % self.name
