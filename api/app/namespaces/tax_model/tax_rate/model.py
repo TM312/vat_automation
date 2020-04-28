@@ -1,4 +1,6 @@
+from flask import current_app
 from app.extensions import db
+
 ####################################################################################
 
 class TaxRate(db.Model):  # type: ignore
@@ -10,8 +12,8 @@ class TaxRate(db.Model):  # type: ignore
 
     tax_rate_type_name = db.Column(db.ForeignKey('tax_rate_type.name'), nullable = False)
 
-    valid_from = db.Column(db.DateTime, nullable=False)
-    valid_to = db.Column(db.DateTime)
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
     rate = db.Column(db.Numeric(precision=8, scale=4))
 
     tax_code = db.relationship("TaxCode", back_populates="countries")
@@ -53,8 +55,8 @@ class TaxRateType(db.Model):  # type: ignore
 
     name = db.Column(db.String(8), primary_key=True)
     public_name = db.Column(db.String(256), nullable=False)
-    valid_from = db.Column(db.DateTime, nullable=False)
-    valid_to = db.Column(db.DateTime)
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
 
     rate = db.Column(db.Numeric(precision=8, scale=4))
     tax_rates = db.relationship('TaxRate', backref='tax_rate_type', lazy=True)

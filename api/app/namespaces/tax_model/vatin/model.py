@@ -15,8 +15,8 @@ class VATIN(db.Model):
     __tablename__ = "vatin"
 
     id = db.Column(db.Integer, primary_key=True)
-    valid_first = db.Column(db.Datetime, default=datetime.datetime.utcnow)
-    valid_to = db.Column(db.DateTime)
+    valid_first = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=datetime.date.today() + datetime.timedelta(days=current_app.config['VATIN_LIFESPAN']))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'),
                                nullable=False)
 

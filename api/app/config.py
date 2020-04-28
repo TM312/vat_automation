@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import List, Type
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -33,7 +34,8 @@ class Config(object):
 
     TAX_DATA_ALLOWED_EXTENSIONS = {'csv'}
     TAX_DATA_MAX_REQUEST_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
-
+    TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2099', '%d-%m-%Y').date()
+    VATIN_LIFESPAN = 7 # in days
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
 
@@ -51,6 +53,7 @@ class Development(Config):
     # Media Uploads
     BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
     #BASE_PATH_MEDIA = '/var/lib/media_data/'
+
 
 
 class Testing(Config):

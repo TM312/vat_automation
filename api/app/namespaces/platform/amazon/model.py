@@ -25,8 +25,8 @@ class DistanceSale(db.Model):  # type: ignore
                                nullable=False)
     arrival_country_code = db.Column(db.String(8), db.ForeignKey('country.code'),
                                      nullable=False)
-    valid_from = db.Column(db.DateTime, nullable=False)
-    valid_to = db.Column(db.DateTime, nullable=False)
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
 
     def __init__(self, **kwargs):
         super(DistanceSale, self).__init__(**kwargs)

@@ -1,4 +1,24 @@
+from flask import current_app
+
 from app.extensions import db
+
+eu_country_AT = db.Table(
+    'eu_country_AT',
+    db.Column('eu_id', db.Integer, db.ForeignKey('eu.id'), primary_key=True),
+    db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True)
+    )
+
+
+class EU(db.Model):
+    __tablename__ = "eu"
+    id = db.Column(db.Integer, primary_key=True)
+    valid_from = db.Column(db.Date, nullble=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+    countries = db.relationship(
+        "Country",
+        secondary=eu_country_AT,
+        back_populates="eus"
+    )
 
 
 class Country(db.Model):  # type: ignore
@@ -9,6 +29,11 @@ class Country(db.Model):  # type: ignore
     id = db.Column(db.Integer, autoincrement=True)
     country_name = db.Column(db.String(16), nullable=False)
     tax_codes = db.relationship('TaxRate', back_populates='country')
+    eus = db.relationship(
+        "EU",
+        secondary=eu_country_AT,
+        back_populates="countries"
+    )
 
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
     distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)

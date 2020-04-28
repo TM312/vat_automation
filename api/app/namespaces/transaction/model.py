@@ -21,16 +21,17 @@ class TransactionType(db.Model):  # type: ignore
 
 
 class TaxTreatment(db.Model):  # type: ignore
-    """ Transaction model,  i.e. locale sale/locale sale reverse charge/ ..."""
+    """ Transaction model,  i.e. LOCALE_SALE, LOCAL_SALE_REVERSE_CHARGE, DISTANCE_SALE, INTRA_COMMUNITY_SALE, EXPORT, LOCAL_ACQUISITION, INTRA_COMMUNITY_ACQUISITION, IMPORT"""
+
     __tablename__ = "tax_treatment"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), nullable=False)
+    code = db.Column(db.String(40), nullable=False)
     description = db.Column(db.String(256))
     transaction_type_name = db.Column(db.String(16), db.ForeignKey('transaction_type.name'),
               nullable=False)
     transactions = db.relationship(
-        'Transaction', backref='customer_type', lazy=True)
+        'Transaction', backref='tax_treatment', lazy=True)
 
     def __init__(self, **kwargs):
         super(TaxTreatment, self).__init__(**kwargs)
@@ -80,7 +81,7 @@ class Transaction(db.Model):  # type: ignore
                          nullable=False) # owner is always a seller_firm
 
 
-    tax_treatment_name = db.Column(db.String(8), db.ForeignKey('tax_treatment.name'),
+    tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'),
                                    nullable=False)
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
