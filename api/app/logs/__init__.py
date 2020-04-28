@@ -1,4 +1,4 @@
-from app.config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, COMPANY_NAME
+from current_app.config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, COMPANY_NAME
 
 import logging
 from logging.handlers import SMTPHandler

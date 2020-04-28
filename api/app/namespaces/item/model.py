@@ -9,8 +9,8 @@ class Item(db.Model):  # type: ignore
     sku = db.Column(db.String(48), nullable=False)
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'),
                                nullable=False)
-    valid_from = db.Column(db.DateTime, nullable=False)
-    valid_to = db.Column(db.DateTime)
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
     brand_name = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(256), nullable=False)
     ean = db.Column(db.String(64), nullable=False)

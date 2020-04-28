@@ -26,7 +26,7 @@ class Customer(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
-    customer_type_code = db.Column(db.String(8), db.ForeignKey('customer_type.code'))
+    type_code = db.Column(db.String(8), db.ForeignKey('customer_type.code'))
 
     !!!                 customer_vat_number = db.Column(db.Integer, db.ForeignKey('XXX'))
 
