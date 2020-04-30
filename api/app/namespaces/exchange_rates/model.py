@@ -35,6 +35,7 @@ class ExchangeRatesBase(db.Model):
     __tablename__ = "exchange_rates"
     id = db.Column(db.Integer, primary_key=True)
     source = db.Column(db.String(32), default="ECB")
+    date = db.Column(db.Date, default=datetime.date.today)
     created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     exchange_rate_collection_id = db.Column(db.Integer, db.ForeignKey('exchange_rate_collection.id'),
                                             nullable=False)
@@ -46,7 +47,7 @@ class ExchangeRatesBase(db.Model):
     czk = db.Column(db.Numeric(scale=8))
     pln = db.Column(db.Numeric(scale=8))
 
-    discriminator = db.Column('exchange_rates_base', db.String(32))
+    discriminator = db.Column('base', db.String(32))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
 
