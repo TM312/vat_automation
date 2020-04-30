@@ -53,6 +53,7 @@ class ExchangeRatesService:
             new_exchange_rates_EUR = ExchangeRatesEUR(
                 source='ECB',
                 created_on=datetime.datetime.utcnow(),
+                date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=1.0000,
                 gbp=exchange_rate_dict['GBP'],
@@ -87,6 +88,7 @@ class ExchangeRatesService:
             new_exchange_rates_GBP = ExchangeRatesEUR(
                 source='ECB',
                 created_on=datetime.datetime.utcnow(),
+                date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=gbp_eur,
                 gbp=1.0000,
@@ -120,6 +122,7 @@ class ExchangeRatesService:
             new_exchange_rates_CZK = ExchangeRatesEUR(
                 source='ECB',
                 created_on=datetime.datetime.utcnow(),
+                date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=czk_eur,
                 gbp=czk_eur * exchange_rates_EUR.gbp,
@@ -152,6 +155,7 @@ class ExchangeRatesService:
             new_exchange_rates_PLN = ExchangeRatesEUR(
                 source='ECB',
                 created_on=datetime.datetime.utcnow(),
+                date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=pln_eur,
                 gbp=pln_eur * exchange_rates_EUR.gbp,
