@@ -1,6 +1,6 @@
 from typing import List
 import jwt
-import datetime
+from datetime import datetime, timedelta
 import inspect
 
 from flask import current_app
@@ -73,7 +73,7 @@ class TokenService:
             # mark the token as blacklisted
             blacklisted_token = Token(
                 token = auth_token,
-                iat = datetime.datetime.fromtimestamp(payload['iat'] / 1e3),
+                iat = datetime.fromtimestamp(payload['iat'] / 1e3),
                 sub = payload['sub']
             )
             db.session.add(blacklisted_token)
@@ -97,8 +97,8 @@ class TokenService:
         try:
             payload = {
                 'iss': current_app.config['COMPANY_NAME'].lower(),
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=token_lifespan),
-                'iat': datetime.datetime.utcnow(),
+                'exp': datetime.utcnow() + timedelta(minutes=token_lifespan),
+                'iat': datetime.utcnow(),
                 'sub': public_id
             }
             auth_token = jwt.encode(

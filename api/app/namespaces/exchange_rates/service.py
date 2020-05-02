@@ -1,6 +1,8 @@
 from .model import ExchangeRateCollection, ExchangeRatesEUR, ExchangeRatesGBP, ExchangeRatesCZK, ExchangeRatesPLN #noqa
 from werkzeug.exceptions import InternalServerError
 
+from datetime import datetime
+
 class ExchangeRatesService:
 
     @staticmethod
@@ -31,7 +33,7 @@ class ExchangeRatesService:
             #create new exchange_rate_collection based on TaxAuditor model
             new_exchange_rate_collection = ExchangeRateCollection(
                 date=date,
-                created_on=datetime.datetime.utcnow()
+                created_on=datetime.utcnow()
             )
 
             #add exchange_rate_collection to db
@@ -52,7 +54,7 @@ class ExchangeRatesService:
 
             new_exchange_rates_EUR = ExchangeRatesEUR(
                 source='ECB',
-                created_on=datetime.datetime.utcnow(),
+                created_on=datetime.utcnow(),
                 date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=1.0000,
@@ -87,7 +89,7 @@ class ExchangeRatesService:
 
             new_exchange_rates_GBP = ExchangeRatesEUR(
                 source='ECB',
-                created_on=datetime.datetime.utcnow(),
+                created_on=datetime.utcnow(),
                 date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=gbp_eur,
@@ -121,7 +123,7 @@ class ExchangeRatesService:
             czk_eur = 1/exchange_rates_EUR.czk
             new_exchange_rates_CZK = ExchangeRatesEUR(
                 source='ECB',
-                created_on=datetime.datetime.utcnow(),
+                created_on=datetime.utcnow(),
                 date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=czk_eur,
@@ -154,7 +156,7 @@ class ExchangeRatesService:
             pln_eur = 1/exchange_rates_EUR.pln
             new_exchange_rates_PLN = ExchangeRatesEUR(
                 source='ECB',
-                created_on=datetime.datetime.utcnow(),
+                created_on=datetime.utcnow(),
                 date=exchange_rate_collection.date,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=pln_eur,

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -16,8 +16,8 @@ class Business(db.Model):  # type: ignore
     name = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.String(120))
     logo_image_name = db.Column(db.String(120), default=None)
-    registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    registered_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     discriminator = db.Column('b_type', db.String(50))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
@@ -25,5 +25,5 @@ class Business(db.Model):  # type: ignore
     def update(self, data_changes):
         for key, val in data_changes.items():
             setattr(self, key, val)
-        self.modified_at = datetime.datetime.utcnow()
+        self.modified_at = datetime.utcnow()
         return self

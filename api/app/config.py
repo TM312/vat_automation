@@ -36,6 +36,7 @@ class Config(object):
     TAX_DATA_MAX_REQUEST_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
     TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2099', '%d-%m-%Y').date()
     VATIN_LIFESPAN = 7 # in days
+    OLD_TRANSACTION_TOLERANCE_DAYS = 100
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
 

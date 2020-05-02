@@ -1,13 +1,10 @@
-import datetime
+import datetime import date, timedelta
 
 from app.extensions import db
 
 from vies import VIES_WSDL_URL, VIES_OPTIONS, logger
 
-from werkzeug.exceptions import HTTPException
-from werkzeug.utils import cached_property
 
-from zeep import Client
 
 
 class VATIN(db.Model):
@@ -15,15 +12,19 @@ class VATIN(db.Model):
     __tablename__ = "vatin"
 
     id = db.Column(db.Integer, primary_key=True)
-    valid_first = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=datetime.date.today() + datetime.timedelta(days=current_app.config['VATIN_LIFESPAN']))
-    seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'),
-                               nullable=False)
+    created_on = db.Column(db.Date, default=date.today())
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=date.today() + timedelta(days=current_app.config['VATIN_LIFESPAN']))
+    initial_tax_date = db.Column(db.Date, nullable=False)
+    _country_code = db.Column(db.String(4), nullable=False)
+    _number = db.Column(db.String(4), nullable=False)
+    valid = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, **kwargs):
-        super(Item, self).__init__(**kwargs)
+        super(VATIN, self).__init__(**kwargs)
         self.country_code = country_code
         self.number = number
+        self.valid = valid
 
 
     # https://www.python-course.eu/python3_properties.php
@@ -43,17 +44,9 @@ class VATIN(db.Model):
     def number(self, value):
         self._number = value.upper().replace(" ", "")
 
-    @cached_property
-    def data(self):
-        """VIES API response data."""
-        client = Client(VIES_WSDL_URL)
-        try:
-            return client.service.checkVat(self.country_code, self.number)
-        except Exception as e:
-            logger.exception(e)
-            raise
 
-     def __str__(self):
+
+    def __str__(self):
         unformated_number = "{country_code}{number}".format(
             country_code=self.country_code, number=self.number,
         )
@@ -65,9 +58,3 @@ class VATIN(db.Model):
 
     def __repr__(self):
         return "<VATIN {}>".format(self.__str__())
-
-
-    @classmethod
-    def from_str(cls, value):
-        """Return a VATIN object by given string."""
-        return cls(value[:2].strip(), value[2:].strip())

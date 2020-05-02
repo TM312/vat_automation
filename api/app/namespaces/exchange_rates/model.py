@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, date
 
 from app.extensions import db  # noqa
 
@@ -7,8 +7,8 @@ class ExchangeRateCollection(db.Model):
     """ ExchangeRates parent_model """
     __tablename__ = "exchange_rate_collection"
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, default=datetime.date.today)
-    created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date = db.Column(db.Date, default=date.today)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
     exchange_rates_eur = db.relationship(
         'ExchangeRatesEUR', backref='exchange_rate_collection', lazy=True)
     exchange_rates_gbp = db.relationship(
@@ -35,8 +35,8 @@ class ExchangeRatesBase(db.Model):
     __tablename__ = "exchange_rates"
     id = db.Column(db.Integer, primary_key=True)
     source = db.Column(db.String(32), default="ECB")
-    date = db.Column(db.Date, default=datetime.date.today)
-    created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date = db.Column(db.Date, default=date.today)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
     exchange_rate_collection_id = db.Column(db.Integer, db.ForeignKey('exchange_rate_collection.id'),
                                             nullable=False)
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'),
