@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import uuid
 import hashlib
 
@@ -20,8 +20,8 @@ class User(db.Model):  # type: ignore
     email = db.Column(db.String(32), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
     employer_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
 
-    registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    registered_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
@@ -29,7 +29,7 @@ class User(db.Model):  # type: ignore
     confirmed = db.Column(db.Boolean, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(32))
-    last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     transaction_uploads = db.relationship(
         'Transaction', backref='uploader', order_by="desc(Transaction.added_on)", lazy=True)
@@ -67,11 +67,11 @@ class User(db.Model):  # type: ignore
             if key == 'password':
                 self.password = self.set_password(value)
             setattr(self, key, val)
-        self.modified_at = datetime.datetime.utcnow()
+        self.modified_at = datetime.utcnow()
         return self
 
     def update_last_seen(self):
-        self.last_seen = datetime.datetime.utcnow()
+        self.last_seen = datetime.utcnow()
         return self
 
 
@@ -80,7 +80,7 @@ class Action(db.Model):  # type: ignore
     __tablename__ = "action"
 
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                          nullable=False)
     method_name = db.Column(db.String(32))

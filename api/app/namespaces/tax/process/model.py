@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from app.extensions import db  # noqa
 
@@ -8,14 +8,14 @@ class TaxRecord(db.Model):  # type: ignore
     __tablename__ = "tax_record"
 
     id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'),
                            nullable=False)
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'),
                                     nullable=False)
 
-    modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     downloaded = db.Column(db.Boolean, default=False)
     activity_period = db.Column(db.String(16), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('business.id'),
@@ -36,7 +36,7 @@ class TaxRecord(db.Model):  # type: ignore
     def update(self, data_changes):  # : TaxRecordInterface):
         for key, val in data_changes.items():
             setattr(self, key, val)
-        self.modified_at = datetime.datetime.utcnow()
+        self.modified_at = datetime.utcnow()
         self.times_submitted += 1
         return self
 
@@ -49,7 +49,7 @@ class TaxRecordInput(db.Model):  # type: ignore
     __tablename__ = "tax_record_input"
 
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     platform = db.Column(db.String(40), default='amazon')
     tax_record_id = db.Column(db.Integer, db.ForeignKey('tax_record.id'),
                               nullable=False)
@@ -64,7 +64,7 @@ class TaxRecordInput(db.Model):  # type: ignore
     def update(self, data_changes):  # : TaxRecordInterface):
         for key, val in data_changes.items():
             setattr(self, key, val)
-        self.modified_at = datetime.datetime.utcnow()
+        self.modified_at = datetime.utcnow()
         self.times_submitted += 1
         return self
 
@@ -74,7 +74,7 @@ class TaxRecordOutput(db.Model):  # type: ignore
     __tablename__ = "tax_record_output"
 
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     tax_record_id = db.Column(db.Integer, db.ForeignKey('tax_record.id'),
                               nullable=False)

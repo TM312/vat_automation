@@ -141,6 +141,34 @@ class TransactionService:
 
 ##################
 
+class ExchangeRateService:
+    def get_rate_by_base_target_date(base, target, date):
+        if base == 'EUR':
+            exchange_rates = ExchangeRatesEUR.query.filter_by(date=date).first()
+        elif base == 'GBP':
+            exchange_rates = ExchangeRatesGBP.query.filter_by(date=date).first()
+        elif base == 'PLN':
+            exchange_rates = ExchangeRatesPLN.query.filter_by(date=date).first()
+        elif base == 'CZK':
+            exchange_rates = ExchangeRatesCZK.query.filter_by(date=date).first()
+        else:
+            raise NotFound('The base currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
+
+        if target == 'EUR':
+            exchange_rate = exchange_rates.eur
+        elif target == 'PLN':
+            exchange_rate = exchange_rates.pln
+        elif target == 'GBP':
+            exchange_rate = exchange_rates.gbp
+        elif target == 'CZK':
+            exchange_rate = exchange_rates.czk
+        else:
+            raise NotFound('The target currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
+
+        return exchange_rate
+
+#####
+
 class InputService:
     @staticmethod
     def read_amazon_upload_into_df(file):
@@ -156,6 +184,32 @@ class InputService:
             raise UnsupportedMediaType('Cannot read file {}.'.format(file)) !!!! filename
 
 
+    @staticmethod
+    def get_date_or_None(df, i:int, column:str):
+        if pd.isnull(df.iloc[i][column]):
+            return None
+        else:
+            try:
+                date = datetime.strptime(df.iloc[i][column], '%d-%m-%Y').date()
+            except:
+                try:
+                    date = datetime.strptime(df.iloc[i][column], '%d.%m.%y').date()
+                except:
+                    raise UnsupportedMediaType('Can not read date format.')
+        return date
+
+    @staticmethod
+    def get_str_or_None(df, i:int, column:str):
+        if pd.isnull(df.iloc[i][column]):
+            return None
+        else:
+            try:
+                string = str(df.iloc[i][column])
+            except:
+                raise UnsupportedMediaType('Can not read date format.')
+
+        return string
+
 
 # class OutputService:
 #     @staticmethod
@@ -164,7 +218,7 @@ class InputService:
 
 #     @staticmethod
 #     def calculate_non_taxable_distance_sale(departure_country, total_value_vat, tax_jurisdiction):
-#         ExchangeRateService.get_rate_by_base_targe_date(base=tax_jurisdiction.currency_code, target=departure_country.currency_code, date=exchange_rate_date)
+#         ExchangeRateService.get_rate_by_base_target_date(base=tax_jurisdiction.currency_code, target=departure_country.currency_code, date=exchange_rate_date)
 
 
 class PlatformService:
@@ -199,8 +253,8 @@ class TaxCodeService:
 
 class TaxRateService:
     @staticmethod
-    def get_by_tax_code_country_tax_date(tax_code, country, tax_date) -> TaxRate:
-        tax_rate = TaxRate.query.filter(TaxRate.tax_code==tax_code, TaxRate.country==country, TaxRate.valid_from<tax_date, TaxRate.valid_to>tax_date).first()
+    def get_by_tax_code_country_tax_date(tax_code_code, country, tax_date) -> TaxRate:
+        tax_rate: Rate = TaxRate.query.filter(TaxRate.tax_code==tax_code_code, TaxRate.country==country, TaxRate.valid_from<tax_date, TaxRate.valid_to>tax_date).first()
         if tax_rate:
             return tax_rate
         else:
@@ -208,7 +262,7 @@ class TaxRateService:
 
     @staticmethod
     def get_by_tax_rate_type_country_tax_date(country, tax_rate_type_name, tax_date) -> TaxRate:
-        tax_rate = TaxRate.query.filter(TaxRate.country==country, TaxRate.tax_rate_type_name==tax_rate_type_name, TaxRate.valid_from<tax_date, TaxRate.valid_to>tax_date).first()
+        tax_rate: TaxRate = TaxRate.query.filter(TaxRate.country==country, TaxRate.tax_rate_type_name==tax_rate_type_name, TaxRate.valid_from<tax_date, TaxRate.valid_to>tax_date).first()
         if tax_rate:
             return tax_rate
         else:
@@ -234,31 +288,55 @@ class CountryService:
             raise NotFound('A constellation of EU countries has not been defined for the requested date ({})'.format(str(date)))
 
 
+    # TransactionService:
+    @staticmethod
+    def vat_check_required(date: date, number: str) -> bool:
+        if not number:
+            return False
+
+        else:
+            return date.today() - timedelta(days=current_app.config['OLD_TRANSACTION_TOLERANCE_DAYS']) <= date
+
+
 
 class CustomerService:
+
     @staticmethod
-    def get_type_by_vatin_date(vat_number, date):
-    # customer_type_code = 'B2C' if not customer_vat_number else --> CHECK VAT NUMBER
-     !!! --> "B2B"
+    def get_customer_type(check_required: bool, country_code: str, number: str, date: date) -> str:
+        if not number:
+            customer_type = 'B2C'
+
+        elif number and check_required:
+            customer_type = 'B2B' if VATINService.check_validity(country_code, number, date) else 'B2C'
+
+        elif number and not check_required:
+            customer_type = 'B2B'
+
         return customer_type
+
+
+
+
 
 
 class TransactionService:
 
     @staticmethod
-    def get_tax_rate_rates(tax_jurisdiction, tax_treatment_code, item_tax_code_code, tax_date):
-        if check_item_price_tax_rate_rate:
-            item_price_tax_rate_rate = check_item_price_tax_rate_rate
-            gift_wrap_tax_rate_rate = shipment_price_tax_rate_rate = TaxRateService.get_by_tax_rate_type_country_tax_date(country=tax_jurisdiction, tax_rate_type_name='S', tax_date=tax_date)
+    def get_tax_rate_rate(tax_jurisdiction: Country, tax_treatment_code: str, item_tax_code_code: str, tax_date: date, **kwargs) -> float:
+        if tax_treatment_code == 'EXPORT' or 'INTRA_COMMUNITY_SALE' or 'LOCAL_SALE_REVERSE_CHARGE':
+            tax_rate_rate = float(0)
 
-        elif tax_treatment_code == 'EXPORT' or 'INTRA_COMMUNITY_SALE' or 'LOCAL_SALE_REVERSE_CHARGE':
-            item_price_tax_rate_rate = gift_wrap_rate_rate = shipment_price_tax_rate_rate = float(0)
+        if 'check_tax_rate_rate' in kwargs:
+            tax_rate_rate = kwargs['check_tax_rate_rate']
 
-        else:
-            item_price_tax_rate_rate = TaxRateService.get_by_tax_code_country_tax_date(tax_code=item_tax_code, country=tax_jurisdiction, tax_date=tax_date).rate
-            shipment_price_tax_rate_rate = gift_wrap_rate_rate = TaxRateService.get_by_tax_rate_type_country_tax_date(country=tax_jurisdiction, tax_rate_type_name='S', tax_date=tax_date)
 
-        return item_price_tax_rate_rate, gift_wrap_tax_rate_rate, shipment_price_tax_rate_rate
+        elif 'tax_rate_type_name' in kwargs:
+            tax_rate_rate = TaxRateService.get_by_tax_rate_type_country_tax_date(country=tax_jurisdiction, tax_rate_type_name=kwargs['tax_rate_type_name'], tax_date=tax_date).rate
+
+        elif 'tax_code_code' in kwargs:
+            tax_rate_rate = TaxRateService.get_by_tax_code_country_tax_date(tax_code_code=kwargs['tax_code_code'], country=tax_jurisdiction, tax_date=tax_date).rate
+
+        return tax_rate_rate
 
 
 
@@ -301,7 +379,7 @@ class TransactionService:
                 transaction_type = TransactionType.query.filter_by(code="REFUND").first()
 
             # elif transaction_type_code == 'REFUND':
-            #     transaction_type = TransactionType.query.filter_by(name="SALE").first()
+            #     transaction_type = TransactionType.query.filter_by(cide="SALE").first()
             #     return transaction_type
 
 
@@ -312,22 +390,6 @@ class TransactionService:
             raise NotFound('The platform for the transaction account "{}" is currently not supported. Please get in touch with one of the administrators.'.format(account.public_id))
 
         return transaction_type
-
-    # TransactionService
-    @staticmethod
-    def check_refund_treatment(bundle, item_price_total_gross, shipment_price_total_gross, gift_wrap_price_total_gross):
-        if bundle:
-            sale_transaction = TransactionService.get_sale_transaction_by_bundle(bundle)
-            if sale_transaction:
-                if not item_price_total_gross or not shipment_price_total_gross or not gift_wrap_price_total_gross:
-                    !!!!!
-                else:
-                    alles von Sales übernehmen !!!!!
-
-        else:
-            return False
-
-
 
 
 
@@ -340,31 +402,41 @@ def transaction_processing(file) -> Transaction:
         raise UnsupportedMediaType('Error while reading the input file ({}).'.format(str(file))) !!!! filename
 
 
-
+    validity_dict_customer, validity_dict_departure_seller, validity_dict_arrival_seller, validity_dict_seller = check_and_create_vatin(df)
 
 
     for i in range(len(df.index)):
         input = Input(df, i)
+        calculation = TransactionService.create_calculation_from_input(input)
+
+        create_transaction_from_input_calculation(input, calculation)
+
+        create_transaction_reference_from_input_calculation(input)
+
+
+## END MASTER FUNCTION ##
+
+
+    def create_calculation_from_input(input)
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(input.check_tax_calculation_date)
 
         account: Account = PlatformService.get_by_public_id_channel_code(input.account_public_id, input.channel_code)
         item: Item = ItemService.get_by_sku_account_date(input.item_sku, account, input.tax_date)
-        bundle: Bundle = TransactionService.get_bundle_by_account_item_date(account, item, input.transaction_public_id) !!! #may be empty: in that case need to be created later
+        bundle: Bundle = TransactionService.get_bundle_by_account_item_transaction_public_id(account, item, input.transaction_public_id) !!! #may be empty: in that case need to be created later
+
+
+
+
+
         transaction_type: TransactionType = get_transaction_type_by_public_code_account(input.transaction_type_public_code, account)
+
         arrival_country: Country = CountryService.get_by_code(input.arrival_country_code)
         departure_country: Country = CountryService.get_by_code(input.departure_country_code)
         eu: EU = CountryService.get_eu_by_date(input.tax_date) #EU
 
-
-        if transaction_type == 'REFUND':
-            check_refund_treatment(calculation.bundle, input.item_price_total_gross, input.shipment_price_total_gross, input.gift_wrap_price_total_gross)
-
-
-
-
-
-        !!!!! #customer_type = CustomerService.get_type_by_vatin_date(vat_number=input.customer_vat_number, date=input.tax_date, !!!!! )
+        customer_type_checked: bool = TransactionService.vat_check_required(date=input.tax_date, number=input.customer_vat_number)
+        customer_type: str = CustomerService.get_customer_type(country_code=input.customer_vat_number_country_code, number=input.customer_vat_number, date=input.tax_date)
 
 
 
@@ -373,7 +445,10 @@ def transaction_processing(file) -> Transaction:
         tax_juristdiction: Country = TransactionService.define_tax_jurisdiction(tax_treatment_code, departure_country, arrival_country)
         item_tax_code_code: str = TransactionService.get_item_tax_code_code(item, input.check_item_tax_code_code)
 
-        item_price_tax_rate_rate, gift_wrap_tax_rate_rate, shipment_price_tax_rate_rate = TransactionService.get_tax_rate_rates(tax_jurisdiction, tax_treatment_code, item_tax_code_code, input.tax_date)
+        item_price_tax_rate_rate: float = TransactionService.get_tax_rate_rate(tax_jurisdiction=tax_jurisdiction, tax_treatment_code=tax_treatment_code, tax_date=input.tax_date, tax_code_code=item_tax_code_code, check_tax_rate_rate=input.check_item_price_tax_rate_rate)
+        gift_wrap_tax_rate_rate: float = TransactionService.get_tax_rate_rate(tax_jurisdiction=tax_jurisdiction, tax_treatment_code=tax_treatment_code, tax_date=input.tax_date, tax_rate_type_name='S')
+        shipment_price_tax_rate_rate : float= TransactionService.get_tax_rate_rate(tax_jurisdiction=tax_jurisdiction, tax_treatment_code=tax_treatment_code, tax_date=input.tax_date, tax_rate_type_name='S')
+
 
         item_price_net: float = TransactionService.get_price_net(input.item_price_gross, item_price_tax_rate_rate)
         item_price_discount_net: float = TransactionService.get_price_net(input.item_price_discount_gross, item_price_tax_rate_rate)
@@ -405,7 +480,9 @@ def transaction_processing(file) -> Transaction:
 
         invoice_currency_code: str = tax_juristdiction.currency_code
 
-        invoice_exchange_rate: float = get_invoice_exchange_rate(input.currency_code, invoice_currency_code, input.tax_date)
+        invoice_exchange_rate_date: date = get_invoice_exchange_rate_date(transaction_type, bundle, input.currency_code, invoice_currency_code, input.tax_date)
+        invoice_exchange_rate: float = get_invoice_exchange_rate(invoice_exchange_rate_date=invoice_exchange_rate_date, currency_code=input.currency_code, invoice_currency_code=invoice_currency_code)
+
 
         invoice_amount_net: float = TransactionService.get_invoice_amount(total_value_net, invoice_exchange_rate)
         invoice_amount_vat: float = TransactionService.get_invoice_amount(total_value_vat, invoice_exchange_rate)
@@ -415,47 +492,16 @@ def transaction_processing(file) -> Transaction:
         # self.departure_seller_vat_country_code: str = departure_country.vat_country_code
         # self.seller_vat_country_code: str = tax_juristdiction.vat_country_code
 
+        arrival_seller_vat_valid: bool = VATINService.check_validity(country_code: arrival_country.vat_country_code, number=input.check_arrival_seller_vat_number, date=input.tax_date)
+        departure_seller_vat_valid: bool = VATINService.check_validity(country_code: departure_country.vat_country_code, number=input.check_departure_seller_vat_number, date=input.tax_date)
+        seller_vat_valid: bool = VATINService.check_validity(country_code: tax_juristdiction.vat_country_code, number=input.check_seller_vat_number, date=input.tax_date)
 
 
 
 
-
-
-
-## END MASTER FUNCTION ##
-
-
-
-    class ExchangeRateService:
-    def get_rate_by_base_targe_date(base, target, date):
-        if base == 'EUR':
-            exchange_rates = ExchangeRatesEUR.query.filter_by(date=date).first()
-        elif base == 'GBP':
-            exchange_rates = ExchangeRatesGBP.query.filter_by(date=date).first()
-        elif base == 'PLN':
-            exchange_rates = ExchangeRatesPLN.query.filter_by(date=date).first()
-        elif base == 'CZK':
-            exchange_rates = ExchangeRatesCZK.query.filter_by(date=date).first()
-        else:
-            raise NotFound('The base currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
-
-        if target == 'EUR':
-            exchange_rate = exchange_rates.eur
-        elif target == 'PLN':
-            exchange_rate = exchange_rates.pln
-        elif target == 'GBP':
-            exchange_rate = exchange_rates.gbp
-        elif target == 'CZK':
-            exchange_rate = exchange_rates.czk
-        else:
-            raise NotFound('The target currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
-
-        return exchange_rate
-
-#####
 
     @staticmethod
-    def get_bundle_by_account_item_transaction_public_id(account, item, transaction_public_id) -> Bundle:
+    def get_bundle_by_account_item_transaction_public_id(account: Account, item: Item, transaction_public_id: str) -> Bundle:
         bundle = Bundle.query.join(Bundle.transactions, aliased=True).filter_by(account_id=account.id, item_id=item.id, public_id=transaction_public_id).first()
         return bundle
 
@@ -467,49 +513,72 @@ def transaction_processing(file) -> Transaction:
 
 
     @staticmethod
-    def get_transactions_by_bundle_transaction_type(bundle, transaction_type) -> List[Transaction]:
+    def get_transactions_by_bundle_transaction_type(bundle: Bundle, transaction_type: TransactionType) -> List[Transaction]:
         transactions = Transaction.query.filter_by(bundle_id=bundle.id, t_type=transaction_type.code).all()
         return transactions
 
 
     @staticmethod
-    def get_invoice_amount(total_value, invoice_exchange_rate):
-        invoice_amount = total_value * invoice_exchange_rate
+    def get_invoice_amount(total_value: float, invoice_exchange_rate: float) -> float:
+        invoice_amount = float(total_value * invoice_exchange_rate)
         return invoice_amount
 
+
     @staticmethod
-    def get_invoice_exchange_rate(currency_code, invoice_currency_code, tax_date):
+    def get_invoice_exchange_rate_date(transaction_type: TransactionType, bundle: Bundle, currency_code: str, invoice_currency_code: str, tax_date: date) -> float or None:
         if check_exchange_rate_required(currency_code, invoice_currency_code):
-            exchange_rate_date = TransactionService.get_exchange_rate_date(tax_date)
-            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_targe_date(base=currency_code, target=invoice_currency_code, date=exchange_rate_date)
+            invoice_exchange_rate_date = TransactionService.get_exchange_rate_date(tax_date, transaction_type, bundle)
+            return invoice_exchange_rate_date
+
+        else:
+            return None
+
+
+     @staticmethod
+    def get_exchange_rate_date(tax_date: date, transaction_type: TransactionType, bundle: Bundle) -> date:
+        if transaction_type.code == "REFUND":
+            sale_transaction: Transaction = TransactionService.get_sale_transaction_by_bundle(bundle)
+
+            if sale_transaction:
+                exchange_rate_date = sale_transaction.invoice_exchange_rate_date
+
+            else:
+                exchange_rate_date = tax_date - datetime.timedelta(days=1)
+
+        else:
+            exchange_rate_date = tax_date - datetime.timedelta(days=1)
+
+        return exchange_rate_date
+
+
+    @staticmethod
+    def get_invoice_exchange_rate(invoice_exchange_rate_date: date, currency_code: str, invoice_currency_code: str) -> float:
+        if invoice_exchange_rate_date:
+            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date)
 
         else:
             invoice_exchange_rate = float(1)
 
         return invoice_exchange_rate
 
-    @staticmethod
-    def get_exchange_rate_date(tax_date):
-        exchange_rate_date = tax_date - datetime.timedelta(days=1)
-        return exchange_rate_date
 
     @staticmethod
-    def check_exchange_rate_required(currency_code, invoice_currency_code) -> bool:
+    def check_exchange_rate_required(currency_code: str, invoice_currency_code: str) -> bool:
         return not currency_code == invoice_currency_code
 
 
     @staticmethod
-    def get_price_net(price_gross, price_tax_rate):
+    def get_price_net(price_gross: float, price_tax_rate: float) ->float:
         price_net = float(price_gross / (1 + price_tax_rate))
         return price_net
 
     @staticmethod
-    def get_price_vat(price_gross, price_tax_rate):
+    def get_price_vat(price_gross: float, price_tax_rate: float) -> float:
         price_vat = float(price_gross / (1 + price_tax_rate) * price_tax_rate)
         return price_vat
 
     @staticmethod
-    def get_total_value(item_price_total, shipment_price_total, gift_wrap_price_total):
+    def get_total_value(item_price_total: float, shipment_price_total: float, gift_wrap_price_total: float) -> float:
         return item_price_total + shipment_price_total + gift_wrap_price_total
 
 
@@ -519,13 +588,13 @@ def transaction_processing(file) -> Transaction:
         return True if check_tax_calculation_date else False
 
     @staticmethod
-    def get_tax_calculation_date(check_tax_calculation_date, tax_date):
+    def get_tax_calculation_date(check_tax_calculation_date, tax_date: date) -> date:
         return check_tax_calculation_date if check_tax_calculation_date else tax_date
 
 
     #TransactioService
     @staticmethod
-    def define_tax_jurisdiction(tax_treatment_code, departure_country, arrival_country) -> Country:
+    def define_tax_jurisdiction(tax_treatment_code: str, departure_country: Country, arrival_country: Country) -> Country:
         if tax_treatment_code == 'DISTANCE_SALE':
             tax_jurisdiction_code = arrival_country.code
         else:
@@ -535,7 +604,7 @@ def transaction_processing(file) -> Transaction:
         return tax_jurisdiction
 
     @staticmethod
-    def get_item_tax_code_code(item, check_item_tax_code_code) -> str:
+    def get_item_tax_code_code(item: Item, check_item_tax_code_code) -> str:
         if account.channel.platform_name == 'amazon':
             if check_item_tax_code_code:
                 item_tax_code_code = check_item_tax_code_code
@@ -547,15 +616,6 @@ def transaction_processing(file) -> Transaction:
                 item_tax_code_code = 'A_GEN_STANDARD'
 
         return item_tax_code_code
-
-
-
-
-
-
-
-
-
 
 
 
@@ -607,7 +667,7 @@ input.invoice_number,
 input.invoice_url,
 input.customer_name,
 input.customer_vat_number,
-input.customer_vat_number_country,
+input.customer_vat_number_country_code,
 input.supplier_vat_number,
 input.supplier_name
 
@@ -655,30 +715,121 @@ input.check_export,
 
 
 
-
-
-
-
-
 # write a smart sanitizing function when time available
-class Input:
+class Input(db.Model):
+account_public_id = db.Column(db.String(128))
+public_activity_period = db.Column(db.String(128))
+channel_code = db.Column(db.String(128))
+marketplace_name = db.Column(db.String(128))
+transaction_type_public_code = db.Column(db.String(128))
+transaction_public_id = db.Column(db.String(128))
+transaction_activity_id = db.Column(db.String(128))
+shipment_date = db.Column(db.Date)
+arrival_date = db.Column(db.Date)
+tax_date = db.Column(db.Date)
+item_sku = db.Column(db.String(128))
+item_name = db.Column(db.String(128))
+item_manufacture_country = db.Column(db.String(128))
+item_quantity = db.Column(db.Integer)
+item_weight_kg = db.Float(precision=)
+item_weight_kg_total
+unit_cost_price_net
+item_price_discount_gross
+item_price_gross
+item_price_total_gross
+shipment_price_discount_gross
+shipment_price_gross
+shipment_price_total_gross
+sale_total_value_gross
+gift_wrap_price_discount_gross
+gift_wrap_price_gross
+gift_wrap_price_total_gross
+currency_code
+departure_country_code
+departure_postal_code
+departure_city
+arrival_country_code
+arrival_postal_code
+arrival_city
+arrival_address
+shipment_mode
+shipment_conditions
+invoice_number
+invoice_url
+customer_name
+customer_vat_number
+customer_vat_number_country_code
+supplier_vat_number
+supplier_name
+
+check_tax_calculation_date
+check_item_price_discount_net
+check_item_price_discount_vat
+check_item_price_net
+check_item_price_vat
+check_item_price_total_net
+check_item_price_total_vat
+check_item_price_tax_rate_rate
+check_shipment_price_discount_net
+check_shipment_price_discount_vat
+check_shipment_price_net
+check_shipment_price_vat
+check_shipment_price_total_net
+check_shipment_price_total_vat
+check_shipment_price_tax_rate_rate
+check_sale_total_value_net
+check_sale_total_value_vat
+check_gift_wrap_price_discount_net
+check_gift_wrap_price_discount_vat
+check_gift_wrap_price_net
+check_gift_wrap_price_vat
+check_gift_wrap_price_total_net
+check_gift_wrap_price_total_vat
+check_gift_wrap_price_tax_rate
+check_item_tax_code_code
+check_departure_seller_vat_country_code
+check_departure_seller_vat_number
+check_arrival_seller_vat_country_code
+check_arrival_seller_vat_number
+check_seller_vat_country_code
+check_seller_vat_number
+check_tax_calculation_imputation_country
+check_tax_jurisdiction
+check_tax_jurisdiction_level
+check_invoice_amount_vat
+check_invoice_currency_code
+check_invoice_exchange_rate
+check_invoice_exchange_rate_date
+check_export
+
+
+
+
+
+
+
+
+
+
+
+
     def __init__(self,df, i):
-        self.account_public_id = str(df.iloc[i]['UNIQUE_ACCOUNT_IDENTIFIER']).upper()
-        self.public_activity_period = str(df.iloc[i]['ACTIVITY_PERIOD']).upper() # --> OUTPUT
-        self.channel_code = str(df.iloc[i]['SALES_CHANNEL']).upper() # str #-->PlatformService.retrieve_account()
-        self.marketplace_name = str(df.iloc[i]['MARKETPLACE']).lower() # str #-->transaction
-        self.transaction_type_public_code = str(df.iloc[i]['TRANSACTION_TYPE']).upper() #-->TransactionService.retrieve_transaction_type()
+        self.account_public_id = InputService.get_str_or_None(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER').upper()
+        self.public_activity_period = InputService.get_str_or_None(df, i, column='ACTIVITY_PERIOD').upper() # --> OUTPUT
+        self.channel_code = InputService.get_str_or_None(df, i, column='SALES_CHANNEL').upper() # str #-->PlatformService.retrieve_account()
+        self.marketplace_name = InputService.get_str_or_None(df, i, column='MARKETPLACE') # str #-->transaction
+        self.transaction_type_public_code = InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE') #-->TransactionService.retrieve_transaction_type()
         self.transaction_public_id = str(df.iloc[i]['TRANSACTION_EVENT_ID']) # str #-->transaction
         self.transaction_activity_id = str(df.iloc[i]['ACTIVITY_TRANSACTION_ID'])  # str #-->transaction --> becomes shipment_id/return_id , etc.
 
-        self.check_tax_calculation_date = datetime.strptime(df.iloc[i]['TAX_CALCULATION_DATE'], '%d-%m-%Y').date() if not pd.isnull(df.iloc[i]['TAX_CALCULATION_DATE']) else None  #NoneType/datetime.date object #-->transaction
-        self.shipment_date = datetime.strptime(df.iloc[i]['TRANSACTION_DEPART_DATE'], '%d-%m-%Y').date() if not pd.isnull(df.iloc[i]['TRANSACTION_DEPART_DATE']) else None #datetime.date object #-->transaction
-        self.arrival_date = datetime.strptime(df.iloc[i]['TRANSACTION_ARRIVAL_DATE'], '%d-%m-%Y').date() if not pd.isnull(df.iloc[i]['TRANSACTION_ARRIVAL_DATE']) else None #datetime.date object #-->transaction
-        self.tax_date = datetime.strptime(df.iloc[i]['TRANSACTION_COMPLETE_DATE'], '%d-%m-%Y').date() if not pd.isnull(df.iloc[i]['TRANSACTION_COMPLETE_DATE']) else None #datetime.date object #-->transaction
+        self.check_tax_calculation_date = InputService.get_date_or_None(df, i, column='TAX_CALCULATION_DATE')
+        self.shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
+        self.arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
+        self.tax_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
 
         self.item_sku = str(df.iloc[i]['SELLER_SKU']) # str --> ItemService.retrieve_item() --> transaction
         self.item_name = str(df.iloc[i]['ITEM_DESCRIPTION']) #str
-        self.item_manufacture_country = str(df.iloc[i]['ITEM_MANUFACTURE_COUNTRY']) if not pd.isnull(df.iloc[i]['ITEM_MANUFACTURE_COUNTRY']) else None #str/NoneType
+        self.item_manufacture_country = InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY') #str/NoneType
         self.item_quantity = int(df.iloc[i]['QTY']) #-->transaction
         self.item_weight_kg = float(df.iloc[i]['ITEM_WEIGHT']) if not pd.isnull(df.iloc[i]['ITEM_WEIGHT']) else None #float/NoneType
         self.item_weight_kg_total = float(df.iloc[i]['TOTAL_ACTIVITY_WEIGHT']) if not pd.isnull(df.iloc[i]['TOTAL_ACTIVITY_WEIGHT']) else None
@@ -732,9 +883,9 @@ class Input:
         self.check_gift_wrap_price_tax_rate = float(df.iloc[i]['GIFT_WRAP_VAT_RATE_PERCENT']) if not pd.isnull(df.iloc[i]['GIFT_WRAP_VAT_RATE_PERCENT']) else None
 
 
-        self.currency_code = str(df.iloc[i]['TRANSACTION_CURRENCY_CODE']) if not pd.isnull(df.iloc[i]['TRANSACTION_CURRENCY_CODE']) else None #str/NoneType
+        self.currency_code = InputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE') #str/NoneType
 
-        self.check_item_tax_code_code = str(df.iloc[i]['PRODUCT_TAX_CODE']) if not pd.isnull(df.iloc[i]['PRODUCT_TAX_CODE']) else None #str/NoneType
+        self.check_item_tax_code_code = InputService.get_str_or_None(df, i, column='PRODUCT_TAX_CODE') #str/NoneType
 
 
         self.departure_country_code = str(df.iloc[i]['DEPARTURE_COUNTRY']) #str
@@ -744,46 +895,42 @@ class Input:
         self.arrival_country_code = str(df.iloc[i]['ARRIVAL_COUNTRY']) #str
         self.arrival_postal_code = str(df.iloc[i]['ARRIVAL_POST_CODE']) #str
         self.arrival_city = str(df.iloc[i]['ARRIVAL_CITY']) #str
-        self.arrival_address = str(df.iloc[i]['ARRIVAL_ADDRESS']) if not pd.isnull(df.iloc[i]['ARRIVAL_ADDRESS']) else None #str/NoneType
+        self.arrival_address = InputService.get_str_or_None(df, i, column='ARRIVAL_ADDRESS')  #str/NoneType
 
-        self.shipment_mode = str(df.iloc[i]['TRANSPORTATION_MODE']) if not pd.isnull(df.iloc[i]['TRANSPORTATION_MODE']) else None #str/NoneType
-        self.shipment_conditions = str(df.iloc[i]['DELIVERY_CONDITIONS']) if not pd.isnull(df.iloc[i]['DELIVERY_CONDITIONS']) else None #str/NoneType
-
-
-        self.check_departure_seller_vat_country_code = str(df.iloc[i]['SELLER_DEPART_VAT_NUMBER_COUNTRY']) if not pd.isnull(df.iloc[i]['SELLER_DEPART_VAT_NUMBER_COUNTRY']) else None
-        self.check_departure_seller_vat_number = str(df.iloc[i]['SELLER_DEPART_COUNTRY_VAT_NUMBER']) if not pd.isnull(df.iloc[i]['SELLER_DEPART_COUNTRY_VAT_NUMBER']) else None
-
-        self.check_arrival_seller_vat_country_code = str(df.iloc[i]['SELLER_ARRIVAL_VAT_NUMBER_COUNTRY']) if not pd.isnull(df.iloc[i]['SELLER_ARRIVAL_VAT_NUMBER_COUNTRY']) else None
-        self.check_arrival_seller_vat_number = str(df.iloc[i]['SELLER_ARRIVAL_COUNTRY_VAT_NUMBER']) if not pd.isnull(df.iloc[i]['SELLER_ARRIVAL_COUNTRY_VAT_NUMBER']) else None
-
-        self.check_seller_vat_country_code = str(df.iloc[i]['TRANSACTION_SELLER_VAT_NUMBER_COUNTRY']) if not pd.isnull(df.iloc[i]['TRANSACTION_SELLER_VAT_NUMBER_COUNTRY']) else None
-        self.check_seller_vat_number = str(df.iloc[i]['TRANSACTION_SELLER_VAT_NUMBER']) if not pd.isnull(df.iloc[i]['TRANSACTION_SELLER_VAT_NUMBER']) else None
+        self.shipment_mode = InputService.get_str_or_None(df, i, column='TRANSPORTATION_MODE') #str/NoneType
+        self.shipment_conditions = InputService.get_str_or_None(df, i, column='DELIVERY_CONDITIONS') #str/NoneType
 
 
-        self.check_tax_calculation_imputation_country = str(df.iloc[i]['VAT_CALCULATION_IMPUTATION_COUNTRY']) if not pd.isnull(df.iloc[i]['VAT_CALCULATION_IMPUTATION_COUNTRY']) else None
-        self.check_tax_jurisdiction = str(df.iloc[i]['TAXABLE_JURISDICTION']) if not pd.isnull(df.iloc[i]['TAXABLE_JURISDICTION']) else None
-        self.check_tax_jurisdiction_level = str(df.iloc[i]['TAXABLE_JURISDICTION_LEVEL']) if not pd.isnull(df.iloc[i]['TAXABLE_JURISDICTION_LEVEL']) else None
+        self.check_departure_seller_vat_country_code = InputService.get_str_or_None(df, i, column='SELLER_DEPART_VAT_NUMBER_COUNTRY')
+        self.check_departure_seller_vat_number = InputService.get_str_or_None(df, i, column='SELLER_DEPART_COUNTRY_VAT_NUMBER')
 
-        self.invoice_number = str(df.iloc[i]['VAT_INV_NUMBER']) if not pd.isnull(df.iloc[i]['VAT_INV_NUMBER']) else None
-        self.check_invoice_amount_vat = float(df.iloc[i]['VAT_INV_CONVERTED_AMT']) if not pd.isnull(df.iloc[i]['VAT_INV_CONVERTED_AMT']) else None
-        self.check_invoice_currency_code = str(df.iloc[i]['VAT_INV_CURRENCY_CODE']) if not pd.isnull(df.iloc[i]['VAT_INV_CURRENCY_CODE']) else None
+        self.check_arrival_seller_vat_country_code = InputService.get_str_or_None(df, i, column='SELLER_ARRIVAL_VAT_NUMBER_COUNTRY')
+        self.check_arrival_seller_vat_number = InputService.get_str_or_None(df, i, column='SELLER_ARRIVAL_COUNTRY_VAT_NUMBER')
+
+        self.check_seller_vat_country_code = InputService.get_str_or_None(df, i, column='TRANSACTION_SELLER_VAT_NUMBER_COUNTRY')
+        self.check_seller_vat_number = InputService.get_str_or_None(df, i, column='TRANSACTION_SELLER_VAT_NUMBER')
+
+
+        self.check_tax_calculation_imputation_country = InputService.get_str_or_None(df, i, column='VAT_CALCULATION_IMPUTATION_COUNTRY')
+        self.check_tax_jurisdiction = InputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION')
+        self.check_tax_jurisdiction_level = InputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION_LEVEL')
+
+        self.invoice_number = InputService.get_str_or_None(df, i, column='VAT_INV_NUMBER')
+        self.check_invoice_amount_vat = float(df.iloc[i]['VAT_INV_CONVERTED_AMT'])
+        self.check_invoice_currency_code = InputService.get_str_or_None(df, i, column='VAT_INV_CURRENCY_CODE')
         self.check_invoice_exchange_rate = float(df.iloc[i]['VAT_INV_EXCHANGE_RATE']) if not pd.isnull(df.iloc[i]['VAT_INV_EXCHANGE_RATE']) else None
-        self.check_invoice_exchange_rate_date = datetime.strptime(str(df.iloc[i]['VAT_INV_EXCHANGE_RATE_DATE']), '%d-%m-%Y').date() if not pd.isnull(df.iloc[i]['VAT_INV_EXCHANGE_RATE_DATE']) else None #datetime.date object
-        self.invoice_url = str(df.iloc[i]['INVOICE_URL']) if not pd.isnull(df.iloc[i]['INVOICE_URL']) else None
+        self.check_invoice_exchange_rate_date = InputService.get_date_or_None(df, i, column='VAT_INV_EXCHANGE_RATE_DATE')
+        self.invoice_url = InputService.get_str_or_None(df, i, column='INVOICE_URL')
 
 
-        self.check_export = str(df.iloc[i]['EXPORT_OUTSIDE_EU']) if not pd.isnull(df.iloc[i]['EXPORT_OUTSIDE_EU']) else None #str #-->transaction
+        self.check_export = InputService.get_str_or_None(df, i, column='EXPORT_OUTSIDE_EU')  #str #-->transaction
 
-        self.customer_name = str(df.iloc[i]['BUYER_NAME']) if not pd.isnull(df.iloc[i]['BUYER_NAME']) else None
-        self.customer_vat_number = str(df.iloc[i]['BUYER_VAT_NUMBER']) if not pd.isnull(df.iloc[i]['BUYER_VAT_NUMBER']) else None
-        self.customer_vat_number_country = str(df.iloc[i]['BUYER_VAT_NUMBER_COUNTRY'])
+        self.customer_name = InputService.get_str_or_None(df, i, column='BUYER_NAME')
+        self.customer_vat_number = InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER')
+        self.customer_vat_number_country_code = InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER_COUNTRY')
 
-        self.supplier_vat_number = str(df.iloc[i]['SUPPLIER_VAT_NUMBER']) if not pd.isnull(df.iloc[i]['SUPPLIER_VAT_NUMBER']) else None # #NoneType/str object #-->transaction
-        self.supplier_name = str(df.iloc[i]['SUPPLIER_NAME']) if not pd.isnull(df.iloc[i]['SUPPLIER_NAME']) else None #NoneType/str object #-->transaction
-
-
-
-
+        self.supplier_vat_number = InputService.get_str_or_None(df, i, column='SUPPLIER_VAT_NUMBER') # #NoneType/str object #-->transaction
+        self.supplier_name = InputService.get_str_or_None(df, i, column='SUPPLIER_NAME') #NoneType/str object #-->transaction
 
 
 

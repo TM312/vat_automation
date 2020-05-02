@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from app.extensions import db  # noqa
 
@@ -40,26 +40,21 @@ class Transaction(db.Model):  # type: ignore
     public_id = db.Column(db.String(128), nullable=False)
     activity_id = db.Column(db.String(128))
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
-    added_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    added_on = db.Column(db.DateTime, default=datetime.utcnow)
     source = db.Column(db.String(128), nullable=False)
     uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
-
-    # accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-
-    owner_id = db.Column(db.Integer, db.ForeignKey('business.id'),
-                         nullable=False) # owner is always a seller_firm
-
-
-    tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'),
-                                   nullable=False)
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
     marketplace_name = db.Column(db.Integer, db.ForeignKey('marketplace.name'))
 
+    item_id = db.Column(db.String(48), db.ForeignKey('item.id'))
+
+    tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'),
+                                   nullable=False)
+
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
 
-    item_id = db.Column(db.String(48), db.ForeignKey('item.id'))
 
 
     item_quantity = db.Column(db.Integer, default=1)
