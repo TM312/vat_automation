@@ -41,7 +41,7 @@ class Transaction(db.Model):  # type: ignore
     activity_id = db.Column(db.String(128))
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
     added_on = db.Column(db.DateTime, default=datetime.utcnow)
-    source = db.Column(db.String(128), nullable=False)
+    #source = db.Column(db.String(128), nullable=False)
     uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -75,7 +75,7 @@ class Transaction(db.Model):  # type: ignore
                               nullable=False)
 
 
-    transaction_calculation_reference = db.relationship('TransactionCalculationReference', uselist=False, back_populates='transaction')
+    transaction_input = db.relationship('TransactionInput', uselist=False, back_populates='transaction')
 
     discriminator = db.Column('t_type', db.String(32)) #t_type: transaction_type
     __mapper_args__ = {'polymorphic_on': discriminator}
@@ -93,7 +93,7 @@ class TransactionCalculationReference(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-    transaction = db.relationship("Transaction", back_populates="transaction_calculation_reference")
+    transaction = db.relationship("Transaction", back_populates="transaction_input")
 
     export = db.Column(db.String(8))
     tax_code = db.Column(db.String(8))
