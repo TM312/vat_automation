@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import inspect
 
 from flask import current_app
+from current_app.config import COMPANY_NAME, SECRET_KEY
 from werkzeug.exceptions import InternalServerError, NotFound, Unauthorized
 
 from app.extensions import db
@@ -96,14 +97,14 @@ class TokenService:
         """
         try:
             payload = {
-                'iss': current_app.config['COMPANY_NAME'].lower(),
+                'iss': COMPANY_NAME.lower(),
                 'exp': datetime.utcnow() + timedelta(minutes=token_lifespan),
                 'iat': datetime.utcnow(),
                 'sub': public_id
             }
             auth_token = jwt.encode(
                 payload,
-                current_app.config['SECRET_KEY'],
+                SECRET_KEY,
                 algorithm='HS256'
             )
             return auth_token
@@ -119,7 +120,7 @@ class TokenService:
         :return: integer|string
         """
         try:
-            key = current_app.config['SECRET_KEY']
+            key = SECRET_KEY
             payload = jwt.decode(auth_token, key)
             is_blacklisted_token = TokenService.check_blacklisted(auth_token)
             if is_blacklisted_token:

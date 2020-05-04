@@ -2,6 +2,7 @@ from typing import List
 
 from flask import request
 from flask import current_app, g
+from current_app.config import TOKEN_LIFESPAN_REGISTRATION
 
 from flask_restx import Namespace, Resource
 
@@ -55,7 +56,7 @@ class UserLogin(Resource):
         """ Login User """
         # get the post data
         user_data: UserInterface = request.json
-        token_lifespan: TokenInterface = current_app.config['TOKEN_LIFESPAN_REGISTRATION']
+        token_lifespan: TokenInterface = TOKEN_LIFESPAN_REGISTRATION
         return TokenService.login_user(user_data, token_lifespan)
 
 

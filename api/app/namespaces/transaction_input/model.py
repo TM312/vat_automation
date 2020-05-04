@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.extensions import db
 
 
@@ -7,8 +9,13 @@ class TransactionInput(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     source = db.Column(db.String(128), nullable=False)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-    transaction = db.relationship("Transaction", back_populates="transaction_input")
+    created_on = db.Column(db.Datetime, default=datetime.utcnow)
+    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
+
+    processed = db.Column(db.Boolean, default=False)
+    processed_on = db.Column(db.Datetime)
+    transaction = db.relationship('Transaction', uselist=False, back_populates='transaction_input')
+
 
     account_public_id = db.Column(db.String(128), nullable=False)
     public_activity_period = db.Column(db.String(64))
@@ -100,3 +107,8 @@ class TransactionInput(db.Model):
 
     def __repr__(self):
         return '<TransactionInput: {} – {}>'.format(self.source, self.transaction_id)
+
+
+    def update_processed(self):
+        self.processed = True
+        self.processed_on = datetime.utcnow()

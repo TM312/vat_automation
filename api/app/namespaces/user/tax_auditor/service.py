@@ -1,6 +1,7 @@
 import pandas as pd
 
 from app.extensions import db
+from current_app.config import BASE_PATH_MEDIA, TAX_DATA_MAX_REQUEST_SIZE, TAX_DATA_ALLOWED_EXTENSIONS
 
 from .model import TaxAuditor
 
@@ -247,7 +248,7 @@ class TaxAuditorService:
 
         # the file is saved to a temporary path relating to the uploader's company. The dir is named 'temp'
         temp_dirpath = os.path.join(
-            current_app.config['BASE_PATH_MEDIA'],
+            BASE_PATH_MEDIA,
             str(tax_auditor.employer.public_id),
             'tax_record',
             'temp'
@@ -269,7 +270,7 @@ class TaxAuditorService:
         # the file size is compared to the allowed file size from config
         # if file size > allowed file size the file is being deleted.
         file_size = os.stat(temp_file_path).st_size
-        if file_size > current_app.config['TAX_DATA_MAX_REQUEST_SIZE']:
+        if file_size > TAX_DATA_MAX_REQUEST_SIZE:
             os.remove(temp_file_path)
             raise RequestEntityTooLarge(
                 'Uploaded files exceed the file limit. Please reduce the number of files to be processed at once.')
@@ -289,7 +290,7 @@ class TaxAuditorService:
             if tax_auditor.employer_id == seller_firm.accounting_firm_id:
                     # i.e. a record is created for the own employer
                 final_dirpath = os.path.join(
-                    current_app.config['BASE_PATH_MEDIA'],
+                    BASE_PATH_MEDIA,
                     str(seller_firm.public_id),
                     'tax_record',
                     activity_period
@@ -348,7 +349,7 @@ class TaxAuditorService:
     def allowed_file(filename):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower(
-            ) in current_app.config['TAX_DATA_ALLOWED_EXTENSIONS']
+            ) in TAX_DATA_ALLOWED_EXTENSIONS
 
     @staticmethod
     def name_info_retrieve(temp_file_path, filename):

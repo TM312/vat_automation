@@ -3,6 +3,7 @@ import uuid
 import hashlib
 
 from flask import current_app
+from current_app.config import BCRYPT_LOG_ROUNDS
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db  # noqa
@@ -31,8 +32,8 @@ class User(db.Model):  # type: ignore
     location = db.Column(db.String(32))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    transaction_uploads = db.relationship(
-        'Transaction', backref='uploader', order_by="desc(Transaction.added_on)", lazy=True)
+    transaction_input_uploads = db.relationship(
+        'TransactionInput', backref='uploader', order_by="desc(TransactionInput.created_on)", lazy=True)
 
     actions = db.relationship(
         'Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
@@ -48,7 +49,7 @@ class User(db.Model):  # type: ignore
     @password.setter
     def password(self, password):
         self.password_hash = bcrypt.generate_password_hash(
-            password, rounds=current_app.config['BCRYPT_LOG_ROUNDS']).decode('utf-8')
+            password, rounds=BCRYPT_LOG_ROUNDS).decode('utf-8')
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)

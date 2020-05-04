@@ -53,7 +53,7 @@ class Development(Config):
 
     # Media Uploads
     BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
-    #BASE_PATH_MEDIA = '/var/lib/media_data/'
+    BASE_PATH_LOGS = '/Users/tm/Projects/NTAMAZON/webapp_data/logs'
 
 
 
@@ -77,7 +77,9 @@ class Production(Config):
     SECRET_KEY = os.getenv('SECRET_KEY_PROD')
 
     # Media Uploads
-    # BASE_PATH_MEDIA = #test_media_uploads
+    # BASE_PATH_MEDIA = '/var/lib/media_data/'
+    BASE_PATH_LOGS = '/var/lib/logs/'
+
 
 
 app_config = dict(
