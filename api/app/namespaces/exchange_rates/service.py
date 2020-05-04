@@ -1,9 +1,43 @@
 from .model import ExchangeRateCollection, ExchangeRatesEUR, ExchangeRatesGBP, ExchangeRatesCZK, ExchangeRatesPLN #noqa
-from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import InternalServerError, NotFound
 
 from datetime import datetime
 
-class ExchangeRatesService:
+class ExchangeRateService:
+
+    @staticmethod
+    def get_rate_by_base_target_date(base, target, date):
+        if base == 'EUR':
+            exchange_rates = ExchangeRatesEUR.query.filter_by(
+                date=date).first()
+        elif base == 'GBP':
+            exchange_rates = ExchangeRatesGBP.query.filter_by(
+                date=date).first()
+        elif base == 'PLN':
+            exchange_rates = ExchangeRatesPLN.query.filter_by(
+                date=date).first()
+        elif base == 'CZK':
+            exchange_rates = ExchangeRatesCZK.query.filter_by(
+                date=date).first()
+        else:
+            raise NotFound(
+                'The base currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
+
+        if target == 'EUR':
+            exchange_rate = exchange_rates.eur
+        elif target == 'PLN':
+            exchange_rate = exchange_rates.pln
+        elif target == 'GBP':
+            exchange_rate = exchange_rates.gbp
+        elif target == 'CZK':
+            exchange_rate = exchange_rates.czk
+        else:
+            raise NotFound(
+                'The target currency "{}" is currently not supported. Please get in touch with one of the administrators.'.format(base))
+
+        return exchange_rate
+
+
 
     @staticmethod
     def retrieve_ecb_exchange_rates():
@@ -26,7 +60,8 @@ class ExchangeRatesService:
         return exchange_rate_dict
 
 
-    def create_exchange_rate_collection(date) -> ExchangeRateCollection:
+    @staticmethod
+    def create_exchange_rate_collection(date: date) -> ExchangeRateCollection:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(date=date).first()
 
         if not exchange_rate_collection:
@@ -42,15 +77,15 @@ class ExchangeRatesService:
 
             return new_exchange_rate_collection
 
-
-    def create_exchange_rates_EUR(date) -> ExchangeRatesEUR:
+    @staticmethod
+    def create_exchange_rates_EUR(date: date) -> ExchangeRatesEUR:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
             date=date).first()
 
         if exchange_rate_collection:
 
             #api call to ECB
-            exchange_rate_dict = ExchangeRatesService.retrieve_ecb_exchange_rates()
+            exchange_rate_dict = ExchangeRateService.retrieve_ecb_exchange_rates()
 
             new_exchange_rates_EUR = ExchangeRatesEUR(
                 source='ECB',
@@ -76,7 +111,7 @@ class ExchangeRatesService:
             }
             raise InternalServerError(response_object)
 
-
+    @staticmethod
     def create_exchange_rates_GBP(date) -> ExchangeRatesGBP:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
                 date=date).first()
@@ -111,7 +146,7 @@ class ExchangeRatesService:
             }
             raise InternalServerError(response_object)
 
-
+    @staticmethod
     def create_exchange_rates_CZK(date) -> ExchangeRatesCZK:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
             date=date).first()
@@ -145,6 +180,7 @@ class ExchangeRatesService:
             }
             raise InternalServerError(response_object)
 
+    @staticmethod
     def create_exchange_rates_PLN(date) -> ExchangeRatesPLN:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
             date=date).first()

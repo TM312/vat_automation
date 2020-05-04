@@ -3,6 +3,7 @@ from datetime import datetime
 
 from flask_mail import Message
 from flask import current_app, render_template
+from current_app.config import MAIL_DEFAULT_SENDER, SECRET_KEY, EMAIL_CONFIRMATION_SALT, FRONTEND_HOST, EMAIL_CONFIRMATION_MAX_AGE
 from itsdangerous.url_safe import URLSafeTimedSerializer
 from itsdangerous import SignatureExpired, BadTimeSignature
 from werkzeug.exceptions import Conflict, Gone, BadRequest
@@ -29,7 +30,7 @@ class EmailService:
 
         msg = Message(
             subject=subject,
-            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            sender=MAIL_DEFAULT_SENDER,
             recipients=recipients
         )
         msg.html = render_template(template, **kwargs)
@@ -37,15 +38,15 @@ class EmailService:
         EmailService.send_async_email(app, msg) # EmailService.send_async_email.delay(app, msg)
 
     def generate_confirmation_url(user_email):
-        confirm_serializer = URLSafeTimedSerializer(secret_key=current_app.config['SECRET_KEY'])
+        confirm_serializer = URLSafeTimedSerializer(secret_key=SECRET_KEY)
         token=confirm_serializer.dumps(
             obj=user_email,
-            salt=current_app.config['EMAIL_CONFIRMATION_SALT']
+            salt=EMAIL_CONFIRMATION_SALT
         )  # Returns a signed string serialized with the internal serializer.
 
 
         confirmation_link = '{}/confirm/{}'.format(
-            current_app.config['FRONTEND_HOST'],
+            FRONTEND_HOST,
             token
             )
 
@@ -54,11 +55,11 @@ class EmailService:
 
     def confirm_email(token):
         confirm_serializer = URLSafeTimedSerializer(
-            secret_key=current_app.config['SECRET_KEY']
+            secret_key=SECRET_KEY
         )
         try:
-            salt = current_app.config['EMAIL_CONFIRMATION_SALT']
-            max_age = current_app.config['EMAIL_CONFIRMATION_MAX_AGE']
+            salt = EMAIL_CONFIRMATION_SALT
+            max_age = EMAIL_CONFIRMATION_MAX_AGE
 
             email = confirm_serializer.loads(
                 token,

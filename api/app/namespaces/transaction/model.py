@@ -37,30 +37,27 @@ class Transaction(db.Model):  # type: ignore
     __tablename__ = "transaction"
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(128), nullable=False)
-    activity_id = db.Column(db.String(128))
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
-    added_on = db.Column(db.DateTime, default=datetime.utcnow)
-    #source = db.Column(db.String(128), nullable=False)
-    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))
+    transaction_input = db.relationship("TransactionInput", back_populates="transaction")
+
+    tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'), nullable=False)
+
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
 
     marketplace_name = db.Column(db.Integer, db.ForeignKey('marketplace.name'))
+    public_id = db.Column(db.String(128), nullable=False)
+    activity_id = db.Column(db.String(128), nullable=False)
 
-    item_id = db.Column(db.String(48), db.ForeignKey('item.id'))
-
-    tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'),
-                                   nullable=False)
+    item_id = db.Column(db.String(48), db.ForeignKey('item.id'), nullable=False)
 
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
 
-
+    transaction_type_code = db.Column(db.String(8))
 
     item_quantity = db.Column(db.Integer, default=1)
-
-
-    tax_calculation_date = db.Column(db.Date)
 
     shipment_date = db.Column(db.Date)
     tax_date = db.Column(db.Date)
@@ -71,141 +68,60 @@ class Transaction(db.Model):  # type: ignore
     arrival_city = db.Column(db.String(256))
     arrival_address = db.Column(db.String(256))
 
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'),
-                              nullable=False)
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
 
 
-    transaction_input = db.relationship('TransactionInput', uselist=False, back_populates='transaction')
 
-    discriminator = db.Column('t_type', db.String(32)) #t_type: transaction_type
-    __mapper_args__ = {'polymorphic_on': discriminator}
+
+
+
+
+
+    tax_calculation_date = db.Column(db.Date)
+    item_price_discount_net = db.Column(db.Float(precision=24))
+    item_price_discount_vat = db.Column(db.Float(precision=24))
+    item_price_net = db.Column(db.Float(precision=24))
+    item_price_vat = db.Column(db.Float(precision=24))
+    item_price_total_net = db.Column(db.Float(precision=24))
+    item_price_total_vat = db.Column(db.Float(precision=24))
+    item_price_tax_rate_rate = db.Column(db.Float(precision=24))
+    shipment_price_discount_net = db.Column(db.Float(precision=24))
+    shipment_price_discount_vat = db.Column(db.Float(precision=24))
+    shipment_price_net = db.Column(db.Float(precision=24))
+    shipment_price_vat = db.Column(db.Float(precision=24))
+    shipment_price_total_net = db.Column(db.Float(precision=24))
+    shipment_price_total_vat = db.Column(db.Float(precision=24))
+    shipment_price_tax_rate_rate = db.Column(db.Float(precision=24))
+    sale_total_value_net = db.Column(db.Float(precision=24))
+    sale_total_value_vat = db.Column(db.Float(precision=24))
+    gift_wrap_price_discount_net = db.Column(db.Float(precision=24))
+    gift_wrap_price_discount_vat = db.Column(db.Float(precision=24))
+    gift_wrap_price_net = db.Column(db.Float(precision=24))
+    gift_wrap_price_vat = db.Column(db.Float(precision=24))
+    gift_wrap_price_total_net = db.Column(db.Float(precision=24))
+    gift_wrap_price_total_vat = db.Column(db.Float(precision=24))
+    gift_wrap_price_tax_rate = db.Column(db.Float(precision=24))
+    item_tax_code_code = db.Column(db.String(8))
+    departure_seller_vat_country_code = db.Column(db.String(8))
+    departure_seller_vat_number = db.Column(db.String(24))
+    arrival_seller_vat_country_code = db.Column(db.String(8))
+    arrival_seller_vat_number = db.Column(db.String(24))
+    seller_vat_country_code = db.Column(db.String(8))
+    seller_vat_number = db.Column(db.String(24))
+    tax_calculation_imputation_country = db.Column(db.String(24))
+    tax_jurisdiction = db.Column(db.String(24))
+    tax_jurisdiction_level = db.Column(db.String(24))
+    invoice_amount_vat = db.Column(db.Float(precision=24))
+    invoice_currency_code = db.Column(db.String(8))
+    invoice_exchange_rate = db.Column(db.Float(precision=24))
+    invoice_exchange_rate_date = db.Column(db.Date)
+    export = db.Column(db.Boolean)
+
+
 
     def __repr__(self):
-        return '<{}: id:{} – public_id:{} - added_on:{} uploader_id: {}>'.format(self.t_type, self.id, self.public_id, self.added_on, self.uploader_id)
+        return '<{}: id:{} – public_id:{} - created_on:{}>'.format(self.transaction_type_code, self.id, self.public_id, self.created_on)
 
 
 
-
-class TransactionCalculationReference(db.Model):
-       """ Calculation reference """
-    __tablename__ = "transaction_calculation_reference"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-    transaction = db.relationship("Transaction", back_populates="transaction_input")
-
-    export = db.Column(db.String(8))
-    tax_code = db.Column(db.String(8))
-
-    arrival_seller_vat_number = db.Column(db.String(48))
-    arrival_seller_vat_number_country = db.Column(db.String(8))
-
-    departure_seller_vat_number = db.Column(db.String(48))
-    departure_seller_vat_number_country = db.Column(db.String(8))
-
-    seller_vat_number = db.Column(db.String(40))
-    seller_vat_number_country = db.Column(db.String(8))
-
-    invoice_amount_vat = db.Column(db.Float())
-    invoice_currency_code = db.Column(db.String(8))
-    invoice_exchange_rate = db.Column(db.Float())
-    invoice_exchange_rate_date = db.Column(db.Date())
-
-    gift_wrap_price_discount_net = db.Column(db.Float())
-    gift_wrap_price_discount_vat = db.Column(db.Float())
-    gift_wrap_price_net = db.Column(db.Float())
-    gift_wrap_price_vat = db.Column(db.Float())
-    gift_wrap_price_total_net = db.Column(db.Float())
-    gift_wrap_price_total_vat = db.Column(db.Float())
-    gift_wrap_price_vat_rate = db.Column(db.Float())
-
-    item_price_discount_net = db.Column(db.Float())
-    item_price_discount_vat = db.Column(db.Float())
-    item_price_net = db.Column(db.Float())
-    item_price_vat = db.Column(db.Float())
-    item_price_total_net = db.Column(db.Float())
-    item_price_total_vat = db.Column(db.Float())
-    item_price_vat_rate = db.Column(db.Float())
-
-    shipment_price_discount_net = db.Column(db.Float())
-    shipment_price_discount_vat = db.Column(db.Float())
-    shipment_price_net = db.Column(db.Float())
-    shipment_price_vat = db.Column(db.Float())
-    shipment_price_total_net = db.Column(db.Float())
-    shipment_price_total_vat = db.Column(db.Float())
-    shipment_price_vat_rate = db.Column(db.Float())
-
-    sale_total_value_net = db.Column(db.Float())
-    sale_total_value_vat = db.Column(db.Float())
-
-    tax_jurisdiction = db.Column(db.String(40))
-    tax_jurisdiction_level = db.Column(db.String(32))
-
-    vat_calculation_imputation_country = db.Column(db.String(8))
-
-
-
-    def __init__(self, **kwargs):
-        super(TransactionCalculationReference, self).__init__(**kwargs)
-
-
-
-
-
-
-class Sale(Transaction):
-    __mapper_args__ = {'polymorphic_identity': 'sale'}
-
-    shipment_id = db.Column(db.String(128))
-
-
-
-    def __init__(self, **kwargs):
-        super(Sale, self).__init__(**kwargs)
-
-
-
-class Return(Transaction):
-    __mapper_args__ = {'polymorphic_identity': 'return'}
-
-    return_id = db.Column(db.String(128))
-
-
-    def __init__(self, **kwargs):
-        super(Return, self).__init__(**kwargs)
-
-
-
-
-class Refund(Transaction):
-    __mapper_args__ = {'polymorphic_identity': 'refund'}
-
-    refund_id = db.Column(db.String(128))
-
-    def __init__(self, **kwargs):
-        super(Refund, self).__init__(**kwargs)
-
-
-
-
-class Movement(Transaction):
-    __mapper_args__ = {'polymorphic_identity': 'movement'}
-
-    movement_id = db.Column(db.String(128))
-
-
-    def __init__(self, **kwargs):
-        super(Movement, self).__init__(**kwargs)
-
-
-
-
-class Acquisition(Transaction):
-    __mapper_args__ = {'polymorphic_identity': 'acquisition'}
-
-    acquisition_id = db.Column(db.String(128))
-
-
-    def __init__(self, **kwargs):
-        super(Acquisition, self).__init__(**kwargs)
+#### ENUM ???ß

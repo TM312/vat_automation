@@ -8,7 +8,7 @@ class TaxTreatment(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(40), nullable=False)
     description = db.Column(db.String(256))
-    transaction_type_name = db.Column(db.String(16), db.ForeignKey('transaction_type.name'),
+    transaction_type_code = db.Column(db.String(16), db.ForeignKey('transaction_type.code'),
                                       nullable=False)
     transactions = db.relationship(
         'Transaction', backref='tax_treatment', lazy=True)

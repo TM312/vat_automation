@@ -4,6 +4,10 @@ import time
 
 from app.extensions import db
 from vatin import MEMBER_COUNTRY_CODES, VATIN_MAX_LENGTH, logger
+
+from current_app.config import VATIN_LIFESPAN
+
+
 from .model import VATIN
 
 from flask import current_app
@@ -36,7 +40,7 @@ class VATINService:
         elif 'valid_from' in kwargs and 'valid_to' not in kwargs:
             valid_from = kwargs['valid_from']
             valid_to_base = max(valid_from, date)
-            valid_to = valid_to_base + timedelta(days=current_app.config['VATIN_LIFESPAN'])
+            valid_to = valid_to_base + timedelta(days=VATIN_LIFESPAN)
 
         elif 'valid_from' not in kwargs and 'valid_to' in kwargs:
             valid_from = min(valid_to, date)
@@ -44,7 +48,7 @@ class VATINService:
 
         elif 'valid_from' not in kwargs and 'valid_to' not in kwargs:
             valid_from = date
-            valid_to = date.today() + timedelta(days=current_app.config['VATIN_LIFESPAN'])
+            valid_to = date.today() + timedelta(days=VATIN_LIFESPAN)
 
 
         new_vatin = VATIN(

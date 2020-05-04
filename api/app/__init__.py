@@ -1,5 +1,6 @@
 # following http://www.patricksoftwareblog.com/structuring-a-flask-project/
 from app.extensions import db, migrate, bcrypt, mail, cors
+from app.logs.service import LogService
 from flask import Flask, jsonify
 import os
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ def create_app(env):
     app.config.from_object(app_config[env])
     register_extensions(app)
     register_api(app)
+    LogService.setup_logging(app)
 
     # for testing purposes of the client (--> '.__init___test.py')
     @app.route("/ping_3f5ca2711e72a507")
@@ -35,7 +37,7 @@ def register_extensions(app):
 def register_api(app):
     from flask_restx import Api
     from app.routes import register_routes
-    api = Api(app, title="NT API", version="0.1.2")
+    api = Api(app, title="Tax-Automation API", version="0.1.5")
     register_routes(api, app)
     #register_routes(api, app, root=os.getenv('API_ROOT'))
     return None
