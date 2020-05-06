@@ -12,7 +12,7 @@ eu_country_AT = db.Table(
 class EU(db.Model):
     __tablename__ = "eu"
     id = db.Column(db.Integer, primary_key=True)
-    valid_from = db.Column(db.Date, nullble=False)
+    valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
     countries = db.relationship(
         "Country",
@@ -27,7 +27,10 @@ class Country(db.Model):  # type: ignore
 
     code = db.Column(db.String(4), primary_key=True)
     vat_country_code = db.Column(db.String(4))
-    country_name = db.Column(db.String(16), nullable=False)
+    name = db.Column(db.String(16), nullable=False)
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+
     tax_codes = db.relationship('TaxRate', back_populates='country')
     eus = db.relationship(
         "EU",
@@ -35,7 +38,7 @@ class Country(db.Model):  # type: ignore
         back_populates="countries"
     )
 
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), default=None)
     distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country', lazy=True)
 
