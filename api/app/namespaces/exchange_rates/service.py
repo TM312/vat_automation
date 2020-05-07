@@ -1,7 +1,7 @@
 from .model import ExchangeRateCollection, ExchangeRatesEUR, ExchangeRatesGBP, ExchangeRatesCZK, ExchangeRatesPLN #noqa
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from datetime import datetime
+from datetime import datetime, date
 
 class ExchangeRateService:
 
@@ -78,9 +78,10 @@ class ExchangeRateService:
             return new_exchange_rate_collection
 
     @staticmethod
-    def create_exchange_rates_EUR(date: date) -> ExchangeRatesEUR:
+    def create_exchange_rates_EUR() -> ExchangeRatesEUR:
+        today = date.today()
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
-            date=date).first()
+            date=today).first()
 
         if exchange_rate_collection:
 
@@ -90,7 +91,7 @@ class ExchangeRateService:
             new_exchange_rates_EUR = ExchangeRatesEUR(
                 source='ECB',
                 created_on=datetime.utcnow(),
-                date=exchange_rate_collection.date,
+                date=today,
                 exchange_rate_collection_id=exchange_rate_collection.id,
                 eur=1.0000,
                 gbp=exchange_rate_dict['GBP'],

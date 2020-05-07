@@ -16,7 +16,7 @@ from werkzeug.exceptions import NotFound, RequestEntityTooLarge, UnsupportedMedi
 from app.extensions import db
 
 # service classes
-from ... import TransactionType
+!!! from ... import TransactionType
 
 
 class TransactionService:
@@ -52,8 +52,8 @@ class TransactionService:
 
     @staticmethod
     def get_own(user):
-        transactions = Transaction.query.filter_by(owner_id=user.id).all().order_by(
-            Transaction.created_on.desc())
+        #transactions = Transaction.query.filter_by(owner_id=user.id).all().order_by(Transaction.created_on.desc())
+        !!! -> needs join search
         return transactions
 
     @staticmethod
@@ -178,8 +178,6 @@ class TaxRateService:
             return tax_rate
         else:
             raise NotFound('The tax rate for the tax rate type "{}" and the country "{}" could not be found. Please get in contact with one of the admins.'.format(tax_rate_type_name, country.name))
-
-
 
 
 
@@ -349,10 +347,6 @@ class TransactionService:
 
 
 
-
-
-
-## END MASTER FUNCTION ##
 
 
 

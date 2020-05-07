@@ -11,11 +11,11 @@ tax_rate_types = [
     },
     {
         'code': 'R2'
-        'description': ''
+        'description': 'Reduced Rate 2'
     },
     {
         'code': 'SR'
-        'description': ''
+        'description': 'Super Reduced Rate'
     },
     {
         'code': 'Z'

@@ -5,9 +5,11 @@ from app.extensions import db
 eu_country_AT = db.Table(
     'eu_country_AT',
     db.Column('eu_id', db.Integer, db.ForeignKey('eu.id'), primary_key=True),
-    db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True)
+    db.Column('country_code', db.Integer, db.ForeignKey('country.code'), primary_key=True)
     )
 
+#### ^potentially change to
+#db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True)
 
 class EU(db.Model):
     __tablename__ = "eu"
