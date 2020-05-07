@@ -8,9 +8,13 @@ class TransactionType(db.Model):  # type: ignore
     __tablename__ = "transaction_type"
 
     code = db.Column(db.String(16), primary_key=True)
-    description = db.Column(db.String(256))
-    tax_treatments = db.relationship(
-        'TaxTreatment', backref='transaction_type', lazy=True)
+    description = db.Column(db.String(128))
+
+    tax_treatment_codes = db.relationship(
+        "TaxTreatment",
+         secondary=tax_treatment_transaction_type_AT,
+        back_populates="transaction_types"
+     )
 
     def __init__(self, **kwargs):
         super(TransactionType, self).__init__(**kwargs)
