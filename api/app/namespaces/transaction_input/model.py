@@ -33,7 +33,6 @@ class TransactionInput(db.Model):
     item_quantity = db.Column(db.Integer)
     item_weight_kg = db.Column(db.Float(precision=24))
     item_weight_kg_total = db.Column(db.Float(precision=24))
-    unit_cost_price_net = db.Column(db.Float(precision=24))
     item_price_discount_gross = db.Column(db.Float(precision=24))
     item_price_gross = db.Column(db.Float(precision=24))
     item_price_total_gross = db.Column(db.Float(precision=24))
@@ -63,6 +62,7 @@ class TransactionInput(db.Model):
     supplier_name = db.Column(db.String(64))
 
     check_tax_calculation_date = db.Column(db.Date)
+    check_unit_cost_price_net = db.Column(db.Float(precision=24))
     check_item_price_discount_net = db.Column(db.Float(precision=24))
     check_item_price_discount_vat = db.Column(db.Float(precision=24))
     check_item_price_net = db.Column(db.Float(precision=24))

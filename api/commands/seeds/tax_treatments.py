@@ -25,8 +25,8 @@ tax_treatments = [
         'description': 'Sale of good(s) leaving the Single European Economic Area. Limited to Transaction Types SALE (and REFUND).'
     },
     {
-        'code': 'LOCAL_ACQUISITION',
-        'name': 'Local Acquisition',
+        'code': 'DOMESTIC_ACQUISITION',
+        'name': 'Domestic Acquisition',
         'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
     },
     {
@@ -34,11 +34,11 @@ tax_treatments = [
         'name': 'Intra Community Acquisition',
         'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Acquisition (Departure != Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number).'
     },
-    {
-        'code': 'IMPORT',
-        'name': 'Import',
-        'description': 'Import of good(s) entering the Single European Economic Area.'
-    }
+    # {
+    #     'code': 'IMPORT',
+    #     'name': 'Import',
+    #     'description': 'Import of good(s) entering the Single European Economic Area.'
+    # }
 ]
 
 
@@ -52,8 +52,8 @@ class TaxTreatmentSeedService:
         transaction_type_tax_treatment_dict = [
             {'SALE': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
             {'REFUND': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
-            {'ACQUISITION': ['LOCAL_ACQUISITION', 'INTRA_COMMUNITY_ACQUISITION', 'IMPORT']},
-            {'MOVEMENT': ['INTRA_COMMUNITY_SALE', 'EXPORT', 'INTRA_COMMUNITY_ACQUISITION', 'IMPORT']}
+            {'ACQUISITION': ['DOMESTIC_ACQUISITION']},
+            {'MOVEMENT': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']}
         ]
 
         try:

@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 from typing import List
-
+from flask import current_app
 from .model import TransactionInput
 
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
@@ -62,6 +62,19 @@ class TransactionInputService:
 
 
     @staticmethod
+    def get_float(df, i:int, column:str) -> float:
+        if pd.isnull(df.iloc[i][column]):
+            return 0.0
+        else:
+            try:
+                flt = float(df.iloc[i][column])
+            except:
+                raise UnsupportedMediaType('Can not read date format.')
+
+        return flt
+
+
+    @staticmethod
     def get_bool(df, i:int, column:str, value_true) -> bool:
         try:
             boolean = bool(df.iloc[i][column] == value_true)
@@ -72,7 +85,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def get_transaction_inputs_by_source(source: str):
+    def get_transaction_inputs_by_source(source: str) -> List[TransactionInput]:
         transaction_inputs = TransactionInput.query.filter_by(source=source).all()
         if transaction_inputs:
             return transaction_inputs
@@ -143,8 +156,7 @@ class TransactionInputService:
                         db.session.add(new_transaction_input)
                         db.session.commit()
                     except:
-                        !!!! db.session.rollback()
-                        !!!! logger.log
+                        db.session.rollback()
 
                         error_counter += 1
 
@@ -203,56 +215,56 @@ class TransactionInputService:
         item_name = str(df.iloc[i]['ITEM_DESCRIPTION']) #str
         item_manufacture_country = TransactionInputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY') #str/NoneType
         item_quantity = int(df.iloc[i]['QTY']) #-->transaction
-        item_weight_kg = float(df.iloc[i]['ITEM_WEIGHT']) if not pd.isnull(df.iloc[i]['ITEM_WEIGHT']) else None #float/NoneType
-        item_weight_kg_total = float(df.iloc[i]['TOTAL_ACTIVITY_WEIGHT']) if not pd.isnull(df.iloc[i]['TOTAL_ACTIVITY_WEIGHT']) else None
+        item_weight_kg = TransactionInputService.get_float(df, i, column='ITEM_WEIGHT')
+        item_weight_kg_total = TransactionInputService.get_float(df, i, column='TOTAL_ACTIVITY_WEIGHT')
 
-        unit_cost_price_net = float(df.iloc[i]['COST_PRICE_OF_ITEMS']) if not pd.isnull(df.iloc[i]['COST_PRICE_OF_ITEMS']) else None
+        check_unit_cost_price_net = TransactionInputService.get_float(df, i, column='COST_PRICE_OF_ITEMS')
 
-        check_item_price_discount_net = float(df.iloc[i]['PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL']) else None
-        check_item_price_discount_vat = float(df.iloc[i]['PROMO_PRICE_OF_ITEMS_VAT_AMT']) if not pd.isnull(df.iloc[i]['PROMO_PRICE_OF_ITEMS_VAT_AMT']) else None
-        item_price_discount_gross = float(df.iloc[i]['PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL']) else None #-->transaction
+        check_item_price_discount_net = TransactionInputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL')
+        check_item_price_discount_vat = TransactionInputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_VAT_AMT')
+        item_price_discount_gross = TransactionInputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL') #-->transaction
 
-        check_item_price_net = float(df.iloc[i]['PRICE_OF_ITEMS_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['PRICE_OF_ITEMS_AMT_VAT_EXCL']) else None
-        check_item_price_vat = float(df.iloc[i]['PRICE_OF_ITEMS_VAT_AMT']) if not pd.isnull(df.iloc[i]['PRICE_OF_ITEMS_AMT_VAT_EXCL']) else None
-        item_price_gross = float(df.iloc[i]['PRICE_OF_ITEMS_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['PRICE_OF_ITEMS_AMT_VAT_EXCL']) else None #-->transaction
+        check_item_price_net = TransactionInputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_EXCL')
+        check_item_price_vat = TransactionInputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_AMT')
+        item_price_gross = TransactionInputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL') #-->transaction
 
-        check_item_price_total_net = float(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL']) else None
-        check_item_price_total_vat = float(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_VAT_AMT']) if not pd.isnull(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_VAT_AMT']) else None
-        item_price_total_gross = float(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL']) else None #-->transaction
+        check_item_price_total_net = TransactionInputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL')
+        check_item_price_total_vat = TransactionInputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_VAT_AMT')
+        item_price_total_gross = TransactionInputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL') #-->transaction
 
-        check_item_price_tax_rate_rate = float(df.iloc[i]['PRICE_OF_ITEMS_VAT_RATE_PERCENT']) if not pd.isnull(df.iloc[i]['PRICE_OF_ITEMS_VAT_RATE_PERCENT']) else None
+        check_item_price_tax_rate_rate = TransactionInputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT')
 
-        check_shipment_price_discount_net = float(df.iloc[i]['PROMO_SHIP_CHARGE_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_EXCL']) else None
-        check_shipment_price_discount_vat = float(df.iloc[i]['PROMO_SHIP_CHARGE_VAT_AMT']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_EXCL']) else None
-        shipment_price_discount_gross = float(df.iloc[i]['PROMO_SHIP_CHARGE_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_EXCL']) else None #-->transaction
+        check_shipment_price_discount_net = TransactionInputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_EXCL')
+        check_shipment_price_discount_vat = TransactionInputService.get_float(df, i, column='PROMO_SHIP_CHARGE_VAT_AMT')
+        shipment_price_discount_gross = TransactionInputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL') #-->transaction
 
-        check_shipment_price_net = float(df.iloc[i]['SHIP_CHARGE_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['SHIP_CHARGE_AMT_VAT_EXCL']) else None
-        check_shipment_price_vat = float(df.iloc[i]['SHIP_CHARGE_VAT_AMT']) if not pd.isnull(df.iloc[i]['SHIP_CHARGE_VAT_AMT']) else None
-        shipment_price_gross = float(df.iloc[i]['SHIP_CHARGE_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['SHIP_CHARGE_AMT_VAT_INCL']) else None #-->transaction
+        check_shipment_price_net = TransactionInputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_EXCL')
+        check_shipment_price_vat = TransactionInputService.get_float(df, i, column='SHIP_CHARGE_VAT_AMT')
+        shipment_price_gross = TransactionInputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_INCL') #-->transaction
 
-        check_shipment_price_total_net = float(df.iloc[i]['TOTAL_SHIP_CHARGE_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['TOTAL_SHIP_CHARGE_AMT_VAT_EXCL']) else None
-        check_shipment_price_total_vat = float(df.iloc[i]['TOTAL_SHIP_CHARGE_VAT_AMT']) if not pd.isnull(df.iloc[i]['TOTAL_SHIP_CHARGE_VAT_AMT']) else None
-        shipment_price_total_gross = float(df.iloc[i]['TOTAL_SHIP_CHARGE_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['TOTAL_SHIP_CHARGE_AMT_VAT_INCL']) else None #-->transaction
+        check_shipment_price_total_net = TransactionInputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_EXCL')
+        check_shipment_price_total_vat = TransactionInputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_VAT_AMT')
+        shipment_price_total_gross = TransactionInputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL') #-->transaction
 
-        check_shipment_price_tax_rate_rate = float(df.iloc[i]['SHIP_CHARGE_VAT_RATE_PERCENT']) if not pd.isnull(df.iloc[i]['SHIP_CHARGE_VAT_RATE_PERCENT']) else None
+        check_shipment_price_tax_rate_rate = TransactionInputService.get_float(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT')
 
-        check_sale_total_value_net = float(df.iloc[i]['TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL']) else None
-        check_sale_total_value_vat = float(df.iloc[i]['TOTAL_ACTIVITY_VALUE_VAT_AMT']) if not pd.isnull(df.iloc[i]['TOTAL_ACTIVITY_VALUE_VAT_AMT']) else None
-        sale_total_value_gross = float(df.iloc[i]['TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL']) else None #-->transaction
+        check_sale_total_value_net = TransactionInputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL')
+        check_sale_total_value_vat = TransactionInputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_VAT_AMT')
+        sale_total_value_gross = TransactionInputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL') #-->transaction
 
-        check_gift_wrap_price_discount_net = float(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_EXCL']) else None
-        check_gift_wrap_price_discount_vat = float(df.iloc[i]['PROMO_GIFT_WRAP_VAT_AMT']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_VAT_AMT']) else None
-        gift_wrap_price_discount_gross = float(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['PROMO_GIFT_WRAP_AMT_VAT_INCL']) else None #-->transaction
+        check_gift_wrap_price_discount_net = TransactionInputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_EXCL')
+        check_gift_wrap_price_discount_vat = TransactionInputService.get_float(df, i, column='PROMO_GIFT_WRAP_VAT_AMT')
+        gift_wrap_price_discount_gross = TransactionInputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL') #-->transaction
 
-        check_gift_wrap_price_net = float(df.iloc[i]['GIFT_WRAP_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['GIFT_WRAP_AMT_VAT_EXCL']) else None
-        check_gift_wrap_price_vat = float(df.iloc[i]['GIFT_WRAP_VAT_AMT']) if not pd.isnull(df.iloc[i]['GIFT_WRAP_VAT_AMT']) else None
-        gift_wrap_price_gross = float(df.iloc[i]['GIFT_WRAP_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['GIFT_WRAP_AMT_VAT_INCL']) else None #-->transaction
+        check_gift_wrap_price_net = TransactionInputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_EXCL')
+        check_gift_wrap_price_vat = TransactionInputService.get_float(df, i, column='GIFT_WRAP_VAT_AMT')
+        gift_wrap_price_gross = TransactionInputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_INCL') #-->transaction
 
-        check_gift_wrap_price_total_net = float(df.iloc[i]['TOTAL_GIFT_WRAP_AMT_VAT_EXCL']) if not pd.isnull(df.iloc[i]['TOTAL_GIFT_WRAP_AMT_VAT_EXCL']) else None
-        check_gift_wrap_price_total_vat = float(df.iloc[i]['TOTAL_GIFT_WRAP_VAT_AMT']) if not pd.isnull(df.iloc[i]['TOTAL_GIFT_WRAP_VAT_AMT']) else None
-        gift_wrap_price_total_gross = float(df.iloc[i]['TOTAL_GIFT_WRAP_AMT_VAT_INCL']) if not pd.isnull(df.iloc[i]['TOTAL_GIFT_WRAP_AMT_VAT_INCL']) else None #-->transaction
+        check_gift_wrap_price_total_net = TransactionInputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_EXCL')
+        check_gift_wrap_price_total_vat = TransactionInputService.get_float(df, i, column='TOTAL_GIFT_WRAP_VAT_AMT')
+        gift_wrap_price_total_gross = TransactionInputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL') #-->transaction
 
-        check_gift_wrap_price_tax_rate = float(df.iloc[i]['GIFT_WRAP_VAT_RATE_PERCENT']) if not pd.isnull(df.iloc[i]['GIFT_WRAP_VAT_RATE_PERCENT']) else None
+        check_gift_wrap_price_tax_rate = TransactionInputService.get_float(df, i, column='GIFT_WRAP_VAT_RATE_PERCENT')
 
 
         currency_code = TransactionInputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE') #str/NoneType
@@ -288,9 +300,9 @@ class TransactionInputService:
         check_tax_jurisdiction_level = TransactionInputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION_LEVEL')
 
         invoice_number = TransactionInputService.get_str_or_None(df, i, column='VAT_INV_NUMBER')
-        check_invoice_amount_vat = float(df.iloc[i]['VAT_INV_CONVERTED_AMT'])
+        check_invoice_amount_vat = TransactionInputService.get_float(df, i, column='VAT_INV_CONVERTED_AMT')
         check_invoice_currency_code = TransactionInputService.get_str_or_None(df, i, column='VAT_INV_CURRENCY_CODE')
-        check_invoice_exchange_rate = float(df.iloc[i]['VAT_INV_EXCHANGE_RATE']) if not pd.isnull(df.iloc[i]['VAT_INV_EXCHANGE_RATE']) else None
+        check_invoice_exchange_rate = TransactionInputService.get_float(df, i, column='VAT_INV_EXCHANGE_RATE')
         check_invoice_exchange_rate_date = TransactionInputService.get_date_or_None(df, i, column='VAT_INV_EXCHANGE_RATE_DATE')
         invoice_url = TransactionInputService.get_str_or_None(df, i, column='INVOICE_URL')
 
@@ -323,7 +335,7 @@ class TransactionInputService:
             item_quantity = item_quantity,
             item_weight_kg = item_weight_kg,
             item_weight_kg_total = item_weight_kg_total,
-            unit_cost_price_net = unit_cost_price_net,
+            check_unit_cost_price_net = check_unit_cost_price_net,
             check_item_price_discount_net = check_item_price_discount_net,
             check_item_price_discount_vat = check_item_price_discount_vat,
             item_price_discount_gross = item_price_discount_gross,
