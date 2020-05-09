@@ -32,8 +32,10 @@ class Config(object):
     # PROFILE_IMAGE_PATH = os.path.join(BASE_PATH_MEDIA, "profile_image")
     # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-    TAX_DATA_ALLOWED_EXTENSIONS = {'csv'}
-    TAX_DATA_MAX_REQUEST_SIZE = 50 * 1024 * 1024  # 50 --> 50MB
+    MAX_FILE_SIZE_INPUT = 50 * 1024 * 1024  # 50 --> 50MB
+
+    ITEM_DATA_ALLOWED_EXTENSIONS = ['csv']
+    TAX_DATA_ALLOWED_EXTENSIONS = ['txt', 'csv']
     TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2099', '%d-%m-%Y').date()
     VATIN_LIFESPAN = 32 # in days
     OLD_TRANSACTION_TOLERANCE_DAYS = 100
@@ -56,6 +58,9 @@ class Development(Config):
     BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
     BASE_PATH_LOGS = '/Users/tm/Projects/NTAMAZON/webapp_data/logs'
     BASE_PATH_SEEDS = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
+    BASE_PATH_STATIC_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm/static_data'
+    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm/transaction_data'
+
 
 
 class Testing(Config):

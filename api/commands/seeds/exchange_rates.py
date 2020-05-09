@@ -1,11 +1,14 @@
 
-from current_app.config import BASE_PATH_SEEDS
 from os import path
 from app.namespaces.exchange_rates.service import ExchangeRateService
 from app.namespaces.exchange_rates.model import ExchangeRatesEUR
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
 import pandas as pd
+from flask import current_app
+
+BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
+
 
 file = 'hist_exchange_rates.csv'
 dirpath = path.join(
@@ -17,7 +20,7 @@ df = pd.read_csv(dirpath)
 
 class ExchangeRatesSeedService:
     @staticmethod
-    def get_date_or_None_incl_format(df, i: int, column: str, dstr_format:str, alternative_dstr_format) -> date or None:
+    def get_date_or_None_incl_format(df, i: int, column: str, dstr_format:str, alternative_dstr_format: str) -> date or None:
         if pd.isnull(df.iloc[i][column]):
             return None
         else:
@@ -34,7 +37,7 @@ class ExchangeRatesSeedService:
     @staticmethod
     def create_exchange_rate_collections():
         for row in range(len(df.index)):
-            date = get_date_or_None_incl_format(df, i=row, column='Date', dstr_format='%Y-%m-%d', alternative_dstr_format='%Y.%m.%d')
+            date = ExchangeRatesSeedService.get_date_or_None_incl_format(df, i=row, column='Date', dstr_format='%Y-%m-%d', alternative_dstr_format='%Y.%m.%d')
             if not date:
                 raise InternalServerError
             else:

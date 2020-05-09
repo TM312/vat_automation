@@ -2,13 +2,11 @@ from typing import List
 
 from flask import request
 from flask import current_app, g
-from current_app.config import TOKEN_LIFESPAN_REGISTRATION
 
 from flask_restx import Namespace, Resource
 
 from .schema import auth_dto
 from ..user.schema_parent import user_dto
-
 
 from .service import TokenService
 
@@ -20,6 +18,7 @@ from ..user.interface_parent import UserInterface
 
 from ..utils.decorators.auth import login_required, accepted_u_types
 
+TOKEN_LIFESPAN_REGISTRATION = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
 ns.add_model(auth_dto.name, auth_dto)

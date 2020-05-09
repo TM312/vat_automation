@@ -3,10 +3,12 @@ import pandas as pd
 from datetime import datetime
 from os import path
 
-from app.config import SERVICE_START_DATE
-from current_app.config import BASE_PATH_SEEDS
-
 from app.country.model import Country, EU
+
+from flask import current_app
+
+BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
+SERVICE_START_DATE = current_app.config["SERVICE_START_DATE"]
 
 
 

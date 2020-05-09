@@ -3,11 +3,12 @@ import uuid
 import hashlib
 
 from flask import current_app
-from current_app.config import BCRYPT_LOG_ROUNDS
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db  # noqa
 from app.extensions import bcrypt
+
+BCRYPT_LOG_ROUNDS = current_app.config["BCRYPT_LOG_ROUNDS"]
 
 
 class User(db.Model):  # type: ignore

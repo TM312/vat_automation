@@ -6,7 +6,6 @@ from datetime import datetime
 import pandas as pd
 
 from flask import current_app
-from current_app.config import BASE_PATH_MEDIA, OLD_TRANSACTION_TOLERANCE_DAYS
 from flask import send_from_directory
 
 from werkzeug.utils import secure_filename
@@ -18,6 +17,9 @@ from app.extensions import db
 # service classes
 !!! from ... import TransactionType
 !!! from... import Bundle
+
+BASE_PATH_MEDIA = current_app.config["BASE_PATH_MEDIA"]
+OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config["OLD_TRANSACTION_TOLERANCE_DAYS"]
 
 
 class TransactionService:

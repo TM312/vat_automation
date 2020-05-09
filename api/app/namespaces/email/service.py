@@ -3,7 +3,6 @@ from datetime import datetime
 
 from flask_mail import Message
 from flask import current_app, render_template
-from current_app.config import MAIL_DEFAULT_SENDER, SECRET_KEY, EMAIL_CONFIRMATION_SALT, FRONTEND_HOST, EMAIL_CONFIRMATION_MAX_AGE
 from itsdangerous.url_safe import URLSafeTimedSerializer
 from itsdangerous import SignatureExpired, BadTimeSignature
 from werkzeug.exceptions import Conflict, Gone, BadRequest
@@ -12,9 +11,13 @@ from app.extensions import mail
 from app.extensions import db
 from ..user.service import UserService
 
-
 from ..utils.decorators.asyncd import asyncd
 
+MAIL_DEFAULT_SENDER = current_app.config["MAIL_DEFAULT_SENDER"]
+SECRET_KEY = current_app.config["SECRET_KEY"]
+EMAIL_CONFIRMATION_SALT = current_app.config["EMAIL_CONFIRMATION_SALT"]
+FRONTEND_HOST = current_app.config["FRONTEND_HOST"]
+EMAIL_CONFIRMATION_MAX_AGE = current_app.config["EMAIL_CONFIRMATION_MAX_AGE"]
 
 class EmailService:
 
