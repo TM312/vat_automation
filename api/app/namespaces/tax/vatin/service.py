@@ -2,17 +2,18 @@ from datetime import date, timedelta
 from zeep import Client
 import time
 
+from flask import current_app
+from werkzeug.exceptions import HTTPException
+
 from app.extensions import db
+
 from vatin import MEMBER_COUNTRY_CODES, VATIN_MAX_LENGTH, logger
-
-from current_app.config import VATIN_LIFESPAN
-
-
 from .model import VATIN
 
-from flask import current_app
 
-from werkzeug.exceptions import HTTPException
+
+VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
+
 
 class VATINService:
 

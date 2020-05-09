@@ -1,6 +1,8 @@
 import pandas as pd
 from os import path
-from current_app.config import BASE_PATH_SEEDS
+from flask import current_app
+
+BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
 
 file = 'tax_codes.csv'
 

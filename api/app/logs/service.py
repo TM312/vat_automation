@@ -1,9 +1,19 @@
-from current_app.config import basedir, ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, COMPANY_NAME, MAIL_USE_TLS, BASE_PATH_LOGS
+from flask import current_app
 import os
 from datetime import date
 
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
+
+basedir = current_app.config["basedir"]
+ADMINS = current_app.config["ADMINS"]
+MAIL_SERVER = current_app.config["MAIL_SERVER"]
+MAIL_PORT = current_app.config["MAIL_PORT"]
+MAIL_USERNAME = current_app.config["MAIL_USERNAME"]
+MAIL_PASSWORD = current_app.config["MAIL_PASSWORD"]
+COMPANY_NAME = current_app.config["COMPANY_NAME"]
+MAIL_USE_TLS = current_app.config["MAIL_USE_TLS"]
+BASE_PATH_LOGS = current_app.config["BASE_PATH_LOGS"]
 
 
 class LogService:

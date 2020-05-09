@@ -1,10 +1,11 @@
-from current_app.config import BASE_PATH_SEEDS
-from app.config import SERVICE_START_DATE
-
 from os import path
 import pandas as pd
 from datetime import datetime
 
+from flask import current_app
+
+BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
+SERVICE_START_DATE = current_app.config["SERVICE_START_DATE"]
 
 
 file_rates = 'tax_rates.csv'
