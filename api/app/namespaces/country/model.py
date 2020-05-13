@@ -48,7 +48,7 @@ class Country(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(Country, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<Country: {}>'.format(self.code)

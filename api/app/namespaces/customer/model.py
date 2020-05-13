@@ -10,11 +10,10 @@ class CustomerType(db.Model):  # type: ignore
     code = db.Column(db.String(8), primary_key=True)
     name = db.Column(db.String(40))
     description = db.Column(db.String(256))
-    customer = db.relationship(
-        'Customer', backref='customer_type', lazy=True)
+    customer = db.relationship('Customer', backref='customer_type', lazy=True)
 
     def __init__(self, **kwargs):
-        super(CustomerType, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<CustomerType: {} – {}>'.format(self.code)
@@ -34,7 +33,7 @@ class Customer(db.Model):  # type: ignore
         'Transaction', backref='customer', lazy=True)
 
     def __init__(self, **kwargs):
-        super(Customer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<Customer: Name:{} – Type:{} – VAT Number: {}>'.format(self.name, self.customer_type_code, self.customer_vat_number)

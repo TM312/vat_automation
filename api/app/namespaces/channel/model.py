@@ -26,4 +26,4 @@ class Channel(db.Model):
     )
 
     def __init__(self, **kwargs):
-        super(Channel, self).__init__(**kwargs)
+        super().__init__(**kwargs)

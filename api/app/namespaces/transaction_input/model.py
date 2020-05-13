@@ -8,9 +8,9 @@ class TransactionInput(db.Model):
     __tablename__ = "transaction_input"
 
     id = db.Column(db.Integer, primary_key=True)
-    source = db.Column(db.String(128), nullable=False)
+    original_filename = db.Column(db.String(128), nullable=False)
     created_on = db.Column(db.Datetime, default=datetime.utcnow)
-    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
 
     processed = db.Column(db.Boolean, default=False)
     processed_on = db.Column(db.Datetime)
@@ -103,7 +103,7 @@ class TransactionInput(db.Model):
     check_export = db.Column(db.Boolean)
 
     def __init__(self, **kwargs):
-        super(TransactionInput, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TransactionInput: {} – {}>'.format(self.source, self.transaction_id)

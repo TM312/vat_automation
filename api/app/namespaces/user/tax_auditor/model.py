@@ -43,7 +43,7 @@ class TaxAuditor(User):
 
 
     def __init__(self, **kwargs):
-        super(TaxAuditor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.avatar_hash = self.gravatar_hash()
         self.confirmed_on = None
 

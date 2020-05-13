@@ -38,12 +38,12 @@ class ChannelService:
             raise NotFound('This channel does not exist.')
 
     @staticmethod
-    def create_channel(channel_data) -> Channel:
+    def create_channel(channel_data: dict) -> Channel:
 
         new_channel = Channel(
-            code = channel_data.get('code')
-            name = channel_data.get('name')
-            platform_code = channel_data.get('platform_code')
+            code = channel_data.get('code'),
+            name = channel_data.get('name'),
+            platform_code = channel_data.get('platform_code'),
             description = channel_data.get('description')
         )
 

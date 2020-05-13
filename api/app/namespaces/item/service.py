@@ -7,7 +7,7 @@ from !!! import Account
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
 
 from ..utils.service import InputService
-from flask import current_app
+from flask import g, current_app
 
 TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
 BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
@@ -29,54 +29,54 @@ class ItemService:
 
 
     @staticmethod
-    def process_item_lists_upload(item_list_files: list, **kwargs):
-        seller_firm_id_list = InputService.get_seller_firm_id_list(files=seller_firm_information_files, **kwargs)
+    #kwargs can contain: seller_firm_id
+    def process_item_files_upload(item_information_files: list, **kwargs):
         file_type='item_list'
-        file_path_in_list = InputService.store_static_data_upload(files=seller_firm_information_files, seller_firm_id_list=seller_firm_id_list, file_type=file_type)
+        df_encoding = None
+        delimiter = None
+        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
+        user_id = g.user.id
 
-        create_function = ItemService.process_item_from_df_file_path
+        for file in item_information_files:
+            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
 
-        flat_response_objects = InputService.create_static_data_inputs(file_path_in_list, seller_firm_id_list, create_function)
+        response_object = {
+            'status': 'success',
+            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(item_information_files)))
+        }
 
-        InputService.move_static_files(file_path_in_list, file_type)
+        return response_object
 
-        return flat_response_objects
+
+
+    # celery task !!!
+    @staticmethod
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+        response_objects = ItemService.create_items(df, file_path_in, **kwargs)
+
+        # celery task !!!
+        InputService.move_file_to_out(file_path_in, file_type)
+
+        return response_objects
 
 
 
 
     @staticmethod
-    def read_item_list_upload_into_df(file_path: str, encoding: str) -> df:
-        if os.path.isfile(file_path):
-            file_name = os.path.basename(file_path)
-            try:
-                if file_name.lower().endswith('.csv'):
-                    df = pd.read_csv(file_path, encoding=encoding)
-                else:
-                    raise UnsupportedMediaType(
-                        'File extension invalid (file: {}).'.format(file_name))
-                return df
-            except:
-                raise UnsupportedMediaType(
-                    'Cannot read file {}.'.format(file_name))
-
-        else:
-            raise #!!! (not a file)
-
-
-
-    @staticmethod
-    def process_item_from_df_file_path(file_path: str, seller_firm_id: int):
-        df = InputService.read_file_path_into_df((file_path, encoding=None)
+    def create_items(df, file_path_in: int, **kwargs):
 
         redundancy_counter = 0
         error_counter = 0
         total_number_items = len(df.index)
-        input_type = 'item'
+        input_type = 'item' # only used for response objects
 
         for i in range(total_number_items):
 
             sku = InputService.get_str(df, i, column='sku')
+            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
@@ -87,10 +87,27 @@ class ItemService:
                 if not valid_to:
                     valid_to = valid_from + timedelta(days=TAX_DEFAULT_VALIDITY)
 
-                try:
-                    redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
-                    new_item = ItemService.create_item(df, i, sku, seller_firm_id, valid_from, valid_to)
+                redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
+                item_data = {
+                    'created_by': kwargs['user_id'],
+                    'created_by': os.path.basename(file_path_in),
+                    'sku': sku,
+                    'seller_firm_id' : seller_firm_id,
+                    'valid_from' : valid_from,
+                    'valid_to' : valid_to,
+                    'brand_name' : InputService.get_str_or_None(df, i, column='brand_name'),
+                    'name' : InputService.get_str_or_None(df, i, column='name'),
+                    'ean' : InputService.get_str_or_None(df, i, column='ean'),
+                    'asin' : InputService.get_str_or_None(df, i, column='asin'),
+                    'fnsku' : InputService.get_str_or_None(df, i, column='fnsku'),
+                    'weight_kg' : InputService.get_float(df, i, column='weight_kg'),
+                    'tax_code_code' :InputService.get_str_or_None(df, i, column='tax_code_code'),
+                    'unit_cost_price_currency_code' :InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
+                    'unit_cost_price_net' :InputService.get_float(df, i, column='unit_cost_price_net')
+                }
 
+                try:
+                    new_item = ItemService.create_item(item_data)
 
                 except:
                     db.session.rollback()
@@ -110,21 +127,23 @@ class ItemService:
 
 
     @staticmethod
-    def create_item(df, i, sku: str, seller_firm_id, valid_from: date, valid_to: date) -> dict:
+    def create_item(item_data: dict) -> Item:
         new_item = Item(
-            sku = sku,
-            seller_firm_id = seller_firm_id,
-            valid_from = valid_from,
-            valid_to = valid_to,
-            brand_name = InputService.get_str_or_None(df, i, column='brand_name'),
-            name=InputService.get_str_or_None(df, i, column='name'),
-            ean=InputService.get_str_or_None(df, i, column='ean'),
-            asin=InputService.get_str_or_None(df, i, column='asin'),
-            fnsku=InputService.get_str_or_None(df, i, column='fnsku'),
-            weight_kg = InputService.get_float(df, i, column='weight_kg'),
-            tax_code_code =InputService.get_str_or_None(df, i, column='tax_code_code'),
-            unit_cost_price_currency_code =InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
-            unit_cost_price_net =InputService.get_float(df, i, column='unit_cost_price_net')
+            created_by = item_data.get('created_by'),
+            original_filename = item_data.get('original_filename'),
+            sku = item_data.get('sku'),
+            seller_firm_id = item_data.get('seller_firm_id'),
+            valid_from = item_data.get('valid_from'),
+            valid_to = item_data.get('valid_to'),
+            brand_name = item_data.get('brand_name'),
+            name = item_data.get('name'),
+            ean = item_data.get('ean'),
+            asin = item_data.get('asin'),
+            fnsku = item_data.get('fnsku'),
+            weight_kg = item_data.get('weight_kg'),
+            tax_code_code = item_data.get('tax_code_code'),
+            unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
+            unit_cost_price_net = item_data.get('unit_cost_price_net')
         )
 
         db.session.add(new_item)
@@ -137,6 +156,7 @@ class ItemService:
     def handle_redundancy(sku: str, seller_firm_id: int, valid_from: date) -> int:
         item: Item = Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id, Item.valid_to >= valid_from).first()
 
+        # if an item with the same sku for the specified validity period already exists, it is being updated or deleted.
         if item:
            if item.valid_from >= valid_from:
                 db.session.delete(item)

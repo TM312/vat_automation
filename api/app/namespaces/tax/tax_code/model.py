@@ -16,7 +16,7 @@ class TaxCode(db.Model):  # type: ignore
     items = db.relationship("Item", backref="tax_code", lazy=True)
 
     def __init__(self, **kwargs):
-        super(TaxCode, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TaxCode:{} valid from:{}>'.format(self.code, self.description)

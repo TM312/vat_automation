@@ -5,7 +5,7 @@ business_dto = Model('business', {
     'public_id': fields.String(readonly=True),
     'company_name': fields.String,
     'logo_image_name': fields.String,
-    'registered_on': fields.DateTime(readonly=True),
+    'created_on': fields.DateTime(readonly=True),
     'modified_at': fields.DateTime(readonly=True),
     'b_type': fields.String
 })

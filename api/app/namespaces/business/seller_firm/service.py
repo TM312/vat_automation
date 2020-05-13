@@ -13,7 +13,7 @@ from .schema import seller_firm_dto
 
 from ...utils.service import InputService
 
-
+BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
 class SellerFirmService:
     @staticmethod
@@ -52,15 +52,16 @@ class SellerFirmService:
             raise NotFound('This accounting firm does not exist.')
 
     @staticmethod
-    def create_seller_firm(seller_firm_data) -> SellerFirm:
+    def create_seller_firm(seller_firm_data: dict) -> SellerFirm:
 
         new_seller_firm = SellerFirm(
-            claimed = seller_firm_data.get('claimed')
-            created_by = seller_firm_data.get('created_by')
-            name = seller_firm_data.get('name')
-            address = seller_firm_data.get('address')
-            establishment_country_code = seller_firm_data.get('establishment_country_code')
-            claimed = seller_firm_data.get('claimed')
+            claimed = seller_firm_data.get('claimed'),
+            created_by = seller_firm_data.get('created_by'),
+            name = seller_firm_data.get('name'),
+            address = seller_firm_data.get('address'),
+            establishment_country_code = seller_firm_data.get('establishment_country_code'),
+            accounting_firm_id = seller_firm_data.get('accounting_firm_id'),
+            accounting_firm_client_id = seller_firm_data.get('accounting_firm_client_id')
         )
 
         #add seller firm to db
@@ -72,48 +73,63 @@ class SellerFirmService:
 
 
     @staticmethod
-    def process_seller_firm_information_lists_upload(seller_firm_information_files: list, **kwargs): #kwargs can contain a single seller_firm_id (which is the seller firm's the public_id)
-        file_type='seller_firm'
-        file_path_in_list = InputService.store_static_data_upload(files=seller_firm_information_files, file_type=file_type)
-        seller_firm_id_list = InputService.get_seller_firm_id_list(files=seller_firm_information_files, **kwargs)
+    #kwargs can contain: seller_firm_id
+    def process_seller_firm_information_files_upload(seller_firm_information_files: list, **kwargs):
+        file_type = 'seller_firm'
+        df_encoding = None
+        delimiter = None
+        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
+        claimed = False
+        user_id = g.user.id
+        accounting_firm_id = g.user.employer_id
 
 
-        create_function = SellerFirmService.process_seller_firm_from_df_file_path
+        for file in seller_firm_information_files:
+            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+            SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, claimed=claimed, user_id=user_id, accounting_firm_id=accounting_firm_id, **kwargs)
 
-        flat_response_objects = InputService.create_static_data_inputs(file_path_in_list, seller_firm_id_list, create_function, user_id=g.user.id, claimed=False, accounting_firm_id = g.user.employer_id)
+        response_object = {
+            'status': 'success',
+            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_information_files)))
+        }
 
-        InputService.move_static_files(file_path_in_list, file_type)
-
-        return flat_response_objects
-
-
-
+        return response_object
 
 
+    # celery task !!!
+    @staticmethod
+    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+        response_objects = SellerFirmService.create_seller_firms(df, file_path_in, **kwargs)
+
+        InputService.move_file_to_out(file_path_in, file_type)
+
+
+        return response_objects
 
 
 
 
     @staticmethod
-    def process_seller_firm_from_df_file_path(file_path: str, **kwargs): #upload only for tax auditors
-        df = InputService.read_file_path_into_df(file_path, encoding=None)
-
+    def create_seller_firms(df, file_path_in: str, **kwargs): #upload only for tax auditors
         error_counter = 0
         total_number_items = len(df.index)
         input_type = 'seller firm'  # only used for response objects
 
         for i in range(total_number_items):
-            try:
-                seller_firm_data = {
-                    'claimed': kwargs['claimed'],
-                    'created_by': kwargs['user_id'],
-                    'name': InputService.get_str_or_None(df, i, column='seller_firm_name'),
-                    'address': InputService.get_str_or_None(df, i, column='address'),
-                    'establishment_country_code': InputService.get_str(df, i, column='establishment_country_code'),
-                    'accounting_firm_id': kwargs['accounting_firm_id'],
-                    'accounting_firm_client_id': InputService.get_str(df, i, column='accounting_firm_client_id'),
-                }
 
+            seller_firm_data = {
+                'claimed': kwargs['claimed'],
+                'created_by': kwargs['user_id'],
+                'name': InputService.get_str_or_None(df, i, column='seller_firm_name'),
+                'address': InputService.get_str_or_None(df, i, column='address'),
+                'establishment_country_code': InputService.get_str(df, i, column='establishment_country_code'),
+                'accounting_firm_id': kwargs['accounting_firm_id'],
+                'accounting_firm_client_id': InputService.get_str(df, i, column='accounting_firm_client_id'),
+            }
+
+            try:
                 SellerFirmService.create_seller_firm(seller_firm_data)
 
             except:
@@ -122,7 +138,7 @@ class SellerFirmService:
 
             db.session.commit()
 
-        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_items, error_counter)
+        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter)
 
         return response_objects
 

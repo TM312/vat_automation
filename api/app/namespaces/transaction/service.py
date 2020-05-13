@@ -304,45 +304,6 @@ class TransactionService:
 
 
 
-    def transaction_processing(source: str) -> List[dict]:
-
-        transaction_inputs: list = TransactionInputService.get_transaction_inputs_by_source(source)
-
-        error_counter = 0
-        redundancy_counter = 0
-
-        for transaction_input in transaction_inputs:
-            if transaction_input.processed = False:
-                transaction = Transaction.query.filter_by(transaction_input_id=transaction_input.id).first()
-
-                if not transaction:
-                    try:
-                        TransactionService.create_transaction_s_from_input(transaction_input)
-                        transaction_input.update_processed()
-                        db.session.commit()
-
-                    except:
-                        db.session.rollback()
-                        current_app.logger.error('Failed to add transaction for transaction input id: {}'.format(transaction_input.id))
-
-                        error_counter += 1
-
-                else:
-                    redundancy_counter += 1
-                    current_app.logger.warning('A transaction processing was initialized more than once based on transaction input {}.'.format(transaction_input.id))
-
-            else:
-                current_app.logger.warning('A transaction input (id: {}) was set for processing altough attribute "processed"==True.'.format(transaction_input.id))
-
-        response_objects = TransactionInputService.create_transaction_response_objects(file, total_number_transactions, error_counter, redundancy_counter)
-
-        current_app.logger.info(response_objects)
-
-
-
-
-
-
 
     def create_transaction_s_from_input(transaction_input: TransactionInput)
 

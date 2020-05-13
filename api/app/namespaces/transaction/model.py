@@ -17,7 +17,7 @@ class TransactionType(db.Model):  # type: ignore
      )
 
     def __init__(self, **kwargs):
-        super(TransactionType, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TransactionType: {}>'.format(self.name)
@@ -30,7 +30,7 @@ class Bundle(db.Model):
     transactions = db.relationship('Transaction', backref='bundle', lazy=True)
 
     def __init__(self, **kwargs):
-        super(Bundle, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<Bundle: {}>'.format(self.id)
