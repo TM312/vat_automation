@@ -18,7 +18,7 @@ class TaxRate(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(TaxRate, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TaxRate: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
@@ -35,7 +35,7 @@ class TaxRateType(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(TaxRateType, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TaxRateType: {}'.format(self.code)

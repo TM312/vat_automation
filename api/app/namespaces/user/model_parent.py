@@ -16,28 +16,31 @@ class User(db.Model):  # type: ignore
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), unique=True,
-                          nullable=False, default=uuid.uuid4)
-    username = db.Column(db.String(32), unique=True, nullable=True)
-    email = db.Column(db.String(32), unique=True, nullable=True) #nullable=True exists for unclaimed accounts
-    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4)
 
     registered_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow)
+    confirmed = db.Column(db.Boolean, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
+    username = db.Column(db.String(32), unique=True, nullable=True)
+    email = db.Column(db.String(32), unique=True)
+
+    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(40))
-    confirmed = db.Column(db.Boolean, default=False)
-    confirmed_on = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(32))
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    transaction_input_uploads = db.relationship(
-        'TransactionInput', backref='uploader', order_by="desc(TransactionInput.created_on)", lazy=True)
+    transaction_input_uploads = db.relationship('TransactionInput', backref='uploader', order_by="desc(TransactionInput.created_on)", lazy=True)
 
-    actions = db.relationship(
-        'Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
+    created_accounts = db.relationship('Account', backref='creator', order_by="desc(Account.created_on)", lazy=True)
+    created_businesses = db.relationship('Business', backref='creator', order_by="desc(Business.created_on)", lazy=True)
+    created_items = db.relationship('Item', backref='creator', order_by="desc(Item.created_on)", lazy=True)
+    created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by="desc(DistanceSale.created_on)", lazy=True)
+
+    actions = db.relationship('Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
 
     discriminator = db.Column('u_type', db.String(56))
     __mapper_args__ = {'polymorphic_on': discriminator}
@@ -83,10 +86,9 @@ class Action(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
-                         nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     method_name = db.Column(db.String(32))
     service_context = db.Column(db.String(32))
 
     def __init__(self, **kwargs):
-        super(Action, self).__init__(**kwargs)
+        super().__init__(**kwargs)

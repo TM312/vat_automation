@@ -14,7 +14,7 @@ class Currency(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(Currency, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<Currency: {}>'.format(self.code)

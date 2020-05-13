@@ -36,7 +36,7 @@ class SellerFirm(Business):
 
 
     def __init__(self, **kwargs):
-        super(SellerFirm, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<SellerFirm: %r>' % self.name

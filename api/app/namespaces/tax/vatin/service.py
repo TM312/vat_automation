@@ -17,61 +17,65 @@ VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
 
 class VATINService:
 
-
-# # TEST
-# value1 = ['DE', 'DE190200766']
-# value2 = ['DE', '190200766']
-# value3 = 'DE190200766'
-# value4 = ['DE', 'IT190200766']
-# values = [value1, value2, value3, value4]
-# for value in values:
-#     print(value)
-#     vat = vat_precheck(value)
-#     print("vat country code: {}".format(vat.country_code))
-#     print("vat number: {}".format(vat.number))
-#     print("")
-
     @staticmethod
-    def create_vatin(country_code: str, number: str, valid_from: date, valid_to: date, valid: bool, **kwargs) -> VATIN:
+    def create_vatin(vatin_data: dict) -> VATIN:
         new_vatin = VATIN(
-            country_code=country_code,
-            number=number,
-            initial_tax_date=kwargs.get('initial_tax_date'),
-            valid_from=valid_from,
-            valid_to=valid_to
-            valid = valid,
-            business_id=kwargs.get('business_id')
+            country_code = vatin_data.get('country_code'),
+            number = vatin_data.get('number'),
+            initial_tax_date = vatin_data.get('initial_tax_date'),
+            valid_from = vatin_data.get('valid_from'),
+            valid_to = vatin_data.get('valid_to'),
+            valid = vatin_data.get('valid '),
+            business_id = vatin_data.get('business_id')
             )
 
         db.session.add(new_vatin)
         db.session.commit()
 
 
-    @staticmethod
-    def process_vat_numbers_upload(vat_numbers_files: list):
+     @staticmethod
+    #kwargs can contain: seller_firm_id
+    def process_vat_numbers_files_upload(vat_numbers_files: list, **kwargs):
         file_type='vat_numbers'
-        file_path_in_list = InputService.store_static_data_upload(files=vat_numbers_files, file_type=file_type)
-        seller_firm_id_list = InputService.get_seller_firm_id_list(files=vat_numbers_files)
+        df_encoding = None
+        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
 
-        create_function = VATINService.process_vatin_from_df_file_path
+        for file in vat_numbers_files:
+            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, basepath, **kwargs)
+
+         response_object = {
+            'status': 'success',
+            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(vat_numbers_files)))
+        }
+
+        return response_object
 
 
-        flat_response_objects = InputService.create_static_data_inputs(file_path_in_list, seller_firm_id_list, create_function)
+    # celery task !!!
+    @staticmethod
+    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> list:
 
-        InputService.move_static_files(file_path_in_list, file_type)
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding)
+        response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
 
-        return flat_response_objects
+        InputService.move_file_to_out(file_path_in, file_type)
+
+        return response_objects
+
+
 
 
     @staticmethod
-    def process_vatin_from_df_file_path(file_path: str, seller_firm_id: str) -> list:
-        df = InputService.read_file_path_into_df(file_path, encoding=None)
+    def create_vatins(df, file_path_in: str, **kwargs) -> list:
 
         error_counter = 0
-        total_number_items = len(df.index)
+        total_number_vatins = len(df.index)
         input_type = 'vat number' #only used for response objects
 
-        for i in range(total_number_items):
+        for i in range(total_number_vatins):
+            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
+
             country_code = InputService.get_str(df, i, column='country_code'),
             number = InputService.get_str(df, i, column='number')
 
@@ -91,7 +95,7 @@ class VATINService:
                 db.session.rollback()
                 error_counter += 1
 
-        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_items, error_counter)
+        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_vatins, error_counter)
 
         return response_objects
 
@@ -141,7 +145,20 @@ class VATINService:
             else:
                 valid = VATINService.is_valid(country_code=country_code, number=number, **kwargs)
                 valid_from, valid_to = VATINService.get_validity_period(date, **kwargs)
-                VATINService.create_vatin(country_code, number, valid_from, valid_to, valid, **kwargs)
+
+                vatin_data = {
+                    'country_code' : country_code,
+                    'number' : number,
+                    'initial_tax_date' : kwargs.get('initial_tax_date'),
+                    'valid_from' : valid_from,
+                    'valid_to' : valid_to
+                    'valid' : valid,
+                    'business_id' : kwargs.get('business_id')
+                }
+                try:
+                    VATINService.create_vatin(vatin_data)
+                except:
+                    raise
 
             return valid
         else:

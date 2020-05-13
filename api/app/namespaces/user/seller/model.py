@@ -5,7 +5,7 @@ class Seller(User):
     __mapper_args__ = {'polymorphic_identity': 'seller'}
 
     def __init__(self, **kwargs):
-        super(Seller, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.avatar_hash = self.gravatar_hash()
         self.confirmed_on = None
 

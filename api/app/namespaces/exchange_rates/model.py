@@ -20,7 +20,7 @@ class ExchangeRateCollection(db.Model):
 
 
     def __init__(self, **kwargs):
-        super(ExchangeRateCollection, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<ExchangeRates: %r>' % self.date
@@ -59,7 +59,7 @@ class ExchangeRatesEUR(ExchangeRatesBase):
                          primary_key=True)
 
     def __init__(self, **kwargs):
-        super(ExchangeRatesEUR, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.currency_code = 'EUR'
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class ExchangeRatesGBP(ExchangeRatesBase):
                                       primary_key=True)
 
     def __init__(self, **kwargs):
-        super(ExchangeRatesGBP, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.currency_code = 'GBP'
 
     def __repr__(self):
@@ -89,7 +89,7 @@ class ExchangeRatesCZK(ExchangeRatesBase):
                                       primary_key=True)
 
     def __init__(self, **kwargs):
-        super(ExchangeRatesCZK, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.currency_code = 'CZK'
 
     def __repr__(self):
@@ -104,7 +104,7 @@ class ExchangeRatesPLN(ExchangeRatesBase):
                                       primary_key=True)
 
     def __init__(ExchangeRatesPLN, **kwargs):
-        super(ExchangeRatesPLN, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.currency_code = 'PLN'
 
     def __repr__(self):

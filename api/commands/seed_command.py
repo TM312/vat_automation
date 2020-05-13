@@ -28,6 +28,7 @@ from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
 from .seeds.platforms import platforms, !!!! #PlatformSeedService
 !!! #from .seeds.channels import channels
+!!! customer types
 
 things_list = {
     'currencies': [Currency, currencies],

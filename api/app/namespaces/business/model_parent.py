@@ -13,11 +13,12 @@ class Business(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), unique=True,
                           nullable=False, default=uuid.uuid4)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id')
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     name = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.String(120))
     # logo_image_name = db.Column(db.String(120), default=None)
-    registered_on = db.Column(db.DateTime, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     discriminator = db.Column('b_type', db.String(50))
     __mapper_args__ = {'polymorphic_on': discriminator}
 

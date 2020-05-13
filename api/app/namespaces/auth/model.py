@@ -11,11 +11,8 @@ class Token(db.Model):
     sub = db.Column(db.String(36), nullable=False)
     blacklisted_on = db.Column(db.DateTime(), default=datetime.utcnow)
 
-    def __init__(self, token, iat, sub):
-        super(Token, self).__init__()
-        self.token = token
-        self.iat = iat
-        self.sub = sub
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<id {}: token: {}'.format(self.id, self.token)

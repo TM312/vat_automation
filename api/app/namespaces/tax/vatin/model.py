@@ -22,7 +22,7 @@ class VATIN(db.Model):
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
 
     def __init__(self, **kwargs):
-        super(VATIN, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
     # https://www.python-course.eu/python3_properties.php

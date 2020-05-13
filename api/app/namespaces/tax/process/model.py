@@ -29,7 +29,7 @@ class TaxRecord(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(TaxRecord, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.modified_at = None
         self.output_name = None
 
@@ -58,7 +58,7 @@ class TaxRecordInput(db.Model):  # type: ignore
     times_submitted = db.Column(db.Integer, nullable=False)
 
     def __init__(self, **kwargs):
-        super(TaxRecordInput, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.times_submitted = 1
 
     def update(self, data_changes):  # : TaxRecordInterface):
@@ -82,7 +82,7 @@ class TaxRecordOutput(db.Model):  # type: ignore
     downloaded = db.Column(db.Boolean, default=False)
 
     def __init__(self, **kwargs):
-        super(TaxRecordOutput, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
 class TaxRecordOutputCountry(db.Model):  # type: ignore
@@ -96,4 +96,4 @@ class TaxRecordOutputCountry(db.Model):  # type: ignore
 
 
     def __init__(self, **kwargs):
-        super(TaxRecordOutputCountry, self).__init__(**kwargs)
+        super().__init__(**kwargs)

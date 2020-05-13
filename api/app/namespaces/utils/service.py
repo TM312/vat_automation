@@ -1,10 +1,14 @@
 import os
 import shutil
 from typing import List
+import pandas as pd
 from flask import g
 from flask import current_app
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge
+
+
+!! SellerFirm
 
 
 MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
@@ -80,14 +84,13 @@ class InputService:
         success_status = 'successfully'
         notification = ''
 
-        if 'redundancy_counter' in kwargs:
-            redundancy_counter = kwargs['redundancy_counter']
-            if redundancy_counter > 0:
-                    response_object_info = {
-                        'status': 'info',
-                        'message': '{} {}s had been uploaded earlier already and were skipped.'.format(str(redundancy_counter), input_type)
-                    }
-                    response_objects.append(response_object_info)
+        if 'redundancy_counter' in kwargs and kwargs['redundancy_counter'] > 0:
+
+            response_object_info = {
+                'status': 'info',
+                'message': '{} {}s had been uploaded earlier already and were skipped.'.format(str(redundancy_counter), input_type)
+            }
+            response_objects.append(response_object_info)
 
         if error_counter > 0:
             notification = ' However, please recheck the submitted file for invalid data.'
@@ -131,45 +134,27 @@ class InputService:
 
 
     @staticmethod
-    def get_seller_firm_id_list(files: list, **kwargs) -> list:
+    def get_seller_firm_id(df, i, **kwargs) -> list:
         if not 'seller_firm_id' in kwargs:
-            seller_firm_id_list = []
-            for file in files:
-                try:
-                    seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
-                    if seller_firm_public_id:
-                        seller_firm_id = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
-                        seller_firm_id_list.append(seller_firm_id)
-
-                except:
-                    raise
-
+            seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
         else:
-            try:
-                seller_firm_public_id = kwargs['seller_firm_id']
-                seller_firm_id = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
-                seller_firm_id_list = [seller_firm_id] * len(files)
-            except:
-                raise
+            seller_firm_public_id = kwargs['seller_firm_id']
 
-        return seller_firm_id_list
+        seller_firm = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
 
-
+        if seller_firm:
+            seller_firm_id = seller_firm.id
+            return seller_firm_id_list
 
 
     @staticmethod
-    def store_static_data_upload(files: list, file_type: str) -> list:
-        file_path_in_list = []
-        for i, file in enumerate(files):
-            try:
-                file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
-                file_path_in_list.append(file_path_in)
+    def store_static_data_upload(file: list, file_type: str) -> list:
+        try:
+            file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
+        except:
+            raise
 
-
-            except:
-                raise
-
-        return file_path_in_list
+        return file_path_in
 
 
 
@@ -210,35 +195,27 @@ class InputService:
             raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
 
 
-
     @staticmethod
-    def move_static_files(file_path_in_list: list, file_type: str):
-        InputService.move_file_to_out(file_path_in_list = file_type_in_list, basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type = file_type)
-
-
-    # maybe as scheduled task
-    @staticmethod
-    def move_file_to_out(file_path_in_list: list, basepath: str, file_type: str):
+    def move_file_to_out(file_path_in: str, basepath: str, file_type: str):
         basepath_in = os.path.join(basepath, file_type, 'in')
         basepath_out = os.path.join(basepath, file_type, 'out')
         os.makedirs(basepath_out, exist_ok=True)
 
-        for file_path_in in file_path_in_list:
-            file_name = os.path.basename(file_path_in)
-            file_path_out = os.path.join(basepath, file_type, 'out', file_name)
-            try:
-                shutil.move(file_path_in, file_path_out)
-            except:
-                raise
+        file_name = os.path.basename(file_path_in)
+        file_path_out = os.path.join(basepath, file_type, 'out', file_name)
+        try:
+            shutil.move(file_path_in, file_path_out)
+        except:
+            raise
 
 
     @staticmethod
-    def read_file_path_into_df(file_path: str, encoding: str) -> df:
+    def read_file_path_into_df(file_path: str, df_encoding, delimiter):
         if os.path.isfile(file_path):
             file_name = os.path.basename(file_path)
             try:
                 if file_name.lower().endswith('.csv'):
-                    df = pd.read_csv(file_path, encoding=encoding)
+                    df = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
                 else:
                     raise UnsupportedMediaType(
                         'File extension invalid (file: {}).'.format(file_name))
@@ -252,36 +229,6 @@ class InputService:
 
 
 
-    @staticmethod
-    def create_static_data_inputs(file_path_in_list: list, seller_firm_id_list: list, create_function: function, **kwargs) -> list: #the output of the create_function needs to be a response object list
-        if file_path_in_list:
-            response_objects_cum = []
-            for i, file_path_in in enumerate(file_path_in_list):
-                if seller_firm_id_list:
-                    try:
-                        if len(seller_firm_id_list) > 0:
-                            seller_firm_id = seller_firm_id_list[i]
-                            response_objects = create_function(file_path_in, seller_firm_id)
-                        else:
-                            response_objects = create_function(file_path_in, **kwargs)
-                        response_objects_cum.append(response_objects)
-
-                    except:
-                        raise !!!
-                else:
-                    try:
-                        response_objects = create_function(file_path_in)
-                        response_objects_cum.append(response_objects)
-
-                    except:
-                        raise !!!
-
-            # flatten list of response_object lists (i.e. response_objects)
-            flat_response_objects = [response_object for response_objects in response_objects_cum for response_object in response_objects]
-            return flat_response_objects
-
-        else:
-            raise
 
 
 #     @staticmethod
@@ -352,12 +299,7 @@ class InputService:
 
 
 
-MOVE FILE:         shutil.move(temp_file_path, final_file_path)
 
-
-!!!!!
-
-BACKUP
 
 # def upload_file(file):
 #         if file.filename == '':
