@@ -5,4 +5,4 @@ class SellerFirmInterface(TypedDict, total=False):
     logo_image_name: str
     amazon_seller_id: str
     accounting_firm_id: str
-    accounting_firm_seller_id: str
+    accounting_firm_client_id: str

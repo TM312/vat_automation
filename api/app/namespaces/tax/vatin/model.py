@@ -2,7 +2,7 @@ import datetime import date, timedelta
 
 from app.extensions import db
 
-from vies import VIES_WSDL_URL, VIES_OPTIONS, logger
+from vatin import VIES_OPTIONS
 
 
 
@@ -15,16 +15,14 @@ class VATIN(db.Model):
     created_on = db.Column(db.Date, default=date.today())
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date, default=date.today() + timedelta(days=current_app.config['VATIN_LIFESPAN']))
-    initial_tax_date = db.Column(db.Date, nullable=False)
+    initial_tax_date = db.Column(db.Date)
     _country_code = db.Column(db.String(4), nullable=False)
     _number = db.Column(db.String(4), nullable=False)
     valid = db.Column(db.Boolean, nullable=False)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
 
     def __init__(self, **kwargs):
         super(VATIN, self).__init__(**kwargs)
-        self.country_code = country_code
-        self.number = number
-        self.valid = valid
 
 
     # https://www.python-course.eu/python3_properties.php
@@ -58,3 +56,8 @@ class VATIN(db.Model):
 
     def __repr__(self):
         return "<VATIN {}>".format(self.__str__())
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

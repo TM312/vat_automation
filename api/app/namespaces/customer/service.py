@@ -9,8 +9,7 @@ class CustomerService:
             customer_type = 'B2C'
 
         elif number and check_required:
-            customer_type = 'B2B' if VATINService.check_validity(
-                country_code, number, date) else 'B2C'
+            customer_type = 'B2B' if VATINService.check_validity(country_code, number, initial_tax_date=date) else 'B2C'
 
         elif number and not check_required:
             customer_type = 'B2B'
