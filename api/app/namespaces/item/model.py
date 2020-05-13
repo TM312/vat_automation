@@ -26,7 +26,7 @@ class Item(db.Model):  # type: ignore
     # storage_media_type = db.Column(db.String(32), nullable=False)
     # storage_category = db.Column(db.String(32), nullable=False)
 
-    tax_code_code = db.Column(db.Integer, db.ForeignKey('tax_code.code'))
+    tax_code_code = db.Column(db.String(8), db.ForeignKey('tax_code.code'))
 
     # item_purchase_price_currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
     # item_purchase_price_net = db.Column(db.Float(precision=28))
@@ -43,4 +43,9 @@ class Item(db.Model):  # type: ignore
         #self.item_volume_m3 = (self.item_length_mm * self.item_width_mm * self.item_height_mm) / (1000**3)
 
     def __repr__(self):
-        return '<Item: {} {} {} {}>'.format(self.seller_firm_id, self.item_sku, self.valid_from, self.valid_to)
+        return '<Item: Seller_id: {} – SKU: {} – validity: {}-{}>'.format(self.seller_firm_id, self.sku, self.valid_from, self.valid_to)
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

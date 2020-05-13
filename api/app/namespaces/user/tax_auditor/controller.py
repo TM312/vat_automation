@@ -66,7 +66,7 @@ class TaxRecordResource(Resource):
     def post(self):
         """Create A Tax Data Entry And Store The Corresponding File"""
         tax_auditor = g.user  # "f997f796-a605-4175-8fae-3de2d0c773a6"
-        uploaded_files = request.files.getlist("files")
+        uploaded_files: list = request.files.getlist("files")
         print("POST file received")
         print('uploaded_files')
         print(uploaded_files)

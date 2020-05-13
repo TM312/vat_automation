@@ -1,7 +1,10 @@
 import os
+import shutil
+from typing import List
 from flask import g
 from flask import current_app
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge
 
 
 MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
@@ -17,9 +20,12 @@ class InputService:
                 date = datetime.strptime(df.iloc[i][column], '%d-%m-%Y').date()
             except:
                 try:
-                    date = datetime.strptime(df.iloc[i][column], '%d.%m.%y').date()
+                    date = datetime.strptime(df.iloc[i][column], '%d.%m.%Y').date()
                 except:
-                    raise UnsupportedMediaType('Can not read date format.')
+                    try:
+                        date = datetime.strptime(df.iloc[i][column], '%d.%m.%y').date()
+                    except:
+                        raise UnsupportedMediaType('Can not read date format.')
         return date
 
 
@@ -28,7 +34,7 @@ class InputService:
         try:
             string = str(df.iloc[i][column])
         except:
-            raise UnsupportedMediaType('Can not read date format.')
+            raise UnsupportedMediaType('Can not read str format.')
         return string
 
 
@@ -53,7 +59,7 @@ class InputService:
             try:
                 flt = float(df.iloc[i][column])
             except:
-                raise UnsupportedMediaType('Can not read date format.')
+                raise UnsupportedMediaType('Can not read float format.')
 
         return flt
 
@@ -63,10 +69,47 @@ class InputService:
         try:
             boolean = bool(df.iloc[i][column] == value_true)
         except:
-            raise UnsupportedMediaType('Can not read date format.')
+            raise UnsupportedMediaType('Can not read bool format.')
 
         return boolean
 
+
+    @staticmethod
+    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[dict]:
+        response_objects = []
+        success_status = 'successfully'
+        notification = ''
+
+        if 'redundancy_counter' in kwargs:
+            redundancy_counter = kwargs['redundancy_counter']
+            if redundancy_counter > 0:
+                    response_object_info = {
+                        'status': 'info',
+                        'message': '{} {}s had been uploaded earlier already and were skipped.'.format(str(redundancy_counter), input_type)
+                    }
+                    response_objects.append(response_object_info)
+
+        if error_counter > 0:
+            notification = ' However, please recheck the submitted file for invalid data.'
+
+            response_object_error = {
+                'status': 'warning',
+                'message': 'For {} {}s, the necessary {} details could not be read.'.format(str(error_counter), input_type, input_type)
+            }
+            response_objects.append(response_object_error)
+
+        filename = os.path.basename(file_path)
+
+        ending = 's' if total_number_inputs != 1 else ''
+
+        response_object = {
+            'status': 'success',
+            'message': 'The {} file "{}" ({} {}{} in total) has been {} uploaded.{}'.format(input_type, filename, str(total_number_inputs), input_type, ending, success_status, notification)
+        }
+
+        response_objects.append(response_object)
+
+        return response_objects
 
 
 
@@ -87,6 +130,48 @@ class InputService:
     #         return file_paths
 
 
+    @staticmethod
+    def get_seller_firm_id_list(files: list, **kwargs) -> list:
+        if not 'seller_firm_id' in kwargs:
+            seller_firm_id_list = []
+            for file in files:
+                try:
+                    seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
+                    if seller_firm_public_id:
+                        seller_firm_id = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
+                        seller_firm_id_list.append(seller_firm_id)
+
+                except:
+                    raise
+
+        else:
+            try:
+                seller_firm_public_id = kwargs['seller_firm_id']
+                seller_firm_id = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
+                seller_firm_id_list = [seller_firm_id] * len(files)
+            except:
+                raise
+
+        return seller_firm_id_list
+
+
+
+
+    @staticmethod
+    def store_static_data_upload(files: list, file_type: str) -> list:
+        file_path_in_list = []
+        for i, file in enumerate(files):
+            try:
+                file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
+                file_path_in_list.append(file_path_in)
+
+
+            except:
+                raise
+
+        return file_path_in_list
+
+
 
     @staticmethod
     def allowed_file(filename: str, allowed_extensions: list) -> bool:
@@ -103,19 +188,20 @@ class InputService:
 
 
     @staticmethod
-    def store_file(file, allowed_extensions: list, basepath: str, file_type: str, owner_id: int):
-        if allowed_file(filename=file.filename, allowed_extensions):
+    def store_file(file, allowed_extensions: list, basepath: str, file_type: str):
+        if allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             filename = secure_filename(file.filename)
+            stored_filename = "{}.{}".format(filename, filename.rsplit('.', 1)[1].lower())
 
-            basepath_in = os.path.join(basepath, filetype, 'in')
+
+            basepath_in = os.path.join(basepath, file_type, 'in')
             os.makedirs(basepath_in, exist_ok=True)
 
-            stored_filename = "{}_{}.{}".format(owner_id, filename, filename.rsplit('.', 1)[1].lower())
-            file_path = os.path.join(basepath_in, stored_filename)
-            file.save(file_path)
+            file_path_in = os.path.join(basepath_in, stored_filename)
+            file.save(file_path_in)
 
-            if InputService.allowed_filesize(file_path):
-                return file_path
+            if InputService.allowed_filesize(file_path=file_path_in):
+                return file_path_in
 
             else:
                 raise RequestEntityTooLarge('Uploaded files exceed the file limit. Please reduce the number of files to be processed at once.')
@@ -125,6 +211,77 @@ class InputService:
 
 
 
+    @staticmethod
+    def move_static_files(file_path_in_list: list, file_type: str):
+        InputService.move_file_to_out(file_path_in_list = file_type_in_list, basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type = file_type)
+
+
+    # maybe as scheduled task
+    @staticmethod
+    def move_file_to_out(file_path_in_list: list, basepath: str, file_type: str):
+        basepath_in = os.path.join(basepath, file_type, 'in')
+        basepath_out = os.path.join(basepath, file_type, 'out')
+        os.makedirs(basepath_out, exist_ok=True)
+
+        for file_path_in in file_path_in_list:
+            file_name = os.path.basename(file_path_in)
+            file_path_out = os.path.join(basepath, file_type, 'out', file_name)
+            try:
+                shutil.move(file_path_in, file_path_out)
+            except:
+                raise
+
+
+    @staticmethod
+    def read_file_path_into_df(file_path: str, encoding: str) -> df:
+        if os.path.isfile(file_path):
+            file_name = os.path.basename(file_path)
+            try:
+                if file_name.lower().endswith('.csv'):
+                    df = pd.read_csv(file_path, encoding=encoding)
+                else:
+                    raise UnsupportedMediaType(
+                        'File extension invalid (file: {}).'.format(file_name))
+                return df
+            except:
+                raise UnsupportedMediaType(
+                    'Cannot read file {}.'.format(file_name))
+
+        else:
+            raise  # !!! (not a file)
+
+
+
+    @staticmethod
+    def create_static_data_inputs(file_path_in_list: list, seller_firm_id_list: list, create_function: function, **kwargs) -> list: #the output of the create_function needs to be a response object list
+        if file_path_in_list:
+            response_objects_cum = []
+            for i, file_path_in in enumerate(file_path_in_list):
+                if seller_firm_id_list:
+                    try:
+                        if len(seller_firm_id_list) > 0:
+                            seller_firm_id = seller_firm_id_list[i]
+                            response_objects = create_function(file_path_in, seller_firm_id)
+                        else:
+                            response_objects = create_function(file_path_in, **kwargs)
+                        response_objects_cum.append(response_objects)
+
+                    except:
+                        raise !!!
+                else:
+                    try:
+                        response_objects = create_function(file_path_in)
+                        response_objects_cum.append(response_objects)
+
+                    except:
+                        raise !!!
+
+            # flatten list of response_object lists (i.e. response_objects)
+            flat_response_objects = [response_object for response_objects in response_objects_cum for response_object in response_objects]
+            return flat_response_objects
+
+        else:
+            raise
 
 
 #     @staticmethod
@@ -145,7 +302,7 @@ class InputService:
 #                 )
 
 #                     final_stored_name = "{}_tax_record_input_{}_amazon.csv".format(
-#                         activity_period, seller_firm.accounting_firm_seller_id)
+#                         activity_period, seller_firm.accounting_firm_client_id)
 
 #                 return [final_dirpath, final_stored_name, seller_firm]
 

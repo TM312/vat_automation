@@ -52,8 +52,7 @@ class AccountingFirmService:
 
     @staticmethod
     def create_accounting_firm(accounting_firm_data) -> AccountingFirm:
-        accounting_firm = AccountingFirm.query.filter_by(
-            company_name=accounting_firm_data.get('company_name')).first()
+        accounting_firm = AccountingFirm.query.filter_by(company_name=accounting_firm_data.get('company_name')).first()
 
         if not accounting_firm:
             #create new accounting based on AccountingFirm model

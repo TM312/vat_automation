@@ -13,9 +13,9 @@ from app.namespaces.tax.tax_rate.model import TaxRate, TaxRateType
 from app.namespaces.transaction.model import TransactionType
 from app.namespaces.tax.tax_treatment.model import TaxTreatment
 from app.namespaces.exchange_rates.model import ExchangeRateCollection
+from app.namespaces.platform.amazon.model import Amazon
+!!! #from app.namespaces.channel.model import Channel
 
-
-#from app.exchange_rates import ExchangeRateCollection
 
 from .seeds.currencies import currencies,
 from .seeds.eu import eu, EUSeedService
@@ -26,6 +26,8 @@ from .seeds.tax_rates import tax_rates
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
+from .seeds.platforms import platforms, !!!! #PlatformSeedService
+!!! #from .seeds.channels import channels
 
 things_list = {
     'currencies': [Currency, currencies],
@@ -36,6 +38,9 @@ things_list = {
     'tax_rates': [TaxRate, tax_rates],
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
+    'platforms': [Amazon, platforms],
+    #'channels': [Channel, channels],
+    #'marketplaces': [Marketplace, marketplaces]
 }
 
 class SeedService:
@@ -85,6 +90,9 @@ class SeedCommand(Command):
 
             EUSeedService.append_countries_to_eu()
             TaxTreatmentSeedService.append_transaction_types_to_tax_treatments()
+            !!! #PlatformSeedService.append_channels_to_platforms()
+            !!! #PlatformSeedService.append_marketplaces_to_platforms()
+
             db.session.commit()
 
             response_object_exchange_rates = ExchangeRatesSeedService.create_exchange_rate_collections()

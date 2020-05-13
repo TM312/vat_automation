@@ -17,6 +17,8 @@ from app.extensions import db
 # service classes
 !!! from ... import TransactionType
 !!! from... import Bundle
+AccountService
+Account
 
 BASE_PATH_MEDIA = current_app.config["BASE_PATH_MEDIA"]
 OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config["OLD_TRANSACTION_TOLERANCE_DAYS"]
@@ -144,15 +146,6 @@ class TransactionService:
 
 
 ##################
-class PlatformService:
-    @staticmethod
-    def get_by_public_id_channel_code(account_public_id: str, channel_code: str) -> Account:
-        account = Account.query.filter_by(public_id=account_public_id,  channel_code=channel_code).first()
-        if account:
-            return account
-        else:
-            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_public_id))
-
 
 
 
@@ -279,7 +272,7 @@ class TransactionService:
 
     @staticmethod
     def get_transaction_type_by_public_code_account(transaction_type_public_code: str, account: Account) -> TransactionType:
-        if account.channel.platform_name == 'amazon':
+        if account.channel.platform_code == 'amazon':
             if transaction_type_code == 'SALE' or transaction_type_public_code == 'COMMINGLING_SELL': !!!!!  transaction_type_code <> transaction_type_public_code
                 transaction_type = TransactionType.query.filter_by(code="SALE").first()
 
@@ -353,7 +346,7 @@ class TransactionService:
 
     def create_transaction_s_from_input(transaction_input: TransactionInput)
 
-        account: Account = PlatformService.get_by_public_id_channel_code(transaction_input.account_public_id, transaction_input.channel_code)
+        account: Account = AccountService.get_by_public_id_channel_code(transaction_input.account_public_id, transaction_input.channel_code)
         transaction_type: TransactionType = get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, account)
 
         if transaction_type.code == 'MOVEMENT':
@@ -458,9 +451,9 @@ class TransactionService:
         # self.departure_seller_vat_country_code: str = departure_country.vat_country_code
         # self.seller_vat_country_code: str = tax_juristdiction.vat_country_code
 
-        arrival_seller_vat_valid: bool = VATINService.check_validity(country_code = arrival_country.vat_country_code, number=transaction_input.check_arrival_seller_vat_number, date=transaction_input.tax_date)
-        departure_seller_vat_valid: bool = VATINService.check_validity(country_code = departure_country.vat_country_code, number=transaction_input.check_departure_seller_vat_number, date=transaction_input.tax_date)
-        seller_vat_valid: bool = VATINService.check_validity(country_code = tax_juristdiction.vat_country_code, number=transaction_input.check_seller_vat_number, date=input.tax_date)
+        arrival_seller_vat_valid: bool = VATINService.check_validity(country_code = arrival_country.vat_country_code, number=transaction_input.check_arrival_seller_vat_number, initial_tax_date=transaction_input.tax_date)
+        departure_seller_vat_valid: bool = VATINService.check_validity(country_code = departure_country.vat_country_code, number=transaction_input.check_departure_seller_vat_number, initial_tax_date=transaction_input.tax_date)
+        seller_vat_valid: bool = VATINService.check_validity(country_code = tax_juristdiction.vat_country_code, number=transaction_input.check_seller_vat_number, initial_tax_date=input.tax_date)
 
 
 
@@ -604,7 +597,7 @@ class TransactionService:
 
     @staticmethod
     def get_item_tax_code_code(item: Item, check_item_tax_code_code) -> str:
-        if account.channel.platform_name == 'amazon':
+        if account.channel.platform_code == 'AMZ':
             if check_item_tax_code_code:
                 item_tax_code_code = check_item_tax_code_code
 

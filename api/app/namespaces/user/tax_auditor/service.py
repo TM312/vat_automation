@@ -12,8 +12,8 @@ from ...business.seller_firm.service import SellerFirmService
 
 
 BASE_PATH_MEDIA = current_app.config["BASE_PATH_MEDIA"]
-TAX_DATA_MAX_REQUEST_SIZE = current_app.config["TAX_DATA_MAX_REQUEST_SIZE"]
-TAX_DATA_ALLOWED_EXTENSIONS = current_app.config["TAX_DATA_ALLOWED_EXTENSIONS"]
+MAX_FILE_SIZE_INPUT = current_app.config["MAX_FILE_SIZE_INPUT"]
+TRANSACTION_DATA_ALLOWED_EXTENSIONS = current_app.config["TRANSACTION_DATA_ALLOWED_EXTENSIONS"]
 
 
 class TaxAuditorService:

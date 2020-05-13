@@ -38,38 +38,6 @@ class TransactionInputService:
 
 
 
-    @staticmethod
-    def create_input_response_objects(file_path, total_number_transactions: int, error_counter: int, redundancy_counter: int) -> List[dict]:
-        response_objects = []
-        success_status = 'successfully'
-        notification = ''
-
-        if redundancy_counter > 0:
-            response_object_info = {
-                'status': 'info',
-                'message': '{} transactions had been uploaded earlier already and were skipped.'.format(str(redundancy_counter))
-            }
-            response_objects.append(response_object_info)
-
-
-        if error_counter > 0:
-            notification = 'However, please recheck the submitted file for invalid data.'
-
-            response_object_error = {
-                'status': 'warning',
-                'message': 'For {} transactions, the necessary transaction details could not be read.'.format(str(error_counter))
-            }
-            response_objects.append(response_object_error)
-
-        filename = os.path.basename(file_path)
-        response_object = {
-                'status': 'success',
-                'message': 'The transaction file "{}" ({} transactions in total) has been {} uploaded. {}'.format(filename, str(total_number_transactions), success_status, notification)
-        }
-
-        response_objects.append(response_object)
-
-        return response_objects
 
 
     @staticmethod
@@ -80,6 +48,7 @@ class TransactionInputService:
         redundancy_counter = 0
         error_counter = 0
         total_number_transactions = len(df.index)
+        input_type = 'transaction'
 
         for i in range(total_number_transactions):
             account_public_id = TransactionInputService.get_transaction_input_identifier_from_amazon_df(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
@@ -108,7 +77,7 @@ class TransactionInputService:
             else:
                 error_counter += 1
 
-        response_objects = TransactionInputService.create_input_response_objects(file_path, total_number_transactions, error_counter, redundancy_counter)
+        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_transactions, error_counter, redundancy_counter=redundancy_counter)
 
         return response_objects
 

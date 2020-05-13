@@ -10,7 +10,7 @@ class SellerFirm(Business):
     claimed = db.Column(db.Boolean, default=False)
     establishment_country_code = db.Column(db.Integer, db.ForeignKey('country.code'))
 
-    vat_numbers = db.relationship('VATIN', backref='seller_firm', lazy=True)
+    vat_numbers = db.relationship('VATIN', backref='business', lazy=True)
 
     # https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/inheritance.html
     @declared_attr
@@ -27,7 +27,7 @@ class SellerFirm(Business):
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    accounting_firm_seller_id = db.Column(db.String(120), default=None)
+    accounting_firm_client_id = db.Column(db.String(120), default=None)
 
     # @declared_attr
     # def tax_records(cls):
