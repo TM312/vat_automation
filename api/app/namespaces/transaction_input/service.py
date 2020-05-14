@@ -8,7 +8,8 @@ from .model import TransactionInput
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
 from app.extensions import db
 
-from ..utils.service import InputService
+from ..utils import InputService
+from ..transaction import TransactionService
 
 
 BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
@@ -57,10 +58,9 @@ class TransactionInputService:
     def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = TransactionInputService.create_transaction_inputs(df, file_path_in, **kwargs)
+        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, **kwargs)
 
-        # celery task !!!
-        !!! Process Transaction
+
         InputService.move_file_to_out(file_path_in, file_type)
 
         return response_objects
@@ -68,12 +68,12 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs(df, file_path_in: int, **kwargs):
+    def create_transaction_inputs_and_transactions(df, file_path_in: int, **kwargs):
 
         redundancy_counter = 0
         error_counter = 0
         total_number_transaction_inputs = len(df.index)
-        input_type = 'transaction input' # only used for response objects
+        input_type = 'transaction' # only used for response objects
 
         for i in range(total_number_transaction_inputs):
             account_public_id = InputService.get_str(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
@@ -92,7 +92,7 @@ class TransactionInputService:
                     'account_public_id': account_public_id,
                     'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(), # --> OUTPUT
                     'channel_code': channel_code,
-                    'marketplace_name': InputService.get_str_or_None(df, i, column='MARKETPLACE'), # str #-->transaction
+                    'marketplace': InputService.get_str_or_None(df, i, column='MARKETPLACE'), # str #-->transaction
                     'transaction_type_public_code': InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE'), #-->TransactionService.retrieve_transaction_type()
                     'public_id': public_id,
                     'activity_id': activity_id,
@@ -210,6 +210,7 @@ class TransactionInputService:
 
                 try:
                     new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
+                    new_transaction = TransactionService.create_transaction(transaction_input_data)
 
                 except:
                     db.session.rollback()
@@ -233,10 +234,10 @@ class TransactionInputService:
             account_public_id = transaction_input_data.get('account_public_id'),
             public_activity_period = transaction_input_data.get('public_activity_period'),
             channel_code = transaction_input_data.get('channel_code'),
-            marketplace_name = transaction_input_data.get('marketplace_name'),
+            marketplace = transaction_input_data.get('marketplace'),
             transaction_type_public_code = transaction_input_data.get('transaction_type_public_code'),
-            transaction_public_id = transaction_input_data.get('transaction_public_id'),
-            transaction_activity_id = transaction_input_data.get('transaction_activity_id'),
+            public_id = transaction_input_data.get('public_id'),
+            activity_id = transaction_input_data.get('activity_id'),
             check_tax_calculation_date = transaction_input_data.get('check_tax_calculation_date'),
             shipment_date = transaction_input_data.get('shipment_date'),
             arrival_date = transaction_input_data.get('arrival_date'),

@@ -2,13 +2,14 @@ import pandas as pd
 
 from app.extensions import db
 from flask import current_app
+
 from .model import TaxAuditor
 
-from ..service_parent import UserService
+from .. import UserService
 
-from ...media.tax_record.model import TaxRecord
-from ...media.tax_record.service import TaxRecordService
-from ...business.seller_firm.service import SellerFirmService
+# from ...media.tax_record.model import TaxRecord
+# from ...media.tax_record.service import TaxRecordService
+from ...business import SellerFirmService
 
 
 BASE_PATH_MEDIA = current_app.config["BASE_PATH_MEDIA"]

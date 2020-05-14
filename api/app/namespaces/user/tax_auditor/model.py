@@ -1,14 +1,14 @@
 
 
 from app.extensions import db  # noqa
-from ..model_parent import User
+from .. import User
 
 
-tax_auditor_tax_record_output_country_AT = db.Table(
-    'tax_auditor_tax_record_output_country_AT',
-    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('tax_record_output_country_id', db.Integer, db.ForeignKey('tax_record_output_country.id'), primary_key=True)
-    )
+# tax_auditor_tax_record_output_country_AT = db.Table(
+#     'tax_auditor_tax_record_output_country_AT',
+#     db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+#     db.Column('tax_record_output_country_id', db.Integer, db.ForeignKey('tax_record_output_country.id'), primary_key=True)
+#     )
 
 tax_auditor_seller_firm_AT = db.Table(
     'tax_auditor_seller_firm_AT',
@@ -21,7 +21,6 @@ tax_auditor_seller_firm_AT = db.Table(
 class TaxAuditor(User):
     __mapper_args__ = {'polymorphic_identity': 'tax_auditor'}
 
-    # tax_records = db.relationship('TaxRecord', backref='creator', order_by="desc(TaxRecord.created_on)", lazy=True)
 
     # tax_record_countries = db.relationship(
     #     'TaxRecordOutputCountry',

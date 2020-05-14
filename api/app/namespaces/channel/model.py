@@ -14,7 +14,7 @@ class Channel(db.Model):
     __tablename__ = "channel"
 
     code = db.Column(db.String(8), primary_key=True)
-    name = db.Column(db.String(64), unique=True)
+    name = db.Column(db.String(64))
     platform_code = db.Column(db.Integer, db.ForeignKey('platform.code'))
     description = db.Column(db.String(256))
     accounts = db.relationship('Account', backref='channel', lazy=True)

@@ -17,7 +17,7 @@ class Business(db.Model):  # type: ignore
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     name = db.Column(db.String(120), unique=True, nullable=False)
-    address = db.Column(db.String(120))
+    address = db.Column(db.String(256))
     # logo_image_name = db.Column(db.String(120), default=None)
     discriminator = db.Column('b_type', db.String(50))
     __mapper_args__ = {'polymorphic_on': discriminator}

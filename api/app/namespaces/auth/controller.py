@@ -6,17 +6,12 @@ from flask import current_app, g
 from flask_restx import Namespace, Resource
 
 from .schema import auth_dto
-from ..user.schema_parent import user_dto
-
 from .service import TokenService
-
 from .model import Token
-from ..user.model_parent import User
-
 from .interface import TokenInterface
-from ..user.interface_parent import UserInterface
 
-from ..utils.decorators.auth import login_required, accepted_u_types
+from ..user import User, UserInterface, user_dto
+from ..utils import login_required, accepted_u_types
 
 TOKEN_LIFESPAN_REGISTRATION = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
 

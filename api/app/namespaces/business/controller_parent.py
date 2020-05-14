@@ -10,8 +10,8 @@ from .schema import business_dto
 from .service import BusinessService
 from .model import Business
 
-from ...auth.interface import TokenInterface
-from ...utils.decorators.auth import login_required, accepted_u_types
+from ..auth import TokenInterface
+from ..utils import login_required, accepted_u_types
 
 
 ns = Namespace("Business", description="Business Related Operations")  # noqa
@@ -42,5 +42,5 @@ class AdminAccountingIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
-        """Delete A Single Accounting Business"""
+        """Delete A Single Business"""
         return BusinessService.delete_by_id(public_id)

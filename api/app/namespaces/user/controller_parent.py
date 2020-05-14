@@ -10,8 +10,8 @@ from .schema_parent import user_dto, user_dto_admin, action_dto
 from .service_parent import UserService
 from .model_parent import User, Action
 
-from ...auth.interface import TokenInterface
-from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from ..auth import TokenInterface
+from ..utils import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("User", description="User Related Operations")  # noqa

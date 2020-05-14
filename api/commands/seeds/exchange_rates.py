@@ -1,7 +1,6 @@
 
 from os import path
-from app.namespaces.exchange_rates.service import ExchangeRateService
-from app.namespaces.exchange_rates.model import ExchangeRatesEUR
+from app.namespaces.exchange_rates import ExchangeRateService, ExchangeRatesEUR
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
 import pandas as pd

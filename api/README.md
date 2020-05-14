@@ -1,5 +1,3 @@
-# NT: BACKEND
-NT Client Repo can be found here: [ hyperlink to be put here ]
 
 
 db sytnax:

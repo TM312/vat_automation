@@ -45,13 +45,12 @@ class Transaction(db.Model):  # type: ignore
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
 
     transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))
-    transaction_input = db.relationship("TransactionInput", back_populates="transaction")
 
     tax_treatment_code = db.Column(db.String(8), db.ForeignKey('tax_treatment.code'), nullable=False)
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
 
-    marketplace_name = db.Column(db.Integer, db.ForeignKey('marketplace.name'))
+    marketplace = db.Column(db.String(64))
     public_id = db.Column(db.String(128), nullable=False)
     activity_id = db.Column(db.String(128), nullable=False)
 

@@ -58,6 +58,7 @@ class Development(Config):
     BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
     BASE_PATH_LOGS = '/Users/tm/Projects/NTAMAZON/webapp_data/logs'
     BASE_PATH_SEEDS = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
+    BASE_PATH_TEMPLATES = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
     BASE_PATH_STATIC_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/static'
     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/transaction'
 

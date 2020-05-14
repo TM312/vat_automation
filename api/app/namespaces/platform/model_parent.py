@@ -13,18 +13,4 @@ class Platform(db.Model):
     __mapper_args__ = {'polymorphic_on': code}
 
     def __repr__(self):
-        return '<Platform: {} ({})>'.format(self.name, self.code)
-
-
-
-class Marketplace(db.Model):
-    """ Marketplace model, e.g. name amazon.it """
-    __tablename__ = "marketplace"
-
-    id = db.Column(db.String(8), primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    transactions = db.relationship(
-        'Transaction', backref='marketplace', lazy=True)
-
-    def __init__(self, **kwargs):
-        super(Marketplace, self).__init__(**kwargs)
+        return '<Platform: {} (code : {})>'.format(self.name, self.code)

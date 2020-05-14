@@ -1,13 +1,13 @@
 import os
 from datetime import date, timedelta
 
-from .model import Item
-
-from !!! import Account
+from flask import g, current_app
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
 
-from ..utils.service import InputService
-from flask import g, current_app
+from .model import Item
+
+from ..account import Account
+from ..utils import InputService
 
 TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
 BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
@@ -90,7 +90,7 @@ class ItemService:
                 redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
                 item_data = {
                     'created_by': kwargs['user_id'],
-                    'created_by': os.path.basename(file_path_in),
+                    'original_filename': os.path.basename(file_path_in),
                     'sku': sku,
                     'seller_firm_id' : seller_firm_id,
                     'valid_from' : valid_from,

@@ -7,11 +7,10 @@ from itsdangerous.url_safe import URLSafeTimedSerializer
 from itsdangerous import SignatureExpired, BadTimeSignature
 from werkzeug.exceptions import Conflict, Gone, BadRequest
 
-from app.extensions import mail
-from app.extensions import db
-from ..user.service import UserService
+from app.extensions import mail, db
+from ..user import UserService
 
-from ..utils.decorators.asyncd import asyncd
+from ..utils import asyncd
 
 MAIL_DEFAULT_SENDER = current_app.config["MAIL_DEFAULT_SENDER"]
 SECRET_KEY = current_app.config["SECRET_KEY"]

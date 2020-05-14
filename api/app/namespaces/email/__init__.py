@@ -1,3 +1,6 @@
+from .service import EmailService
+from .interface import EmailInterface
+
 BASE_ROUTE = "email"
 
 #def attach_auth(api, app, root):

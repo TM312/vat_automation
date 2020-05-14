@@ -1,11 +1,9 @@
 from typing import List
 
-from flask import request, g
-from flask import current_app
+from flask import request, g, current_app
 from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
-
 
 from app.extensions import mail
 from .schema import tax_auditor_dto, action_dto
@@ -13,10 +11,16 @@ from .service import TaxAuditorService
 from .model import TaxAuditor
 from .interface import TaxAuditorInterface
 
-from ...auth.interface import TokenInterface
-from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from ...utils import login_required, accepted_u_types, confirmation_required, TemplateService
 
-SellerFirmInterface
+
+from ...business import SellerFirmService
+from ...item import ItemService
+from ...transaction_input import TransactionInputService
+from ...platform import DistanceSaleService
+from ...account import AccountService
+from ...tax import VATINService
+
 
 
 
@@ -57,20 +61,81 @@ class TaxAuditorResource(Resource):
         return TaxAuditorService.update(tax_auditor, data_changes)
 
 
-@ns.route("/upload")
-class TaxRecordResource(Resource):
+
+@ns.route("/upload/seller_firm_information")
+class SellerFirmInformationTAResource(Resource):
     @login_required
     @employer_required
     # @confirmation_required
-    # @ns.expect(tax_record_dto, validate=True)
+    # !!! @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        """Create A Tax Data Entry And Store The Corresponding File"""
-        tax_auditor = g.user  # "f997f796-a605-4175-8fae-3de2d0c773a6"
-        uploaded_files: list = request.files.getlist("files")
+        """Create an unclaimed seller firm as a client"""
+        seller_firm_information_files: list = request.files.getlist("files")
         print("POST file received")
         print('uploaded_files')
-        print(uploaded_files)
-        return TaxRecordService.upload_input(tax_auditor, uploaded_files)
+        print(seller_firm_information_files)
+        claimed = False
+        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed)
+
+
+@ns.route("/upload/item_information")
+class ItemInformationTAResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        item_information_files: list = request.files.getlist("files")
+        return ItemService.process_item_files_upload(item_information_files)
+
+
+
+@ns.route("/upload/account_information")
+class AccountInformationTAResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        account_information_files: list = request.files.getlist("files")
+        return AccountService.process_account_files_upload(account_information_files)
+
+
+
+@ns.route("/upload/distance_sales")
+class DistanceSalesTAResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        distance_sale_information_files: list = request.files.getlist("files")
+        return DistanceSaleService.process_distance_sale_files_upload(distance_sale_information_files)
+
+
+
+@ns.route("/upload/vat_numbers")
+class VATNumbersTAResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        vat_numbers_files: list = request.files.getlist("files")
+        return VATINService.process_vat_numbers_files_upload(vat_numbers_files)
+
+
+
+@ns.route("/upload/transaction_reports")
+class TransactionReportsTAResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        transaction_input_files: list = request.files.getlist("files")
+        return TransactionInputService.process_transaction_input_files_upload(transaction_input_files)
+
 
 
 
@@ -125,3 +190,15 @@ class TaxRecordResource(Resource):
 #         tax_auditor = g.user
 #         client_public_id = public_id
 #         return TaxAuditorService.unfollow(tax_auditor, client_public_id)
+
+
+# @ns.route("/download/<string:activity_period>/<string:filename>")
+# class TransactionResource(Resource):
+#     @login_required
+#     # @confirmation_required
+#     # @ns.expect(transaction_dto, validate=True)
+#     def get(self, activity_period, filename):
+#         """Download A Tax Data File"""
+#         #user = "f997f796-a605-4175-8fae-3de2d0c773a6"
+#         user = g.user
+#         return TransactionService.download_file(user, activity_period, filename)

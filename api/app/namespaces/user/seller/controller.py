@@ -11,8 +11,8 @@ from .service import SellerService
 from .model import Seller
 from .interface import SellerInterface
 
-from ...auth.interface import TokenInterface
-from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from ...auth import TokenInterface
+from ...utils import login_required, accepted_u_types, confirmation_required
 
 
 

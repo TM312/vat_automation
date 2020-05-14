@@ -5,30 +5,32 @@ from werkzeug.exceptions import InternalServerError
 from app.extensions import db
 
 
-from app.namespaces.currency.model import Currency
-from app.namespaces.country.model import EU
-from app.namespaces.country.model import Country
-from app.namespaces.tax.tax_code.model import TaxCode
-from app.namespaces.tax.tax_rate.model import TaxRate, TaxRateType
-from app.namespaces.transaction.model import TransactionType
-from app.namespaces.tax.tax_treatment.model import TaxTreatment
-from app.namespaces.exchange_rates.model import ExchangeRateCollection
-from app.namespaces.platform.amazon.model import Amazon
-!!! #from app.namespaces.channel.model import Channel
+from app.namespaces.currency import Currencys
+from app.namespaces.country import EU, Country
+from app.namespaces.transaction import TransactionType
+from app.namespaces.tax import TaxTreatment, TaxCode, TaxRate, TaxRateType
+from app.namespaces.platform import Amazon
+from app.namespaces.channel import Channel
+from app.namespaces.customer import CustomerRelationship
+from app.namespaces.user import Admin, TaxAuditor
+from app.namespaces.business import AccountingFirm
 
 
-from .seeds.currencies import currencies,
+from .seeds.currencies import currencies
 from .seeds.eu import eu, EUSeedService
-from .seeds.countries import countries,
+from .seeds.countries import countries
 from .seeds.tax_codes import tax_codes
 from .seeds.tax_rate_types import tax_rate_types
 from .seeds.tax_rates import tax_rates
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
-from .seeds.platforms import platforms, !!!! #PlatformSeedService
-!!! #from .seeds.channels import channels
-!!! customer types
+from .seeds.platforms import platforms
+from .seeds.channels import channels
+from .seeds.customer_relationships import customer_relationships
+from .seeds.users import admins, tax_auditors
+from .seeds.accounting_firms import accounting_firms
+
 
 things_list = {
     'currencies': [Currency, currencies],
@@ -40,8 +42,12 @@ things_list = {
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Amazon, platforms],
-    #'channels': [Channel, channels],
-    #'marketplaces': [Marketplace, marketplaces]
+    'channels': [Channel, channels],
+    'customer_relationships': [CustomerRelationship, customer_relationships],
+    'admins': [Admin, admins],
+    'accounting_firms': [AccountingFirm, accounting_firms],
+    'tax_auditors': [TaxAuditor, tax_auditors],
+
 }
 
 class SeedService:
@@ -91,8 +97,6 @@ class SeedCommand(Command):
 
             EUSeedService.append_countries_to_eu()
             TaxTreatmentSeedService.append_transaction_types_to_tax_treatments()
-            !!! #PlatformSeedService.append_channels_to_platforms()
-            !!! #PlatformSeedService.append_marketplaces_to_platforms()
 
             db.session.commit()
 
