@@ -1,5 +1,7 @@
 from .model import Token  # noqa
 from .schema import auth_dto  # noqa
+from .service import TokenService
+from .interface import TokenInterface
 
 BASE_ROUTE = "auth"
 

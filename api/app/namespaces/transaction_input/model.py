@@ -14,13 +14,13 @@ class TransactionInput(db.Model):
 
     processed = db.Column(db.Boolean, default=False)
     processed_on = db.Column(db.Datetime)
-    transaction = db.relationship('Transaction', uselist=False, back_populates='transaction_input')
+    transactions = db.relationship('Transaction', back_populates='transaction_input')
 
 
     account_public_id = db.Column(db.String(128), nullable=False)
     public_activity_period = db.Column(db.String(64))
     channel_code = db.Column(db.String(64))
-    marketplace_name = db.Column(db.String(96))
+    marketplace = db.Column(db.String(96))
     transaction_type_public_code = db.Column(db.String(40))
     public_id = db.Column(db.String(64))
     activity_id = db.Column(db.String(64))

@@ -10,8 +10,8 @@ from app.extensions import db
 from .model import Token
 from .interface import TokenInterface
 
-from ..user.model_parent import User
-from ..user.service_parent import UserService
+from ..user import User, UserService
+
 
 COMPANY_NAME = current_app.config["COMPANY_NAME"]
 SECRET_KEY = current_app.config["SECRET_KEY"]

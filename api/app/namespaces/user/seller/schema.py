@@ -1,5 +1,5 @@
 from flask_restx import Model, fields
-from ..schema_parent import user_dto, user_dto_admin
+from .. import user_dto, user_dto_admin
 
 
 seller_dto = user_dto.clone('seller', {

@@ -6,7 +6,7 @@ from app.extensions import db
 from .model import AccountingFirm
 from .schema import accounting_firm_dto
 
-from ...user.tax_auditor.model import TaxAuditor
+from ...user import TaxAuditor
 
 
 class AccountingFirmService:

@@ -2,7 +2,7 @@ from flask import g, current_app
 from app.extensions import db
 
 from .model import Account
-from ..utils.service import InputService
+from ..utils import InputService
 
 
 BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']

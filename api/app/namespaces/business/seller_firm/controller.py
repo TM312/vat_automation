@@ -11,8 +11,8 @@ from .service import SellerFirmService
 from .model import SellerFirm
 from .interface import SellerFirmInterface
 
-from ...auth.interface import TokenInterface
-from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from ...auth import TokenInterface
+from ...utils import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa
@@ -30,13 +30,13 @@ class SellerFirmResource(Resource):
 
     @ns.expect(seller_firm_dto, validate=True)
     def post(self):
-        """Create A Single Accounting Firm"""
+        """Create A Single Seller Firm"""
         seller_firm_data: SellerFirmInterface = request.json
         return SellerFirmService.create_seller_firm(seller_firm_data)
 
     @login_required
     def delete(self) -> Response:
-        """Delete A Single Accounting Business"""
+        """Delete A Single Seller Firm"""
         seller = g.user
         return SellerFirmService.delete_own(seller)
 
@@ -45,7 +45,7 @@ class SellerFirmResource(Resource):
     @ns.marshal_with(seller_firm_dto)
     #@accepted_u_types('admin', 'seller')
     def put(self) -> SellerFirm:
-        """Update A own accounting firm"""
+        """Update A own Seller Firm"""
         seller = g.user
         data_changes: SellerFirmInterface = request.json  # JSON body of a request
         return SellerFirmService.update_own(seller, data_changes)

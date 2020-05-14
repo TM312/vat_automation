@@ -1,5 +1,18 @@
-from .model import User  # noqa
-from .schema import user_dto  # noqa
+from .admin.model import Admin
+
+from .seller.model import Seller
+from .seller.service import SellerService
+from .seller.interface import SellerInterface
+from .seller.schema import seller_dto, seller_dto_admin
+
+from .tax_auditor.model import TaxAuditor
+from .tax_auditor.service import TaxAuditorService
+from .tax_auditor.interface import !!!
+from .tax_auditor.schema import tax_auditor_dto, tax_auditor_dto_admin
+
+from .model_parent import User, Action
+from .service_parent import UserService
+from .schema_parent import user_dto, user_dto_admin, action_dto
 
 BASE_ROUTE = "user"
 

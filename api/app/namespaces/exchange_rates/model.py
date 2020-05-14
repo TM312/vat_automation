@@ -9,14 +9,10 @@ class ExchangeRateCollection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, default=date.today)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    exchange_rates_eur = db.relationship(
-        'ExchangeRatesEUR', backref='exchange_rate_collection', lazy=True)
-    exchange_rates_gbp = db.relationship(
-        'ExchangeRatesGBP', backref='exchange_rate_collection', lazy=True)
-    exchange_rates_czk = db.relationship(
-        'ExchangeRatesPLN', backref='exchange_rate_collection', lazy=True)
-    exchange_rates_pln = db.relationship(
-        'ExchangeRatesPLN', backref='exchange_rate_collection', lazy=True)
+    exchange_rates_eur = db.relationship('ExchangeRatesEUR', backref='exchange_rate_collection', lazy=True)
+    exchange_rates_gbp = db.relationship('ExchangeRatesGBP', backref='exchange_rate_collection', lazy=True)
+    exchange_rates_czk = db.relationship('ExchangeRatesPLN', backref='exchange_rate_collection', lazy=True)
+    exchange_rates_pln = db.relationship('ExchangeRatesPLN', backref='exchange_rate_collection', lazy=True)
 
 
     def __init__(self, **kwargs):
@@ -37,10 +33,8 @@ class ExchangeRatesBase(db.Model):
     source = db.Column(db.String(32), default="ECB")
     date = db.Column(db.Date, default=date.today)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    exchange_rate_collection_id = db.Column(db.Integer, db.ForeignKey('exchange_rate_collection.id'),
-                                            nullable=False)
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'),
-                              nullable=False)
+    exchange_rate_collection_id = db.Column(db.Integer, db.ForeignKey('exchange_rate_collection.id'), nullable=False)
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
 
     eur = db.Column(db.Numeric(scale=8))
     gbp = db.Column(db.Numeric(scale=8))
@@ -55,8 +49,7 @@ class ExchangeRatesEUR(ExchangeRatesBase):
     """ ExchangeRates EUR model """
     __mapper_args__ = {'polymorphic_identity': 'eur'}
 
-    exchange_rates_eur_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'),
-                         primary_key=True)
+    exchange_rates_eur_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'), primary_key=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -70,8 +63,7 @@ class ExchangeRatesGBP(ExchangeRatesBase):
     """ ExchangeRates GPB model """
     __mapper_args__ = {'polymorphic_identity': 'gbp'}
 
-    gbp_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'),
-                                      primary_key=True)
+    gbp_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'), primary_key=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -85,8 +77,7 @@ class ExchangeRatesCZK(ExchangeRatesBase):
     """ ExchangeRates CZK model """
     __mapper_args__ = {'polymorphic_identity': 'czk'}
 
-    czk_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'),
-                                      primary_key=True)
+    czk_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'), primary_key=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -100,8 +91,7 @@ class ExchangeRatesPLN(ExchangeRatesBase):
     """ ExchangeRates PLN model """
     __mapper_args__ = {'polymorphic_identity': 'pln'}
 
-    pln_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'),
-                                      primary_key=True)
+    pln_id = db.Column('id', db.Integer, db.ForeignKey('exchange_rates.id'), primary_key=True)
 
     def __init__(ExchangeRatesPLN, **kwargs):
         super().__init__(**kwargs)

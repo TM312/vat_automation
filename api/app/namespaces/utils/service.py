@@ -2,19 +2,29 @@ import os
 import shutil
 from typing import List
 import pandas as pd
-from flask import g
-from flask import current_app
+from datetime import datetime
+
+from flask import g, current_app, send_from_directory
+
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge
 
+from ..business import SellerFirm
 
-!! SellerFirm
 
 
 MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
+BASE_PATH_TEMPLATES = current_app.config['BASE_PATH_TEMPLATES']
+
+class TemplateService:
+
+    def download_file(filename: str):
+        return send_from_directory(directory=BASE_PATH_TEMPLATES, filename=filename, as_attachment=True)
+
+
+
 
 class InputService:
-
     @staticmethod
     def get_date_or_None(df, i:int, column:str) -> date or None:
         if pd.isnull(df.iloc[i][column]):

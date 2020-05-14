@@ -8,7 +8,7 @@ from app.extensions import db
 from .model import Seller
 from .schema import seller_dto
 
-from ...email.service import EmailService
+from ...email import EmailService
 
 
 class SellerService:

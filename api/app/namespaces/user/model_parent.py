@@ -5,8 +5,7 @@ import hashlib
 from flask import current_app
 from sqlalchemy.dialects.postgresql import UUID
 
-from app.extensions import db  # noqa
-from app.extensions import bcrypt
+from app.extensions import db, bcrypt
 
 BCRYPT_LOG_ROUNDS = current_app.config["BCRYPT_LOG_ROUNDS"]
 
@@ -24,10 +23,10 @@ class User(db.Model):  # type: ignore
     confirmed_on = db.Column(db.DateTime, nullable=True)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    username = db.Column(db.String(32), unique=True, nullable=True)
+    username = db.Column(db.String(32), unique=True)
     email = db.Column(db.String(32), unique=True)
 
-    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(40))
