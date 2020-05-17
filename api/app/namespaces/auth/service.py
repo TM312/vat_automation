@@ -3,18 +3,17 @@ import jwt
 from datetime import datetime, timedelta
 import inspect
 
-from flask import current_app
+from flask import current_app, g
 from werkzeug.exceptions import InternalServerError, NotFound, Unauthorized
 
 from app.extensions import db
 from .model import Token
 from .interface import TokenInterface
 
-from ..user import User, UserService
+from ..user.model_parent import User
+from ..user.service_parent import UserService
 
 
-COMPANY_NAME = current_app.config["COMPANY_NAME"]
-SECRET_KEY = current_app.config["SECRET_KEY"]
 
 
 class TokenService:
@@ -33,15 +32,15 @@ class TokenService:
 
 
     @staticmethod
-    def login_user(user_data, token_lifespan):
+    def login_user(user_data):
         # fetch the user data
         user = User.query.filter_by(email=user_data.get('email')).first()
         if user and user.check_password(user_data.get('password')):
+            token_lifespan = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
             auth_token = TokenService.encode_auth_token(
                 public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
-                UserService.ping(user, method_name=inspect.stack()[0][3],
-                                 service_context=TokenService.__name__)
+                UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
                 response_object = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
@@ -63,9 +62,12 @@ class TokenService:
             raise Unauthorized(payload)  # ('Provide a valid auth token.')
 
     @staticmethod
-    def logout_user(user, auth_token):
+    def logout_user(auth_token):
         # update a user's last_seen attribute & creates a new action object
         # the inspect module needs to be imported whenever ping is called
+
+        user = g.user
+
         UserService.ping(user, method_name=inspect.stack()[0][3],
                          service_context=TokenService.__name__)
 
@@ -98,14 +100,14 @@ class TokenService:
         """
         try:
             payload = {
-                'iss': COMPANY_NAME.lower(),
+                'iss': current_app.config["COMPANY_NAME"].lower(),
                 'exp': datetime.utcnow() + timedelta(minutes=token_lifespan),
                 'iat': datetime.utcnow(),
                 'sub': public_id
             }
             auth_token = jwt.encode(
                 payload,
-                SECRET_KEY,
+                current_app.config["SECRET_KEY"],
                 algorithm='HS256'
             )
             return auth_token

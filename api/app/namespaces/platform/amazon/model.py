@@ -1,5 +1,5 @@
 from app.extensions import db
-from .. import Platform
+from ..model_parent import Platform
 from sqlalchemy.ext.declarative import declared_attr
 
 

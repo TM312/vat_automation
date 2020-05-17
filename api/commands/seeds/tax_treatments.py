@@ -15,6 +15,11 @@ tax_treatments = [
         'description': 'Transaction taxable in the country of arrival. EU Cross-border Sale (Departure != Arrival Country). Limited to B2C Transactions, and to Transaction Types SALE and REFUND.'
     },
     {
+        'code': 'NON_TAXABLE_DISTANCE_SALE',
+        'name': 'Non-taxable Distance Sale',
+        'description': 'Transaction non-taxable but to be reported in the country of departure. EU Cross-border Sale (Departure != Arrival Country). Limited to B2C Transactions, and to Transaction Types SALE and REFUND.'
+    },
+    {
         'code': 'INTRA_COMMUNITY_SALE',
         'name': 'Intra Community Sale',
         'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Sale (Departure != Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number).'
@@ -40,6 +45,8 @@ tax_treatments = [
     #     'description': 'Import of good(s) entering the Single European Economic Area.'
     # }
 ]
+
+!!!! sowohl entry für non taxable distane sale als auch wann der auftaucht
 
 
 

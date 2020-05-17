@@ -3,7 +3,7 @@ from .service import TemplateService
 
 
 ns = Namespace("utils", description="Utilities Related Operations")  # noqa
-!!! ns.add_model(transaction_dto.name, transaction_dto)
+ns.add_model(transaction_dto.name)
 
 
 

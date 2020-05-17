@@ -5,23 +5,26 @@ from werkzeug.exceptions import InternalServerError
 from app.extensions import db
 
 
-from app.namespaces.currency import Currencys
-from app.namespaces.country import EU, Country
-from app.namespaces.transaction import TransactionType
-from app.namespaces.tax import TaxTreatment, TaxCode, TaxRate, TaxRateType
-from app.namespaces.platform import Amazon
-from app.namespaces.channel import Channel
-from app.namespaces.customer import CustomerRelationship
-from app.namespaces.user import Admin, TaxAuditor
-from app.namespaces.business import AccountingFirm
+from app.namespaces.currency.model import Currency
+from app.namespaces.country.model import EU, Country
+from app.namespaces.transaction.model import TransactionType
+from app.namespaces.tax.tax_code.model import TaxCode
+from app.namespaces.tax.tax_treatment.model import TaxTreatment
+from app.namespaces.tax.tax_rate.model import TaxRate, TaxRateType
+from app.namespaces.platform.amazon.model import Amazon
+from app.namespaces.channel.model import Channel
+from app.namespaces.customer.model import CustomerRelationship
+from app.namespaces.user.admin.model import Admin
+from app.namespaces.user.tax_auditor.model import TaxAuditor
+from app.namespaces.business.accounting_firm.model import AccountingFirm
 
 
 from .seeds.currencies import currencies
-from .seeds.eu import eu, EUSeedService
-from .seeds.countries import countries
-from .seeds.tax_codes import tax_codes
+from .seeds.eu import EUSeedService
+from .seeds.countries import CountrySeedService
+from .seeds.tax_codes import TaxCodesSeedService
 from .seeds.tax_rate_types import tax_rate_types
-from .seeds.tax_rates import tax_rates
+from .seeds.tax_rates import TaxRateSeedService
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
@@ -31,6 +34,10 @@ from .seeds.customer_relationships import customer_relationships
 from .seeds.users import admins, tax_auditors
 from .seeds.accounting_firms import accounting_firms
 
+countries = CountrySeedService.seed_countries()
+eu = EUSeedService.seed_eu()
+tax_codes = TaxCodesSeedService.seed_tax_codes()
+tax_rates = TaxRateSeedService.seed_tax_rates()
 
 things_list = {
     'currencies': [Currency, currencies],

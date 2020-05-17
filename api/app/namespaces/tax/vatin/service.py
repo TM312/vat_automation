@@ -8,11 +8,12 @@ from werkzeug.exceptions import HTTPException
 
 from app.extensions import db
 
-from vatin import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, logger
+from . import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, logger
 from .model import VATIN
 
+from ...business.seller_firm.service import SellerFirmService
 
-VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
+
 
 
 class VATINService:
@@ -33,9 +34,11 @@ class VATINService:
         db.session.commit()
 
 
-     @staticmethod
+    @staticmethod
     #kwargs can contain: seller_firm_id
     def process_vat_numbers_files_upload(vat_numbers_files: list, **kwargs):
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
+
         file_type='vat_numbers'
         df_encoding = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
@@ -44,7 +47,7 @@ class VATINService:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
             VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, basepath, **kwargs)
 
-         response_object = {
+        response_object = {
             'status': 'success',
             'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(vat_numbers_files)))
         }
@@ -52,7 +55,7 @@ class VATINService:
         return response_object
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> list:
 
@@ -68,13 +71,15 @@ class VATINService:
 
     @staticmethod
     def create_vatins(df, file_path_in: str, **kwargs) -> list:
+        VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
+
 
         error_counter = 0
         total_number_vatins = len(df.index)
         input_type = 'vat number' #only used for response objects
 
         for i in range(total_number_vatins):
-            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
 
             country_code = InputService.get_str(df, i, column='country_code'),
             number = InputService.get_str(df, i, column='number')
@@ -87,7 +92,7 @@ class VATINService:
             if not valid_to:
                 valid_to = valid_from + timedelta(days=VATIN_LIFESPAN)
 
-            seller_firm_id = seller_firm_id_list[i]:
+            seller_firm_id = seller_firm_id_list[i]
             try:
                 VATINService.check_validity(country_code, number, valid, valid_from=valid_from, valid_to=valid_to, business_id=seller_firm_id)
 
@@ -105,6 +110,8 @@ class VATINService:
 
     @staticmethod
     def get_validity_period(date: date, **kwargs):
+        VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
+
         if 'valid_from' in kwargs and 'valid_to' in kwargs:
             valid_from = kwargs['valid_from']
             valid_to = kwargs['valid_to']
@@ -151,7 +158,7 @@ class VATINService:
                     'number' : number,
                     'initial_tax_date' : kwargs.get('initial_tax_date'),
                     'valid_from' : valid_from,
-                    'valid_to' : valid_to
+                    'valid_to' : valid_to,
                     'valid' : valid,
                     'business_id' : kwargs.get('business_id')
                 }
@@ -237,7 +244,7 @@ class VATINService:
             raise HTTPException(msg)
 
 
-    @staticmethod #!!! async??
+    @staticmethod #!! async??
     def check_data(country_code, number):
         """VIES API response data."""
         client = Client(VIES_WSDL_URL)

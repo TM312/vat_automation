@@ -1,10 +1,9 @@
 import re
-from zeep import Client
 
 import logging
 
 
-logger = logging.getLogger("vies")
+logger = logging.getLogger("vatin")
 
 
 def dk_format(v):

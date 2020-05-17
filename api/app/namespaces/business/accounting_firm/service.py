@@ -6,7 +6,7 @@ from app.extensions import db
 from .model import AccountingFirm
 from .schema import accounting_firm_dto
 
-from ...user import TaxAuditor
+from ...user.tax_auditor.model import TaxAuditor
 
 
 class AccountingFirmService:
@@ -50,42 +50,42 @@ class AccountingFirmService:
         else:
             raise NotFound('This accounting firm does not exist.')
 
-    @staticmethod
-    def create_accounting_firm(accounting_firm_data) -> AccountingFirm:
-        accounting_firm = AccountingFirm.query.filter_by(company_name=accounting_firm_data.get('company_name')).first()
+    # @staticmethod
+    # def create_accounting_firm(accounting_firm_data) -> AccountingFirm:
+    #     accounting_firm = AccountingFirm.query.filter_by(company_name=accounting_firm_data.get('company_name')).first()
 
-        if not accounting_firm:
-            #create new accounting based on AccountingFirm model
-            new_accounting_firm = AccountingFirm(
-                company_name=accounting_firm_data.get('company_name')
-                logo_image_name=accounting_firm_data.get('logo_image_name')
-            )
-            #add accounting business to db
-            db.session.add(new_accounting_firm)
-            db.session.commit()
+    #     if not accounting_firm:
+    #         #create new accounting based on AccountingFirm model
+    #         new_accounting_firm = AccountingFirm(
+    #             company_name=accounting_firm_data.get('company_name'),
+    #             logo_image_name=accounting_firm_data.get('logo_image_name')
+    #         )
+    #         #add accounting business to db
+    #         db.session.add(new_accounting_firm)
+    #         db.session.commit()
 
-            response_object = {
-                'status': 'success',
-                'message': 'Successfully registered.'
-            }
-            return response_object
+    #         response_object = {
+    #             'status': 'success',
+    #             'message': 'Successfully registered.'
+    #         }
+    #         return response_object
 
-        else:
-            response_object = {
-                'status': 'error',
-                'message': 'An accounting business with this name has already been registered.'
-            }
-            return response_object
+    #     else:
+    #         response_object = {
+    #             'status': 'error',
+    #             'message': 'An accounting business with this name has already been registered.'
+    #         }
+    #         return response_object
 
 
 
-    @staticmethod
-    def get_own_clients(tax_auditor: TaxAuditor):
-        #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
-        accounting_firm=AccountingFirm.query.filter(
-            AccountingFirm.id == tax_auditor.employer.id).first()
-        if accounting_firm:
-            return accounting_firm.clients.all()
+    # @staticmethod
+    # def get_own_clients(tax_auditor: TaxAuditor):
+    #     #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
+    #     accounting_firm=AccountingFirm.query.filter(
+    #         AccountingFirm.id == tax_auditor.employer.id).first()
+    #     if accounting_firm:
+    #         return accounting_firm.clients.all()
 
 
 

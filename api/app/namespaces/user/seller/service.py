@@ -8,7 +8,7 @@ from app.extensions import db
 from .model import Seller
 from .schema import seller_dto
 
-from ...email import EmailService
+from ...email.service import EmailService
 
 
 class SellerService:
@@ -20,7 +20,7 @@ class SellerService:
             #create new seller based on Seller model
             new_seller = Seller(
                 email=seller_data.get('email'),
-                password=seller_data.get('password')
+                password=seller_data.get('password'),
                 claimed=True,
                 role='employee'
             )

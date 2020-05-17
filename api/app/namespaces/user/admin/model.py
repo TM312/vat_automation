@@ -1,4 +1,4 @@
-from .. import User
+from ..model_parent import User
 
 class Admin(User):
     __mapper_args__ = {'polymorphic_identity': 'admin'}

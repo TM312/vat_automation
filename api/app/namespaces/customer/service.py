@@ -1,4 +1,4 @@
-from ..tax import VATINService
+from ..tax.vatin.service import VATINService
 
 class CustomerService:
 

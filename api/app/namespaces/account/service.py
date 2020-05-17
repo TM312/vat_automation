@@ -2,10 +2,10 @@ from flask import g, current_app
 from app.extensions import db
 
 from .model import Account
-from ..utils import InputService
+from ..utils.service import InputService
+from ..business.seller_firm.service import SellerFirmService
 
 
-BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
 class AccountService:
 
@@ -22,6 +22,8 @@ class AccountService:
     @staticmethod
     #kwargs can contain: seller_firm_id
     def process_account_files_upload(account_information_files: list, **kwargs):
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
         file_type = 'account_list'
         df_encoding = None
         delimiter = None
@@ -32,7 +34,7 @@ class AccountService:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
             AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
 
-         response_object = {
+        response_object = {
             'status': 'success',
             'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(account_information_files)))
         }
@@ -41,7 +43,7 @@ class AccountService:
 
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_account_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 
@@ -67,7 +69,7 @@ class AccountService:
 
         for i in range(total_number_accounts):
 
-            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
             public_id = InputService.get_str(df, i, column='account_id')
             channel_code = InputService.get_str(df, i, column='channel_code')
 

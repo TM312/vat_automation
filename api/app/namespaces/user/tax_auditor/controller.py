@@ -6,20 +6,21 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from app.extensions import mail
-from .schema import tax_auditor_dto, action_dto
+from .schema import tax_auditor_dto
 from .service import TaxAuditorService
 from .model import TaxAuditor
 from .interface import TaxAuditorInterface
 
-from ...utils import login_required, accepted_u_types, confirmation_required, TemplateService
+from ...utils import login_required, accepted_u_types, confirmation_required
+from ...utils.service import TemplateService
 
 
-from ...business import SellerFirmService
-from ...item import ItemService
-from ...transaction_input import TransactionInputService
-from ...platform import DistanceSaleService
-from ...account import AccountService
-from ...tax import VATINService
+from ...business.seller_firm.service import SellerFirmService
+from ...item.service import ItemService
+from ...transaction_input.service import TransactionInputService
+from ...platform.amazon.service import DistanceSaleService
+from ...account.service import AccountService
+from ...tax.vatin.service import VATINService
 
 
 

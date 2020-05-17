@@ -7,24 +7,31 @@ from app.country.model import Country, EU
 
 from flask import current_app
 
-BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
-SERVICE_START_DATE = current_app.config["SERVICE_START_DATE"]
 
-
-
-
-eu = [
-    {
-        'valid_from': SERVICE_START_DATE,
-        'valid_to': datetime.strptime('31-12-2020', '%d-%m-%Y').date()
-    }
-]
 
 
 
 class EUSeedService:
+
+    @staticmethod
+    def seed_eu():
+        SERVICE_START_DATE = current_app.config["SERVICE_START_DATE"]
+
+        eu = [
+            {
+                'valid_from': SERVICE_START_DATE,
+                'valid_to': datetime.strptime('31-12-2020', '%d-%m-%Y').date()
+            }
+        ]
+        return eu
+
+
+
+
     @staticmethod
     def append_countries_to_eu():
+        BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
+
 
         file = 'eu.csv'
         dirpath = path.join(

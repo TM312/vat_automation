@@ -5,8 +5,8 @@ from typing import List
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from app.extensions import db
-from .model import User, Action
-from .schema import user_dto
+from .model_parent import User, Action
+from .schema_parent import user_dto
 
 
 class UserService:

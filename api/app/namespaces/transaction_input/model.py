@@ -4,16 +4,16 @@ from app.extensions import db
 
 
 class TransactionInput(db.Model):
-     """ TransactionInput model """
+    """ TransactionInput model """
     __tablename__ = "transaction_input"
 
     id = db.Column(db.Integer, primary_key=True)
     original_filename = db.Column(db.String(128), nullable=False)
-    created_on = db.Column(db.Datetime, default=datetime.utcnow)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
 
     processed = db.Column(db.Boolean, default=False)
-    processed_on = db.Column(db.Datetime)
+    processed_on = db.Column(db.DateTime)
     transactions = db.relationship('Transaction', back_populates='transaction_input')
 
 
@@ -26,7 +26,7 @@ class TransactionInput(db.Model):
     activity_id = db.Column(db.String(64))
     shipment_date = db.Column(db.Date)
     arrival_date = db.Column(db.Date)
-    tax_date = db.Column(db.Date)
+    complete_date = db.Column(db.Date)
     item_sku = db.Column(db.String(128))
     item_name = db.Column(db.String(128))
     item_manufacture_country = db.Column(db.String(128))

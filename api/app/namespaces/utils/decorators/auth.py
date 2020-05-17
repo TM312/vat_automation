@@ -3,7 +3,7 @@ from functools import wraps
 from flask import request, g
 from werkzeug.exceptions import Unauthorized, Forbidden
 
-from ...auth import TokenService
+from ...auth.service import TokenService
 
 
 def login_required(f):
