@@ -8,15 +8,11 @@ from itsdangerous import SignatureExpired, BadTimeSignature
 from werkzeug.exceptions import Conflict, Gone, BadRequest
 
 from app.extensions import mail, db
-from ..user import UserService
+from ..user.service_parent import UserService
+from ..utils.decorators.asyncd import asyncd
 
-from ..utils import asyncd
 
-MAIL_DEFAULT_SENDER = current_app.config["MAIL_DEFAULT_SENDER"]
-SECRET_KEY = current_app.config["SECRET_KEY"]
-EMAIL_CONFIRMATION_SALT = current_app.config["EMAIL_CONFIRMATION_SALT"]
-FRONTEND_HOST = current_app.config["FRONTEND_HOST"]
-EMAIL_CONFIRMATION_MAX_AGE = current_app.config["EMAIL_CONFIRMATION_MAX_AGE"]
+
 
 class EmailService:
 
@@ -28,6 +24,8 @@ class EmailService:
 
 
     def send_email(subject, recipients, template, **kwargs):
+        MAIL_DEFAULT_SENDER = current_app.config["MAIL_DEFAULT_SENDER"]
+
         app = current_app._get_current_object()
 
         msg = Message(
@@ -40,6 +38,10 @@ class EmailService:
         EmailService.send_async_email(app, msg) # EmailService.send_async_email.delay(app, msg)
 
     def generate_confirmation_url(user_email):
+        SECRET_KEY = current_app.config["SECRET_KEY"]
+        EMAIL_CONFIRMATION_SALT = current_app.config["EMAIL_CONFIRMATION_SALT"]
+        FRONTEND_HOST = current_app.config["FRONTEND_HOST"]
+
         confirm_serializer = URLSafeTimedSerializer(secret_key=SECRET_KEY)
         token=confirm_serializer.dumps(
             obj=user_email,
@@ -56,6 +58,10 @@ class EmailService:
 
 
     def confirm_email(token):
+        EMAIL_CONFIRMATION_SALT = current_app.config["EMAIL_CONFIRMATION_SALT"]
+        SECRET_KEY = current_app.config["SECRET_KEY"]
+        EMAIL_CONFIRMATION_MAX_AGE = current_app.config["EMAIL_CONFIRMATION_MAX_AGE"]
+
         confirm_serializer = URLSafeTimedSerializer(
             secret_key=SECRET_KEY
         )

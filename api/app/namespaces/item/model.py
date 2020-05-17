@@ -1,20 +1,19 @@
+from datetime import datetime
 from app.extensions import db
-from flask import current_app
 
-TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
 class Item(db.Model):  # type: ignore
     """ Item model """
     __tablename__ = "item"
 
     id = db.Column(db.Integer, primary_key=True)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id')
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    original_filename = db.Column(db.String(128)
+    original_filename = db.Column(db.String(128))
     sku = db.Column(db.String(48), nullable=False)
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=TAX_DEFAULT_VALIDITY)
+    valid_to = db.Column(db.Date)
     brand_name = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(256), nullable=False)
     ean = db.Column(db.String(64), nullable=False)

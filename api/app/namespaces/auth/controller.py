@@ -1,7 +1,7 @@
 from typing import List
 
 from flask import request
-from flask import current_app, g
+from flask import current_app
 
 from flask_restx import Namespace, Resource
 
@@ -12,8 +12,6 @@ from .interface import TokenInterface
 
 from ..user import User, UserInterface, user_dto
 from ..utils import login_required, accepted_u_types
-
-TOKEN_LIFESPAN_REGISTRATION = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
 ns.add_model(auth_dto.name, auth_dto)
@@ -50,8 +48,7 @@ class UserLogin(Resource):
         """ Login User """
         # get the post data
         user_data: UserInterface = request.json
-        token_lifespan: TokenInterface = TOKEN_LIFESPAN_REGISTRATION
-        return TokenService.login_user(user_data, token_lifespan)
+        return TokenService.login_user(user_data)
 
 
 @ns.route('/logout')
@@ -61,7 +58,6 @@ class UserLogout(Resource):
     """
     @login_required
     def post(self):
-        user = g.user
         # get auth token from request header
         auth_token: TokenInterface = request.headers.get('Authorization')
-        return TokenService.logout_user(user, auth_token)
+        return TokenService.logout_user(auth_token)

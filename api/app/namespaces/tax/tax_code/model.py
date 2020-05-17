@@ -1,5 +1,5 @@
 from app.extensions import db
-
+from ...channel.model import channel_tax_code_AT
 
 class TaxCode(db.Model):  # type: ignore
     """ Item tax_code, e.g. A_GEN_STANDARD """

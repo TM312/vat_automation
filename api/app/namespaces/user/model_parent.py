@@ -7,8 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db, bcrypt
 
-BCRYPT_LOG_ROUNDS = current_app.config["BCRYPT_LOG_ROUNDS"]
-
 
 class User(db.Model):  # type: ignore
     """ User model """
@@ -51,6 +49,7 @@ class User(db.Model):  # type: ignore
 
     @password.setter
     def password(self, password):
+        BCRYPT_LOG_ROUNDS = current_app.config["BCRYPT_LOG_ROUNDS"]
         self.password_hash = bcrypt.generate_password_hash(
             password, rounds=BCRYPT_LOG_ROUNDS).decode('utf-8')
 

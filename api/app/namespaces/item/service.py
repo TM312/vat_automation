@@ -6,12 +6,10 @@ from werkzeug.exceptions import NotFound, UnsupportedMediaType
 
 from .model import Item
 
-from ..account import Account
-from ..utils import InputService
+from ..account.model import Account
+from ..utils.service import InputService
+from ..business.seller_firm.service import SellerFirmService
 
-TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
-BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
-STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config["STATIC_DATA_ALLOWED_EXTENSIONS"]
 
 
 class ItemService:
@@ -19,7 +17,7 @@ class ItemService:
     @staticmethod
     def get_by_sku_account_date(item_sku: str, account: Account, date: date) -> Item:
         if account.channel.platform_code == 'AMZ':
-            item = Item.query.filter(Item.sku==item_sku, Item.seller_firm_id=account.seller_firm_id, Item.valid_from<=date, Item.valid_to>=date).first()
+            item = Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id, Item.valid_from<=date, Item.valid_to>=date).first()
             if item:
                 return item
             else:
@@ -31,6 +29,8 @@ class ItemService:
     @staticmethod
     #kwargs can contain: seller_firm_id
     def process_item_files_upload(item_information_files: list, **kwargs):
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
+
         file_type='item_list'
         df_encoding = None
         delimiter = None
@@ -50,14 +50,14 @@ class ItemService:
 
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_item_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = ItemService.create_items(df, file_path_in, **kwargs)
 
-        # celery task !!!
+        # celery task !!
         InputService.move_file_to_out(file_path_in, file_type)
 
         return response_objects
@@ -67,6 +67,8 @@ class ItemService:
 
     @staticmethod
     def create_items(df, file_path_in: int, **kwargs):
+        TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
+
 
         redundancy_counter = 0
         error_counter = 0
@@ -76,7 +78,7 @@ class ItemService:
         for i in range(total_number_items):
 
             sku = InputService.get_str(df, i, column='sku')
-            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
@@ -158,7 +160,7 @@ class ItemService:
 
         # if an item with the same sku for the specified validity period already exists, it is being updated or deleted.
         if item:
-           if item.valid_from >= valid_from:
+            if item.valid_from >= valid_from:
                 db.session.delete(item)
 
             else:

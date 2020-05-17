@@ -8,11 +8,10 @@ from .model import TransactionInput
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
 from app.extensions import db
 
-from ..utils import InputService
-from ..transaction import TransactionService
+from ..utils.service import InputService
+from ..transaction.service import TransactionService
 
 
-BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
 
 class TransactionInputService:
@@ -25,7 +24,8 @@ class TransactionInputService:
         elif file.lower().endswith('.txt'):
             delimiter=None
         else:
-            raise UnsupportedMediaType('File extension invalid (file: {}).'.format(file))  !!!! filename
+            filename = os.path.basename(file)
+            raise UnsupportedMediaType('File extension invalid (file: {}).'.format(filename))
 
         return delimiter
 
@@ -33,6 +33,8 @@ class TransactionInputService:
     @staticmethod
     #kwargs can contain: seller_firm_id
     def process_transaction_input_files_upload(transaction_input_files: list, **kwargs):
+        BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
+
         file_type='item_list'
         df_encoding = 'latin-1'
         basepath = BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
@@ -53,7 +55,7 @@ class TransactionInputService:
 
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 
@@ -100,7 +102,7 @@ class TransactionInputService:
                     'check_tax_calculation_date': InputService.get_date_or_None(df, i, column='TAX_CALCULATION_DATE'),
                     'shipment_date': InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE'),
                     'arrival_date': InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE'),
-                    'tax_date': InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE'),
+                    'complete_date': InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE'),
 
                     'item_sku': item_sku,  # str --> ItemService.retrieve_item() --> transaction
                     'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
@@ -210,7 +212,7 @@ class TransactionInputService:
 
                 try:
                     new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
-                    new_transaction = TransactionService.create_transaction(transaction_input_data)
+                    new_transaction = TransactionService.create_transactions(transaction_input_data)
 
                 except:
                     db.session.rollback()
@@ -241,7 +243,7 @@ class TransactionInputService:
             check_tax_calculation_date = transaction_input_data.get('check_tax_calculation_date'),
             shipment_date = transaction_input_data.get('shipment_date'),
             arrival_date = transaction_input_data.get('arrival_date'),
-            tax_date = transaction_input_data.get('tax_date'),
+            complete_date = transaction_input_data.get('complete_date'),
             item_sku = transaction_input_data.get('item_sku'),
             item_name = transaction_input_data.get('item_name'),
             item_manufacture_country = transaction_input_data.get('item_manufacture_country'),

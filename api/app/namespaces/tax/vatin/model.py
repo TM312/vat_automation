@@ -1,8 +1,8 @@
-import datetime import date, timedelta
+from datetime import date, timedelta
 
 from app.extensions import db
 
-from vatin import VIES_OPTIONS
+from . import VIES_OPTIONS
 
 
 
@@ -14,7 +14,7 @@ class VATIN(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_on = db.Column(db.Date, default=date.today())
     valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=date.today() + timedelta(days=current_app.config['VATIN_LIFESPAN']))
+    valid_to = db.Column(db.Date)
     initial_tax_date = db.Column(db.Date)
     _country_code = db.Column(db.String(4), nullable=False)
     _number = db.Column(db.String(4), nullable=False)

@@ -1,4 +1,5 @@
 from datetime import datetime
+from ..tax.tax_treatment import tax_treatment_transaction_type_AT
 
 from app.extensions import db  # noqa
 
@@ -12,7 +13,7 @@ class TransactionType(db.Model):  # type: ignore
 
     tax_treatment_codes = db.relationship(
         "TaxTreatment",
-         secondary=tax_treatment_transaction_type_AT,
+        secondary=tax_treatment_transaction_type_AT,
         back_populates="transaction_types"
      )
 
@@ -58,7 +59,7 @@ class Transaction(db.Model):  # type: ignore
 
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
 
-    transaction_type_code = db.Column(db.String(8))
+    type_code = db.Column(db.String(8), db.ForeignKey('transaction_type.code'), nullable=False)
 
     item_quantity = db.Column(db.Integer, default=1)
 
@@ -123,7 +124,7 @@ class Transaction(db.Model):  # type: ignore
 
 
     def __repr__(self):
-        return '<{}: id:{} – public_id:{} - created_on:{}>'.format(self.transaction_type_code, self.id, self.public_id, self.created_on)
+        return '<{}: id:{} – public_id:{} - created_on:{}>'.format(self.type_code, self.id, self.public_id, self.created_on)
 
 
 

@@ -1,5 +1,3 @@
-from .service import EmailService
-from .interface import EmailInterface
 
 BASE_ROUTE = "email"
 

@@ -2,26 +2,32 @@ import os
 import shutil
 from typing import List
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
 
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge
-
-from ..business import SellerFirm
+from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
 
 
 
-MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
-BASE_PATH_TEMPLATES = current_app.config['BASE_PATH_TEMPLATES']
 
 class TemplateService:
 
     def download_file(filename: str):
+        BASE_PATH_TEMPLATES = current_app.config['BASE_PATH_TEMPLATES']
+
         return send_from_directory(directory=BASE_PATH_TEMPLATES, filename=filename, as_attachment=True)
 
 
+class HelperService:
+    @staticmethod
+    def get_date_from_str(date_string:str, date_format: str):
+        try:
+            date = datetime.strptime(date_string, date_format)
+        except:
+            raise UnprocessableEntity('Unreadable date format.')
+        return date
 
 
 class InputService:
@@ -143,22 +149,13 @@ class InputService:
     #         return file_paths
 
 
-    @staticmethod
-    def get_seller_firm_id(df, i, **kwargs) -> list:
-        if not 'seller_firm_id' in kwargs:
-            seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
-        else:
-            seller_firm_public_id = kwargs['seller_firm_id']
-
-        seller_firm = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
-
-        if seller_firm:
-            seller_firm_id = seller_firm.id
-            return seller_firm_id_list
 
 
     @staticmethod
     def store_static_data_upload(file: list, file_type: str) -> list:
+        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
         try:
             file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
         except:
@@ -177,6 +174,8 @@ class InputService:
 
     @staticmethod
     def allowed_filesize(file_path: str) -> bool:
+        MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
+
         file_size = os.stat(file_path).st_size
         if not file_size <= MAX_FILE_SIZE_INPUT:
             os.remove(file_path)
@@ -390,5 +389,3 @@ class InputService:
 #                     }
 #                     response_objects.append(response_object)
 #                     #raise UnsupportedMediaType()
-
-!!!!!

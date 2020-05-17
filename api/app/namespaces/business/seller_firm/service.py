@@ -11,9 +11,8 @@ from app.extensions import db
 from .model import SellerFirm
 from .schema import seller_firm_dto
 
-from ...utils import InputService
+from ...utils.service import InputService
 
-BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
 class SellerFirmService:
     @staticmethod
@@ -26,6 +25,7 @@ class SellerFirmService:
         seller_firm = SellerFirm.query.filter_by(public_id = public_id).first()
         if seller_firm:
             return seller_firm
+
 
 
     @staticmethod
@@ -71,10 +71,25 @@ class SellerFirmService:
         return new_seller_firm
 
 
+    @staticmethod
+    def get_seller_firm_id(df, i, **kwargs) -> list:
+        if not 'seller_firm_id' in kwargs:
+            seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
+        else:
+            seller_firm_public_id = kwargs['seller_firm_id']
+
+        seller_firm = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
+
+        if seller_firm:
+            seller_firm_id = seller_firm.id
+            return seller_firm_id_list
+
 
     @staticmethod
     #kwargs can contain: seller_firm_id
     def process_seller_firm_information_files_upload(seller_firm_information_files: list, claimed: bool, **kwargs):
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
         file_type = 'seller_firm'
         df_encoding = None
         delimiter = None
@@ -95,7 +110,7 @@ class SellerFirmService:
         return response_object
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 

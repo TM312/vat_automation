@@ -1,5 +1,5 @@
 from app.extensions import db  # noqa
-from .. import Business
+from ..model_parent import Business
 from sqlalchemy.ext.declarative import declared_attr
 
 

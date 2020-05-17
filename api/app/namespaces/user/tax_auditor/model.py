@@ -1,7 +1,7 @@
 
 
 from app.extensions import db  # noqa
-from .. import User
+from ..model_parent import User
 
 
 # tax_auditor_tax_record_output_country_AT = db.Table(

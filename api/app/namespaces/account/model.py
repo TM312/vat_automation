@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from app.extensions import db
 
 
@@ -8,7 +8,7 @@ class Account(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(24), nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id')
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.utcnow)
     channel_code = db.Column(db.Integer, db.ForeignKey('channel.code'))

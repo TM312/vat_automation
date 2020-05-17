@@ -6,18 +6,12 @@ from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 import pandas as pd
 from flask import current_app
 
-BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
-
 
 file = 'hist_exchange_rates.csv'
-dirpath = path.join(
-    BASE_PATH_SEEDS,
-    file)
-
-df = pd.read_csv(dirpath)
 
 
 class ExchangeRatesSeedService:
+
     @staticmethod
     def get_date_or_None_incl_format(df, i: int, column: str, dstr_format:str, alternative_dstr_format: str) -> date or None:
         if pd.isnull(df.iloc[i][column]):
@@ -35,6 +29,10 @@ class ExchangeRatesSeedService:
 
     @staticmethod
     def create_exchange_rate_collections():
+        BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
+        dirpath = path.join(BASE_PATH_SEEDS, file)
+        df = pd.read_csv(dirpath)
+
         for row in range(len(df.index)):
             date = ExchangeRatesSeedService.get_date_or_None_incl_format(df, i=row, column='Date', dstr_format='%Y-%m-%d', alternative_dstr_format='%Y.%m.%d')
             if not date:

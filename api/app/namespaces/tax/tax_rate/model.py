@@ -1,4 +1,3 @@
-from flask import current_app
 from app.extensions import db
 
 
@@ -8,10 +7,10 @@ class TaxRate(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+    valid_to = db.Column(db.Date)
 
     country_code = db.Column(db.String(4), db.ForeignKey('country.code'))
-    tax_code_code = db.Column(db.String(8), db.ForeignKey('tax_code.code')
+    tax_code_code = db.Column(db.String(8), db.ForeignKey('tax_code.code'))
     tax_rate_type_code = db.Column(db.ForeignKey('tax_rate_type.code'), nullable = False)
 
     rate = db.Column(db.Numeric(precision=8, scale=4))
@@ -20,8 +19,8 @@ class TaxRate(db.Model):  # type: ignore
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def __repr__(self):
-        return '<TaxRate: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
+            def __repr__(self):
+                return '<TaxRate: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
 
 
 

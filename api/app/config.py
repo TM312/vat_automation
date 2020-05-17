@@ -69,7 +69,7 @@ class Testing(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_TEST')
     SECRET_KEY = os.getenv('SECRET_KEY_TEST')
     BCRYPT_LOG_ROUNDS = 4
-    CSRF_ENABLED = False  # only for testing!!!
+    CSRF_ENABLED = False  # only for testing config!
 
 
 class Staging(Config):

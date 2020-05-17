@@ -4,11 +4,10 @@ from flask import g, current_app
 from app.extensions import db
 
 from .model import DistanceSale
-from ...utils import InputService
+from ...utils.service import InputService
+from ...business.seller_firm.service import SellerFirmService
 
 
-BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
-TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
 
 
@@ -18,6 +17,8 @@ class DistanceSaleService:
     @staticmethod
     #kwargs can contain: seller_firm_id
     def process_distance_sale_files_upload(distance_sale_information_files: list, **kwargs) -> dict:
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
         file_type = 'distance_sale_list'
         df_encoding = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
@@ -37,7 +38,7 @@ class DistanceSaleService:
 
 
 
-    # celery task !!!
+    # celery task !!
     @staticmethod
     def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
 
@@ -55,6 +56,7 @@ class DistanceSaleService:
 
     @staticmethod
     def create_distance_sales(df, file_path_in: int, **kwargs) -> list:
+        TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
         redundancy_counter = 0
         error_counter = 0
@@ -63,7 +65,7 @@ class DistanceSaleService:
 
         for i in range(total_number_distance_sales):
 
-            seller_firm_id = InputService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
