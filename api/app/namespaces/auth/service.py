@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union, Dict
 import jwt
 from datetime import datetime, timedelta
 import inspect
@@ -12,27 +12,32 @@ from .interface import TokenInterface
 
 from ..user.model_parent import User
 from ..user.service_parent import UserService
+from ..user.interface_parent import UserInterface
+from ..utils.interface import ResponseObjectInterface
 
+from ..user.admin.model import Admin
+from ..user.seller.model import Seller
+from ..user.tax_auditor.model import TaxAuditor
 
 
 
 class TokenService:
     @staticmethod
     def get_all() -> List[Token]:
-        tokens = Token.query.all()
-        return tokens
+        auth_tokens = Token.query.all()
+        return auth_tokens
 
     @staticmethod
     def get_by_id(auth_token: TokenInterface) -> Token:
-        token = Token.query.filter(Token.token == auth_token).first()
-        if token:
-            return token, 200
+        auth_token = Token.query.filter(Token.auth_token == auth_token).first()
+        if auth_token:
+            return auth_token, 200
         else:
             raise NotFound('Token does not exist.')
 
 
     @staticmethod
-    def login_user(user_data):
+    def login_user(user_data: UserInterface) -> ResponseObjectInterface:
         # fetch the user data
         user = User.query.filter_by(email=user_data.get('email')).first()
         if user and user.check_password(user_data.get('password')):
@@ -51,7 +56,7 @@ class TokenService:
             raise Unauthorized('Invalid Email or Password.')
 
     @staticmethod
-    def current_user(auth_token):
+    def current_user(auth_token: TokenInterface) -> Union[TaxAuditor, Admin, Seller]:
             payload = TokenService.decode_auth_token(auth_token)
             if not isinstance(payload, str):
                 user = User.query.filter(User.public_id == payload['sub']).first()
@@ -62,21 +67,20 @@ class TokenService:
             raise Unauthorized(payload)  # ('Provide a valid auth token.')
 
     @staticmethod
-    def logout_user(auth_token):
+    def logout_user(auth_token: TokenInterface) -> ResponseObjectInterface:
         # update a user's last_seen attribute & creates a new action object
         # the inspect module needs to be imported whenever ping is called
 
         user = g.user
 
-        UserService.ping(user, method_name=inspect.stack()[0][3],
-                         service_context=TokenService.__name__)
+        UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
 
         # actual logout
         payload = TokenService.decode_auth_token(auth_token)
         if isinstance(payload, dict):
             # mark the token as blacklisted
             blacklisted_token = Token(
-                token = auth_token,
+                auth_token = auth_token,
                 iat = datetime.fromtimestamp(payload['iat'] / 1e3),
                 sub = payload['sub']
             )
@@ -93,7 +97,7 @@ class TokenService:
             raise Unauthorized(payload)
 
     @staticmethod
-    def encode_auth_token(public_id: str, token_lifespan: int):
+    def encode_auth_token(public_id: str, token_lifespan: int) -> str:
         """
         Generates the Auth Token
         :return: string
@@ -116,7 +120,7 @@ class TokenService:
             return e
 
     @staticmethod
-    def decode_auth_token(auth_token):
+    def decode_auth_token(auth_token: TokenInterface) -> Dict[TokenInterface]:
         """
         Decodes the auth token
         :param auth_token:
@@ -136,10 +140,6 @@ class TokenService:
             return 'Invalid token. Please log in again.'
 
     @staticmethod
-    def check_blacklisted(auth_token):
+    def check_blacklisted(auth_token: TokenInterface) -> bool:
         # check whether auth token has been blacklisted
-        res = Token.query.filter_by(token=str(auth_token)).first()
-        if res:
-            return True
-        else:
-            return False
+        return return True if Token.query.filter_by(token=str(auth_token)).first() != None else False

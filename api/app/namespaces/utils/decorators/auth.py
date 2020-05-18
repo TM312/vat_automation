@@ -17,7 +17,7 @@ def login_required(f):
             # finally call f. [f() now has access to g.user]
             return f(*args, **kwargs)
         else:
-            raise Unauthorized('You are not authorized to access the resource. Please provide a valid token.')
+            raise Unauthorized('You are not authorized to access the resource. Please provide a valid auth token.')
 
     return wrap
 

@@ -10,7 +10,9 @@ from .service import TokenService
 from .model import Token
 from .interface import TokenInterface
 
-from ..user import User, UserInterface, user_dto
+from ..user.interface_parent import UserInterface
+
+#from ..user import User, UserInterface, user_dto
 from ..utils import login_required, accepted_u_types
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
@@ -27,14 +29,14 @@ class AdminTokenResource(Resource):
         """List Of Registered Tokens"""
         return TokenService.get_all()
 
-@ns.route("/<string:token>")
+@ns.route("/<string:auth_token>")
 class AdminTokenIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.marshal_with(auth_dto)
-    def get(self, token: str) -> Token:
+    def get(self, auth_token: TokenInterface) -> Token:
         """Get One Token"""
-        return TokenService.get_by_id(token)
+        return TokenService.get_by_id(auth_token)
 
 
 @ns.route('/login')

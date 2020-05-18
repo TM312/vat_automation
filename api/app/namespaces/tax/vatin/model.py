@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import datetime, date
 
 from app.extensions import db
 
@@ -12,7 +12,7 @@ class VATIN(db.Model):
     __tablename__ = "vatin"
 
     id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.Date, default=date.today())
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date)
     initial_tax_date = db.Column(db.Date)

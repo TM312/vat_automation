@@ -1,10 +1,11 @@
 import os
 import shutil
-from typing import List
+from typing import List, BinaryIO
 import pandas as pd
 from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
+from .interface import ResponseObjectInterface
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
@@ -22,7 +23,7 @@ class TemplateService:
 
 class HelperService:
     @staticmethod
-    def get_date_from_str(date_string:str, date_format: str):
+    def get_date_from_str(date_string:str, date_format: str) -> date:
         try:
             date = datetime.strptime(date_string, date_format)
         except:
@@ -32,7 +33,7 @@ class HelperService:
 
 class InputService:
     @staticmethod
-    def get_date_or_None(df, i:int, column:str) -> date or None:
+    def get_date_or_None(df: pd.DataFrame, i:int, column:str) -> date:
         if pd.isnull(df.iloc[i][column]):
             return None
         else:
@@ -50,7 +51,7 @@ class InputService:
 
 
     @staticmethod
-    def get_str(df, i:int, column:str) -> str:
+    def get_str(df: pd.DataFrame, i: int, column: str) -> str:
         try:
             string = str(df.iloc[i][column])
         except:
@@ -59,7 +60,7 @@ class InputService:
 
 
     @staticmethod
-    def get_str_or_None(df, i:int, column:str) -> str or None:
+    def get_str_or_None(df: pd.DataFrame, i:int, column:str) -> str:
         if pd.isnull(df.iloc[i][column]):
             return None
         else:
@@ -72,7 +73,7 @@ class InputService:
 
 
     @staticmethod
-    def get_float(df, i:int, column:str) -> float:
+    def get_float(df: pd.DataFrame, i:int, column:str) -> float:
         if pd.isnull(df.iloc[i][column]):
             return 0.0
         else:
@@ -85,7 +86,7 @@ class InputService:
 
 
     @staticmethod
-    def get_bool(df, i:int, column:str, value_true) -> bool:
+    def get_bool(df: pd.DataFrame, i: int, column: str, value_true) -> bool:
         try:
             boolean = bool(df.iloc[i][column] == value_true)
         except:
@@ -95,7 +96,7 @@ class InputService:
 
 
     @staticmethod
-    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[dict]:
+    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[ResponseObjectInterface]:
         response_objects = []
         success_status = 'successfully'
         notification = ''
@@ -152,7 +153,7 @@ class InputService:
 
 
     @staticmethod
-    def store_static_data_upload(file: list, file_type: str) -> list:
+    def store_static_data_upload(file, file_type: str) -> str:
         STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
@@ -182,7 +183,7 @@ class InputService:
 
 
     @staticmethod
-    def store_file(file, allowed_extensions: list, basepath: str, file_type: str):
+    def store_file(file: BinaryIO, allowed_extensions: list, basepath: str, file_type: str) -> str:
         if allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             filename = secure_filename(file.filename)
             stored_filename = "{}.{}".format(filename, filename.rsplit('.', 1)[1].lower())
@@ -219,7 +220,7 @@ class InputService:
 
 
     @staticmethod
-    def read_file_path_into_df(file_path: str, df_encoding, delimiter):
+    def read_file_path_into_df(file_path: str, df_encoding: str, delimiter: str) -> pd.DataFrame:
         if os.path.isfile(file_path):
             file_name = os.path.basename(file_path)
             try:

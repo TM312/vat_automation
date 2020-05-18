@@ -30,5 +30,4 @@ class EmailConfirmationResource(Resource):
     """POST Request for email confirmation token state"""
     def post(self):
         token : EmailInterface = request.json['token']  # JSON body of a request
-        print(token)
         return EmailService.confirm_email(token)

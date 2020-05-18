@@ -2,16 +2,19 @@ from datetime import date, timedelta
 import os
 import datetime
 import uuid
-from typing import List
+from typing import List, BinaryIO, Dict
+import pandas as pd
 
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized, UnsupportedMediaType
 from flask import g, current_app
 from app.extensions import db
 
 from .model import SellerFirm
+from .interface import SellerFirmInterface
 from .schema import seller_firm_dto
 
 from ...utils.service import InputService
+from ...utils.interface import ResponseObjectInterface
 
 
 class SellerFirmService:
@@ -27,16 +30,15 @@ class SellerFirmService:
             return seller_firm
 
 
-
     @staticmethod
-    def update(public_id: str, data_changes: dict) -> SellerFirm:
+    def update(public_id: str, data_changes: SellerFirmInterface) -> SellerFirm:
         seller_firm = SellerFirmService.get_by_id(public_id)
         seller_firm.update(data_changes)
         db.session.commit()
         return seller_firm
 
     @staticmethod
-    def delete_by_id(public_id: str):
+    def delete_by_id(public_id: str) -> ResponseObjectInterface:
         #check if accounting business exists in db
         seller_firm = SellerFirm.query.filter(SellerFirm.public_id == public_id).first()
         if seller_firm:
@@ -52,7 +54,7 @@ class SellerFirmService:
             raise NotFound('This accounting firm does not exist.')
 
     @staticmethod
-    def create_seller_firm(seller_firm_data: dict) -> SellerFirm:
+    def create_seller_firm(seller_firm_data: SellerFirmInterface) -> SellerFirm:
 
         new_seller_firm = SellerFirm(
             claimed = seller_firm_data.get('claimed'),
@@ -72,7 +74,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def get_seller_firm_id(df, i, **kwargs) -> list:
+    def get_seller_firm_id(df: pd.DataFrame, i: int, **kwargs) -> int:
         if not 'seller_firm_id' in kwargs:
             seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_id')
         else:
@@ -82,16 +84,16 @@ class SellerFirmService:
 
         if seller_firm:
             seller_firm_id = seller_firm.id
-            return seller_firm_id_list
+            return seller_firm_id
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: list, claimed: bool, **kwargs):
+    #kwargs can contain: seller_firm_public_id
+    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, int]) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'
-        df_encoding = None
+        df_encoding = 'utf-8'
         delimiter = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
@@ -112,7 +114,7 @@ class SellerFirmService:
 
     # celery task !!
     @staticmethod
-    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = SellerFirmService.create_seller_firms(df, file_path_in, **kwargs)
@@ -126,7 +128,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def create_seller_firms(df, file_path_in: str, **kwargs): #upload only for tax auditors
+    def create_seller_firms(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[ResponseObjectInterface]: #upload only for tax auditors
         error_counter = 0
         total_number_items = len(df.index)
         input_type = 'seller firm'  # only used for response objects

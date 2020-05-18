@@ -7,14 +7,14 @@ from .model import AccountingFirm
 from .schema import accounting_firm_dto
 
 from ...user.tax_auditor.model import TaxAuditor
+from ...utils.interface import ResponseObjectInterface
 
 
 class AccountingFirmService:
     @staticmethod
     def get_own(tax_auditor: TaxAuditor) -> AccountingFirm:
         #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
-        accounting_firm = AccountingFirm.query.filter(
-            AccountingFirm.id == tax_auditor.employer.id).first()
+        accounting_firm = AccountingFirm.query.filter(AccountingFirm.id == tax_auditor.employer.id).first()
         if accounting_firm:
             return accounting_firm
         else:
@@ -23,8 +23,7 @@ class AccountingFirmService:
     @staticmethod
     def update_own(tax_auditor: TaxAuditor, data_changes) -> AccountingFirm:
         #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
-        accounting_firm = AccountingFirm.query.filter(
-            AccountingFirm.id == tax_auditor.employer.id).first()
+        accounting_firm = AccountingFirm.query.filter(AccountingFirm.id == tax_auditor.employer.id).first()
         if accounting_firm:
             accounting_firm.update(data_changes)
             db.session.commit()
@@ -34,7 +33,7 @@ class AccountingFirmService:
 
 
     @staticmethod
-    def delete_own(tax_auditor: TaxAuditor):
+    def delete_own(tax_auditor: TaxAuditor) -> ResponseObjectInterface:
         #check if accounting_firm exists by querying the Business table for the tax_auditors employer id
         accounting_firm = AccountingFirm.query.filter(
             AccountingFirm.id == tax_auditor.employer.id).first()

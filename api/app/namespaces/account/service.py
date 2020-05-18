@@ -1,8 +1,12 @@
 from flask import g, current_app
 from app.extensions import db
+from typing import List, BinaryIO
+import pandas as pd
 
 from .model import Account
+from .interface import AccountInterface
 from ..utils.service import InputService
+from ..utils.interface import ResponseObjectInterface
 from ..business.seller_firm.service import SellerFirmService
 
 
@@ -20,12 +24,12 @@ class AccountService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
-    def process_account_files_upload(account_information_files: list, **kwargs):
+    #kwargs can contain: seller_firm_public_id
+    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'account_list'
-        df_encoding = None
+        df_encoding = 'utf-8'
         delimiter = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
@@ -45,7 +49,7 @@ class AccountService:
 
     # celery task !!
     @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
@@ -60,7 +64,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_accounts(df, file_path_in: int, **kwargs):
+    def create_accounts(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[ResponseObjectInterface]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -101,7 +105,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_account(account_data: dict) -> Account:
+    def create_account(account_data: AccountInterface) -> Account:
 
         new_account = Account(
             created_by = account_data.get('created_by'),

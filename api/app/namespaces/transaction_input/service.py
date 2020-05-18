@@ -1,14 +1,17 @@
 import os
 from datetime import datetime
 import pandas as pd
-from typing import List
+from typing import List, BinaryIO
 from flask import g, current_app
+
 from .model import TransactionInput
+from .interface import TransactionInputInterface
 
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
 from app.extensions import db
 
 from ..utils.service import InputService
+from ..utils.interface import ResponseObjectInterface
 from ..transaction.service import TransactionService
 
 
@@ -18,7 +21,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def get_df_transaction_input_delimiter(file):
+    def get_df_transaction_input_delimiter(file: BinaryIO) -> str:
         if file.lower().endswith('.txt'):
             delimiter='\t'
         elif file.lower().endswith('.txt'):
@@ -31,12 +34,12 @@ class TransactionInputService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
-    def process_transaction_input_files_upload(transaction_input_files: list, **kwargs):
+    #kwargs can contain: seller_firm_public_id
+    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
         BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
         file_type='item_list'
-        df_encoding = 'latin-1'
+        df_encoding = 'utf-8'
         basepath = BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
         user_id = g.user.id
 
@@ -57,7 +60,7 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, **kwargs)
@@ -70,7 +73,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df, file_path_in: int, **kwargs):
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -212,7 +215,7 @@ class TransactionInputService:
 
                 try:
                     new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
-                    new_transaction = TransactionService.create_transactions(transaction_input_data)
+                    TransactionService.create_transaction_s(transaction_input_data)
 
                 except:
                     db.session.rollback()
@@ -229,7 +232,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_input(transaction_input_data: dict) -> TransactionInput:
+    def create_transaction_input(transaction_input_data: TransactionInputInterface) -> TransactionInput:
         new_transaction_input = TransactionInput(
             created_by = transaction_input_data.get('created_by'),
             original_filename = transaction_input_data.get('original_filename'),
@@ -328,7 +331,7 @@ class TransactionInputService:
     def handle_redundancy(account_public_id: str, channel_code: str, public_id: str) -> int:
         transation_input: TransactionInput = TransactionInput.query.filter_by(account_public_id=account_public_id, channel_code=channel_code, public_id=public_id, activity_id=activity_id, item_sku=item_sku).first()
 
-        # if an item with the same sku for the specified validity period already exists, it is being updated or deleted.
+        # if an item with the same sku for the specified validity period already exists, it is being deleted.
         if transation_input:
             db.session.delete(transation_input)
             redundancy_counter = 1
