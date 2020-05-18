@@ -21,12 +21,15 @@ class DistanceSale(db.Model):  # type: ignore
     created_by = db.Column(db.Integer, db.ForeignKey('user.id')
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     original_filename = db.Column(db.String(128))
+    valid_from = db.Column(db.Date, nullable=False)
+    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
 
     platform_code = db.Column(db.String(32), db.ForeignKey('platform.code'), nullable=False)
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     arrival_country_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+    status = db.Column(db.Boolean, nullable=False)
+
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

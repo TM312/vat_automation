@@ -1,4 +1,5 @@
 from ..tax.vatin.service import VATINService
+from datetime import date
 
 class CustomerService:
 

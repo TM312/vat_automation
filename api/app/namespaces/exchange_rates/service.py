@@ -6,7 +6,7 @@ from datetime import datetime, date
 class ExchangeRateService:
 
     @staticmethod
-    def get_rate_by_base_target_date(base, target, date):
+    def get_rate_by_base_target_date(base: str, target: str, date: date):
         if base == 'EUR':
             exchange_rates = ExchangeRatesEUR.query.filter_by(
                 date=date).first()
@@ -113,7 +113,7 @@ class ExchangeRateService:
             raise InternalServerError(response_object)
 
     @staticmethod
-    def create_exchange_rates_GBP(date) -> ExchangeRatesGBP:
+    def create_exchange_rates_GBP(date: date) -> ExchangeRatesGBP:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
                 date=date).first()
 
@@ -148,7 +148,7 @@ class ExchangeRateService:
             raise InternalServerError(response_object)
 
     @staticmethod
-    def create_exchange_rates_CZK(date) -> ExchangeRatesCZK:
+    def create_exchange_rates_CZK(date: date) -> ExchangeRatesCZK:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
             date=date).first()
 
@@ -182,7 +182,7 @@ class ExchangeRateService:
             raise InternalServerError(response_object)
 
     @staticmethod
-    def create_exchange_rates_PLN(date) -> ExchangeRatesPLN:
+    def create_exchange_rates_PLN(date: date) -> ExchangeRatesPLN:
         exchange_rate_collection = ExchangeRateCollection.query.filter_by(
             date=date).first()
 

@@ -1,4 +1,5 @@
 from .model import Country, EU
+from datetime import date
 
 from werkzeug.exceptions import NotFound
 
@@ -14,7 +15,7 @@ class CountryService:
                 'The country "{}" is currently not supported by our database. Please get in contact with one of the admins.'.format(country_code))
 
     @staticmethod
-    def get_eu_by_date(date) -> EU:
+    def get_eu_by_date(date: date) -> EU:
         eu = EU.query.filter(EU.valid_from <= date,
                              EU.valid_to >= date).first()
         if eu:

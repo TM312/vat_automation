@@ -35,12 +35,12 @@ class VATINService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
+    #kwargs can contain: seller_firm_public_id
     def process_vat_numbers_files_upload(vat_numbers_files: list, **kwargs):
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='vat_numbers'
-        df_encoding = None
+        df_encoding = 'utf-8'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         for file in vat_numbers_files:

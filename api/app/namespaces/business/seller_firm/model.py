@@ -29,11 +29,6 @@ class SellerFirm(Business):
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
 
-    # @declared_attr
-    # def tax_records(cls):
-    #     "tax_records column, if not present already."
-    #     return Business.__table__.c.get('tax_records', db.relationship('TaxRecord', backref='owner', order_by="desc(TaxRecord.created_on)", lazy=True))
-
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,13 +1,17 @@
 import os
 from datetime import date, timedelta
+from typing import List, BinaryIO
+import pandas as pd
 
 from flask import g, current_app
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
 
 from .model import Item
+from .interface import ItemInterface
 
 from ..account.model import Account
 from ..utils.service import InputService
+from ..utils.interface import ResponseObjectInterface
 from ..business.seller_firm.service import SellerFirmService
 
 
@@ -27,12 +31,12 @@ class ItemService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
-    def process_item_files_upload(item_information_files: list, **kwargs):
+    #kwargs can contain: seller_firm_public_id
+    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='item_list'
-        df_encoding = None
+        df_encoding = 'utf-8'
         delimiter = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
@@ -52,7 +56,7 @@ class ItemService:
 
     # celery task !!
     @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = ItemService.create_items(df, file_path_in, **kwargs)
@@ -66,7 +70,7 @@ class ItemService:
 
 
     @staticmethod
-    def create_items(df, file_path_in: int, **kwargs):
+    def create_items(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
         TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
 
 
@@ -129,13 +133,13 @@ class ItemService:
 
 
     @staticmethod
-    def create_item(item_data: dict) -> Item:
+    def create_item(item_data: ItemInterface) -> Item:
         new_item = Item(
             created_by = item_data.get('created_by'),
             original_filename = item_data.get('original_filename'),
             sku = item_data.get('sku'),
             seller_firm_id = item_data.get('seller_firm_id'),
-            valid_from = item_data.get('valid_from'),
+        w    valid_from = item_data.get('valid_from'),
             valid_to = item_data.get('valid_to'),
             brand_name = item_data.get('brand_name'),
             name = item_data.get('name'),

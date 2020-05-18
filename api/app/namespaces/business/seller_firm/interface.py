@@ -1,8 +1,7 @@
-from mypy_extensions import TypedDict
+from ..interface_parent import BusinessInterface
 
-class SellerFirmInterface(TypedDict, total=False):
-    company_name: str
-    logo_image_name: str
-    amazon_seller_id: str
-    accounting_firm_id: str
+class SellerFirmInterface(BusinessInterface):
+    claimed: bool
+    establishment_country_code: str
+    accounting_firm_id: int
     accounting_firm_client_id: str

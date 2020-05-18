@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, BinaryIO
 
 from flask import request, g, current_app
 from flask.wrappers import Response
@@ -13,6 +13,7 @@ from .interface import TaxAuditorInterface
 
 from ...utils import login_required, accepted_u_types, confirmation_required
 from ...utils.service import TemplateService
+from ...utils.interface import ResponseObjectInterface
 
 
 from ...business.seller_firm.service import SellerFirmService
@@ -48,7 +49,7 @@ class TaxAuditorResource(Resource):
         return TaxAuditorService.create_tax_auditor(tax_auditor_data)
 
     @login_required
-    def delete(self) -> Response:
+    def delete(self) -> ResponseObjectInterface:
         """Delete self"""
         return TaxAuditorService.delete_by_id(g.user.public_id)
 
@@ -71,12 +72,11 @@ class SellerFirmInformationTAResource(Resource):
     # !!! @ns.expect(tax_record_dto, validate=True)
     def post(self):
         """Create an unclaimed seller firm as a client"""
-        seller_firm_information_files: list = request.files.getlist("files")
+        seller_firm_information_files: List[BinaryIO] = request.files.getlist("files")
         print("POST file received")
         print('uploaded_files')
         print(seller_firm_information_files)
-        claimed = False
-        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed)
+        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed=False)
 
 
 @ns.route("/upload/item_information")
@@ -86,7 +86,7 @@ class ItemInformationTAResource(Resource):
     # @confirmation_required
     @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        item_information_files: list = request.files.getlist("files")
+        item_information_files: List[BinaryIO] = request.files.getlist("files")
         return ItemService.process_item_files_upload(item_information_files)
 
 
@@ -98,7 +98,7 @@ class AccountInformationTAResource(Resource):
     # @confirmation_required
     @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        account_information_files: list = request.files.getlist("files")
+        account_information_files: List[BinaryIO] = request.files.getlist("files")
         return AccountService.process_account_files_upload(account_information_files)
 
 
@@ -110,7 +110,7 @@ class DistanceSalesTAResource(Resource):
     # @confirmation_required
     @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        distance_sale_information_files: list = request.files.getlist("files")
+        distance_sale_information_files: List[BinaryIO] = request.files.getlist("files")
         return DistanceSaleService.process_distance_sale_files_upload(distance_sale_information_files)
 
 
@@ -122,7 +122,7 @@ class VATNumbersTAResource(Resource):
     # @confirmation_required
     @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        vat_numbers_files: list = request.files.getlist("files")
+        vat_numbers_files: List[BinaryIO] = request.files.getlist("files")
         return VATINService.process_vat_numbers_files_upload(vat_numbers_files)
 
 
@@ -134,7 +134,7 @@ class TransactionReportsTAResource(Resource):
     # @confirmation_required
     @ns.expect(tax_record_dto, validate=True)
     def post(self):
-        transaction_input_files: list = request.files.getlist("files")
+        transaction_input_files: List[BinaryIO] = request.files.getlist("files")
         return TransactionInputService.process_transaction_input_files_upload(transaction_input_files)
 
 

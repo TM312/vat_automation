@@ -1,10 +1,14 @@
+from typing import List, Dict, BinaryIO
 import os
+import pandas as pd
 from datetime import date, timedelta
 from flask import g, current_app
 from app.extensions import db
 
 from .model import DistanceSale
+from .interface import DistanceSaleInterface
 from ...utils.service import InputService
+from ...utils.interface import ResponseObjectInterface
 from ...business.seller_firm.service import SellerFirmService
 
 
@@ -15,12 +19,12 @@ class DistanceSaleService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_id
-    def process_distance_sale_files_upload(distance_sale_information_files: list, **kwargs) -> dict:
+    #kwargs can contain: seller_firm_public_id
+    def process_distance_sale_files_upload(distance_sale_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'distance_sale_list'
-        df_encoding = None
+        df_encoding = 'utf-8'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
         delimiter = None
@@ -40,7 +44,7 @@ class DistanceSaleService:
 
     # celery task !!
     @staticmethod
-    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding, delimiter, basepath: str, **kwargs) -> list:
+    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
@@ -55,7 +59,7 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def create_distance_sales(df, file_path_in: int, **kwargs) -> list:
+    def create_distance_sales(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
         TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
         redundancy_counter = 0
@@ -69,7 +73,7 @@ class DistanceSaleService:
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            distance_sale = InputService.get_str(df, i, column='distance_sale')
+            status = InputService.get_str(df, i, column='status')
 
             if not valid_from:
                 valid_from = date.today()
@@ -85,8 +89,9 @@ class DistanceSaleService:
                     'seller_firm_id': seller_firm_id,
                     'valid_from': valid_from,
                     'valid_to': valid_to,
+                    'platform_code': 'AMZ',
                     'arrival_country_code': arrival_country_code,
-                    'distance_sale': distance_sales
+                    'status': status
                 }
 
                 try:
@@ -107,7 +112,7 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def create_distance_sale(distance_sale_data: dict) -> DistanceSale:
+    def create_distance_sale(distance_sale_data: DistanceSaleInterface) -> DistanceSale:
 
         new_distance_sale = DistanceSale(
             created_by = distance_sale_data.get('created_by'),
@@ -116,7 +121,7 @@ class DistanceSaleService:
             valid_from = distance_sale_data.get('valid_from'),
             valid_to = distance_sale_data.get('valid_to'),
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
-            distance_sale = distance_sale_data.get('distance_sale')
+            status = distance_sale_data.get('status')
         )
 
         #add seller firm to db
