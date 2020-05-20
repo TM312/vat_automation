@@ -36,7 +36,7 @@ class AccountService:
 
         for file in account_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
+            AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
         response_object = {
             'status': 'success',
@@ -49,11 +49,11 @@ class AccountService:
 
     # celery task !!
     @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
+    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
-        response_objects = AccountService.create_accounts(df, file_path_in, **kwargs)
+        response_objects = AccountService.create_accounts(df, file_path_in, user_id, **kwargs)
 
         InputService.move_file_to_out(file_path_in, file_type)
 
@@ -64,7 +64,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_accounts(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[ResponseObjectInterface]:
+    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -81,7 +81,7 @@ class AccountService:
             if seller_firm_id:
                 redundancy_counter += AccountService.handle_redundancy(public_id, channel_code)
                 account_data = {
-                    'created_by': kwargs['user_id'],
+                    'created_by': user_id,
                     'seller_firm_id' : seller_firm_id,
                     'public_id' : public_id,
                     'channel_code' : channel_code

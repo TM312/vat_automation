@@ -31,7 +31,7 @@ class DistanceSaleService:
 
         for file in distance_sale_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
+            DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
          response_object = {
             'status': 'success',
@@ -44,11 +44,11 @@ class DistanceSaleService:
 
     # celery task !!
     @staticmethod
-    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
+    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
-        response_objects = DistanceSaleService.create_distance_sales(df, file_path_in, **kwargs)
+        response_objects = DistanceSaleService.create_distance_sales(df, file_path_in, user_id, **kwargs)
 
         InputService.move_file_to_out(file_path_in, file_type)
 
@@ -59,7 +59,7 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def create_distance_sales(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
         TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
         redundancy_counter = 0
@@ -84,7 +84,7 @@ class DistanceSaleService:
                 redundancy_counter += DistanceSaleService.handle_redundancy(public_id, channel_code)
 
                 distance_sale_data = {
-                    'created_by': kwargs['user_id'],
+                    'created_by': user_id,
                     'original_filename' : os.path.basename(file_path_in),
                     'seller_firm_id': seller_firm_id,
                     'valid_from': valid_from,
@@ -151,3 +151,10 @@ class DistanceSaleService:
             redundancy_counter = 0
 
         return redundancy_counter
+
+
+    @staticmethod
+    def get_distance_sale_status(platform_code: str, seller_firm_id: int, arrival_country_code: str, tax_date: date) -> bool:
+        distance_sale=DistanceSale.query.filter_by(DistanceSale.platform_code==platform_code, DistanceSale.seller_firm_id==seller_firm_id, DistanceSale.arrival_country_code==arrival_country_code, DistanceSale.valid_from<=tax_date, DistanceSale.valid_to>=tax_date).first()
+        if distance_sale:
+            return distance_sale.status

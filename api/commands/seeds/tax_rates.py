@@ -9,7 +9,7 @@ file_rates = 'tax_rates.csv'
 file_types = 'tax_rate_types.csv'
 
 
-class TaxRateSeedService:
+class VatSeedService:
 
     @staticmethod
     def seed_tax_rates():
@@ -39,13 +39,13 @@ class TaxRateSeedService:
                 # print(tax_rate_type)
                 # print(rate)
 
-                tax_rate = {
+                vat = {
                     'valid_from': SERVICE_START_DATE,
                     'valid_to': TAX_DEFAULT_VALIDITY,
                     'country_code': country,
                     'tax_rate_type_code': tax_rate_type_code,
                     'rate': rate
                 }
-                tax_rates.append(tax_rate)
+                tax_rates.append(vat)
 
         return tax_rates

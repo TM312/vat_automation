@@ -10,7 +10,7 @@ from app.namespaces.country.model import EU, Country
 from app.namespaces.transaction.model import TransactionType
 from app.namespaces.tax.tax_code.model import TaxCode
 from app.namespaces.tax.tax_treatment.model import TaxTreatment
-from app.namespaces.tax.tax_rate.model import TaxRate, TaxRateType
+from app.namespaces.tax.vat.model import Vat, TaxRateType
 from app.namespaces.platform.amazon.model import Amazon
 from app.namespaces.channel.model import Channel
 from app.namespaces.customer.model import CustomerRelationship
@@ -24,7 +24,7 @@ from .seeds.eu import EUSeedService
 from .seeds.countries import CountrySeedService
 from .seeds.tax_codes import TaxCodesSeedService
 from .seeds.tax_rate_types import tax_rate_types
-from .seeds.tax_rates import TaxRateSeedService
+from .seeds.tax_rates import VatSeedService
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
@@ -37,7 +37,7 @@ from .seeds.accounting_firms import accounting_firms
 countries = CountrySeedService.seed_countries()
 eu = EUSeedService.seed_eu()
 tax_codes = TaxCodesSeedService.seed_tax_codes()
-tax_rates = TaxRateSeedService.seed_tax_rates()
+tax_rates = VatSeedService.seed_tax_rates()
 
 things_list = {
     'currencies': [Currency, currencies],
@@ -45,7 +45,7 @@ things_list = {
     'countries': [Country, countries],
     'tax_codes': [TaxCode, tax_codes],
     'tax_rate_types': [TaxRateType, tax_rate_types],
-    'tax_rates': [TaxRate, tax_rates],
+    'tax_rates': [Vat, tax_rates],
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Amazon, platforms],

@@ -138,14 +138,14 @@ class VATINService:
     def check_validity(country_code: str, number, **kwargs) -> bool:
         vat = VATINService.vat_precheck(country_code, number)
         if vat:
-            if 'initial_tax_date' in kwargs:
+            if isinstance(kwargs.get('initial_tax_date'), date):
                 vatin = VATIN.query.filter(VATIN.country_code == country_code, VATIN.number == number, VATIN.initial_tax_date <= kwargs['initial_tax_date'], VATIN.valid_to >= kwargs['initial_tax_date']).first()
             else:
                 vatin = VATIN.query.filter(VATIN.country_code == country_code, VATIN.number == number).first()
 
             if vatin:
                 valid = vatin.valid
-                if not vatin.initial_tax_date and 'initial_tax_date' in kwargs:
+                if not vatin.initial_tax_date and isinstance(kwargs.get('initial_tax_date'), date):
                     vatin.initial_tax_date = kwargs['initial_tax_date']
                     db.session.commit()
 

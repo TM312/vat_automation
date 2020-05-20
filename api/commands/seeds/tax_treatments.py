@@ -46,9 +46,6 @@ tax_treatments = [
     # }
 ]
 
-!!!! sowohl entry für non taxable distane sale als auch wann der auftaucht
-
-
 
 
 
