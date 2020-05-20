@@ -7,7 +7,7 @@ class TaxCode(db.Model):  # type: ignore
 
     code = db.Column(db.String(8), primary_key=True)
     description = db.Column(db.String(128), nullable=False)
-    countries = db.relationship('TaxRate', back_populates='tax_code')
+    countries = db.relationship('Vat', back_populates='tax_code')
     channels = db.relationship(
         "Channel",
         secondary=channel_tax_code_AT,

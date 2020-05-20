@@ -16,8 +16,17 @@ class UserService:
         return users
 
     @staticmethod
-    def get_by_id(public_id: str) -> User:
+    def get_by_public_id(public_id: str) -> User:
         user = User.query.filter(User.public_id == public_id).first()
+        if user:
+            return user
+        else:
+            raise NotFound('This user does not exist.')
+
+
+    @staticmethod
+    def get_by_id(id: int) -> User:
+        user = User.query.filter(User.id == id).first()
         if user:
             return user
         else:
@@ -48,7 +57,7 @@ class UserService:
 
 
     @staticmethod
-    def delete_by_id(public_id: str):
+    def delete_by_public_id(public_id: str):
         #check if user exists in db
         user = User.query.filter(User.public_id == public_id).first()
         if user:

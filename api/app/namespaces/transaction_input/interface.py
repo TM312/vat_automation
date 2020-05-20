@@ -61,14 +61,14 @@ class TransactionInputInterface(TypedDict, total=False):
     check_item_price_vat: str
     check_item_price_total_net: str
     check_item_price_total_vat: str
-    check_item_price_tax_rate_rate: str
+    check_item_price_vat_rate: str
     check_shipment_price_discount_net: str
     check_shipment_price_discount_vat: str
     check_shipment_price_net: str
     check_shipment_price_vat: str
     check_shipment_price_total_net: str
     check_shipment_price_total_vat: str
-    check_shipment_price_tax_rate_rate: str
+    check_shipment_price_vat_rate: str
     check_sale_total_value_net: str
     check_sale_total_value_vat: str
     check_gift_wrap_price_discount_net: str

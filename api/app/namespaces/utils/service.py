@@ -1,15 +1,16 @@
 import os
 import shutil
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
 from .interface import ResponseObjectInterface
+from .model import TransactionNotification
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
-
+from app.extensions import db
 
 
 
@@ -29,6 +30,36 @@ class HelperService:
         except:
             raise UnprocessableEntity('Unreadable date format.')
         return date
+
+
+
+class NotificationService:
+    @staticmethod
+    def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_input_id: int) -> Dict:
+        notification_data = {
+            'subject': '{}s Not Matching'.format(main_subject),
+            'original_filename': original_filename,
+            'status': status,
+            'message': 'The reference value from the original transaction report ({}) differs from the calculated value ({}). The original reference value has been used for subsequent processing.'.format(reference_value, calculated_value),
+            'transaction_input_id': transaction_input_id
+        }
+        return notification_data
+
+    @staticmethod
+    def create_transaction_notification(notification_data):
+        new_notification = TransactionNotification(
+            subject=notification_data.get('subject')
+            original_filename = notification_data.get('original_filename')
+            status = notification_data.get('status')
+            message = notification_data.get('message')
+            transaction_input_id = notification_data.get('transaction_input_id')
+        )
+
+        db.session.add(new_notification)
+        db.session.commit()
+
+
+
 
 
 class InputService:
@@ -101,7 +132,7 @@ class InputService:
         success_status = 'successfully'
         notification = ''
 
-        if 'redundancy_counter' in kwargs and kwargs['redundancy_counter'] > 0:
+        if isinstance(kwargs.get('redundancy_counter'), int) and kwargs.get('redundancy_counter') > 0:
 
             response_object_info = {
                 'status': 'info',
@@ -236,157 +267,3 @@ class InputService:
 
         else:
             raise  # !!! (not a file)
-
-
-
-
-
-#     @staticmethod
-#     def assess_amazon_csv_info(tax_auditor, amazon_seller_id, activity_period):
-
-#         # check if seller firm from file exists in db
-#         seller_firm = SellerFirm.query.filter(SellerFirm.amazon_seller_id == amazon_seller_id).first()
-
-#         if seller_firm:
-
-#             if tax_auditor.employer_id == seller_firm.accounting_firm_id:
-#                     # i.e. a record is created for the own employer
-#                 final_dirpath = os.path.join(
-#                     BASE_PATH_MEDIA,
-#                     str(seller_firm.public_id),
-#                     'tax_record',
-#                     activity_period
-#                 )
-
-#                     final_stored_name = "{}_tax_record_input_{}_amazon.csv".format(
-#                         activity_period, seller_firm.accounting_firm_client_id)
-
-#                 return [final_dirpath, final_stored_name, seller_firm]
-
-#             else:
-#                 response_object = {
-#                     'status': 'error',
-#                     'message': 'A seller firm with amazon unique identifier {} exists but has not established a client relationship with your company. Please establish this relationship first.'.format(amazon_seller_id)
-#                 }
-
-#                 return response_object
-
-#         else:
-#             response_object = {
-#                 'status': 'error',
-#                 'message': 'A seller firm with the amazon unique identifier {} has not been registered yet.'.format(amazon_seller_id)
-#             }
-
-#             return response_object
-
-
-# @staticmethod
-#     def name_info_retrieve(temp_file_path, filename):
-#         try:
-#             df = pd.read_csv(filepath_or_buffer=temp_file_path, sep=',')
-#             if (df.columns[0] == 'UNIQUE_ACCOUNT_IDENTIFIER' and
-#                     df.columns[1] == 'ACTIVITY_PERIOD'):
-#                 activity_period = df.iloc[0][1]
-#                 amazon_seller_id = df.iloc[0][0]
-#                 platform = 'amazon'
-
-#                 return [activity_period, amazon_seller_id, platform]
-#             else:
-#                 response_object = {
-#                     'status': 'error',
-#                     'message': 'Tax record file {} is not formatted properly. Please recheck.'.format(filename)
-#                 }
-#                 return response_object
-#                 #raise UnsupportedMediaType()
-
-#         except:
-#             response_object = {
-#                 'status': 'error',
-#                 'message': 'Error at file {}: Can not read csv. Make sure it is formatted properly.'.format(filename)
-#             }
-#             return response_object
-#             #raise UnsupportedMediaType()
-
-
-
-
-
-# def upload_file(file):
-#         if file.filename == '':
-#                     response_object = {
-#                         'status': 'error',
-#                         'message': 'File {} is empty.'.format(filename)
-#                     }
-#                     response_objects.append(response_object)
-#                     continue
-
-#                 if TaxAuditorService.allowed_file(file.filename):
-
-#                     temp_file_path, filename = TaxAuditorService.store_to_temp_path(
-#                         tax_auditor, file)
-
-
-#                     # once all checks are passed the file is renamed and moved into the final dir
-#                     return_object = TaxAuditorService.name_info_retrieve(
-#                         temp_file_path, filename)
-
-#                     # check if List is returned from function (if not the return object is the response object for failed processing.)
-#                     if isinstance(return_object, list):
-#                         # assign explicit var names to the function output
-#                         activity_period, amazon_seller_id, platform = return_object
-
-#                         ##
-#                         ## IF PLATFORM == 'amazon' --> check in file additional parameters.
-#                         ##
-
-#                         return_object = TaxAuditorService.assess_amazon_csv_info(
-#                             tax_auditor, amazon_seller_id)
-
-#                         if isinstance(return_object, list):
-#                             final_dirpath, final_stored_name, seller_firm = return_object
-
-#                             os.makedirs(final_dirpath, exist_ok=True)
-#                             final_file_path = os.path.join(
-#                                 final_dirpath, final_stored_name)
-#                             shutil.move(temp_file_path, final_file_path)
-
-#                             # #creating a database entry for the tax record
-#                             # new_tax_record = TaxRecordService.create(
-#                             #     user=tax_auditor,
-#                             #     seller_firm=seller_firm,
-#                             #     platform=platform
-#                             #     final_dirpath=final_dirpath,
-#                             #     activity_period=activity_period
-#                             # )
-
-#                             # #creating a database entry for the uploaded tax record input file
-#                             # TaxRecordService.create_input(
-#                             #     platform=platform,
-#                             #     original_input_name=filename,
-#                             #     formatted_input_name=final_stored_name,
-#                             #     tax_record=new_tax_record
-#                             # )
-
-#                             # updating the user status, i.e. last_seen
-#                             UserService.ping(tax_auditor, method_name=inspect.stack()[0][3],
-#                                             service_context=TaxRecordService.__name__)
-
-#                             response_object = {
-#                                 'status': 'success',
-#                                 'message': 'File {} successfully uploaded.'.format(filename)
-#                             }
-
-#                         else:
-#                             response_object = return_object
-#                     else:
-#                         response_object = return_object
-
-#                     response_objects.append(response_object)
-
-#                 else:
-#                     response_object = {
-#                         'status': 'error',
-#                         'message': 'The type of file {} is not allowed. Please provide a valid csv file.'.format(filename)
-#                     }
-#                     response_objects.append(response_object)
-#                     #raise UnsupportedMediaType()

@@ -54,22 +54,22 @@ class AdminUserIdResource(Resource):
     @ns.marshal_with(user_dto_admin)
     def get(self, public_id: str) -> User:
         """Get One User"""
-        return UserService.get_by_id(public_id)
+        return UserService.get_by_public_id(public_id)
 
     @login_required
     @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
         """Delete A Single User"""
-        return UserService.delete_by_id(public_id)
+        return UserService.delete_by_public_id(public_id)
 
 
-@ns.route("/<string:public_id>/actions")
-@ns.param("public_id", "Public user ID")
-class AdminUserIdActionsResource(Resource):
-    """Get user's actions"""
-    @login_required
-    @accepted_u_types('admin')
-    @ns.marshal_with(action_dto, envelope='data')
-    def get(self, public_id: str) -> Action:
-        """Get One User"""
-        return UserService.get_actions_by_user_id(public_id)
+# @ns.route("/<string:public_id>/actions")
+# @ns.param("public_id", "Public user ID")
+# class AdminUserIdActionsResource(Resource):
+#     """Get user's actions"""
+#     @login_required
+#     @accepted_u_types('admin')
+#     @ns.marshal_with(action_dto, envelope='data')
+#     def get(self, public_id: str) -> Action:
+#         """Get One User"""
+#         return UserService.get_actions_by_user_public_id(public_id)

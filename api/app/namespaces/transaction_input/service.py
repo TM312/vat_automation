@@ -46,7 +46,7 @@ class TransactionInputService:
         for file in transaction_input_files:
             delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
+            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
 
         response_object = {
@@ -60,10 +60,10 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, **kwargs)
+        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, **kwargs)
 
 
         InputService.move_file_to_out(file_path_in, file_type)
@@ -73,7 +73,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -91,14 +91,14 @@ class TransactionInputService:
 
                 redundancy_counter += TransactionInputService.handle_redundancy(account_public_id, channel_code, public_id, activity_id, item_sku)
                 transaction_input_data = {
-                    'created_by': kwargs['user_id'],
+                    'created_by': user_id,
                     'original_filename': os.path.basename(file_path_in),
 
                     'account_public_id': account_public_id,
-                    'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(), # --> OUTPUT
+                    'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(),
                     'channel_code': channel_code,
-                    'marketplace': InputService.get_str_or_None(df, i, column='MARKETPLACE'), # str #-->transaction
-                    'transaction_type_public_code': InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE'), #-->TransactionService.retrieve_transaction_type()
+                    'marketplace': InputService.get_str_or_None(df, i, column='MARKETPLACE'),
+                    'transaction_type_public_code': InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE'),
                     'public_id': public_id,
                     'activity_id': activity_id,
 
@@ -107,10 +107,10 @@ class TransactionInputService:
                     'arrival_date': InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE'),
                     'complete_date': InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE'),
 
-                    'item_sku': item_sku,  # str --> ItemService.retrieve_item() --> transaction
+                    'item_sku': item_sku,
                     'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
                     'item_manufacture_country': InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY'),
-                    'item_quantity': int(df.iloc[i]['QTY']), #-->transaction
+                    'item_quantity': int(df.iloc[i]['QTY']),
                     'item_weight_kg': InputService.get_float(df, i, column='ITEM_WEIGHT'),
                     'item_weight_kg_total': InputService.get_float(df, i, column='TOTAL_ACTIVITY_WEIGHT'),
 
@@ -118,57 +118,57 @@ class TransactionInputService:
 
                     'check_item_price_discount_net': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
                     'check_item_price_discount_vat': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_discount_gross': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL'), #-->transaction
+                    'item_price_discount_gross': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
                     'check_item_price_net': InputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_EXCL'),
                     'check_item_price_vat': InputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_gross': InputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL'), #-->transaction
+                    'item_price_gross': InputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
                     'check_item_price_total_net': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
                     'check_item_price_total_vat': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_total_gross': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL'), #-->transaction
+                    'item_price_total_gross': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
-                    'check_item_price_tax_rate_rate': InputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT'),
+                    'check_item_price_vat_rate': InputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT'),
 
                     'check_shipment_price_discount_net': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_EXCL'),
                     'check_shipment_price_discount_vat': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_discount_gross': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL'), #-->transaction
+                    'shipment_price_discount_gross': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL'),
 
                     'check_shipment_price_net': InputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_EXCL'),
                     'check_shipment_price_vat': InputService.get_float(df, i, column='SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_gross': InputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_INCL'), #-->transaction
+                    'shipment_price_gross': InputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_INCL'),
 
                     'check_shipment_price_total_net': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_EXCL'),
                     'check_shipment_price_total_vat': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_total_gross': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL'), #-->transaction
+                    'shipment_price_total_gross': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL'),
 
-                    'check_shipment_price_tax_rate_rate': InputService.get_float(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT'),
+                    'check_shipment_price_vat_rate': InputService.get_float(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT'),
 
                     'check_sale_total_value_net': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL'),
                     'check_sale_total_value_vat': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_VAT_AMT'),
-                    'sale_total_value_gross': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL'), #-->transaction
+                    'sale_total_value_gross': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL'),
 
                     'check_gift_wrap_price_discount_net': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_EXCL'),
                     'check_gift_wrap_price_discount_vat': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_discount_gross': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL'), #-->transaction
+                    'gift_wrap_price_discount_gross': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL'),
 
                     'check_gift_wrap_price_net': InputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_EXCL'),
                     'check_gift_wrap_price_vat': InputService.get_float(df, i, column='GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_gross': InputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_INCL'), #-->transaction
+                    'gift_wrap_price_gross': InputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_INCL'),
 
                     'check_gift_wrap_price_total_net': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_EXCL'),
                     'check_gift_wrap_price_total_vat': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_total_gross': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL'), #-->transaction
+                    'gift_wrap_price_total_gross': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL'),
 
                     'check_gift_wrap_price_tax_rate': InputService.get_float(df, i, column='GIFT_WRAP_VAT_RATE_PERCENT'),
 
 
-                    'currency_code': InputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE'), #str/NoneType
+                    'currency_code': InputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE'),
 
-                    'check_item_tax_code_code': InputService.get_str_or_None(df, i, column='PRODUCT_TAX_CODE'), #str/NoneType
+                    'check_item_tax_code_code': InputService.get_str_or_None(df, i, column='PRODUCT_TAX_CODE'),
 
 
-                    'departure_country_code': InputService.get_str(df, i, column='DEPARTURE_COUNTRY'), #str
+                    'departure_country_code': InputService.get_str(df, i, column='DEPARTURE_COUNTRY'),
                     'departure_postal_code': InputService.get_str(df, i, column='DEPARTURE_POST_CODE'),
                     'departure_city': InputService.get_str(df, i, column='DEPATURE_CITY'),
 
@@ -203,14 +203,14 @@ class TransactionInputService:
                     'invoice_url': InputService.get_str_or_None(df, i, column='INVOICE_URL'),
 
 
-                    'check_export': InputService.get_bool(df, i, column='EXPORT_OUTSIDE_EU', value_true='YES'),  #str #-->transaction
+                    'check_export': InputService.get_bool(df, i, column='EXPORT_OUTSIDE_EU', value_true='YES'),
 
                     'customer_name': InputService.get_str_or_None(df, i, column='BUYER_NAME'),
                     'customer_vat_number': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER'),
                     'customer_vat_number_country_code': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER_COUNTRY'),
 
-                    'supplier_vat_number': InputService.get_str_or_None(df, i, column='SUPPLIER_VAT_NUMBER'), # #NoneType/str object #-->transaction
-                    'supplier_name': InputService.get_str_or_None(df, i, column='SUPPLIER_NAME') #NoneType/str object #-->transaction
+                    'supplier_vat_number': InputService.get_str_or_None(df, i, column='SUPPLIER_VAT_NUMBER'),
+                    'supplier_name': InputService.get_str_or_None(df, i, column='SUPPLIER_NAME')
                 }
 
                 try:
@@ -263,7 +263,7 @@ class TransactionInputService:
             check_item_price_total_net = transaction_input_data.get('check_item_price_total_net'),
             check_item_price_total_vat = transaction_input_data.get('check_item_price_total_vat'),
             item_price_total_gross = transaction_input_data.get('item_price_total_gross'),
-            check_item_price_tax_rate_rate = transaction_input_data.get('check_item_price_tax_rate_rate'),
+            check_item_price_vat_rate = transaction_input_data.get('check_item_price_vat_rate'),
             check_shipment_price_discount_net = transaction_input_data.get('check_shipment_price_discount_net'),
             check_shipment_price_discount_vat = transaction_input_data.get('check_shipment_price_discount_vat'),
             shipment_price_discount_gross = transaction_input_data.get('shipment_price_discount_gross'),
@@ -273,7 +273,7 @@ class TransactionInputService:
             check_shipment_price_total_net = transaction_input_data.get('check_shipment_price_total_net'),
             check_shipment_price_total_vat = transaction_input_data.get('check_shipment_price_total_vat'),
             shipment_price_total_gross = transaction_input_data.get('shipment_price_total_gross'),
-            check_shipment_price_tax_rate_rate = transaction_input_data.get('check_shipment_price_tax_rate_rate'),
+            check_shipment_price_vat_rate = transaction_input_data.get('check_shipment_price_vat_rate'),
             check_sale_total_value_net = transaction_input_data.get('check_sale_total_value_net'),
             check_sale_total_value_vat = transaction_input_data.get('check_sale_total_value_vat'),
             sale_total_value_gross = transaction_input_data.get('sale_total_value_gross'),

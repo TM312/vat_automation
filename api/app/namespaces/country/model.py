@@ -33,7 +33,7 @@ class Country(db.Model):  # type: ignore
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
 
-    tax_codes = db.relationship('TaxRate', back_populates='country')
+    tax_codes = db.relationship('Vat', back_populates='country')
     eus = db.relationship(
         "EU",
         secondary=eu_country_AT,

@@ -24,7 +24,7 @@ class Item(db.Model):  # type: ignore
     # height_mm = db.Column(db.Integer, nullable=False)
     # volume_m3 = db.Column(db.Float(precision=28), nullable=False)
     # volume_f3 = db.Column(db.Float(precision=28), nullable=False)
-    weight_kg = db.Column(db.Float(precision=28), nullable=False)
+    weight_kg = db.Column(db.Numeric(scale=4), nullable=False)
     # storage_size = db.Column(db.String(32), nullable=False)
     # storage_media_type = db.Column(db.String(32), nullable=False)
     # storage_category = db.Column(db.String(32), nullable=False)
@@ -35,7 +35,7 @@ class Item(db.Model):  # type: ignore
     # item_purchase_price_net = db.Column(db.Float(precision=28))
 
     unit_cost_price_currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
-    unit_cost_price_net = db.Column(db.Float(precision=28))
+    unit_cost_price_net = db.Column(db.Numeric(scale=2))
 
     transactions = db.relationship('Transaction', backref='item', lazy=True)
 

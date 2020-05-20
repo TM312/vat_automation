@@ -10,7 +10,7 @@ from .model import Item
 from .interface import ItemInterface
 
 from ..account.model import Account
-from ..utils.service import InputService
+from ..utils.service import InputService, NotificationService
 from ..utils.interface import ResponseObjectInterface
 from ..business.seller_firm.service import SellerFirmService
 
@@ -28,6 +28,32 @@ class ItemService:
                 raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
 
 
+    @staticmethod
+    def compare_calculation_reference(transaction_input: TransactionInput, item: Item):
+        notification_data_list = []
+        if item.name and transaction_input.item_name and item.name != transaction_input.item_name:
+            notification_data = NotificationService.create_notification_data(main_subject='Item Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_name, calculated_value=item.name, transaction_input_id=transaction_input.id)
+            notification_data_list.append(notification_data)
+
+        if item.weight_kg and transaction_input.item_weight_kg and item.weight_kg != transaction_input.item_weight_kg:
+            notification_data = NotificationService.create_notification_data(main_subject='Item Weight', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_weight_kg, calculated_value=item.weight_kg, transaction_input_id=transaction_input.id)
+            notification_data_list.append(notification_data)
+
+
+        if item.asin and transaction_input.asin and item.asin != transaction_input.asin:
+            notification_data = NotificationService.create_notification_data(main_subject='ASIN', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.asin, calculated_value=item.asin, transaction_input_id=transaction_input.id)
+            notification_data_list.append(notification_data)
+
+        try:
+            for notification_data in notification_data_list:
+                NotificationService.create_transaction_notification(notification_data)
+
+        except:
+            raise
+
+
+
+
 
 
     @staticmethod
@@ -43,7 +69,7 @@ class ItemService:
 
         for file in item_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id=user_id, **kwargs)
+            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
         response_object = {
             'status': 'success',
@@ -56,10 +82,10 @@ class ItemService:
 
     # celery task !!
     @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = ItemService.create_items(df, file_path_in, **kwargs)
+        response_objects = ItemService.create_items(df, file_path_in, user_id, **kwargs)
 
         # celery task !!
         InputService.move_file_to_out(file_path_in, file_type)
@@ -70,7 +96,7 @@ class ItemService:
 
 
     @staticmethod
-    def create_items(df: pd.DataFrame, file_path_in: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
         TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
 
 
@@ -95,7 +121,7 @@ class ItemService:
 
                 redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
                 item_data = {
-                    'created_by': kwargs['user_id'],
+                    'created_by': user_id,
                     'original_filename': os.path.basename(file_path_in),
                     'sku': sku,
                     'seller_firm_id' : seller_firm_id,
@@ -139,7 +165,7 @@ class ItemService:
             original_filename = item_data.get('original_filename'),
             sku = item_data.get('sku'),
             seller_firm_id = item_data.get('seller_firm_id'),
-        w    valid_from = item_data.get('valid_from'),
+            valid_from = item_data.get('valid_from'),
             valid_to = item_data.get('valid_to'),
             brand_name = item_data.get('brand_name'),
             name = item_data.get('name'),
