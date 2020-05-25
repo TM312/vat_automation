@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, BinaryIO, Dict
+import pandas as pd
 from datetime import date, timedelta
-from zeep import Client
+from zeep import Client, helpers
 import time
 
 from flask import current_app
@@ -11,12 +12,44 @@ from app.extensions import db
 from . import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, logger
 from .model import VATIN
 
+from ...utils.interface import ResponseObjectInterface
 from ...business.seller_firm.service import SellerFirmService
 
 
 
-
 class VATINService:
+
+    @staticmethod
+    def get_by_id(id: int) -> VATIN:
+        return VATIN.query.filter_by(id=id).first()
+
+
+
+    @staticmethod
+    def get_vatin(country_code: str, number: str, date: date) -> VATIN:
+        vatin: VATIN.query.filter_by(VATIN.country_code == country_code, VATIN.number==number, VATIN.valid_from<=date, VATIN.valid_to>=date).first()
+        return vatin
+
+
+
+    @staticmethod
+    def get_vatin_if_number(country_code_temp: str, number_temp: str, date: date) -> VATIN:
+        if not isinstance(number_temp, str):
+            return None
+        else:
+            try:
+                country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
+                vatin = VATINService.get_vatin(country_code, number, date)
+                if not isinstance(vatin, VATIN):
+                    valid_from, valid_to = VATINService.get_validity_period(date)
+                    business_id = None
+                    vatin = VATINService.create_vatin_by_request(country_code, number, valid_from, valid_to, business_id)
+
+            except:
+                raise
+
+            return vatin
+
 
     @staticmethod
     def create_vatin(vatin_data: dict) -> VATIN:
@@ -26,7 +59,9 @@ class VATINService:
             initial_tax_date = vatin_data.get('initial_tax_date'),
             valid_from = vatin_data.get('valid_from'),
             valid_to = vatin_data.get('valid_to'),
-            valid = vatin_data.get('valid '),
+            valid = vatin_data.get('valid'),
+            name = vatin_data.get('name'),
+            address = vatin_data.get('address'),
             business_id = vatin_data.get('business_id')
             )
 
@@ -36,7 +71,7 @@ class VATINService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_vat_numbers_files_upload(vat_numbers_files: list, **kwargs):
+    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='vat_numbers'
@@ -57,7 +92,7 @@ class VATINService:
 
     # celery task !!
     @staticmethod
-    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> list:
+    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> List[ResponseObjectInterface]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding)
         response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
@@ -66,23 +101,18 @@ class VATINService:
 
         return response_objects
 
-
-
-
+    # **kwargs['seller_firm_pulic_id'] may hold a seller firm's public id
     @staticmethod
-    def create_vatins(df, file_path_in: str, **kwargs) -> list:
+    def create_vatins(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[ResponseObjectInterface]:
         VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
-
 
         error_counter = 0
         total_number_vatins = len(df.index)
         input_type = 'vat number' #only used for response objects
 
         for i in range(total_number_vatins):
-            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
 
-            country_code = InputService.get_str(df, i, column='country_code'),
-            number = InputService.get_str(df, i, column='number')
+            country_code, number = VATINService.get_vat_from_df(df, i)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
@@ -92,24 +122,28 @@ class VATINService:
             if not valid_to:
                 valid_to = valid_from + timedelta(days=VATIN_LIFESPAN)
 
-            seller_firm_id = seller_firm_id_list[i]
-            try:
-                VATINService.check_validity(country_code, number, valid, valid_from=valid_from, valid_to=valid_to, business_id=seller_firm_id)
+            vatin = VATIN.query.filter(country_code=country_code, number=number).first()
 
-            except:
-                db.session.rollback()
-                error_counter += 1
+            if vatin:
+                if vatin.valid and valid_to > vatin.valid_to:
+                    vatin.valid_to = valid_to
+                    db.session.commit()
+                    continue
+
+            else:
+                seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
+                vatin = VATINService.create_vatin_by_request(country_code, number, valid_from, valid_to, business_id=seller_firm_id)
+                if not isinstance(vatin, VATIN):
+                    error_counter += 1
+
+
 
         response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_vatins, error_counter)
 
         return response_objects
 
-
-
-
-
     @staticmethod
-    def get_validity_period(date: date, **kwargs):
+    def get_validity_period(date: date, **kwargs) -> List[date, date]:
         VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
 
         if 'valid_from' in kwargs and 'valid_to' in kwargs:
@@ -132,87 +166,76 @@ class VATINService:
         return valid_from, valid_to
 
 
+    @staticmethod
+    def get_vat_from_df(df: pd.DataFrame, i: int) -> List[str, str]:
+        country_code_temp = InputService.get_str(df, i, column='country_code'),
+        number_temp = InputService.get_str(df, i, column='number')
+        country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
+        return country_code, number
 
 
     @staticmethod
-    def check_validity(country_code: str, number, **kwargs) -> bool:
-        vat = VATINService.vat_precheck(country_code, number)
-        if vat:
-            if isinstance(kwargs.get('initial_tax_date'), date):
-                vatin = VATIN.query.filter(VATIN.country_code == country_code, VATIN.number == number, VATIN.initial_tax_date <= kwargs['initial_tax_date'], VATIN.valid_to >= kwargs['initial_tax_date']).first()
-            else:
-                vatin = VATIN.query.filter(VATIN.country_code == country_code, VATIN.number == number).first()
+    def create_vatin_by_request(country_code: str, number: str, valid_from: date, valid_to: date, business_id: int):
+        vat = VIESService.send_request(country_code, number)
 
-            if vatin:
-                valid = vatin.valid
-                if not vatin.initial_tax_date and isinstance(kwargs.get('initial_tax_date'), date):
-                    vatin.initial_tax_date = kwargs['initial_tax_date']
-                    db.session.commit()
+        valid = vat['valid']
+        name = vat['name']
+        address = vat['address']
 
-            else:
-                valid = VATINService.is_valid(country_code=country_code, number=number, **kwargs)
-                valid_from, valid_to = VATINService.get_validity_period(date, **kwargs)
 
-                vatin_data = {
-                    'country_code' : country_code,
-                    'number' : number,
-                    'initial_tax_date' : kwargs.get('initial_tax_date'),
-                    'valid_from' : valid_from,
-                    'valid_to' : valid_to,
-                    'valid' : valid,
-                    'business_id' : kwargs.get('business_id')
-                }
-                try:
-                    VATINService.create_vatin(vatin_data)
-                except:
-                    raise
+        vatin_data = {
+            'country_code': country_code,
+            'number': number,
+            'valid_from': valid_from,
+            'valid_to': valid_to,
+            'valid': valid,
+            'name': name,
+            'address': address,
+            'business_id': business_id
+            }
 
-            return valid
-        else:
-            return False
+        try:
+            vatin: VATIN = VATINService.create_vatin(vatin_data)
+            return vatin
+        except:
+            db.session.rollback()
+
+
+
+
+
 
     @staticmethod
-    def vat_precheck(country_code, number):
-
-        if not number:
+    def vat_precheck(country_code_temp: str, number_temp: str) -> List[str, str]:
+        if not number_temp:
             return None
 
-        elif not re.match(r"^[a-zA-Z]", number):
-            vat = [country_code, number]
+        elif not re.match(r"^[a-zA-Z]", number_temp):
+            VATINService.verify(country_code, number_temp)
+            country_code, number = country_code_temp, number_temp
 
-        elif country_code == number[:2].strip():
-            vat = [country_code, number]
+        elif country_code_temp == number_temp[:2].strip():
+            VATINService.verify(country_code_temp, number_temp)
+            country_code, number = country_code_temp, number_temp
 
         else:
-            # print("country codes dont match. Proceeding with country code from VAT Number.")
-            country_code = number[:2].strip()
-            number = number[2:].strip()
-            vat = [country_code, number] #at this point country_code and number may still be invalid, which will be checked hereafter.
+            country_code = number_temp[:2].strip()
+            number = number_temp[2:].strip()
+            VATINService.verify(country_code, number)
 
-        return vat
+
+        return country_code, number
+
+
 
 
     @staticmethod
-    def is_valid(country_code, number, date) -> bool:
-        if vatin:
-            return vatin.valid
-        else:
-            try:
-                VATINService.verify(country_code, number)
-                VATINService.validate(country_code, number)
-
-            except HTTPException:
-                return False
-            else:
-                return True
-
-    @staticmethod
-    def verify(country_code, number):
+    def verify(country_code: str, number: str):
         VATINService.verify_country_code(country_code)
         VATINService.verify_regex(country_code, number)
 
     @staticmethod
-    def verify_country_code(country_code):
+    def verify_country_code(country_code: str):
         if not re.match(r"^[a-zA-Z]", country_code):
             msg = "{} is not a valid ISO_3166-1 country code.".format(country_code)
             raise HTTPException(msg)
@@ -222,7 +245,7 @@ class VATINService:
             raise HTTPException(msg)
 
     @staticmethod
-    def verify_regex(country_code, number):
+    def verify_regex(country_code: str, number: str):
         country = dict(
             map(
                 lambda x, y: (x, y),
@@ -236,21 +259,27 @@ class VATINService:
             raise HTTPException(msg)
 
 
-    @staticmethod
-    def validate(country_code, number):
-        valid = VATINService.check_data(country_code, number)
-        if not valid:
-            msg = "{} is not a valid VATIN.".format(country_code)
-            raise HTTPException(msg)
 
+
+
+
+class VIESService:
 
     @staticmethod #!! async??
-    def check_data(country_code, number):
+    def send_request(country_code: str, number: str) -> Dict:
         """VIES API response data."""
         client = Client(VIES_WSDL_URL)
         try:
-            return client.service.checkVat(country_code, number)
+            vat_zeep_object = client.service.checkVat(country_code, number)
+            vat = helpers.serialize_object(vat_zeep_object)
+            return vat
 
         except Exception as e:
-            logger.exception(e)
-            return False
+            logger.exception(e) !!!!
+            msg="{} is not a valid VATIN.".format(country_code)
+            raise HTTPException(msg)
+
+
+    @staticmethod
+    def sanitize_response_detail(vat: , parameter: str) -> str:
+        return None if parameter == '---' else parameter

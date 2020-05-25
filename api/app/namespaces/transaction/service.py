@@ -20,9 +20,14 @@ from ..transaction_input.interface import TransactionInputInterface
 from ..item.service import ItemService
 from ..country.model import Country
 from ..country.service import CountryService
+from ..customer.model import Customer
+from ..customer.service import CustomerService
 from ..tax.vat.model import Vat
 from ..tax.vat.service import VatService
+from ..tax.vatin.model import VATIN
+from ..tax.vatin.service import VATINService
 from ..business.seller_firm.model import SellerFirm
+from ..business.seller_firm.service import SellerFirmService
 from ..utils.service import HelperService
 from ..platform.amazon.service import DistanceSaleService
 
@@ -52,38 +57,44 @@ class TransactionService:
         arrival_country: Country = CountryService.get_by_code(transaction_input.arrival_country_code)
         departure_country: Country = CountryService.get_by_code(transaction_input.departure_country_code)
         eu: EU = CountryService.get_eu_by_date(tax_date)
-        customer_relationship_code: str = CustomerService.get_customer_relationship_code(country_code=transaction_input.customer_vat_number_country_code, number=transaction_input.customer_vat_number, date=tax_date)
-        customer_relationship_code_checked: bool = TransactionService.vat_check_required(date=tax_date, number=transaction_input.customer_vat_number)
+
+        customer_vat_check_required: bool = TransactionService.vat_check_required(transaction_input, date=tax_date, number=transaction_input.customer_vat_number)
+
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
-            tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship_code, departure_country, arrival_country, amazon_vat_calculation_service)
-            new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship_code, customer_relationship_code_checked, amazon_vat_calculation_service)
+            tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service)
+            new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
             # check for special case: non taxable distance sale
             if new_transaction.tax_treatment_code == 'DISTANCE_SALE':
                 tax_treatment_code = 'NON_TAXABLE_DISTANCE_SALE'
-                new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship_code, customer_relationship_code_checked, amazon_vat_calculation_service)
+                new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
         elif transaction_type.code == 'RETURN':
             return None
 
         elif transaction_type.code == 'ACQUISITION':
-            tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship_code, departure_country, arrival_country, amazon_vat_calculation_service
-            new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship_code, customer_relationship_code_checked, amazon_vat_calculation_service)
+            tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service
+            new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
         elif transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             tax_treatment_codes = ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']
             for tax_treatment_code in tax_treatment_codes:
-                new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship_code, customer_relationship_code_checked, amazon_vat_calculation_service)
+                new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
 
 
 
     @staticmethod
-    def calculate_transaction_vars(transaction_input: TransactionInput, transaction_type: TransactionType, account: Account, tax_treatment_code: str, tax_date: date, item: Item, bundle: Bundle, arrival_country: Country, departure_country: Country, eu: EU, customer_relationship_code: str, customer_relationship_code_checked: bool, amazon_vat_calculation_service: bool)
+    def calculate_transaction_vars(transaction_input: TransactionInput, transaction_type: TransactionType, account: Account, tax_treatment_code: str, tax_date: date, item: Item, bundle: Bundle, arrival_country: Country, departure_country: Country, eu: EU, customer_relationship: str, customer_relationship_checked: bool, amazon_vat_calculation_service: bool)
 
+        customer_vatin: VATIN = CustomerService.get_vatin_or_None(customer_vat_check_required, country_code=transaction_input.customer_vat_number_country_code, number=transaction_input.customer_vat_number, date=tax_date)
+        customer_relationship: str = CustomerService.get_customer_relationship(customer_vatin, check_required=customer_vat_check_required)
+        customer: Customer = CustomerService.get_customer_or_None(customer_vatin, customer_relationship)
+
+        tax_calculation_date = TransactionService.get_tax_calculation_date(transaction_input.check_tax_calculation_date)
         tax_juristdiction: Country = TransactionService.get_tax_jurisdiction(tax_treatment_code, departure_country, arrival_country)
 
         item_tax_code_code: str = TransactionService.get_item_tax_code_code(transaction_input, item, reference_tax_code=transaction_input.check_item_tax_code_code)
@@ -141,11 +152,19 @@ class TransactionService:
         vat_rate_reverse_charge: float = TransactionService.get_vat_rate_reverse_charge(transaction_input, arrival_country, tax_treatment_code, tax_date, tax_rate_type_code=item_tax_rate_type_code)
         invoice_amount_vat_reverse_charge: float = TransactionService.get_invoice_amount_vat_reverse_charge(invoice_amount_net, vat_rate_reverse_charge)
 
-        arrival_seller_vat_valid: bool = VATINService.check_validity(country_code = arrival_country.vat_country_code, number=transaction_input.check_arrival_seller_vat_number, initial_tax_date=tax_date)
-        departure_seller_vat_valid: bool = VATINService.check_validity(country_code = departure_country.vat_country_code, number=transaction_input.check_departure_seller_vat_number, initial_tax_date=tax_date)
-        seller_vat_valid: bool = VATINService.check_validity(country_code=tax_juristdiction.vat_country_code, number=transaction_input.check_seller_vat_number, initial_tax_date=tax_date)
+
+        arrival_seller_vatin: SellerFirmService.get_vatin_or_None_and_verify(transaction_input, arrival_country.vat_country_code, transaction_input.check_arrival_seller_vat_number, date=tax_date)
+        departure_seller_vatin: SellerFirmService.get_vatin_or_None_and_verify(transaction_input, departure_country.vat_country_code, transaction_input.check_departure_seller_vat_number, date=tax_date)
+        seller_vatin: SellerFirmService.get_vatin_or_None_and_verify(transaction_input, tax_juristdiction.vat_country_code, transaction_input.check_seller_vat_number, date=tax_date)
+
+
+
+
 
         ItemService.compare_calculation_reference(transaction_input, item)
+
+        CustomerService.compare_calculation_reference(transaction_input, customer_vatin)
+
 
         transaction_data= {
             'account_id': account.id,
@@ -153,14 +172,23 @@ class TransactionService:
             'transaction_type': transaction_type.code,
             'amazon_vat_calculation_service': amazon_vat_calculation_service,
 
-            'customer_relationship_code_checked': customer_relationship_code_checked,
-            'customer_relationship_code': customer_relationship_code,
+            'customer_relationship_checked': customer_relationship_checked,
+            'customer_relationship': customer_relationship,
+            'customer_id': customer.id,
+            'customer_vatin_id': customer_vatin.id,
+
+            'tax_juristdiction_code': tax_juristdiction.code,
 
             'tax_treatment_code': tax_treatment_code,
 
             'tax_date': tax_date,
+            'tax_calculation_date': tax_calculation_date,
 
-            'item_tax_code_code': ,
+            'item_tax_code_code': item_tax_code_code,
+
+            'item_tax_rate_type_code': item_tax_rate_type_code,
+            'shipment_tax_rate_type_code': shipment_tax_rate_type_code,
+            'gift_wrap_tax_rate_type_code': gift_wrap_tax_rate_type_code,
 
             'item_price_net': item_price_net,
             'item_price_discount_net': item_price_discount_net,
@@ -198,21 +226,21 @@ class TransactionService:
             'invoice_currency_code': invoice_currency_code,
             'transaction_currency_code': ,
 
-            'invoice_exchange_rate_date': ,
-            'invoice_exchange_rate': ,
+            'invoice_exchange_rate_date': invoice_exchange_rate_date,
+            'invoice_exchange_rate': invoice_exchange_rate,
 
 
-            'invoice_amount_net': ,
-            'invoice_amount_vat': ,
-            'invoice_amount_gross': ,
+            'invoice_amount_net': invoice_amount_net,
+            'invoice_amount_vat': invoice_amount_vat,
+            'invoice_amount_gross': invoice_amount_gross,
 
-            'vat_rate_reverse_charge': ,
-            'invoice_amount_vat_reverse_charge': ,
+            'vat_rate_reverse_charge': vat_rate_reverse_charge,
+            'invoice_amount_vat_reverse_charge': invoice_amount_vat_reverse_charge,
 
 
-            'arrival_seller_vat_valid': ,
-            'departure_seller_vat_valid': ,
-            'seller_vat_valid':
+            'arrival_seller_vatin_id': arrival_seller_vatin.id,
+            'departure_seller_vatin_id': departure_seller_vatin.id,
+            'seller_vatin_id': seller_vatin.id
 
         }
 
@@ -247,22 +275,14 @@ class TransactionService:
 
 
 
-
-
-
-
-
-
-
-
     @staticmethod
-    def get_tax_treatment_code(transaction_type: TransactionType, account: Account, transaction_input: TransactionInput, eu: EU, customer_relationship_code: str, departure_country: Country, arrival_country: Country, amazon_vat_calculation_service: bool, **kwargs) -> str:
+    def get_tax_treatment_code(transaction_type: TransactionType, account: Account, transaction_input: TransactionInput, eu: EU, customer_relationship: str, departure_country: Country, arrival_country: Country, amazon_vat_calculation_service: bool, **kwargs) -> str:
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             if (transaction_input.check_export or arrival_country not in eu.countries):
                 tax_treatment_code = 'EXPORT'
 
-            elif customer_relationship_code == "B2B":
+            elif customer_relationship == "B2B":
                 if departure_country.code != arrival_country.code:
                     tax_treatment_code = 'INTRA_COMMUNITY_SALE'
 
@@ -277,7 +297,7 @@ class TransactionService:
                         tax_treatment_code='LOCAL_SALE'
 
 
-            elif customer_relationship_code == "B2C":
+            elif customer_relationship == "B2C":
                 if departure_country.code != arrival_country.code and DistanceSaleService.get_distance_sale_status(platform_code=account.platform_code, seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date)
                     tax_treatment_code = 'DISTANCE_SALE'
 
@@ -295,7 +315,6 @@ class TransactionService:
 
 
 
-
     @staticmethod
     def get_by_validity_public_id(start_date_str: str, end_date_str: str, seller_firm_public_id: str) -> List[Transaction]:
 
@@ -308,14 +327,28 @@ class TransactionService:
 
 
     @staticmethod
-    def vat_check_required(date: date, number: str) -> bool:
+    def vat_check_required(transaction_input: TransactionInput, date: date, number: str) -> bool:
         OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config['OLD_TRANSACTION_TOLERANCE_DAYS']
-
         if not number:
             return False
-
         else:
-            return date.today() - timedelta(days=OLD_TRANSACTION_TOLERANCE_DAYS) <= date
+            result: bool = date.today() - timedelta(days=OLD_TRANSACTION_TOLERANCE_DAYS) <= date
+
+            if not result:
+                notification_data = {
+                    'subject': 'Old Transaction',
+                    'original_filename': transaction_input.original_filename,
+                    'status': 'info',
+                    'message': 'Due to the age (>{} days) of the tax date the customer VAT Number ({}) it is assumed to be valid without further checks.'.format(OLD_TRANSACTION_TOLERANCE_DAYS, number),
+                    'transaction_input_id': transaction_input.id
+                }
+                try:
+                    NotificationService.create_transaction_notification(notification_data)
+                except:
+                    db.session.rollback()
+                    raise
+
+            return result
 
 
 
@@ -333,10 +366,11 @@ class TransactionService:
         if isinstance(kwargs.get('reference_vat_rate'), float):
             reference_vat_rate=kwargs['reference_vat_rate']
             if calculated_vat_rate != reference_vat_rate:
-                notification_data = NotificationService.create_notification_data(main_subject='Tax Rate', original_filename=transaction_input.original_filename, status='info', reference_value=str(reference_vat_rate), calculated_value=str(calculated_vat_rate), transaction_input_id=transaction_input.id)
+                notification_data = NotificationService.create_notification_data(main_subject='Tax Rate', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_vat_rate), calculated_value=str(calculated_vat_rate), transaction_input_id=transaction_input.id)
                 try:
                     NotificationService.create_transaction_notification(notification_data)
                 except:
+                    db.session.rollbac()
                     raise
 
                 vat_rate=reference_vat_rate
@@ -514,7 +548,7 @@ class TransactionService:
 
     @staticmethod
     def check_exchange_rate_required(transaction_currency_code: str, invoice_currency_code: str) -> bool:
-        return True if transaction_currency_code != invoice_currency_code else False
+        return transaction_currency_code != invoice_currency_code
 
 
     @staticmethod
@@ -540,11 +574,11 @@ class TransactionService:
 
     @staticmethod
     def check_amazon_vat_calculation_service(check_tax_calculation_date: date) -> bool:
-        return True if check_tax_calculation_date else False
+        return isinstance(check_tax_calculation_date, date)
 
     @staticmethod
-    def get_tax_calculation_date(check_tax_calculation_date, tax_date: date) -> date:
-        return check_tax_calculation_date if check_tax_calculation_date else tax_date - timedelta(days=1)
+    def get_tax_calculation_date(check_tax_calculation_date: date, tax_date: date) -> date:
+        return check_tax_calculation_date if isinstance(check_tax_calculation_date, date) else tax_date - timedelta(days=1)
 
 
     @staticmethod
@@ -575,11 +609,12 @@ class TransactionService:
         if isinstance(kwargs.get('reference_tax_code'):
             reference_tax_code = kwargs['reference_tax_code']
             if calculated_item_tax_code_code != reference_tax_code:
-                notification_data=NotificationService.create_notification_data(main_subject='Item Tax Code', original_filename=transaction_input.original_filename, status='info', reference_value=str(reference_tax_code), calculated_value=str(calculated_item_tax_code_code), transaction_input_id=transaction_input.id)
+                notification_data=NotificationService.create_notification_data(main_subject='Item Tax Code', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_tax_code), calculated_value=str(calculated_item_tax_code_code), transaction_input_id=transaction_input.id)
                 try:
                     NotificationService.create_transaction_notification(notification_data)
                     item_tax_code_code = reference_tax_code
                 except:
+                    db.session.rollbac()
                     raise
             else:
                 item_tax_code_code = calculated_item_tax_code_code

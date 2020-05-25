@@ -9,7 +9,7 @@ eu_country_AT = db.Table(
     )
 
 #### ^potentially change to
-#db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True)
+#db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True) !!!!
 
 class EU(db.Model):
     __tablename__ = "eu"

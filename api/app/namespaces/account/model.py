@@ -10,7 +10,7 @@ class Account(db.Model):
     public_id = db.Column(db.String(24), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime)
     channel_code = db.Column(db.Integer, db.ForeignKey('channel.code'))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship('Transaction', backref='account', lazy=True)

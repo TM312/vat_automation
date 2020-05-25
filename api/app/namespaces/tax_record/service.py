@@ -7,7 +7,8 @@ from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauth
 
 from .interface import TaxRecordDictInterface
 
-from ..utils.service import HelperService
+from ..utils.service import HelperService, NotificationService
+from ..utils.model import TransactionNotification
 from ..utils.interface import ResponseObjectInterface
 from ..transaction.model import Transaction
 from ..transaction.service import TransactionService
@@ -16,6 +17,8 @@ from ..transaction_input.model import TransactionInput
 
 from ..business.seller_firm.model import SellerFirm
 from ..user.service_parent import UserService
+from ..tax.vatin.service import VATINService
+from ..tax.vatin.model import VATIN
 
 class TaxRecordService:
 
@@ -25,7 +28,7 @@ class TaxRecordService:
         seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
         if g.user.employer_id == seller_firm.accounting_firm_id:
 
-            !!! call as async celery task
+            #!!! call as async celery task
             tax_record_file = TaxRecordService.get_by_validity_public_id(start_date_str, end_date_str, seller_firm_public_id)
 
 
@@ -161,33 +164,36 @@ class TaxRecordService:
 
 
     @staticmethod
-    def create_t_type_dict(t_treatment_code: str, tax_record_base_dict: Dict, transaction_input_dict: Dict, t_dict: Dict) -> Dict:
+    def create_t_type_dict(t_treatment_code: str, tax_record_base_dict: Dict, transaction_input: TransactionInput, t: Transaction) -> Dict:
         if t_treatment_code == 'LOCAL_SALE':
-            t_type_dict =
-
-            --> !! hier werden die tax type spezifischen dicts definiert auf Basis Gespräch Davide Nico
+            t_type_dict=tax_record_base_dict
 
         elif t_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE':
-            t_type_dict =
+            add_local_sales_reverse_charge = {
+                'VAT_RATE_REVERSE_CHARGE': t.vat_rate_reverse_charge,
+                'INVOICE_AMOUNT_VAT_REVERSE_CHARGE': t.invoice_amount_vat_reverse_charge
+            }
+
+            t_type_dict={**tax_record_base_dict, **add_local_sales_reverse_charge}
 
 
         elif t_treatment_code == 'DISTANCE_SALE':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
         elif t_treatment_code == 'NON_TAXABLE_DISTANCE_SALE':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
         elif t_treatment_code == 'INTRA_COMMUNITY_SALE':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
         elif t_treatment_code == 'EXPORT':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
         elif t_treatment_code == 'DOMESTIC_ACQUISITION':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
         elif t_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
-            t_type_dict =
+            t_type_dict = tax_record_base_dict
 
 
         else:
@@ -219,10 +225,14 @@ class TaxRecordService:
             seller_firm = SellerFirm.query.filter(id = t.account.seller_firm_id).first()
             t_treatment_code = t.tax_treatment
             transaction_input = TransactionInput.query.filter_by(transaction_id = t.id).first()
+            arrival_seller_vatin = VATINService.get_by_id(t.arrival_seller_vatin_id)
+            departure_seller_vatin = VATINService.get_by_id(t.departure_seller_vatin_id)
+            seller_vatin = VATINService.get_by_id(t.seller_vatin_id)
+            customer_vatin=VATINService.get_by_id(t.customer_vatin_id)
 
-            # # using the sqlalchemy internal __dict__ method --> https://stackoverflow.com/questions/1958219/convert-sqlalchemy-row-object-to-python-dict
-            # transaction_input_dict = transaction_input.__dict__
-            # t_dict = t.__dict__
+            info_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'info')
+            warning_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'warning')
+
 
             tax_record_base_dict = {
 
@@ -298,65 +308,59 @@ class TaxRecordService:
                 'GIFT_WRAP_PRICE_DISCOUNT_GROSS': transaction_input.gift_wrap_price_discount_net,
                 'GIFT_WRAP_PRICE_TOTAL_GROSS': transaction_input.gift_wrap_price_total_gross,
 
-                'INVOICE_CURRENCY': t.invoice_currency_code
+                'INVOICE_CURRENCY': t.invoice_currency_code,
 
-                'ITEM_TAX_CODE':
-                'ITEM_TAX_RATE_TYPE':
+                'ITEM_TAX_CODE': t.item_tax_code_code,
+                'ITEM_TAX_RATE_TYPE': t.item_tax_rate_type_code,
 
-                'DEPARTURE_CITY':
-                'DEPARTURE_COUNTRY':
-                'DEPARTURE_POSTAL_CODE':
+                'DEPARTURE_CITY': transaction_input.departure_city,
+                'DEPARTURE_COUNTRY': transaction_input.departure_country_code,
+                'DEPARTURE_POSTAL_CODE': transaction_input.departure_postal_code,
 
-                'ARRIVAL_CITY':
-                'ARRIVAL_COUNTRY':
-                'ARRIVAL_POSTAL_CODE':
+                'ARRIVAL_CITY': transaction_input.departure_city,
+                'ARRIVAL_COUNTRY': transaction_input.departure_country_code,
+                'ARRIVAL_POSTAL_CODE': transaction_input.departure_postal_code,
 
-                'DEPARTURE_SELLER_VAT_NUMBER_COUNTRY':
-                'DEPARTURE_SELLER_VAT_NUMBER':
-                'DEPARTURE_SELLER_VAT_VALID':
-                'DEPARTURE_SELLER_VAT_CHECKED_DATE':
+                'DEPARTURE_SELLER_VAT_NUMBER_COUNTRY': departure_seller_vatin.country_code if isinstance(departure_seller_vatin, VATIN) else None,
+                'DEPARTURE_SELLER_VAT_NUMBER': departure_seller_vatin.number if isinstance(departure_seller_vatin, VATIN) else None,
+                'DEPARTURE_SELLER_VAT_VALID': departure_seller_vatin.valid if isinstance(departure_seller_vatin, VATIN) else None,
+                'DEPARTURE_SELLER_VAT_CHECKED_DATE': departure_seller_vatin.created_on if isinstance(departure_seller_vatin, VATIN) else None,
 
-                'ARRIVAL_SELLER_VAT_NUMBER_COUNTRY':
-                'ARRIVAL_SELLER_VAT_NUMBER':
-                'ARRIVAL_SELLER_VAT_VALID':
-                'ARRIVAL_SELLER_VAT_CHECKED_DATE':
+                'ARRIVAL_SELLER_VAT_NUMBER_COUNTRY': arrival_seller_vatin.country_code if isinstance(arrival_seller_vatin, VATIN) else None,
+                'ARRIVAL_SELLER_VAT_NUMBER': arrival_seller_vatin.number if isinstance(arrival_seller_vatin, VATIN) else None,
+                'ARRIVAL_SELLER_VAT_VALID': arrival_seller_vatin.valid if isinstance(arrival_seller_vatin, VATIN) else None,
+                'ARRIVAL_SELLER_VAT_CHECKED_DATE': arrival_seller_vatin.created_on if isinstance(arrival_seller_vatin, VATIN) else None,
 
-                'SELLER_VAT_NUMBER_COUNTRY':
-                'SELLER_VAT_NUMBER':
-                'SELLER_VAT_VALID':
-                'SELLER_VAT_CHECKED_DATE':
+                'SELLER_VAT_NUMBER_COUNTRY': arrival_seller_vatin.country_code if isinstance(arrival_seller_vatin, VATIN) else None,
+                'SELLER_VAT_NUMBER': arrival_seller_vatin.number if isinstance(arrival_seller_vatin, VATIN) else None,
+                'SELLER_VAT_VALID': arrival_seller_vatin.valid if isinstance(arrival_seller_vatin, VATIN) else None,
+                'SELLER_VAT_CHECKED_DATE': arrival_seller_vatin.created_on if isinstance(arrival_seller_vatin, VATIN) else None,
 
-                'CUSTOMER_VAT_NUMBER_COUNTRY':
-                'CUSTOMER_VAT_NUMBER':
-                'CUSTOMER_VAT_VALID':
-                'CUSTOMER_VAT_CHECKED_DATE':
+                'CUSTOMER_VAT_NUMBER_COUNTRY': customer_vatin.country_code if isinstance(customer_vatin, VATIN) else None,
+                'CUSTOMER_VAT_NUMBER': customer_vatin.number if isinstance(customer_vatin, VATIN) else None,
+                'CUSTOMER_VAT_VALID': customer_vatin.valid if isinstance(customer_vatin, VATIN) else None,
+                'CUSTOMER_VAT_CHECKED_DATE': customer_vatin.created_on if isinstance(customer_vatin, VATIN) else None,
 
-                'TAX_JURISDICTION':
+                'TAX_JURISDICTION_CODE': t.tax_juristdiction_code,
 
-                'INVOICE_AMOUNT_NET':
-                'INVOICE_AMOUNT_VAT':
-                'INVOICE_AMOUNT_GROSS':
+                'INVOICE_AMOUNT_NET': t.invoice_amount_net,
+                'INVOICE_AMOUNT_VAT': t.invoice_amount_vat,
+                'INVOICE_AMOUNT_GROSS': t.invoice_amount_gross,
 
-                'INVOICE_NUMBER':
-                'INVOICE_CURRENCY':
-                'INVOICE_EXCHANGE_RATE':
-                'INVOICE_EXCHANGE_RATE_DATE':
-                'INVOICE_URL':
+                'INVOICE_NUMBER': transaction_input.invoice_number,
+                'INVOICE_CURRENCY_CODE': transaction_input.check_invoice_currency_code,
+                'INVOICE_EXCHANGE_RATE_DATE': t.invoice_exchange_rate_date,
+                'INVOICE_EXCHANGE_RATE': t.invoice_exchange_rate,
+                'INVOICE_URL': transaction_input.invoice_url,
 
-                'CUSTOMER_NAME':
+                'CUSTOMER_NAME': transaction_input.customer_name,
 
-                'ARRIVAL_ADDRESS':
-                'SUPPLIER_NAME':
-                'SUPPLIER_VAT_NUMBER':
-
-
-
-
-                    invoice amounts auf 2 Nachkommastellen gerundet
-                    Rates auf 5
+                'ARRIVAL_ADDRESS': transaction_input.arrival_address,
+                'SUPPLIER_NAME': transaction_input.supplier_name,
+                'SUPPLIER_VAT_NUMBER': transaction_input.supplier_vat_number
             }
 
-            t_type_dict = TaxRecordService.create_t_type_dict(t_treatment_code: str, tax_record_base_dict: Dict, transaction_input_dict: Dict, t_dict: Dict)
-            TaxRecordService.append_to_tax_record_dict(tax_record_dict: Dict, t_treatment_code: str, t_type_dict: Dict)
+            t_type_dict = TaxRecordService.create_t_type_dict(t_treatment_code, tax_record_base_dict, transaction_input, t)
+            TaxRecordService.append_to_tax_record_dict(tax_record_dict, t_treatment_code, t_type_dict)
 
         return tax_record_dict
