@@ -34,6 +34,12 @@ class HelperService:
 
 
 class NotificationService:
+
+    @staticmethod
+    def get_by_transaction_input_id_status(transaction_input_id: int, status: str) -> List[TransactionNotification]:
+        return TransactionNotification.query.filter_by(transaction_input_id=transaction_input_id).all()
+
+
     @staticmethod
     def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_input_id: int) -> Dict:
         notification_data = {

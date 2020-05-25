@@ -73,7 +73,7 @@ class AccountService:
 
         for i in range(total_number_accounts):
 
-            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
             public_id = InputService.get_str(df, i, column='account_id')
             channel_code = InputService.get_str(df, i, column='channel_code')
 

@@ -13,12 +13,16 @@ class VATIN(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime)
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date)
     initial_tax_date = db.Column(db.Date)
+
     _country_code = db.Column(db.String(4), nullable=False)
-    _number = db.Column(db.String(4), nullable=False)
+    _number = db.Column(db.String(16), nullable=False)
     valid = db.Column(db.Boolean, nullable=False)
+    name = db.Column(db.String(32))
+    address = db.Column(db.String(80))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
 
     def __init__(self, **kwargs):
@@ -60,4 +64,5 @@ class VATIN(db.Model):
     def update(self, data_changes):
         for key, val in data_changes.items():
             setattr(self, key, val)
+        self.modified_at = datetime.utcnow()
         return self

@@ -13,7 +13,6 @@ from app.namespaces.tax.tax_treatment.model import TaxTreatment
 from app.namespaces.tax.vat.model import Vat, TaxRateType
 from app.namespaces.platform.amazon.model import Amazon
 from app.namespaces.channel.model import Channel
-from app.namespaces.customer.model import CustomerRelationship
 from app.namespaces.user.admin.model import Admin
 from app.namespaces.user.tax_auditor.model import TaxAuditor
 from app.namespaces.business.accounting_firm.model import AccountingFirm
@@ -30,7 +29,6 @@ from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
 from .seeds.platforms import platforms
 from .seeds.channels import channels
-from .seeds.customer_relationships import customer_relationships
 from .seeds.users import admins, tax_auditors
 from .seeds.accounting_firms import accounting_firms
 
@@ -50,7 +48,6 @@ things_list = {
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Amazon, platforms],
     'channels': [Channel, channels],
-    'customer_relationships': [CustomerRelationship, customer_relationships],
     'admins': [Admin, admins],
     'accounting_firms': [AccountingFirm, accounting_firms],
     'tax_auditors': [TaxAuditor, tax_auditors],

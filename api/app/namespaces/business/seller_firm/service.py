@@ -13,7 +13,10 @@ from .model import SellerFirm
 from .interface import SellerFirmInterface
 from .schema import seller_firm_dto
 
-from ...utils.service import InputService
+from ..service_parent import BusinessService
+from ...tax.vatin.service import VATINService
+from ...tax.vatin.model import VATIN
+from ...utils.service import InputService, NotificationService
 from ...utils.interface import ResponseObjectInterface
 
 
@@ -53,6 +56,28 @@ class SellerFirmService:
         else:
             raise NotFound('This accounting firm does not exist.')
 
+
+    @staticmethod
+    def get_vatin_or_None_and_verify(transaction_input: TransactionInput, country_code_temp: str, number_temp: str, date: date) -> VATIN:
+
+        vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
+        if isinstance(vatin: VATIN):
+            business = BusinessService.get_by_name_address_or_None(vatin.name, vatin.address)
+
+        # if isinstance(business, SellerFirm):
+            # if not business.id != vatin.business_id: #potentially a notification
+            #     notification_data = {
+            #         'subject': '{}s Not Matching'.format(main_subject),
+            #         'original_filename': original_filename,
+            #         'status': 'warning',
+            #         'message': 'The '.format(reference_value, calculated_value),
+            #         'transaction_input_id': transaction_input_id
+            #     }
+            #     NotificationService.create_transaction_notification(notification_data)
+
+        return vatin
+
+
     @staticmethod
     def create_seller_firm(seller_firm_data: SellerFirmInterface) -> SellerFirm:
 
@@ -74,12 +99,21 @@ class SellerFirmService:
 
 
     @staticmethod
-    def get_seller_firm_id(df: pd.DataFrame, i: int, **kwargs) -> int:
+    def get_seller_firm_id(**kwargs) -> int:
+        """
+        Function may take either:
+            - a pd.Dataframe kwargs['df'] and an integer kwargs['i'] as the row index
+        or  - a str kwargs['seller_firm_public_id']
+        If both, the later one is prioritized.
+        """
         if isinstance(kwargs.get('seller_firm_public_id'), str):
             seller_firm_public_id = kwargs['seller_firm_public_id']
 
-        else:
+        elif ('df' and 'i') in kwargs and isinstance(kwargs['df'], pd.DataFrame) and isinstance(kwargs['i'], int):
             seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_public_id')
+
+        else:
+            raise
 
         seller_firm = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
 

@@ -108,7 +108,7 @@ class ItemService:
         for i in range(total_number_items):
 
             sku = InputService.get_str(df, i, column='sku')
-            seller_firm_id = SellerFirmService.get_seller_firm_id(df, i, **kwargs)
+            seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
