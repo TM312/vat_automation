@@ -62,6 +62,8 @@ class Development(Config):
     BASE_PATH_TEMPLATES = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
     BASE_PATH_STATIC_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/static'
     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/transaction'
+    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/tax_record'
+
 
 
 

@@ -204,7 +204,7 @@ class InputService:
 
 
     @staticmethod
-    def allowed_file(filename: str, allowed_extensions: list) -> bool:
+    def allowed_file(filename: str, allowed_extensions: List) -> bool:
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower(
             ) in allowed_extensions
@@ -220,13 +220,24 @@ class InputService:
 
 
     @staticmethod
-    def store_file(file: BinaryIO, allowed_extensions: list, basepath: str, file_type: str) -> str:
+    def store_file(file: BinaryIO, allowed_extensions: List, basepath: str, **kwargs) -> str:
         if allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             filename = secure_filename(file.filename)
             stored_filename = "{}.{}".format(filename, filename.rsplit('.', 1)[1].lower())
 
+            if 'file_type' in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
+                basepath_in = os.path.join(basepath, file_type, 'in')
 
-            basepath_in = os.path.join(basepath, file_type, 'in')
+            elif 'file_type' in kwargs and 'in_out' in kwargs and kwargs.get('in_out') == False:
+                basepath_in = os.path.join(basepath, file_type)
+
+            elif 'file_type' not in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
+                basepath_in = os.path.join(basepath, 'in')
+
+            elif 'file_type' not in kwargs and 'in_out' in kwargs and kwargs.get('in_out') == False:
+                basepath_in = os.path.join(basepath)
+
+
             os.makedirs(basepath_in, exist_ok=True)
 
             file_path_in = os.path.join(basepath_in, stored_filename)

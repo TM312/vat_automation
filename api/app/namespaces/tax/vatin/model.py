@@ -24,6 +24,7 @@ class VATIN(db.Model):
     name = db.Column(db.String(32))
     address = db.Column(db.String(80))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
+    transactions = db.relationship('Transaction', backref='vatin', lazy=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

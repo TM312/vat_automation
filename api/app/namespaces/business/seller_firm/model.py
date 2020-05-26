@@ -29,9 +29,12 @@ class SellerFirm(Business):
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
 
+    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy=True)
+
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<SellerFirm: %r>' % self.name
+        return '<SellerFirm: {}>'.format(self.name)

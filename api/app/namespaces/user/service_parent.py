@@ -1,5 +1,5 @@
 import datetime
-import uuid
+from uuid import UUID
 from typing import List
 
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized
@@ -16,7 +16,7 @@ class UserService:
         return users
 
     @staticmethod
-    def get_by_public_id(public_id: str) -> User:
+    def get_by_public_id(public_id: UUID) -> User:
         user = User.query.filter(User.public_id == public_id).first()
         if user:
             return user
@@ -57,7 +57,7 @@ class UserService:
 
 
     @staticmethod
-    def delete_by_public_id(public_id: str):
+    def delete_by_public_id(public_id: UUID):
         #check if user exists in db
         user = User.query.filter(User.public_id == public_id).first()
         if user:

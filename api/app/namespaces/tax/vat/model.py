@@ -31,6 +31,7 @@ class TaxRateType(db.Model):  # type: ignore
     code = db.Column(db.String(8), primary_key=True)
     description = db.Column(db.String(256))
     tax_rates = db.relationship('Vat', backref='tax_rate_type', lazy=True)
+    transaction_items = db.relationship('Transaction', backref='tax_rate_type', lazy=True)
 
 
     def __init__(self, **kwargs):

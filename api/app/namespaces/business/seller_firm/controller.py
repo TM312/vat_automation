@@ -49,14 +49,3 @@ class SellerFirmResource(Resource):
         seller = g.user
         data_changes: SellerFirmInterface = request.json  # JSON body of a request
         return SellerFirmService.update_own(seller, data_changes)
-
-
-# @ns.route("/unclaimed")
-# class Unclaimed_SellerFirmResource(Resource):
-#     @login_required
-#     @ns.expect(seller_firm_dto, validate=True)
-#     def post(self):
-#         """Create A Single Accounting Firm"""
-#         seller_firm_data: SellerFirmInterface = request.json
-#         tax_auditor = g.user
-#         return SellerFirmService.create_unclaimed_seller_firm(tax_auditor, seller_firm_data)

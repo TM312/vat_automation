@@ -9,12 +9,12 @@ class TransactionInputInterface(TypedDict, total=False):
     processed: bool
     processed_on: datetime
 
-    account_public_id: str
+    account_given_id: str
     public_activity_period: str
     channel_code: str
     marketplace: str
     transaction_type_public_code: str
-    public_id: str
+    given_id: str
     activity_id: str
     shipment_date: date
     arrival_date: date
@@ -47,9 +47,9 @@ class TransactionInputInterface(TypedDict, total=False):
     shipment_conditions: str
     invoice_number: str
     invoice_url: str
-    customer_name: str
-    customer_vat_number: str
-    customer_vat_number_country_code: str
+    customer_firm_name: str
+    customer_firm_vat_number: str
+    customer_firm_vat_number_country_code: str
     supplier_vat_number: str
     supplier_name: str
 

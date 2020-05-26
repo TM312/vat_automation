@@ -2,7 +2,7 @@ from mypy_extensions import TypedDict
 from datetime import datetime
 
 class UserInterface(TypedDict, total=False):
-    public_id: str
+    public_id: UUID
 
     registered_on: datetime
     modified_at: datetime
