@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db, bcrypt
 
+from ..tax_record.model import tax_record_user_AT
+
 
 class User(db.Model):  # type: ignore
     """ User model """
@@ -36,6 +38,9 @@ class User(db.Model):  # type: ignore
     created_businesses = db.relationship('Business', backref='creator', order_by="desc(Business.created_on)", lazy=True)
     created_items = db.relationship('Item', backref='creator', order_by="desc(Item.created_on)", lazy=True)
     created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by="desc(DistanceSale.created_on)", lazy=True)
+    created_tax_records = db.relationship('TaxRecord', backref='creator', order_by="desc(TaxRecord.created_on)", lazy=True)
+
+    downloaded_tax_records = db.relationship('TaxRecord', secondary=tax_record_user_AT, back_populates="downloaders")
 
     actions = db.relationship('Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
 

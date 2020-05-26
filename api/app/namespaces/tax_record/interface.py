@@ -16,7 +16,36 @@ class TaxRecordDictInterface(TypedDict, total=True):
 
 
 class LOCAL_SALES_DictInterface(TaxRecordBaseDictInterface):
-    #asdlöasd
+    pass
+
+
+class LOCAL_SALE_REVERSE_CHARGES_DictInterface(TaxRecordBaseDictInterface):
+    VAT_RATE_REVERSE_CHARGE: float
+    INVOICE_AMOUNT_VAT_REVERSE_CHARGE: float
+
+
+class DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class NON_TAXABLE_DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class INTRA_COMMUNITY_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class EXPORTS_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class DOMESTIC_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class INTRA_COMMUNITY_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
+    pass
 
 
 class TaxRecordBaseDictInterface(TypedDict, total=False):
@@ -29,25 +58,32 @@ class TaxRecordBaseDictInterface(TypedDict, total=False):
     CREATED_BY: str
     ORIGINAL_FILENAME: str
 
-    ACCOUNT_ID: str
+    ACCOUNT_GIVEM_ID: str
     CHANNEL_CODE: str
     MARKETPLACE: str
     TRANSACTION_TYPE: str
 
-    PUBLIC_ID: str
+    TRANSACTION_GIVEN_ID: str
     ACTIVITY_ID: str
 
     AMAZON_VAT_CALCULATION_SERVICE: bool
-    CUSTOMER_TYPE: str
+    CUSTOMER_RELATIONSHIP: str
+    CUSTOMER_RELATIONSHIP_CHECKED: bool
+
+    TAX_JURISDICTION_CODE: str
+
     TAX_TREATMENT_CODE: str
 
+    TAX_DATE: date
     TAX_CALCULATION_DATE: date
     SHIPMENT_DATE: date
-    TAX_DATE: date
 
     ITEM_SKU: str
     ITEM_NAME: str
     ITEM_QUANTITY: int
+
+    ITEM_TAX_CODE: str
+    ITEM_TAX_RATE_TYPE: str
 
     ITEM_PRICE_NET: float
     ITEM_PRICE_DISCOUNT_NET: float
@@ -92,11 +128,6 @@ class TaxRecordBaseDictInterface(TypedDict, total=False):
     GIFT_WRAP_PRICE_DISCOUNT_GROSS: float
     GIFT_WRAP_PRICE_TOTAL_GROSS: float
 
-    INVOICE_CURRENCY: str
-
-    ITEM_TAX_CODE: str
-    ITEM_TAX_RATE_TYPE: str
-
     DEPARTURE_CITY: str
     DEPARTURE_COUNTRY: str
     DEPARTURE_POSTAL_CODE: str
@@ -120,12 +151,10 @@ class TaxRecordBaseDictInterface(TypedDict, total=False):
     SELLER_VAT_VALID: bool
     SELLER_VAT_CHECKED_DATE: date
 
-    CUSTOMER_VAT_NUMBER_COUNTRY: str
-    CUSTOMER_VAT_NUMBER: str
-    CUSTOMER_VAT_VALID: bool
-    CUSTOMER_VAT_CHECKED_DATE: date
-
-    TAX_JURISDICTION: str
+    CUSTOMER_FIRM_VAT_NUMBER_COUNTRY: str
+    CUSTOMER_FIRM_VAT_NUMBER: str
+    CUSTOMER_FIRM_VAT_VALID: bool
+    CUSTOMER_FIRM_VAT_CHECKED_DATE: date
 
     INVOICE_AMOUNT_NET: float
     INVOICE_AMOUNT_VAT: float
@@ -136,8 +165,6 @@ class TaxRecordBaseDictInterface(TypedDict, total=False):
     INVOICE_EXCHANGE_RATE: str
     INVOICE_EXCHANGE_RATE_DATE: str
     INVOICE_URL: str
-
-    CUSTOMER_NAME: str
 
     ARRIVAL_ADDRESS: str
     SUPPLIER_NAME: str

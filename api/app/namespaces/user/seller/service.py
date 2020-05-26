@@ -1,5 +1,5 @@
 import datetime
-import uuid
+from uuid import UUID
 from typing import List
 
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized
@@ -62,7 +62,7 @@ class SellerService:
 
 
     @staticmethod
-    def delete_by_id(public_id: str):
+    def delete_by_id(public_id: UUID):
         #check if seller exists in db
         seller = Seller.query.filter(Seller.public_id == public_id).first()
         if seller:
@@ -71,7 +71,7 @@ class SellerService:
 
             response_object = {
                 'status': 'success',
-                'message': 'Seller (Public ID: {}) has been successfully deleted.'.format(public_id)
+                'message': 'Seller (Public ID: {}) has been successfully deleted.'.format(str(public_id))
             }
             return response_object
         else:

@@ -1,7 +1,8 @@
 from datetime import date, timedelta
 import os
 import datetime
-import uuid
+from uuid import UUID
+
 from typing import List, BinaryIO, Dict
 import pandas as pd
 
@@ -27,21 +28,21 @@ class SellerFirmService:
         return seller_firms
 
     @staticmethod
-    def get_by_id(public_id: str) -> SellerFirm:
+    def get_by_id(public_id: UUID) -> SellerFirm:
         seller_firm = SellerFirm.query.filter_by(public_id = public_id).first()
         if seller_firm:
             return seller_firm
 
 
     @staticmethod
-    def update(public_id: str, data_changes: SellerFirmInterface) -> SellerFirm:
+    def update(public_id: UUID, data_changes: SellerFirmInterface) -> SellerFirm:
         seller_firm = SellerFirmService.get_by_id(public_id)
         seller_firm.update(data_changes)
         db.session.commit()
         return seller_firm
 
     @staticmethod
-    def delete_by_id(public_id: str) -> ResponseObjectInterface:
+    def delete_by_id(public_id: UUID) -> ResponseObjectInterface:
         #check if accounting business exists in db
         seller_firm = SellerFirm.query.filter(SellerFirm.public_id == public_id).first()
         if seller_firm:
@@ -103,10 +104,10 @@ class SellerFirmService:
         """
         Function may take either:
             - a pd.Dataframe kwargs['df'] and an integer kwargs['i'] as the row index
-        or  - a str kwargs['seller_firm_public_id']
+        or  - a UUID kwargs['seller_firm_public_id']
         If both, the later one is prioritized.
         """
-        if isinstance(kwargs.get('seller_firm_public_id'), str):
+        if isinstance(kwargs.get('seller_firm_public_id'), UUID):
             seller_firm_public_id = kwargs['seller_firm_public_id']
 
         elif ('df' and 'i') in kwargs and isinstance(kwargs['df'], pd.DataFrame) and isinstance(kwargs['i'], int):
@@ -124,7 +125,7 @@ class SellerFirmService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, int]) -> ResponseObjectInterface:
+    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> ResponseObjectInterface:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'

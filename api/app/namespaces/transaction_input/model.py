@@ -2,6 +2,19 @@ from datetime import datetime
 
 from app.extensions import db
 
+class Bundle(db.Model):
+    """ Bundle model """
+    __tablename__ = "bundle"
+
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_inputs = db.relationship('TransactionInput', backref='bundle', lazy=True)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        return '<Bundle: {}>'.format(self.id)
+
 
 class TransactionInput(db.Model):
     """ TransactionInput model """
@@ -9,6 +22,7 @@ class TransactionInput(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     original_filename = db.Column(db.String(128), nullable=False)
+    bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
 
@@ -17,12 +31,12 @@ class TransactionInput(db.Model):
     transactions = db.relationship('Transaction', backref='transaction_input', lazy=True)
     notifications = db.relationship('TransactionNotification', backref='transaction_input', order_by="desc(TransactionNotification.created_on)", lazy=True)
 
-    account_public_id = db.Column(db.String(128), nullable=False)
+    account_given_id = db.Column(db.String(128), nullable=False)
     public_activity_period = db.Column(db.String(64))
     channel_code = db.Column(db.String(64))
     marketplace = db.Column(db.String(96))
     transaction_type_public_code = db.Column(db.String(40))
-    public_id = db.Column(db.String(64))
+    given_id = db.Column(db.String(64))
     activity_id = db.Column(db.String(64))
     shipment_date = db.Column(db.Date)
     arrival_date = db.Column(db.Date)
@@ -55,9 +69,9 @@ class TransactionInput(db.Model):
     shipment_conditions = db.Column(db.String(24))
     invoice_number = db.Column(db.String(64))
     invoice_url = db.Column(db.String(256))
-    customer_name = db.Column(db.String(64))
-    customer_vat_number = db.Column(db.String(24))
-    customer_vat_number_country_code = db.Column(db.String(8))
+    customer_firm_name = db.Column(db.String(64))
+    customer_firm_vat_number = db.Column(db.String(24))
+    customer_firm_vat_number_country_code = db.Column(db.String(8))
     supplier_vat_number = db.Column(db.String(24))
     supplier_name = db.Column(db.String(64))
 

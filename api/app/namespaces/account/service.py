@@ -14,12 +14,12 @@ from ..business.seller_firm.service import SellerFirmService
 class AccountService:
 
     @staticmethod
-    def get_by_public_id_channel_code(account_public_id: str, channel_code: str) -> Account:
-        account = Account.query.filter_by(public_id=account_public_id,  channel_code=channel_code).first()
+    def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
+        account = Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
         if account:
             return account
         else:
-            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_public_id))
+            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
 
 
 
@@ -74,16 +74,16 @@ class AccountService:
         for i in range(total_number_accounts):
 
             seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
-            public_id = InputService.get_str(df, i, column='account_id')
+            given_id = InputService.get_str(df, i, column='account_id')
             channel_code = InputService.get_str(df, i, column='channel_code')
 
 
             if seller_firm_id:
-                redundancy_counter += AccountService.handle_redundancy(public_id, channel_code)
+                redundancy_counter += AccountService.handle_redundancy(given_id, channel_code)
                 account_data = {
                     'created_by': user_id,
                     'seller_firm_id' : seller_firm_id,
-                    'public_id' : public_id,
+                    'given_id' : given_id,
                     'channel_code' : channel_code
                 }
 
@@ -110,7 +110,7 @@ class AccountService:
         new_account = Account(
             created_by = account_data.get('created_by'),
             seller_firm_id = account_data.get('seller_firm_id'),
-            public_id = account_data.get('public_id'),
+            given_id = account_data.get('given_id'),
             channel_code = account_data.get('channel_code')
         )
 
@@ -126,10 +126,10 @@ class AccountService:
 
 
     @staticmethod
-    def handle_redundancy(public_id: str, channel_code: str) -> int:
-        account: Account = Account.query.filter(Account.public_id == public_id,  Account.channel_code == channel_code).first()
+    def handle_redundancy(given_id: str, channel_code: str) -> int:
+        account: Account = Account.query.filter(Account.given_id == given_id,  Account.channel_code == channel_code).first()
 
-        # if an account with the same public_id and channel_code already exists, it is being deleted.
+        # if an account with the same given_id and channel_code already exists, it is being deleted.
         if account:
             db.session.delete(account)
             redundancy_counter = 1

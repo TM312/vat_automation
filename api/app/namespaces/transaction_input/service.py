@@ -16,9 +16,22 @@ from ..transaction.service import TransactionService
 
 
 
+class BundleService:
+
+    @staticmethod
+    def get_or_create_bundle_by_account_item_transaction_input_given_id(account: Account, item: Item, transaction_input_given_id: str) -> Bundle:
+        bundle = Bundle.query.join(Bundle.transaction_inputs, aliased=True).filter_by(account_id=account.id, item_id=item.id, given_id=transaction_input_given_id).first()
+        if bundle:
+            return bundle
+
+        else:
+            new_bundle = Bundle()
+            db.session.add(new_bundle)
+            return new_bundle
+
+
 
 class TransactionInputService:
-
 
     @staticmethod
     def get_df_transaction_input_delimiter(file: BinaryIO) -> str:
@@ -45,7 +58,7 @@ class TransactionInputService:
 
         for file in transaction_input_files:
             delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
-            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+            file_path_in = InputService.store_file(file, allowed_extensions=['csv'], basepath)
             TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
 
@@ -81,25 +94,25 @@ class TransactionInputService:
         input_type = 'transaction' # only used for response objects
 
         for i in range(total_number_transaction_inputs):
-            account_public_id = InputService.get_str(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
+            account_given_id = InputService.get_str(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, identifier='SALES_CHANNEL')
-            public_id = InputService.get_str(df, i, identifier='TRANSACTION_EVENT_ID')
+            given_id = InputService.get_str(df, i, identifier='TRANSACTION_EVENT_ID')
             activity_id = InputService.get_str(df, i, identifier='ACTIVITY_TRANSACTION_ID')
             item_sku = InputService.get_str(df, i, identifier='SELLER_SKU')
 
-            if account_public_id and channel_code and public_id and activity_id and item_sku:
+            if account_given_id and channel_code and given_id and activity_id and item_sku:
 
-                redundancy_counter += TransactionInputService.handle_redundancy(account_public_id, channel_code, public_id, activity_id, item_sku)
+                redundancy_counter += TransactionInputService.handle_redundancy(account_given_id, channel_code, given_id, activity_id, item_sku)
                 transaction_input_data = {
                     'created_by': user_id,
                     'original_filename': os.path.basename(file_path_in),
 
-                    'account_public_id': account_public_id,
+                    'account_given_id': account_given_id,
                     'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(),
                     'channel_code': channel_code,
                     'marketplace': InputService.get_str_or_None(df, i, column='MARKETPLACE'),
                     'transaction_type_public_code': InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE'),
-                    'public_id': public_id,
+                    'given_id': given_id,
                     'activity_id': activity_id,
 
                     'check_tax_calculation_date': InputService.get_date_or_None(df, i, column='TAX_CALCULATION_DATE'),
@@ -205,9 +218,9 @@ class TransactionInputService:
 
                     'check_export': InputService.get_bool(df, i, column='EXPORT_OUTSIDE_EU', value_true='YES'),
 
-                    'customer_name': InputService.get_str_or_None(df, i, column='BUYER_NAME'),
-                    'customer_vat_number': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER'),
-                    'customer_vat_number_country_code': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER_COUNTRY'),
+                    'customer_firm_name': InputService.get_str_or_None(df, i, column='BUYER_NAME'),
+                    'customer_firm_vat_number': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER'),
+                    'customer_firm_vat_number_country_code': InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER_COUNTRY'),
 
                     'supplier_vat_number': InputService.get_str_or_None(df, i, column='SUPPLIER_VAT_NUMBER'),
                     'supplier_name': InputService.get_str_or_None(df, i, column='SUPPLIER_NAME')
@@ -236,12 +249,12 @@ class TransactionInputService:
         new_transaction_input = TransactionInput(
             created_by = transaction_input_data.get('created_by'),
             original_filename = transaction_input_data.get('original_filename'),
-            account_public_id = transaction_input_data.get('account_public_id'),
+            account_given_id = transaction_input_data.get('account_given_id'),
             public_activity_period = transaction_input_data.get('public_activity_period'),
             channel_code = transaction_input_data.get('channel_code'),
             marketplace = transaction_input_data.get('marketplace'),
             transaction_type_public_code = transaction_input_data.get('transaction_type_public_code'),
-            public_id = transaction_input_data.get('public_id'),
+            given_id = transaction_input_data.get('given_id'),
             activity_id = transaction_input_data.get('activity_id'),
             check_tax_calculation_date = transaction_input_data.get('check_tax_calculation_date'),
             shipment_date = transaction_input_data.get('shipment_date'),
@@ -314,9 +327,9 @@ class TransactionInputService:
             check_invoice_exchange_rate_date = transaction_input_data.get('check_invoice_exchange_rate_date'),
             invoice_url = transaction_input_data.get('invoice_url'),
             check_export = transaction_input_data.get('check_export'),
-            customer_name = transaction_input_data.get('customer_name'),
-            customer_vat_number = transaction_input_data.get('customer_vat_number'),
-            customer_vat_number_country_code = transaction_input_data.get('customer_vat_number_country_code'),
+            customer_firm_name = transaction_input_data.get('customer_firm_name'),
+            customer_firm_vat_number = transaction_input_data.get('customer_firm_vat_number'),
+            customer_firm_vat_number_country_code = transaction_input_data.get('customer_firm_vat_number_country_code'),
             supplier_vat_number = transaction_input_data.get('supplier_vat_number'),
             supplier_name = transaction_input_data.get('supplier_name')
         )
@@ -328,8 +341,8 @@ class TransactionInputService:
 
 
     @staticmethod
-    def handle_redundancy(account_public_id: str, channel_code: str, public_id: str) -> int:
-        transation_input: TransactionInput = TransactionInput.query.filter_by(account_public_id=account_public_id, channel_code=channel_code, public_id=public_id, activity_id=activity_id, item_sku=item_sku).first()
+    def handle_redundancy(account_given_id: str, channel_code: str, given_id: str) -> int:
+        transation_input: TransactionInput = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
 
         # if an item with the same sku for the specified validity period already exists, it is being deleted.
         if transation_input:

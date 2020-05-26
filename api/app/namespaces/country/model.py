@@ -44,7 +44,8 @@ class Country(db.Model):  # type: ignore
     distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country', lazy=True)
 
-    transaction_arrivals = db.relationship('Transaction', backref='arrival_country', lazy=True)
+    transactions = db.relationship('Transaction', backref='tax_jurisdiction', lazy=True)
+    tax_records = db.relationship('TaxRecord', back_populates='tax_jurisdiction')
 
 
     def __init__(self, **kwargs):

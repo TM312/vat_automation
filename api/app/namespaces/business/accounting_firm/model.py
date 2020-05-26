@@ -17,7 +17,7 @@ class AccountingFirm(Business):
     #     "tax_records column, if not present already."
     #     return Business.__table__.c.get('tax_records', db.relationship('TaxRecord', backref='accounting_firm', order_by="desc(TaxRecord.created_on)", lazy=True))
 
-    clients =db.relationship('SellerFirm', backref='accounting_firm', lazy=True)
+    clients = db.relationship('SellerFirm', backref='accounting_firm', lazy=True)
 
 
     def __init__(self, **kwargs):
