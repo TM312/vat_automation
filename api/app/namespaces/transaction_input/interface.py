@@ -1,3 +1,4 @@
+from typing import List
 from mypy_extensions import TypedDict
 from datetime import date, datetime
 
@@ -8,6 +9,8 @@ class TransactionInputInterface(TypedDict, total=False):
 
     processed: bool
     processed_on: datetime
+    transactions: List['app.namepsaces.transaction.Transaction']
+    notifications: List['app.namepsaces.utils.Notification']
 
     account_given_id: str
     public_activity_period: str

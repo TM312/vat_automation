@@ -1,13 +1,14 @@
 from datetime import datetime
 import uuid
 import hashlib
+from ..business.model_parent import Business
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db, bcrypt
 
-from ..tax_record.model import tax_record_user_AT
+from ..utils.ATs import tax_record_user_AT
 
 
 class User(db.Model):  # type: ignore
@@ -18,34 +19,34 @@ class User(db.Model):  # type: ignore
     public_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4)
 
     registered_on = db.Column(db.DateTime, default=datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime)
     confirmed = db.Column(db.Boolean, default=False)
-    confirmed_on = db.Column(db.DateTime, nullable=True)
+    confirmed_on = db.Column(db.DateTime)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    username = db.Column(db.String(32), unique=True)
+    name = db.Column(db.String(32), unique=True)
     email = db.Column(db.String(32), unique=True)
-
-    employer_id = db.Column(db.Integer, db.ForeignKey('business.id'))
+    # https://docs.sqlalchemy.org/en/13/core/constraints.html
+    employer_id = db.Column(db.Integer, db.ForeignKey('business.id', name='fk_user_employer_id_business'))
     role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(40))
     location = db.Column(db.String(32))
 
-    transaction_input_uploads = db.relationship('TransactionInput', backref='uploader', order_by="desc(TransactionInput.created_on)", lazy=True)
+    transaction_input_uploads = db.relationship('TransactionInput', backref='uploader', order_by='desc(TransactionInput.created_on)', lazy=True)
 
-    created_accounts = db.relationship('Account', backref='creator', order_by="desc(Account.created_on)", lazy=True)
-    created_businesses = db.relationship('Business', backref='creator', order_by="desc(Business.created_on)", lazy=True)
-    created_items = db.relationship('Item', backref='creator', order_by="desc(Item.created_on)", lazy=True)
-    created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by="desc(DistanceSale.created_on)", lazy=True)
-    created_tax_records = db.relationship('TaxRecord', backref='creator', order_by="desc(TaxRecord.created_on)", lazy=True)
+    created_accounts = db.relationship('Account', backref='creator', order_by='desc(Account.created_on)', lazy=True)
+    created_businesses = db.relationship('Business', backref='creator', order_by="desc(Business.created_on)", primaryjoin="Business.created_by==User.id", post_update=True)
+    created_items = db.relationship('Item', backref='creator', order_by='desc(Item.created_on)', lazy=True)
+    created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by='desc(DistanceSale.created_on)', lazy=True)
+    created_tax_records = db.relationship('TaxRecord', backref='creator', order_by='desc(TaxRecord.created_on)', lazy=True)
 
-    downloaded_tax_records = db.relationship('TaxRecord', secondary=tax_record_user_AT, back_populates="downloaders")
+    downloaded_tax_records = db.relationship('TaxRecord', secondary=tax_record_user_AT, back_populates="downloaded_by_users")
 
-    actions = db.relationship('Action', backref='user', order_by="desc(Action.timestamp)", lazy=True)
+    actions = db.relationship('Action', backref='user', order_by='desc(Action.timestamp)', lazy=True)
 
-    discriminator = db.Column('u_type', db.String(56))
-    __mapper_args__ = {'polymorphic_on': discriminator}
+    u_type = db.Column(db.String(56))
+    __mapper_args__ = {'polymorphic_on': u_type}
 
 
     @property
@@ -54,7 +55,7 @@ class User(db.Model):  # type: ignore
 
     @password.setter
     def password(self, password):
-        BCRYPT_LOG_ROUNDS = current_app.config["BCRYPT_LOG_ROUNDS"]
+        BCRYPT_LOG_ROUNDS = current_app.config['BCRYPT_LOG_ROUNDS']
         self.password_hash = bcrypt.generate_password_hash(
             password, rounds=BCRYPT_LOG_ROUNDS).decode('utf-8')
 
@@ -81,6 +82,16 @@ class User(db.Model):  # type: ignore
     def update_last_seen(self):
         self.last_seen = datetime.utcnow()
         return self
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.avatar_hash = self.gravatar_hash()
+        self.confirmed_on = None
+
+    def __repr__(self):
+        return '<User: {} | Type: {} | Role: {}>.'.format(self.email, self.u_type, self.role)
+
+
 
 
 class Action(db.Model):  # type: ignore

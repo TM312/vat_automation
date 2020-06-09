@@ -1,12 +1,8 @@
 from flask import current_app
 
 from app.extensions import db
+from ..utils.ATs import eu_country_AT
 
-eu_country_AT = db.Table(
-    'eu_country_AT',
-    db.Column('eu_id', db.Integer, db.ForeignKey('eu.id'), primary_key=True),
-    db.Column('country_code', db.Integer, db.ForeignKey('country.code'), primary_key=True)
-    )
 
 #### ^potentially change to
 #db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True) !!!!
@@ -15,7 +11,7 @@ class EU(db.Model):
     __tablename__ = "eu"
     id = db.Column(db.Integer, primary_key=True)
     valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+    valid_to = db.Column(db.Date)
     countries = db.relationship(
         "Country",
         secondary=eu_country_AT,
@@ -29,23 +25,24 @@ class Country(db.Model):  # type: ignore
 
     code = db.Column(db.String(4), primary_key=True)
     vat_country_code = db.Column(db.String(4))
-    name = db.Column(db.String(16), nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date, default=current_app.config['TAX_DEFAULT_VALIDITY'])
+    name = db.Column(db.String(64), nullable=False)
+    valid_from = db.Column(db.Date)
+    valid_to = db.Column(db.Date)
 
-    tax_codes = db.relationship('Vat', back_populates='country')
+    #tax_codes = db.relationship('Vat', back_populates='country')
     eus = db.relationship(
         "EU",
         secondary=eu_country_AT,
         back_populates="countries"
     )
 
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), default=None)
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
     distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country', lazy=True)
 
     transactions = db.relationship('Transaction', backref='tax_jurisdiction', lazy=True)
-    tax_records = db.relationship('TaxRecord', back_populates='tax_jurisdiction')
+    tax_records = db.relationship('TaxRecord', backref='tax_jurisdiction', lazy=True)
+    vats = db.relationship('Vat', backref='country', lazy=True)
 
 
     def __init__(self, **kwargs):

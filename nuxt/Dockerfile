@@ -3,7 +3,7 @@ ARG NODE_VERSION
 FROM node:$NODE_VERSION
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /home/app
 
 # Copy the app package and package-lock.json file
 COPY ./package*.json ./
@@ -11,7 +11,7 @@ COPY ./package*.json ./
 # Install node packages
 RUN npm clean-install
 
-# Copy or project directory (locally) in the current directory of our docker image (/app)
+# Copy or project directory (locally) in the current directory of our docker image (/home/app)
 COPY . .
 
 # Build the app

@@ -8,7 +8,7 @@ user_dto = Model('user', {
     'confirmed_on': fields.DateTime(readonly=True),
     'last_seen': fields.DateTime(readonly=True),
     'role': fields.String(readonly=True),
-    'username': fields.String,
+    'name': fields.String,
     'email': fields.String,
     'password_hash': fields.String(readonly=True),
     'avatar_hash': fields.String(readonly=True),

@@ -1,8 +1,19 @@
 from mypy_extensions import TypedDict
 from typing import List, Dict
-from datetime import date
-from ..utils.model import Error
+from datetime import date, datetime
 
+
+class TaxRecordInterface(TypedDict, total=False):
+    id: int
+    public_id: str
+    active: bool
+    created_on: datetime
+    created_by: int
+    start_date: date
+    end_date: date
+    filename: str
+    seller_firm_id: int
+    tax_jurisdiction_code: str
 
 class TaxRecordDictInterface(TypedDict, total=True):
     LOCAL_SALES: List[Dict]
@@ -13,39 +24,6 @@ class TaxRecordDictInterface(TypedDict, total=True):
     EXPORTS: List[Dict]
     DOMESTIC_ACQUISITIONS: List[Dict]
     INTRA_COMMUNITY_ACQUISITIONS: List[Dict]
-
-
-class LOCAL_SALES_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class LOCAL_SALE_REVERSE_CHARGES_DictInterface(TaxRecordBaseDictInterface):
-    VAT_RATE_REVERSE_CHARGE: float
-    INVOICE_AMOUNT_VAT_REVERSE_CHARGE: float
-
-
-class DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class NON_TAXABLE_DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class INTRA_COMMUNITY_SALES_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class EXPORTS_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class DOMESTIC_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
-    pass
-
-
-class INTRA_COMMUNITY_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
-    pass
 
 
 class TaxRecordBaseDictInterface(TypedDict, total=False):
@@ -169,3 +147,35 @@ class TaxRecordBaseDictInterface(TypedDict, total=False):
     ARRIVAL_ADDRESS: str
     SUPPLIER_NAME: str
     SUPPLIER_VAT_NUMBER: str
+
+class LOCAL_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class LOCAL_SALE_REVERSE_CHARGES_DictInterface(TaxRecordBaseDictInterface):
+    VAT_RATE_REVERSE_CHARGE: float
+    INVOICE_AMOUNT_VAT_REVERSE_CHARGE: float
+
+
+class DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class NON_TAXABLE_DISTANCE_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class INTRA_COMMUNITY_SALES_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class EXPORTS_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class DOMESTIC_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
+    pass
+
+
+class INTRA_COMMUNITY_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
+    pass

@@ -1,5 +1,5 @@
-from mypy_extensions import TypedDict
+from ..interface_parent import UserInterface
 
-class SellerInterface(TypedDict, total=False):
-    email: str
-    password: str
+
+class SellerInterface(UserInterface):
+    pass

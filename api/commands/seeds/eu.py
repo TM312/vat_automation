@@ -3,19 +3,14 @@ import pandas as pd
 from datetime import datetime
 from os import path
 
-from app.country.model import Country, EU
-
-from flask import current_app
-
-
-
+from app.namespaces.country.model import Country, EU
 
 
 class EUSeedService:
 
     @staticmethod
     def seed_eu():
-        SERVICE_START_DATE = current_app.config["SERVICE_START_DATE"]
+        from . import SERVICE_START_DATE
 
         eu = [
             {
@@ -26,27 +21,24 @@ class EUSeedService:
         return eu
 
 
-
-
     @staticmethod
     def append_countries_to_eu():
-        BASE_PATH_SEEDS = current_app.config["BASE_PATH_SEEDS"]
-
+        from . import BASE_PATH_SEEDS
 
         file = 'eu.csv'
         dirpath = path.join(
             BASE_PATH_SEEDS,
             file)
 
-
         df = pd.read_csv(dirpath)
-        eu = EU.query.filter_by(id=1).first()
+        eu = EU.query.first()
         eu_size = 0
 
         try:
             for row in range(len(df.index)):
                 if bool(df.iloc[row]['eu_1']):
                     country = Country.query.filter_by(code=df.iloc[row]['code']).first()
+                    print('appending {} to eu'.format(str(country.code)))
                     eu.countries.append(country)
                     eu_size +=1
 

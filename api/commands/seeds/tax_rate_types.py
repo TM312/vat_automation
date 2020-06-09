@@ -2,23 +2,23 @@
 
 tax_rate_types = [
     {
-        'code': 'S'
+        'code': 'S',
         'description': 'Standard Rate'
     },
     {
-        'code': 'R'
+        'code': 'R',
         'description': 'Reduced Rate'
     },
     {
-        'code': 'R2'
+        'code': 'R2',
         'description': 'Reduced Rate 2'
     },
     {
-        'code': 'SR'
+        'code': 'SR',
         'description': 'Super Reduced Rate'
     },
     {
-        'code': 'Z'
+        'code': 'Z',
         'description': 'Zero Rate'
     }
 ]

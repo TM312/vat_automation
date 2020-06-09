@@ -6,8 +6,6 @@ from app import create_app
 from app.extensions import db
 
 from commands.seed_command import SeedCommand
-# from commands.fake import FakeUserCreationCommand
-# from commands.initial import InitialUserCreationCommand
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,8 +18,6 @@ manager = Manager(app)
 app.app_context().push()
 
 manager.add_command("seed_db", SeedCommand)
-# manager.add_command("fake_users_db", FakeUserCreationCommand)
-# manager.add_command("initial_users_db", InitialUserCreationCommand)
 manager.add_command('db', MigrateCommand)
 
 @manager.command

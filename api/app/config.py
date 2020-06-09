@@ -28,8 +28,15 @@ class Config(object):
     EMAIL_CONFIRMATION_SALT = os.getenv('EMAIL_CONFIRMATION_SALT')
     EMAIL_CONFIRMATION_MAX_AGE = 3600  # 3600 #in seconds
 
+    # Static Data Paths
+    BASE_PATH_SEEDS = '/home/data/seeds'
+    BASE_PATH_LOGS = '/home/data/logs'
+    BASE_PATH_TEMPLATES = '/home/data/templates'
+    BASE_PATH_STATIC_DATA_SELLER_FIRM = '/home/data/seller_firm_data/static'
+    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/home/data/seller_firm_data/transaction'
+    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/home/data/seller_firm_data/tax_record'
+
     # Media
-    # PROFILE_IMAGE_PATH = os.path.join(BASE_PATH_MEDIA, "profile_image")
     # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
     MAX_FILE_SIZE_INPUT = 50 * 1024 * 1024  # 50 --> 50MB
@@ -51,20 +58,10 @@ class Development(Config):
     DEBUG = True
     DEVELOPMENT = True
     # structure: dialect+driver://username:password@host:port/database
+    #           [DB_TYPE]+[DB_CONNECTOR]: // [USERNAME]: [PASSWORD]@[HOST]: [PORT]/[DB_NAME]
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_DEV')
     SECRET_KEY = os.getenv('SECRET_KEY_DEV')
     BCRYPT_LOG_ROUNDS = 4
-
-    # Media Uploads
-    BASE_PATH_MEDIA = '/Users/tm/Projects/NTAMAZON/webapp_data/test_media_uploads/'
-    BASE_PATH_LOGS = '/Users/tm/Projects/NTAMAZON/webapp_data/logs'
-    BASE_PATH_SEEDS = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
-    BASE_PATH_TEMPLATES = '/Users/tm/Projects/NTAMAZON/webapp_data/seeds'
-    BASE_PATH_STATIC_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/static'
-    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/transaction'
-    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/Users/tm/Projects/NTAMAZON/webapp_data/seller_firm_data/tax_record'
-
-
 
 
 class Testing(Config):
@@ -85,11 +82,6 @@ class Production(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_PROD')
     SECRET_KEY = os.getenv('SECRET_KEY_PROD')
-
-    # Media Uploads
-    # BASE_PATH_MEDIA = '/var/lib/media_data/'
-    BASE_PATH_LOGS = '/var/lib/logs/'
-    BASE_PATH_SEEDS = '/var/lib/seeds/'
 
 
 

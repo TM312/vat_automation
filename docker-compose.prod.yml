@@ -15,8 +15,10 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - /home/thomas/data/certbot/conf:/etc/letsencrypt
-            - /home/thomas/data/certbot/www:/var/www/certbot
+            - certbot:/data/certbot
+            - letsencrypt:/data/letsencrypt
+            # - /home/thomas/data/certbot/conf:/etc/letsencrypt
+            # - /home/thomas/data/certbot/www:/var/www/certbot
         networks:
             - web
         depends_on:
@@ -30,8 +32,10 @@ services:
         image: certbot/certbot
         restart: unless-stopped
         volumes:
-            - /home/thomas/data/certbot/conf:/etc/letsencrypt
-            - /home/thomas/data/certbot/www:/var/www/certbot
+            - certbot:/data/certbot
+            - letsencrypt:/data/letsencrypt
+            # - /home/thomas/data/certbot/conf:/etc/letsencrypt
+            # - /home/thomas/data/certbot/www:/var/www/certbot
         networks:
             - web
         entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
@@ -40,6 +44,8 @@ services:
                                                                 # --email no-reply@tax-automation.com
 
     api:
+        volumes:
+            - media_data:/data/media/
         env_file:
             - .prod.env
 
@@ -48,6 +54,8 @@ services:
             - .prod.env
 
     postgres:
+        volumes:
+            - pgdata:/data/postgres/
         env_file:
             - .prod.env
 
@@ -56,3 +64,11 @@ networks:
     web:
         # external:
         #     name: nginx_web
+
+
+
+volumes:
+    pgdata:
+    media_data:
+    certbot:
+    letsencrypt:

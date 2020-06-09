@@ -29,7 +29,7 @@ class Item(db.Model):  # type: ignore
     # storage_media_type = db.Column(db.String(32), nullable=False)
     # storage_category = db.Column(db.String(32), nullable=False)
 
-    tax_code_code = db.Column(db.String(8), db.ForeignKey('tax_code.code'))
+    tax_code_code = db.Column(db.String(40), db.ForeignKey('tax_code.code'))
 
     # item_purchase_price_currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
     # item_purchase_price_net = db.Column(db.Float(precision=28))

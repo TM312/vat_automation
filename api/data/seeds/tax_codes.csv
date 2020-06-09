@@ -1,0 +1,67 @@
+﻿code,description
+A_GEN_STANDARD,Standard Rate
+A_BOOKS_GEN,Printed Books
+A_BOOK_ATLAS,Book of Maps or Charts
+A_BOOK_AUDIOBOOK,Audiobooks in the physical format
+A_BOOK_GLOBE,Spherical Map or Chart
+A_BOOK_MAGAZINE,Periodical Publication
+A_BOOK_MAP,Diagrammatic Area of Land or Sea
+A_BOOK_ADULT,Adult Coloring or Activity Book
+A_CLTH_BABY,General Baby Clothing
+A_CLTH_CHILD,General Children's Clothing
+A_CLTH_PROTECTIVE,Protective Sport or Work Clothing
+A_FOOD_GEN,General Food Products
+A_FOOD_CAKEDECOR,Cake Decorating Foods
+A_FOOD_CANFRUIT,Canned Fruit and Vegetables
+A_FOOD_CEREALBARS,Cereal Bars
+A_FOOD_CEREALCHOCBARS,Chocolate Cereal Bars
+A_FOOD_CHOCEREAL,Chocolate Cereal
+A_FOOD_CNDY,Candy
+A_FOOD_COFFEE,Coffee
+A_FOOD_DAIRY,Milk and other Dairy Foods
+A_FOOD_DESSERT,Desserts Without Chocolate
+A_FOOD_DRIEDFRUIT,Dried Fruits and Vegetables
+A_FOOD_FLOUR,Flour
+A_FOOD_MEATCHICKEN,Chicken or Other Meats
+A_FOOD_MISCBEVERAGE,Carbonated Water or Other Non-Soda / Juice Drinks
+A_FOOD_NAAN,Naan
+A_FOOD_NCARBWTR,Non-Carbonated Water
+A_FOOD_OIL,Oils
+A_FOOD_PASTANOODLE,Pasta and Noodles
+A_FOOD_PASTRYCASE,Pastry
+A_FOOD_PLAINBISCUIT,Plain Biscuits
+A_FOOD_PLAINCRACKER,Plain Crackers
+A_FOOD_PLAINNUT,Plain Nuts
+A_FOOD_RICE,Rice
+A_FOOD_SEASONINGS,"Salt, Pepper, and other Seasonings"
+A_FOOD_SNACK,Non-chocolate Snacks and Treats
+A_FOOD_SODAJUICE,Sodas and Juices
+A_FOOD_SPREAD,Spreadable Food
+A_FOOD_SWEETNER,Sugar and other Sweeteners
+A_FOOD_TEA,Tea
+A_FOOD_VEGETABLE,Fresh or Frozen Fruits and Vegetables
+A_FOOD_PETFOOD,Food for Pets
+A_FOOD_ANIMALFOOD,Food for Farm Animals
+A_FOOD_ANIMALMED,Medicine for Farm Animals
+A_FOOD_ANIMALVITAMINS,Vitamins for Farm Animals
+A_HLTH_NUTRITIONBAR,Nutrition Bar
+A_HLTH_NUTRITIONDRINK,Nutrition Drink
+A_HLTH_PILLCAPSULETABLET,Pills and Capsules
+A_HLTH_SMOKINGCESSATION,Smoking Cessation Aids
+A_HLTH_SMOKINGGUM,Smoke Cessation Gum
+A_HLTH_VITAMINS,Vitamins and Minerals
+A_HPC_CONTRACEPTIVE,Condoms and other Contraceptive Aids
+A_HPC_DIETARYSUPPL,Dietary Supplements
+A_HPC_INCONTINENCE,Adult Diapers and Incontinence Aids
+A_HPC_MEDICINE,Other Medicines
+A_HPC_SANITARYPRODUCTS,Female Hygienic and Other Sanitary Products
+A_HPC_WALKINGSTICK,Walking Sticks and other Mobility Aids
+A_OUTDOOR_FERTILIZER,Plant Fertilizers
+A_OUTDOOR_LAWNCONTROL,"Insecticides, Herbicides, and Fungicides"
+A_OUTDOOR_PLANTFOOD,Plant Food
+A_OUTDOOR_PLANTS,Plants
+A_OUTDOOR_SEEDS,Plant seeds
+A_BABY_BIBCLOTH,Baby Bib Cloth
+A_BABY_CARSEAT,Car Seats for Baby and Children
+A_BABY_NAPPIES,Baby or Children's Nappy or Diaper
+A_GEN_NOTAX,Outside the scope of VAT

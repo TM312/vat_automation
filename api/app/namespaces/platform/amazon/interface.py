@@ -1,5 +1,11 @@
 from mypy_extensions import TypedDict
 from datetime import date, datetime
+from typing import List
+from . import DistanceSale
+
+
+class AmazonInterface(PlatformInterface):
+    distance_sales: List[DistanceSale]
 
 
 class DistanceSaleInterface(TypedDict, total=False):

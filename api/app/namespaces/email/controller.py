@@ -4,10 +4,11 @@ from flask_restx import Namespace, Resource
 
 from .service import EmailService
 from .interface import EmailInterface
-from ..utils import login_required
+
+from ..utils.decorators import login_required
 
 ns = Namespace("email", description="Email Related Operations")  # noqa
-ns.add_model(email.name, email)
+#ns.add_model(email.name, email)
 
 
 @ns.route("/request_confirm")

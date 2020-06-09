@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
-from flask import request, g
-from flask import current_app
+from flask import request, g, current_app
+
 from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
@@ -10,7 +10,6 @@ from .schema_parent import user_dto, user_dto_admin, action_dto
 from .service_parent import UserService
 from .model_parent import User, Action
 
-from ..auth import TokenInterface
 from ..utils import login_required, accepted_u_types, confirmation_required
 
 

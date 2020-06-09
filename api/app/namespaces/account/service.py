@@ -3,15 +3,47 @@ from app.extensions import db
 from typing import List, BinaryIO
 import pandas as pd
 
-from .model import Account
+from . import Account
 from .interface import AccountInterface
 from ..utils.service import InputService
-from ..utils.interface import ResponseObjectInterface
+from ..utils.schema import response_object_dto
 from ..business.seller_firm.service import SellerFirmService
 
 
 
 class AccountService:
+
+    @staticmethod
+    def get_all() -> List[Account]:
+        accounts = Account.query.all()
+        return accounts
+
+    @staticmethod
+    def get_by_id(account_id: int) -> Account:
+        return Account.query.filter(Account.id == account_id).first()
+
+    @staticmethod
+    def update(account_id: int, data_changes: AccountInterface) -> Account:
+        account = AccountService.get_by_id(account_id)
+        account.update(data_changes)
+        db.session.commit()
+        return account
+
+    @staticmethod
+    def delete_by_id(account_id: str):
+        account = Account.query.filter(Account.id == item_id).first()
+        if account:
+            db.session.delete(account)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Account (code: {}) has been successfully deleted.'.format(account_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This account does not exist.')
+
 
     @staticmethod
     def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
@@ -25,7 +57,7 @@ class AccountService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
+    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> response_object_dto:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'account_list'
@@ -49,7 +81,7 @@ class AccountService:
 
     # celery task !!
     @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
@@ -64,7 +96,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -88,7 +120,7 @@ class AccountService:
                 }
 
                 try:
-                    new_account = AccountService.create_account(account_data)
+                    new_account = AccountService.create(account_data)
 
                 except:
                     db.session.rollback()
@@ -105,7 +137,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_account(account_data: AccountInterface) -> Account:
+    def create(account_data: AccountInterface) -> Account:
 
         new_account = Account(
             created_by = account_data.get('created_by'),

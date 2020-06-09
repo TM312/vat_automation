@@ -1,10 +1,11 @@
+from flask_restx import Namespace, Resource
+
 from .service import TemplateService
+from .decorators import login_required
 
 
 
 ns = Namespace("utils", description="Utilities Related Operations")  # noqa
-ns.add_model(transaction_dto.name)
-
 
 
 @ns.route("/template/<string:name>")
