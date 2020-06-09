@@ -1,5 +1,5 @@
 from app.extensions import db  # noqa
-from ..model_parent import Business
+from .. import Business
 from sqlalchemy.ext.declarative import declared_attr
 
 class AccountingFirm(Business):
@@ -9,15 +9,12 @@ class AccountingFirm(Business):
     @declared_attr
     def employees(cls):
         "Employees column, if not present already."
-        return Business.__table__.c.get('employees', db.relationship(
-            'TaxAuditor', backref='employer', lazy=True))
+        # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
+        #also: https://stackoverflow.com/questions/22355890/sqlalchemy-multiple-foreign-keys-in-one-mapped-class-to-the-same-primary-key
+        return Business.__table__.c.get('employees', db.relationship('TaxAuditor', backref='employer', primaryjoin='TaxAuditor.employer_id==Business.id'))
 
-    # @declared_attr
-    # def tax_records(cls):
-    #     "tax_records column, if not present already."
-    #     return Business.__table__.c.get('tax_records', db.relationship('TaxRecord', backref='accounting_firm', order_by="desc(TaxRecord.created_on)", lazy=True))
 
-    clients = db.relationship('SellerFirm', backref='accounting_firm', lazy=True)
+    clients = db.relationship('SellerFirm', backref=db.backref('accounting_firm', remote_side=[Business.id]))
 
 
     def __init__(self, **kwargs):

@@ -5,18 +5,52 @@ import pandas as pd
 
 from flask import g, current_app
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
+from app.extensions import db
 
-from .model import Item
+from . import Item
 from .interface import ItemInterface
 
-from ..account.model import Account
+from ..account import Account
 from ..utils.service import InputService, NotificationService
-from ..utils.interface import ResponseObjectInterface
-from ..business.seller_firm.service import SellerFirmService
+from ..utils.schema import response_object_dto
+from ..transaction_input import TransactionInput
 
 
 
 class ItemService:
+    @staticmethod
+    def get_all() -> List[Item]:
+        items = Item.query.all()
+        return items
+
+    @staticmethod
+    def get_by_id(item_id: int) -> Item:
+        return Item.query.filter(Item.id == item_id).first()
+
+
+    @staticmethod
+    def update(item_id: int, data_changes: ItemInterface) -> Item:
+        item = ItemService.get_by_id(item_id)
+        item.update(data_changes)
+        db.session.commit()
+        return item
+
+    @staticmethod
+    def delete_by_id(item_id: str):
+        item = Item.query.filter(Item.id == item_id).first()
+        if item:
+            db.session.delete(item)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Item (code: {}) has been successfully deleted.'.format(item_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This item does not exist.')
+
+
 
     @staticmethod
     def get_by_sku_account_date(item_sku: str, account: Account, date: date) -> Item:
@@ -58,7 +92,7 @@ class ItemService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
+    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> response_object_dto:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -82,7 +116,7 @@ class ItemService:
 
     # celery task !!
     @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = ItemService.create_items(df, file_path_in, user_id, **kwargs)
@@ -96,7 +130,9 @@ class ItemService:
 
 
     @staticmethod
-    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+        from ..business.seller_firm.service import SellerFirmService
+
         TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
 
 
@@ -139,7 +175,7 @@ class ItemService:
                 }
 
                 try:
-                    new_item = ItemService.create_item(item_data)
+                    new_item = ItemService.create(item_data)
 
                 except:
                     db.session.rollback()
@@ -159,7 +195,7 @@ class ItemService:
 
 
     @staticmethod
-    def create_item(item_data: ItemInterface) -> Item:
+    def create(item_data: ItemInterface) -> Item:
         new_item = Item(
             created_by = item_data.get('created_by'),
             original_filename = item_data.get('original_filename'),

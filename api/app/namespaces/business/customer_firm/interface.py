@@ -1,5 +1,5 @@
 from ..interface_parent import BusinessInterface
-
+from typing import List
 
 class CustomerFirmInterface(BusinessInterface):
-    vatin_id: int
+    transactions: List['app.namespaces.transaction.Transaction']

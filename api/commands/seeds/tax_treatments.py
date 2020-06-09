@@ -1,7 +1,11 @@
+from app.namespaces.transaction.model import TransactionType
+from app.namespaces.tax.tax_treatment.model import TaxTreatment
+
+
 tax_treatments = [
     {
         'code':'LOCAL_SALE',
-        'name': 'Local Sale'
+        'name': 'Local Sale',
         'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
     },
     {
@@ -38,7 +42,7 @@ tax_treatments = [
         'code': 'INTRA_COMMUNITY_ACQUISITION',
         'name': 'Intra Community Acquisition',
         'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Acquisition (Departure != Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number).'
-    },
+    }#  ,
     # {
     #     'code': 'IMPORT',
     #     'name': 'Import',
@@ -62,10 +66,11 @@ class TaxTreatmentSeedService:
 
         try:
             for key, val in transaction_type_tax_treatment_dict.items():
-            transaction_type = TransactionType.query.filter_by(code=key).first()
-            for tax_treatment_code in val:
-                tax_treatment = TransactionType.query.filter_by(code=tax_treatment_code).first()
-                transaction_type.tax_treatments.append(tax_treatment)
+                transaction_type = TransactionType.query.filter_by(code=key).first()
+                print(transaction_type.code) #--> 'SALE'
+                for tax_treatment_code in val: #--> 'LOCAL_SALE'
+                    tax_treatment = TaxTreatment.query.filter_by(code=tax_treatment_code).first()
+                    transaction_type.tax_treatments.append(tax_treatment)
 
 
             response_object = {

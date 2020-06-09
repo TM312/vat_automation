@@ -2,32 +2,18 @@ import os
 from datetime import datetime
 import pandas as pd
 from typing import List, BinaryIO
+
 from flask import g, current_app
+from werkzeug.exceptions import UnsupportedMediaType, NotFound
+from app.extensions import db
 
 from .model import TransactionInput
 from .interface import TransactionInputInterface
 
-from werkzeug.exceptions import UnsupportedMediaType, NotFound
-from app.extensions import db
-
 from ..utils.service import InputService
-from ..utils.interface import ResponseObjectInterface
-from ..transaction.service import TransactionService
+from ..utils.schema import response_object_dto
 
 
-
-class BundleService:
-
-    @staticmethod
-    def get_or_create_bundle_by_account_item_transaction_input_given_id(account: Account, item: Item, transaction_input_given_id: str) -> Bundle:
-        bundle = Bundle.query.join(Bundle.transaction_inputs, aliased=True).filter_by(account_id=account.id, item_id=item.id, given_id=transaction_input_given_id).first()
-        if bundle:
-            return bundle
-
-        else:
-            new_bundle = Bundle()
-            db.session.add(new_bundle)
-            return new_bundle
 
 
 
@@ -48,7 +34,7 @@ class TransactionInputService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
+    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> response_object_dto:
         BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -58,13 +44,14 @@ class TransactionInputService:
 
         for file in transaction_input_files:
             delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
-            file_path_in = InputService.store_file(file, allowed_extensions=['csv'], basepath)
+            allowed_extensions = ['csv']
+            file_path_in = InputService.store_file(file, allowed_extensions, basepath)
             TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
 
         response_object = {
             'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(item_information_files)))
+            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(transaction_input_files)))
         }
 
         return response_object
@@ -73,7 +60,7 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, **kwargs)
@@ -86,7 +73,9 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+        from ..transaction.service import TransactionService
+
 
         redundancy_counter = 0
         error_counter = 0

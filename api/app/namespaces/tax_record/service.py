@@ -1,28 +1,27 @@
 import pandas as pd
 from datetime import date
 from flask import g, current_app, send_from_directory
-from typing import List, BinaryIO, Dict
+from typing import List, BinaryIO, Dict, Union
 from uuid import UUID
 
 from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauthorized, NotFound
 
 from .interface import TaxRecordDictInterface
-from .model import TaxRecord
+from . import TaxRecord
 
 from ..utils.service import HelperService, NotificationService, InputService
-from ..utils.model import TransactionNotification
-from ..utils.interface import ResponseObjectInterface
-from ..transaction.model import Transaction
-from ..transaction.service import TransactionService
-from ..transaction_input.model import TransactionInput
+from ..utils import TransactionNotification
+from ..utils import response_object_dto
+from ..transaction import Transaction
+from ..transaction_input import TransactionInput
 #from ..transaction_input.service import TransactionInputService
 
-from ..business.seller_firm.model import SellerFirm
-from ..user.service_parent import UserService
-from ..tax.vatin.service import VATINService
-from ..tax.vatin.model import VATIN
 
 class TaxRecordService:
+    @staticmethod
+    def get_all() -> List[Vat]:
+        vats = Vat.query.all()
+        return vats
 
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
@@ -44,7 +43,9 @@ class TaxRecordService:
 
 
     def download_tax_record(public_id: str):
+        from ..business.seller_firm import SellerFirm
         BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config['BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM']
+
         tax_record = TaxRecord.query.filter_by(public_id = public_id).first()
         if tax_record:
             seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
@@ -59,7 +60,8 @@ class TaxRecordService:
 
 
     @staticmethod
-    def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> ResponseObjectInterface:
+    def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> response_object_dto:
+        from ..business.seller_firm import SellerFirm
         BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config['BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM']
 
         seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
@@ -82,17 +84,17 @@ class TaxRecordService:
 
 
     @staticmethod
-    def get_df_list(tax_record_dict: TaxRecordDictInterface) -> List[List[pd.DataFrame], List[str]]:
+    def get_df_list(tax_record_dict: TaxRecordDictInterface) -> List[Union[pd.DataFrame, str]]:
         tab_names = ['LOCAL_SALES', 'LOCAL_SALES_REVERSE_CHARGE', 'DISTANCE_SALES', 'NON_TAXABLE_DISTANCE_SALES', 'INTRA_COMMUNITY_SALES', 'EXPORTS', 'DOMESTIC_ACQUISITIONS', 'INTRA_COMMUNITY_ACQUISITIONS']
         #'SUMMARY',
-        df_local_sales = pd.Dataframe(tax_record_dict.get('LOCAL_SALES')
-        df_local_sales_reverse_charge = pd.Dataframe(tax_record_dict.get('LOCAL_SALES_REVERSE_CHARGE')
-        df_distance_sales = pd.Dataframe(tax_record_dict.get('DISTANCE_SALES')
-        df_non_taxable_distance_sales = pd.Dataframe(tax_record_dict.get('NON_TAXABLE_DISTANCE_SALES')
-        df_intra_community_sales = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_SALES')
-        df_exports = pd.Dataframe(tax_record_dict.get('EXPORTS')
-        df_domestic_acquisitions = pd.Dataframe(tax_record_dict.get('DOMESTIC_ACQUISITIONS')
-        df_intra_community_acquisitions = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS')
+        df_local_sales = pd.Dataframe(tax_record_dict.get('LOCAL_SALES'))
+        df_local_sales_reverse_charge = pd.Dataframe(tax_record_dict.get('LOCAL_SALES_REVERSE_CHARGE'))
+        df_distance_sales = pd.Dataframe(tax_record_dict.get('DISTANCE_SALES'))
+        df_non_taxable_distance_sales = pd.Dataframe(tax_record_dict.get('NON_TAXABLE_DISTANCE_SALES'))
+        df_intra_community_sales = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_SALES'))
+        df_exports = pd.Dataframe(tax_record_dict.get('EXPORTS'))
+        df_domestic_acquisitions = pd.Dataframe(tax_record_dict.get('DOMESTIC_ACQUISITIONS'))
+        df_intra_community_acquisitions = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS'))
         #df_summary = TaxRecordService.calculate_front_page(df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_intra_community_acquisitions)
 
         df_list = [df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_intra_community_acquisitions]
@@ -141,6 +143,8 @@ class TaxRecordService:
     # celery task on this level
     @staticmethod
     def save_as_file(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, basepath: str, user_id: int, tax_jurisdiction_code: str) -> BinaryIO:
+        from ..transaction.service import TransactionService
+
         transactions = TransactionService.get_by_validity_public_id(start_date_str, end_date_str, seller_firm_public_id, tax_jurisdiction_code)
 
         tax_record_dict = TaxRecordService.get_tax_record_dict_from_transactions(transactions)
@@ -272,6 +276,12 @@ class TaxRecordService:
 
     @staticmethod
     def get_tax_record_dict_from_transactions(transactions: Transaction) -> TaxRecordDictInterface:
+        from ..tax.vatin.service import VATINService
+        from ..tax.vatin import VATIN
+        from ..user.service_parent import UserService
+
+
+
         local_sales = local_sales_reverse_charge = distance_sales = non_taxable_distance_sales = intra_community_sales = exports = domestic_acquisitions = intra_community_acquisitions = []
         t_treatment_list=[]
 
@@ -307,7 +317,7 @@ class TaxRecordService:
                 'SELLER_FIRM_ADDRESS': seller_firm.address,
                 'SELLER_FIRM_ESTABLISHMENT_COUNTRY': seller_firm.establishment_country_code,
 
-                'CREATED_BY': UserService.get_by_id(id=transaction_input.created_by).username,
+                'CREATED_BY': UserService.get_by_id(id=transaction_input.created_by).name,
                 'ORIGINAL_FILENAME': transaction_input.original_filename,
 
                 'ACCOUNT_GIVEN_ID': transaction_input.account_given_id,

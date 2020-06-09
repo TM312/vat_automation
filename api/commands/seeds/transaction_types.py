@@ -23,7 +23,7 @@ transaction_types = [
         'description': 'Seller’s inventory is transferred between fulfillment centers.'
     },
     {
-        'code': 'INBOUND'
+        'code': 'INBOUND',
         'description': 'Seller sends inventory to a fulfillment center.'
     }
 ]

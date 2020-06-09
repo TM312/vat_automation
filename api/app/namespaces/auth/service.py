@@ -13,7 +13,7 @@ from .interface import TokenInterface
 from ..user.model_parent import User
 from ..user.service_parent import UserService
 from ..user.interface_parent import UserInterface
-from ..utils.interface import ResponseObjectInterface
+from ..utils.schema import response_object_dto
 
 from ..user.admin.model import Admin
 from ..user.seller.model import Seller
@@ -37,7 +37,7 @@ class TokenService:
 
 
     @staticmethod
-    def login_user(user_data: UserInterface) -> ResponseObjectInterface:
+    def login_user(user_data: UserInterface) -> response_object_dto:
         # fetch the user data
         user = User.query.filter_by(email=user_data.get('email')).first()
         if user and user.check_password(user_data.get('password')):
@@ -67,7 +67,7 @@ class TokenService:
             raise Unauthorized(payload)  # ('Provide a valid auth token.')
 
     @staticmethod
-    def logout_user(auth_token: TokenInterface) -> ResponseObjectInterface:
+    def logout_user(auth_token: TokenInterface) -> response_object_dto:
         # update a user's last_seen attribute & creates a new action object
         # the inspect module needs to be imported whenever ping is called
 
@@ -120,7 +120,7 @@ class TokenService:
             return e
 
     @staticmethod
-    def decode_auth_token(auth_token: TokenInterface) -> Dict[TokenInterface]:
+    def decode_auth_token(auth_token: TokenInterface) -> Dict:
         """
         Decodes the auth token
         :param auth_token:
@@ -142,4 +142,4 @@ class TokenService:
     @staticmethod
     def check_blacklisted(auth_token: TokenInterface) -> bool:
         # check whether auth token has been blacklisted
-        return return True if Token.query.filter_by(token=str(auth_token)).first() != None else False
+        return True if Token.query.filter_by(token=str(auth_token)).first() != None else False

@@ -3,6 +3,7 @@ from datetime import date, datetime
 from uuid import UUID
 
 class BusinessInterface(TypedDict, total=False):
+    id: int
     public_id: UUID
     created_by: str
     created_on: datetime

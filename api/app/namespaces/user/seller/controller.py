@@ -11,7 +11,6 @@ from .service import SellerService
 from .model import Seller
 from .interface import SellerInterface
 
-from ...auth.interface import TokenInterface
 from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
 
 
@@ -24,31 +23,37 @@ ns.add_model(seller_dto.name, seller_dto)
 # https://github.com/python-restx/flask-restx/blob/014eb9591e61cd3adbbd29a38b76df6a688f067b/flask_restx/namespace.py
 
 
-@ns.route("/")
+@ns.route('/')
 class SellerResource(Resource):
-    # @ns.param("public_id", "Public seller ID")
+    '''Get all Seller'''
     @login_required
-    @ns.marshal_with(seller_dto, envelope='data')
-    def get(self) -> Seller:
-        """ Current Seller Seller """
-        return g.user
+    @accepted_u_types('admin')
+    @ns.marshal_list_with(seller_dto, envelope='data')
+    def get(self) -> List[Seller]:
+        '''List Of Registered Seller Firms'''
+        return SellerService.get_all()
 
-    @ns.expect(seller_dto, validate=True)
-    def post(self):
-        """Create A Single Seller"""
-        seller_data: SellerInterface = request.json
-        return SellerService.create_self(seller_data)
-
-    @login_required
-    def delete(self) -> Response:
-        """Delete self"""
-        return SellerService.delete_by_id(g.user.public_id)
-
-    @login_required
+    @accepted_u_types('admin')
     @ns.expect(seller_dto, validate=True)
     @ns.marshal_with(seller_dto)
-    def put(self) -> Seller:
-        """Update self"""
-        data_changes: SellerInterface = request.json  # JSON body of a request
-        seller = g.user
-        return SellerService.update(seller, data_changes)
+    def post(self):
+        """Create A Single Seller Firm"""
+        admin_data: SellerInterface = request.json
+        return SellerService.create(admin_data)
+
+
+@ns.route('/<int:seller_id>')
+@ns.param('seller_id', 'Seller firm ID')
+class SellerIdResource(Resource):
+    @login_required
+    @accepted_u_types('admin')
+    @ns.marshal_with(seller_dto)
+    def get(self, seller_id: int) -> Seller:
+        '''Get One Seller'''
+        return SellerService.get_by_id(seller_id)
+
+    @login_required
+    @accepted_u_types('admin')
+    def delete(self, seller_id: int) -> Response:
+        '''Delete A Single Seller'''
+        return SellerService.delete_by_id(seller_id)

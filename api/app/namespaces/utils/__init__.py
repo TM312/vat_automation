@@ -1,5 +1,6 @@
 from .decorators.asyncd import asyncd
 from .decorators.auth import login_required, accepted_u_types, confirmation_required, employer_required
+from .schema import notification_dto, transaction_notification_dto
 
 BASE_ROUTE = "utils"
 

@@ -1,9 +1,10 @@
 import re
+from .model import VATIN
+from .schema import vatin_dto
 
-import logging
 
 
-logger = logging.getLogger("vatin")
+
 
 
 def dk_format(v):

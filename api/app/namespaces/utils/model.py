@@ -9,8 +9,8 @@ class Notification(db.Model):
     status = db.Column(db.String(16))
     message = db.Column(db.String(256))
 
-    discriminator = db.Column('n_type', db.String(56))
-    __mapper_args__ = {'polymorphic_on': discriminator}
+    n_type = db.Column(db.String(56))
+    __mapper_args__ = {'polymorphic_on': n_type}
 
 
     def __init__(self, **kwargs):

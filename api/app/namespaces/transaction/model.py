@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..tax.tax_treatment import tax_treatment_transaction_type_AT
+from ..utils.ATs import tax_treatment_transaction_type_AT
 
 from app.extensions import db  # noqa
 
@@ -11,7 +11,7 @@ class TransactionType(db.Model):  # type: ignore
     code = db.Column(db.String(16), primary_key=True)
     description = db.Column(db.String(128))
 
-    tax_treatment_codes = db.relationship(
+    tax_treatments = db.relationship(
         "TaxTreatment",
         secondary=tax_treatment_transaction_type_AT,
         back_populates="transaction_types"
@@ -21,7 +21,7 @@ class TransactionType(db.Model):  # type: ignore
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<TransactionType: {}>'.format(self.name)
+        return '<TransactionType: {}>'.format(self.code)
 
 
 class Transaction(db.Model):  # type: ignore
@@ -50,8 +50,8 @@ class Transaction(db.Model):  # type: ignore
     tax_calculation_date = db.Column(db.Date, nullable=False)
     item_tax_code_code = db.Column(db.String(8), nullable=False)
     item_tax_rate_type_code = db.Column(db.String(8), db.ForeignKey('tax_rate_type.code'), nullable=False)
-    shipment_tax_rate_type_code
-    gift_wrap_tax_rate_type_code
+    shipment_tax_rate_type_code = db.Column(db.String(8))
+    gift_wrap_tax_rate_type_code = db.Column(db.String(8))
     item_price_net = db.Column(db.Numeric(scale=2))
     item_price_discount_net = db.Column(db.Numeric(scale=2))
     item_price_total_net = db.Column(db.Numeric(scale=2))
@@ -85,86 +85,12 @@ class Transaction(db.Model):  # type: ignore
     invoice_amount_gross = db.Column(db.Numeric(scale=2))
     vat_rate_reverse_charge = db.Column(db.Numeric(scale=2))
     invoice_amount_vat_reverse_charge = db.Column(db.Numeric(scale=2))
-    arrival_seller_vatin_id db.Column(db.Integer)
-    departure_seller_vatin_id db.Column(db.Integer)
-    seller_vatin_id db.Column(db.Integer)
+    arrival_seller_vatin_id = db.Column(db.Integer)
+    departure_seller_vatin_id = db.Column(db.Integer)
+    seller_vatin_id = db.Column(db.Integer)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # tax_calculation_date = db.Column(db.Date)
-    # item_price_discount_net = db.Column(db.Float(precision=24))
-    # item_price_discount_vat = db.Column(db.Float(precision=24))
-    # item_price_net = db.Column(db.Float(precision=24))
-    # item_price_vat = db.Column(db.Float(precision=24))
-    # item_price_total_net = db.Column(db.Float(precision=24))
-    # item_price_total_vat = db.Column(db.Float(precision=24))
-    # item_price_vat_rate = db.Column(db.Float(precision=24))
-    # shipment_price_discount_net = db.Column(db.Float(precision=24))
-    # shipment_price_discount_vat = db.Column(db.Float(precision=24))
-    # shipment_price_net = db.Column(db.Float(precision=24))
-    # shipment_price_vat = db.Column(db.Float(precision=24))
-    # shipment_price_total_net = db.Column(db.Float(precision=24))
-    # shipment_price_total_vat = db.Column(db.Float(precision=24))
-    # shipment_price_vat_rate = db.Column(db.Float(precision=24))
-    # sale_total_value_net = db.Column(db.Float(precision=24))
-    # sale_total_value_vat = db.Column(db.Float(precision=24))
-    # gift_wrap_price_discount_net = db.Column(db.Float(precision=24))
-    # gift_wrap_price_discount_vat = db.Column(db.Float(precision=24))
-    # gift_wrap_price_net = db.Column(db.Float(precision=24))
-    # gift_wrap_price_vat = db.Column(db.Float(precision=24))
-    # gift_wrap_price_total_net = db.Column(db.Float(precision=24))
-    # gift_wrap_price_total_vat = db.Column(db.Float(precision=24))
-    # gift_wrap_price_tax_rate = db.Column(db.Float(precision=24))
-    # item_tax_code_code = db.Column(db.String(8))
-    # departure_seller_vat_country_code = db.Column(db.String(8))
-    # departure_seller_vat_number = db.Column(db.String(24))
-    # arrival_seller_vat_country_code = db.Column(db.String(8))
-    # arrival_seller_vat_number = db.Column(db.String(24))
-    # seller_vat_country_code = db.Column(db.String(8))
-    # seller_vat_number = db.Column(db.String(24))
-    # tax_calculation_imputation_country = db.Column(db.String(24))
-    # tax_jurisdiction = db.Column(db.String(24))
-    # tax_jurisdiction_level = db.Column(db.String(24))
-    # invoice_amount_vat = db.Column(db.Float(precision=24))
-    # invoice_currency_code = db.Column(db.String(8))
-    # invoice_exchange_rate = db.Column(db.Float(precision=24))
-    # invoice_exchange_rate_date = db.Column(db.Date)
-    # export = db.Column(db.Boolean)
-
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
     def __repr__(self):

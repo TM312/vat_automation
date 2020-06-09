@@ -14,11 +14,8 @@ from .model import SellerFirm
 from .interface import SellerFirmInterface
 from .schema import seller_firm_dto
 
-from ..service_parent import BusinessService
-from ...tax.vatin.service import VATINService
-from ...tax.vatin.model import VATIN
 from ...utils.service import InputService, NotificationService
-from ...utils.interface import ResponseObjectInterface
+from ...utils import response_object_dto
 
 
 class SellerFirmService:
@@ -28,23 +25,25 @@ class SellerFirmService:
         return seller_firms
 
     @staticmethod
-    def get_by_id(public_id: UUID) -> SellerFirm:
-        seller_firm = SellerFirm.query.filter_by(public_id = public_id).first()
-        if seller_firm:
-            return seller_firm
+    def get_by_public_id(public_id: UUID) -> SellerFirm:
+        return SellerFirm.query.filter_by(public_id = public_id).first()
+
+    @staticmethod
+    def get_by_id(seller_firm_id: int) -> SellerFirm:
+        return SellerFirm.query.filter_by(id=seller_firm_id).first()
 
 
     @staticmethod
-    def update(public_id: UUID, data_changes: SellerFirmInterface) -> SellerFirm:
-        seller_firm = SellerFirmService.get_by_id(public_id)
+    def update(seller_firm_id: int, data_changes: SellerFirmInterface) -> SellerFirm:
+        seller_firm = SellerFirmService.get_by_id(seller_firm_id)
         seller_firm.update(data_changes)
         db.session.commit()
         return seller_firm
 
     @staticmethod
-    def delete_by_id(public_id: UUID) -> ResponseObjectInterface:
+    def delete_by_id(seller_firm_id: int) -> response_object_dto:
         #check if accounting business exists in db
-        seller_firm = SellerFirm.query.filter(SellerFirm.public_id == public_id).first()
+        seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
         if seller_firm:
             db.session.delete(seller_firm)
             db.session.commit()
@@ -59,28 +58,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def get_vatin_or_None_and_verify(transaction_input: TransactionInput, country_code_temp: str, number_temp: str, date: date) -> VATIN:
-
-        vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-        if isinstance(vatin: VATIN):
-            business = BusinessService.get_by_name_address_or_None(vatin.name, vatin.address)
-
-        # if isinstance(business, SellerFirm):
-            # if not business.id != vatin.business_id: #potentially a notification
-            #     notification_data = {
-            #         'subject': '{}s Not Matching'.format(main_subject),
-            #         'original_filename': original_filename,
-            #         'status': 'warning',
-            #         'message': 'The '.format(reference_value, calculated_value),
-            #         'transaction_input_id': transaction_input_id
-            #     }
-            #     NotificationService.create_transaction_notification(notification_data)
-
-        return vatin
-
-
-    @staticmethod
-    def create_seller_firm(seller_firm_data: SellerFirmInterface) -> SellerFirm:
+    def create(seller_firm_data: SellerFirmInterface) -> SellerFirm:
 
         new_seller_firm = SellerFirm(
             claimed = seller_firm_data.get('claimed'),
@@ -125,7 +103,7 @@ class SellerFirmService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> ResponseObjectInterface:
+    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> response_object_dto:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'
@@ -150,7 +128,7 @@ class SellerFirmService:
 
     # celery task !!
     @staticmethod
-    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = SellerFirmService.create_seller_firms(df, file_path_in, user_id, **kwargs)
@@ -164,7 +142,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]: #upload only for tax auditors
+    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]: #upload only for tax auditors
         error_counter = 0
         total_number_items = len(df.index)
         input_type = 'seller firm'  # only used for response objects
@@ -182,7 +160,7 @@ class SellerFirmService:
             }
 
             try:
-                SellerFirmService.create_seller_firm(seller_firm_data)
+                SellerFirmService.create(seller_firm_data)
 
             except:
                 db.session.rollback()

@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
-from .interface import ResponseObjectInterface
+from .interface import response_object_dto
 from .model import TransactionNotification
 
 from werkzeug.utils import secure_filename
@@ -54,10 +54,10 @@ class NotificationService:
     @staticmethod
     def create_transaction_notification(notification_data):
         new_notification = TransactionNotification(
-            subject=notification_data.get('subject')
-            original_filename = notification_data.get('original_filename')
-            status = notification_data.get('status')
-            message = notification_data.get('message')
+            subject=notification_data.get('subject'),
+            original_filename = notification_data.get('original_filename'),
+            status = notification_data.get('status'),
+            message = notification_data.get('message'),
             transaction_input_id = notification_data.get('transaction_input_id')
         )
 
@@ -133,7 +133,7 @@ class InputService:
 
 
     @staticmethod
-    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[response_object_dto]:
         response_objects = []
         success_status = 'successfully'
         notification = ''

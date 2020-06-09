@@ -2,7 +2,6 @@
 from app.extensions import db, migrate, bcrypt, mail, cors
 #from app.logs.service import LogService
 from flask import Flask, jsonify
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -15,7 +14,7 @@ def create_app(env):
     register_api(app)
     # !!! LogService.setup_logging(app)
 
-    # for testing purposes of the client (--> '.__init___test.py')
+    # for testing purposes of the client (--> '.__init__test.py')
     @app.route("/ping_3f5ca2711e72a507")
     def ping():
         return jsonify("pong_3f5ca2711e72a507")

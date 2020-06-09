@@ -1,6 +1,9 @@
 from typing import List
-from .model import Channel
 from app.extensions import db
+
+
+from . import Channel
+from .interface import ChannelInterface
 
 class ChannelService:
     @staticmethod
@@ -10,20 +13,18 @@ class ChannelService:
 
     @staticmethod
     def get_by_code(code: str) -> Channel:
-        channel = Channel.query.filter(Channel.code == code).first()
-        if channel:
-            return channel
+        return Channel.query.filter(Channel.code == code).first()
 
 
     @staticmethod
-    def update(code: str, data_changes: dict) -> Channel:
-        channel = ChannelService.get_by_id(code)
+    def update(code: str, data_changes: ChannelInterface) -> Channel:
+        channel = ChannelService.get_by_code(code)
         channel.update(data_changes)
         db.session.commit()
         return channel
 
     @staticmethod
-    def delete_by_id(code: str):
+    def delete_by_code(code: str):
         channel = Channel.query.filter(Channel.code == code).first()
         if channel:
             db.session.delete(channel)
@@ -38,7 +39,7 @@ class ChannelService:
             raise NotFound('This channel does not exist.')
 
     @staticmethod
-    def create_channel(channel_data: dict) -> Channel:
+    def create(channel_data: ChannelInterface) -> Channel:
 
         new_channel = Channel(
             code = channel_data.get('code'),

@@ -5,22 +5,19 @@ from datetime import date, timedelta
 from flask import g, current_app
 from app.extensions import db
 
-from .model import DistanceSale
+from . import DistanceSale
 from .interface import DistanceSaleInterface
 from ...utils.service import InputService
-from ...utils.interface import ResponseObjectInterface
-from ...business.seller_firm.service import SellerFirmService
-
+from ...utils.schema import response_object_dto
 
 
 
 
 class DistanceSaleService:
 
-
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_distance_sale_files_upload(distance_sale_information_files: List[BinaryIO], **kwargs) -> ResponseObjectInterface:
+    def process_distance_sale_files_upload(distance_sale_information_files: List[BinaryIO], **kwargs) -> response_object_dto:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'distance_sale_list'
@@ -33,7 +30,7 @@ class DistanceSaleService:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
             DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
-         response_object = {
+        response_object = {
             'status': 'success',
             'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(distance_sale_information_files)))
         }
@@ -44,7 +41,7 @@ class DistanceSaleService:
 
     # celery task !!
     @staticmethod
-    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
@@ -59,7 +56,9 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[ResponseObjectInterface]:
+    def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+        from ...business.seller_firm.service import SellerFirmService
+
         TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 
         redundancy_counter = 0
@@ -138,7 +137,7 @@ class DistanceSaleService:
 
         # if an distance_sale with the same sku for the specified validity period already exists, it is being updated or deleted.
         if distance_sale:
-           if distance_sale.valid_from >= valid_from:
+            if distance_sale.valid_from >= valid_from:
                 db.session.delete(distance_sale)
 
             else:

@@ -1,7 +1,16 @@
-from mypy_extensions import TypedDict
+from typing import TypedDict
+from datetime import datetime
 
 
-class ResponseObjectInterface(TypedDict, total=False):
+class NotificationInterface(TypedDict, total=False):
+    id: int
+    created_on: datetime
+    subject: str
     status: str
     message: str
-    token: str
+    n_type: str
+
+
+class TransactionNotificationInterface(NotificationInterface):
+    transaction_input_id: int
+    original_filename: str

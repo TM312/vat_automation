@@ -6,46 +6,65 @@ from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
 
-from .schema import seller_firm_dto
+from . import SellerFirm
+from . import seller_firm_dto
 from .service import SellerFirmService
-from .model import SellerFirm
 from .interface import SellerFirmInterface
 
-from ...auth import TokenInterface
-from ...utils import login_required, accepted_u_types, confirmation_required
+from ...utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required
 
 
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa
 ns.add_model(seller_firm_dto.name, seller_firm_dto)
 
 
-@ns.route("/")
+
+@ns.route('/')
 class SellerFirmResource(Resource):
+    '''Get all SellerFirm Firms'''
     @login_required
-    @ns.marshal_with(seller_firm_dto)
-    def get(self) -> SellerFirm:
-        """Get own Accounting Firm"""
-        seller = g.user
-        return SellerFirmService.get_own(seller)
+    @accepted_u_types('admin')
+    @ns.marshal_list_with(seller_firm_dto, envelope='data')
+    def get(self) -> List[SellerFirm]:
+        '''List Of Registered SellerFirm Firms'''
+        return SellerFirmService.get_all()
 
     @ns.expect(seller_firm_dto, validate=True)
+    @ns.marshal_with(seller_firm_dto)
     def post(self):
         """Create A Single Seller Firm"""
         seller_firm_data: SellerFirmInterface = request.json
-        return SellerFirmService.create_seller_firm(seller_firm_data)
+        return SellerFirmService.create(seller_firm_data)
 
-    @login_required
-    def delete(self) -> Response:
-        """Delete A Single Seller Firm"""
-        seller = g.user
-        return SellerFirmService.delete_own(seller)
 
+@ns.route('/<int:seller_firm_id>')
+@ns.param('seller_firm_id', 'Seller firm ID')
+class SellerFirmIdResource(Resource):
     @login_required
-    @ns.expect(seller_firm_dto, validate=True)
+    @accepted_u_types('admin')
     @ns.marshal_with(seller_firm_dto)
-    #@accepted_u_types('admin', 'seller')
-    def put(self) -> SellerFirm:
-        """Update A own Seller Firm"""
-        seller = g.user
-        data_changes: SellerFirmInterface = request.json  # JSON body of a request
-        return SellerFirmService.update_own(seller, data_changes)
+    def get(self, seller_firm_id: int) -> SellerFirm:
+        '''Get One SellerFirm'''
+        return SellerFirmService.get_by_id(seller_firm_id)
+
+    @login_required
+    @accepted_u_types('admin')
+    def delete(self, seller_firm_id: int) -> Response:
+        '''Delete A Single SellerFirm'''
+        return SellerFirmService.delete_by_id(seller_firm_id)
+
+
+
+@ns.route("/csv")
+class SellerFirmInformationResource(Resource):
+    @login_required
+    @employer_required
+    # @confirmation_required
+    # !!! @ns.expect(tax_record_dto, validate=True)
+    def post(self):
+        """Create an unclaimed seller firm as a client"""
+        seller_firm_information_files: List[BinaryIO] = request.files.getlist("files")
+        print("POST file received")
+        print('uploaded_files')
+        print(seller_firm_information_files)
+        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed=False)

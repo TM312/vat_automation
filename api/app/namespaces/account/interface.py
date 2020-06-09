@@ -1,6 +1,6 @@
 from mypy_extensions import TypedDict
+from typing import List
 from datetime import datetime
-from uuid import UUID
 
 class AccountInterface(TypedDict, total=False):
     given_id: str
@@ -9,3 +9,4 @@ class AccountInterface(TypedDict, total=False):
     modified_at: datetime
     channel_code: str
     seller_firm_id: int
+    transactions: List['app.namespaces.transaction.Transaction']

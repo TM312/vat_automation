@@ -1,11 +1,6 @@
 from app.extensions import db
+from ...utils.ATs import tax_treatment_transaction_type_AT
 
-
-tax_treatment_transaction_type_AT = db.Table(
-    'tax_treatment_transaction_type_AT',
-    db.Column('tax_treatment_code', db.Integer, db.ForeignKey('tax_treatment.code'), primary_key=True),
-    db.Column('transaction_type_code', db.Integer, db.ForeignKey('transaction_type.code'), primary_key=True)
-    )
 
 
 class TaxTreatment(db.Model):  # type: ignore
@@ -18,20 +13,19 @@ class TaxTreatment(db.Model):  # type: ignore
     description = db.Column(db.String(512))
 
 
-    transaction_type_codes = db.relationship(
+    transaction_types = db.relationship(
         "TransactionType",
         secondary=tax_treatment_transaction_type_AT,
         back_populates="tax_treatments"
     )
 
-    transactions = db.relationship(
-        'Transaction', backref='tax_treatment', lazy=True)
+    transactions = db.relationship('Transaction', backref='tax_treatment', lazy=True)
 
     def __init__(self, **kwargs):
-        super(TaxTreatment, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<TaxTreatment: {} – {}>'.format(self.name, self.transaction_type_name)
+        return '<TaxTreatment: {}>'.format(self.code)
 
 
 # Transaction Type --> TaxTreatment

@@ -1,0 +1,249 @@
+﻿name,code,eu_1
+Afghanistan,AF,FALSE
+Albania,AL,FALSE
+Algeria,DZ,FALSE
+American Samoa,AS,FALSE
+Andorra,AD,FALSE
+Angola,AO,FALSE
+Anguilla,AI,FALSE
+Antarctica,AQ,FALSE
+Antigua and Barbuda,AG,FALSE
+Argentina,AR,FALSE
+Armenia,AM,FALSE
+Aruba,AW,FALSE
+Australia,AU,FALSE
+Austria,AT,TRUE
+Azerbaijan,AZ,FALSE
+Bahamas,BS,FALSE
+Bahrain,BH,FALSE
+Bangladesh,BD,FALSE
+Barbados,BB,FALSE
+Belarus,BY,FALSE
+Belgium,BE,TRUE
+Belize,BZ,FALSE
+Benin,BJ,FALSE
+Bermuda,BM,FALSE
+Bhutan,BT,FALSE
+Bolivia,BO,FALSE
+Bonaire,BQ,FALSE
+Bosnia and Herzegovina,BA,FALSE
+Botswana,BW,FALSE
+Bouvet Island,BV,FALSE
+Brazil,BR,FALSE
+British Indian Ocean Territory,IO,FALSE
+Brunei Darussalam,BN,FALSE
+Bulgaria,BG,TRUE
+Burkina Faso,BF,FALSE
+Burundi,BI,FALSE
+Cambodia,KH,FALSE
+Cameroon,CM,FALSE
+Canada,CA,FALSE
+Cape Verde,CV,FALSE
+Cayman Islands,KY,FALSE
+Central African Republic,CF,FALSE
+Chad,TD,FALSE
+Chile,CL,FALSE
+China,CN,FALSE
+Christmas Island,CX,FALSE
+Cocos (Keeling) Islands,CC,FALSE
+Colombia,CO,FALSE
+Comoros,KM,FALSE
+Congo,CG,FALSE
+Democratic Republic of the Congo,CD,FALSE
+Cook Islands,CK,FALSE
+Costa Rica,CR,FALSE
+Croatia,HR,TRUE
+Cuba,CU,FALSE
+Curacao,CW,FALSE
+Cyprus,CY,TRUE
+Czech Republic,CZ,TRUE
+Cote d'Ivoire,CI,FALSE
+Denmark,DK,TRUE
+Djibouti,DJ,FALSE
+Dominica,DM,FALSE
+Dominican Republic,DO,FALSE
+Ecuador,EC,FALSE
+Egypt,EG,FALSE
+El Salvador,SV,FALSE
+Equatorial Guinea,GQ,FALSE
+Eritrea,ER,FALSE
+Estonia,EE,TRUE
+Ethiopia,ET,FALSE
+Falkland Islands (Malvinas),FK,FALSE
+Faroe Islands,FO,FALSE
+Fiji,FJ,FALSE
+Finland,FI,TRUE
+France,FR,TRUE
+French Guiana,GF,FALSE
+French Polynesia,PF,FALSE
+French Southern Territories,TF,FALSE
+Gabon,GA,FALSE
+Gambia,GM,FALSE
+Georgia,GE,FALSE
+Germany,DE,TRUE
+Ghana,GH,FALSE
+Gibraltar,GI,FALSE
+Greece,GR,TRUE
+Greenland,GL,FALSE
+Grenada,GD,FALSE
+Guadeloupe,GP,FALSE
+Guam,GU,FALSE
+Guatemala,GT,FALSE
+Guernsey,GG,FALSE
+Guinea,GN,FALSE
+Guinea-Bissau,GW,FALSE
+Guyana,GY,FALSE
+Haiti,HT,FALSE
+Heard Island and McDonald Islands,HM,FALSE
+Holy See (Vatican City State),VA,FALSE
+Honduras,HN,FALSE
+Hong Kong,HK,FALSE
+Hungary,HU,TRUE
+Iceland,IS,FALSE
+India,IN,FALSE
+Indonesia,ID,FALSE
+"Iran, Islamic Republic of",IR,FALSE
+Iraq,IQ,FALSE
+Ireland,IE,TRUE
+Isle of Man,IM,FALSE
+Israel,IL,FALSE
+Italy,IT,TRUE
+Jamaica,JM,FALSE
+Japan,JP,FALSE
+Jersey,JE,FALSE
+Jordan,JO,FALSE
+Kazakhstan,KZ,FALSE
+Kenya,KE,FALSE
+Kiribati,KI,FALSE
+"Korea, Democratic People's Republic of",KP,FALSE
+"Korea, Republic of",KR,FALSE
+Kuwait,KW,FALSE
+Kyrgyzstan,KG,FALSE
+Lao People's Democratic Republic,LA,FALSE
+Latvia,LV,TRUE
+Lebanon,LB,FALSE
+Lesotho,LS,FALSE
+Liberia,LR,FALSE
+Libya,LY,FALSE
+Liechtenstein,LI,FALSE
+Lithuania,LT,TRUE
+Luxembourg,LU,TRUE
+Macao,MO,FALSE
+North Macedonia,MK,FALSE
+Madagascar,MG,FALSE
+Malawi,MW,FALSE
+Malaysia,MY,FALSE
+Maldives,MV,FALSE
+Mali,ML,FALSE
+Malta,MT,TRUE
+Marshall Islands,MH,FALSE
+Martinique,MQ,FALSE
+Mauritania,MR,FALSE
+Mauritius,MU,FALSE
+Mayotte,YT,FALSE
+Mexico,MX,FALSE
+"Micronesia, Federated States of",FM,FALSE
+"Moldova, Republic of",MD,FALSE
+Monaco,MC,FALSE
+Mongolia,MN,FALSE
+Montenegro,ME,FALSE
+Montserrat,MS,FALSE
+Morocco,MA,FALSE
+Mozambique,MZ,FALSE
+Myanmar,MM,FALSE
+Namibia,NA,FALSE
+Nauru,NR,FALSE
+Nepal,NP,FALSE
+Netherlands,NL,TRUE
+New Caledonia,NC,FALSE
+New Zealand,NZ,FALSE
+Nicaragua,NI,FALSE
+Niger,NE,FALSE
+Nigeria,NG,FALSE
+Niue,NU,FALSE
+Norfolk Island,NF,FALSE
+Northern Mariana Islands,MP,FALSE
+Norway,NO,FALSE
+Oman,OM,FALSE
+Pakistan,PK,FALSE
+Palau,PW,FALSE
+"Palestine, State of",PS,FALSE
+Panama,PA,FALSE
+Papua New Guinea,PG,FALSE
+Paraguay,PY,FALSE
+Peru,PE,FALSE
+Philippines,PH,FALSE
+Pitcairn,PN,FALSE
+Poland,PL,TRUE
+Portugal,PT,TRUE
+Puerto Rico,PR,FALSE
+Qatar,QA,FALSE
+Romania,RO,TRUE
+Russian Federation,RU,FALSE
+Rwanda,RW,FALSE
+Reunion,RE,FALSE
+Saint Barthelemy,BL,FALSE
+Saint Helena,SH,FALSE
+Saint Kitts and Nevis,KN,FALSE
+Saint Lucia,LC,FALSE
+Saint Martin (French part),MF,FALSE
+Saint Pierre and Miquelon,PM,FALSE
+Saint Vincent and the Grenadines,VC,FALSE
+Samoa,WS,FALSE
+San Marino,SM,FALSE
+Sao Tome and Principe,ST,FALSE
+Saudi Arabia,SA,FALSE
+Senegal,SN,FALSE
+Serbia,RS,FALSE
+Seychelles,SC,FALSE
+Sierra Leone,SL,FALSE
+Singapore,SG,FALSE
+Sint Maarten (Dutch part),SX,FALSE
+Slovakia,SK,TRUE
+Slovenia,SI,TRUE
+Solomon Islands,SB,FALSE
+Somalia,SO,FALSE
+South Africa,ZA,FALSE
+South Georgia and the South Sandwich Islands,GS,FALSE
+South Sudan,SS,FALSE
+Spain,ES,TRUE
+Sri Lanka,LK,FALSE
+Sudan,SD,FALSE
+Suriname,SR,FALSE
+Svalbard and Jan Mayen,SJ,FALSE
+Swaziland,SZ,FALSE
+Sweden,SE,TRUE
+Switzerland,CH,FALSE
+Syrian Arab Republic,SY,FALSE
+Taiwan,TW,FALSE
+Tajikistan,TJ,FALSE
+United Republic of Tanzania,TZ,FALSE
+Thailand,TH,FALSE
+Timor-Leste,TL,FALSE
+Togo,TG,FALSE
+Tokelau,TK,FALSE
+Tonga,TO,FALSE
+Trinidad and Tobago,TT,FALSE
+Tunisia,TN,FALSE
+Turkey,TR,FALSE
+Turkmenistan,TM,FALSE
+Turks and Caicos Islands,TC,FALSE
+Tuvalu,TV,FALSE
+Uganda,UG,FALSE
+Ukraine,UA,FALSE
+United Arab Emirates,AE,FALSE
+United Kingdom,GB,TRUE
+United States,US,FALSE
+United States Minor Outlying Islands,UM,FALSE
+Uruguay,UY,FALSE
+Uzbekistan,UZ,FALSE
+Vanuatu,VU,FALSE
+Venezuela,VE,FALSE
+Viet Nam,VN,FALSE
+British Virgin Islands,VG,FALSE
+US Virgin Islands,VI,FALSE
+Wallis and Futuna,WF,FALSE
+Western Sahara,EH,FALSE
+Yemen,YE,FALSE
+Zambia,ZM,FALSE
+Zimbabwe,ZW,FALSE

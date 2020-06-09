@@ -23,17 +23,6 @@ Get initial tests from here:
 	* background jobs _redis queue_? _frequency:_ daily | _ideas from here: [https://realpython.com/flask-by-example-implementing-a-redis-task-queue/]
 		* transactions, etc.
 
-2. Modules --> Amazon --> Services --> Dashboard
-	* entity
-	*
-
-3. Modules --> Amazon --> Services --> VAT
-	* VAT model
-	* background jobs _redis queue_? _frequency:_ daily
-		* exchange rate
-
-4. Modules --> Amazon --> (billing)
-
 ### Other things
 * Mail
     * ~~Registration/Confirmation~~
@@ -42,7 +31,6 @@ Get initial tests from here:
     * eg. ~~admin~~, rate limit | _ideas from here_: [http://pycoder.net/bospy/presentation.html#bonus-material]
 
 ### Deployment
-* Docker container
 * AWS EC2 Cluster, load balancing
 --> check out: [https://github.com/Miserlou/Zappa] for *Servless* (however that exactly works)
 
@@ -83,9 +71,7 @@ path
 ### Seeding the database
 
 ```
-python manage.py fake_users_db
 
-python manage.py initial_users_db
 ```
 
 ### Running the app

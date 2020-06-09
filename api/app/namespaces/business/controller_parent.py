@@ -7,41 +7,41 @@ from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
 
-from .schema import business_dto
-from .service import BusinessService
-from .model import Business
+from . import Business
+from .schema_parent import business_dto
+from .service_parent import BusinessService
+from .interface_parent import BusinessInterface
 
-from ..auth import TokenInterface
 from ..utils import login_required, accepted_u_types
 
 
-ns = Namespace("Business", description="Business Related Operations")  # noqa
+ns = Namespace('Business', description='Business Related Operations')  # noqa
 ns.add_model(business_dto.name, business_dto)
 
 
-@ns.route("/")
-class AdminAccountingListResource(Resource):
-    """Get all Accounting Firms"""
+@ns.route('/')
+class AdminBusinessListResource(Resource):
+    '''Get all Business Firms'''
     @login_required
     @accepted_u_types('admin')
     @ns.marshal_list_with(business_dto, envelope='data')
-    def get(self) -> List[Accounting]:
-        """List Of Registered Accounting Firms"""
+    def get(self) -> List[Business]:
+        '''List Of Registered Business Firms'''
         return BusinessService.get_all()
 
 
-@ns.route("/<string:public_id>")
-@ns.param("public_id", "Public accounting business ID")
-class AdminAccountingIdResource(Resource):
+@ns.route('/<string:public_id>')
+@ns.param('public_id', 'Public accounting business ID')
+class AdminBusinessIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.marshal_with(business_dto)
     def get(self, public_id: str) -> Business:
-        """Get One Accounting"""
+        '''Get One Business'''
         return BusinessService.get_by_id(UUID(public_id))
 
     @login_required
     @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
-        """Delete A Single Business"""
+        '''Delete A Single Business'''
         return BusinessService.delete_by_id(UUID(public_id))

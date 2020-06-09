@@ -1,3 +1,4 @@
+from .model import Token
 
 BASE_ROUTE = "auth"
 

@@ -6,22 +6,21 @@ from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from app.extensions import db
 from .model import Seller
-from .schema import seller_dto
+from .interface import SellerInterface
+
 
 from ...email.service import EmailService
 
 
 class SellerService:
-    # seller seller register self path
-     # check if seller already exists in db
-    def create_self(seller_data) -> Seller:
+    @staticmethod
+    def create(seller_data: SellerInterface) -> Seller:
         seller = Seller.query.filter_by(email=seller_data.get('email')).first()
         if not seller:
             #create new seller based on Seller model
             new_seller = Seller(
                 email=seller_data.get('email'),
                 password=seller_data.get('password'),
-                claimed=True,
                 role='employee'
             )
             #add seller to db
@@ -47,7 +46,7 @@ class SellerService:
         else:
             response_object = {
                 'status': 'error',
-                'message': 'A seller with the this email address already exists. Try logging in instead.'.format(public_id)
+                'message': 'A seller with the this email address already exists. Try logging in instead.'
             }
             return response_object
 

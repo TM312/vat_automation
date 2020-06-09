@@ -8,16 +8,15 @@ class SellerFirm(Business):
     __mapper_args__ = {'polymorphic_identity': 'seller_firm'}
 
     claimed = db.Column(db.Boolean, default=False)
-    establishment_country_code = db.Column(db.Integer, db.ForeignKey('country.code'))
+    establishment_country_code = db.Column(db.String(8), db.ForeignKey('country.code'))
 
-    vat_numbers = db.relationship('VATIN', backref='business', lazy=True)
 
     # https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/inheritance.html
     @declared_attr
     def employees(cls):
-        "Employees column, if not present already."
-        return Business.__table__.c.get('employees', db.relationship(
-            'Seller', backref='employer', lazy=True))
+        'Employees column, if not present already.'
+        # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
+        return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
 
     distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy=True)
     items = db.relationship('Item', backref='seller_firm', lazy=True)
@@ -37,4 +36,4 @@ class SellerFirm(Business):
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<SellerFirm: {}>'.format(self.name)
+        return '<SellerFirm: {} | Address: {}>'.format(self.name, self.name)
