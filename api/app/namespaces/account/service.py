@@ -1,12 +1,11 @@
 from flask import g, current_app
 from app.extensions import db
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Dict
 import pandas as pd
 
 from . import Account
 from .interface import AccountInterface
 from ..utils.service import InputService
-from ..utils.schema import response_object_dto
 from ..business.seller_firm.service import SellerFirmService
 
 
@@ -57,7 +56,7 @@ class AccountService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> response_object_dto:
+    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'account_list'
@@ -81,7 +80,7 @@ class AccountService:
 
     # celery task !!
     @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
@@ -96,7 +95,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
 
         redundancy_counter = 0
         error_counter = 0

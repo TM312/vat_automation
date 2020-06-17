@@ -21,8 +21,7 @@ class TaxTreatment(db.Model):  # type: ignore
 
     transactions = db.relationship('Transaction', backref='tax_treatment', lazy=True)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+
 
     def __repr__(self):
         return '<TaxTreatment: {}>'.format(self.code)

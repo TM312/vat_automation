@@ -1,5 +1,4 @@
 from flask_restx import Model, fields
-from ..transaction import transaction_dto
 
 
 account_dto = Model('account', {
@@ -9,6 +8,5 @@ account_dto = Model('account', {
     'created_on': fields.DateTime(readonly=True),
     'modified_at': fields.DateTime(readonly=True),
     'channel_code': fields.String,
-    'seller_firm_id': fields.Integer
-    'transactions': fields.List(fields.Nested(transaction_dto))
+    'seller_firm_id': fields.Integer,
 })

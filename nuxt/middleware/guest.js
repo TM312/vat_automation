@@ -1,5 +1,5 @@
-export default function ({ store, redirect }) {
-  if (store.state.auth.loggedIn) {
-    return redirect('/dashboard')
-  }
+export default function ({ $auth, redirect }) {
+    if ($auth.loggedIn) {
+        return redirect('/dashboard')
+    }
 }

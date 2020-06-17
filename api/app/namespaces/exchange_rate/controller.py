@@ -1,5 +1,7 @@
 from typing import List, BinaryIO
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
+
 from .service import ExchangeRateService
 from . import ExchangeRate
 from . import exchange_rate_dto
@@ -8,10 +10,10 @@ from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("ExchangeRate", description="ExchangeRate Related Operations")  # noqa
-#ns.add_model(seller_firm_dto.name, seller_firm_dto)
+ns.add_model(exchange_rate_dto.name, exchange_rate_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class ExchangeRateResource(Resource):
     """ExchangeRates"""
     @ns.marshal_list_with(exchange_rate_dto, envelope='data')
@@ -26,8 +28,8 @@ class ExchangeRateResource(Resource):
         return ExchangeRateService.create(request.parsed_obj)
 
 
-@api.route("/<int:exchange_rate_id>")
-@api.param("exchange_rate_id", "ExchangeRate database ID")
+@ns.route("/<int:exchange_rate_id>")
+@ns.param("exchange_rate_id", "ExchangeRate database ID")
 class ExchangeRateIdResource(Resource):
     def get(self, exchange_rate_id: int) -> ExchangeRate:
         """Get Single ExchangeRate"""

@@ -1,6 +1,7 @@
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import Channel
 from . import channel_dto
@@ -13,7 +14,7 @@ ns = Namespace("Channel", description="Channel Related Operations")  # noqa
 ns.add_model(channel_dto.name, channel_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class ChannelResource(Resource):
     """Channels"""
     @ns.marshal_list_with(channel_dto, envelope='data')
@@ -28,8 +29,8 @@ class ChannelResource(Resource):
         return ChannelService.create(request.parsed_obj)
 
 
-@api.route("/<str:channel_code>")
-@api.param("channel_code", "Channel database code")
+@ns.route("/<string:channel_code>")
+@ns.param("channel_code", "Channel database code")
 class ChannelIdResource(Resource):
     def get(self, channel_code: str) -> Channel:
         """Get Single Channel"""

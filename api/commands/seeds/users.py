@@ -1,8 +1,8 @@
 
 
-from app.namespaces.user.admin.model import Admin
-from app.namespaces.user.tax_auditor.model import TaxAuditor
-from app.namespaces.business.accounting_firm.model import AccountingFirm
+from app.namespaces.user.admin import Admin
+from app.namespaces.user.tax_auditor import TaxAuditor
+from app.namespaces.business.accounting_firm import AccountingFirm
 
 from app.extensions import db
 

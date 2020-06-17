@@ -3,13 +3,14 @@ from flask import request
 
 from flask_restx import Namespace, Resource
 
+from . import transaction_input_dto
 from .service import TransactionInputService
 
 from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("TransactionInput", description="Transaction Input Related Operations")  # noqa
-#ns.add_model(user_dto.name, user_dto) !!!
+ns.add_model(transaction_input_dto.name, transaction_input_dto)
 
 
 @ns.route("/csv")

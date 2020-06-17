@@ -5,13 +5,13 @@ from flask import current_app
 
 from flask_restx import Namespace, Resource
 
-from .schema import auth_dto
+from . import Token
+from . import auth_dto
 from .service import TokenService
-from .model import Token
 from .interface import TokenInterface
 
 from ..user.interface_parent import UserInterface
-from ..user.schema_parent import user_dto
+from ..user import user_dto
 from ..utils.decorators import login_required, accepted_u_types
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
@@ -21,8 +21,8 @@ ns.add_model(auth_dto.name, auth_dto)
 @ns.route("/")
 class AdminTokenResource(Resource):
     """Get all tokens"""
-    @login_required
-    @accepted_u_types('admin')
+    #@login_required
+    #@accepted_u_types('admin')
     @ns.marshal_list_with(auth_dto)
     def get(self) -> List[Token]:
         """List Of Registered Tokens"""
@@ -30,8 +30,8 @@ class AdminTokenResource(Resource):
 
 @ns.route("/<string:auth_token>")
 class AdminTokenIdResource(Resource):
-    @login_required
-    @accepted_u_types('admin')
+    #@login_required
+    #@accepted_u_types('admin')
     @ns.marshal_with(auth_dto)
     def get(self, auth_token: TokenInterface) -> Token:
         """Get One Token"""
@@ -47,8 +47,8 @@ class UserLogin(Resource):
     #@ns.header('Authorization',  description='Auth Token')
     def post(self):
         """ Login User """
-        # get the post data
         user_data: UserInterface = request.json
+        print(user_data, flush=True)
         return TokenService.login_user(user_data)
 
 

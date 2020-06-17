@@ -1,6 +1,6 @@
 from typing import List
 
-from flask import request
+from flask import request, g
 from flask import current_app
 from flask.wrappers import Response
 
@@ -22,8 +22,8 @@ ns.add_model(seller_firm_dto.name, seller_firm_dto)
 @ns.route('/')
 class SellerFirmResource(Resource):
     '''Get all SellerFirm Firms'''
-    @login_required
-    @accepted_u_types('admin')
+    #@login_required
+    #@accepted_u_types('admin')
     @ns.marshal_list_with(seller_firm_dto, envelope='data')
     def get(self) -> List[SellerFirm]:
         '''List Of Registered SellerFirm Firms'''
@@ -40,25 +40,37 @@ class SellerFirmResource(Resource):
 @ns.route('/<int:seller_firm_id>')
 @ns.param('seller_firm_id', 'Seller firm ID')
 class SellerFirmIdResource(Resource):
-    @login_required
-    @accepted_u_types('admin')
+    #@login_required
+    #@accepted_u_types('admin')
     @ns.marshal_with(seller_firm_dto)
     def get(self, seller_firm_id: int) -> SellerFirm:
         '''Get One SellerFirm'''
         return SellerFirmService.get_by_id(seller_firm_id)
 
-    @login_required
-    @accepted_u_types('admin')
+    # @login_required
+    # @accepted_u_types('admin')
     def delete(self, seller_firm_id: int) -> Response:
         '''Delete A Single SellerFirm'''
         return SellerFirmService.delete_by_id(seller_firm_id)
 
 
+@ns.route('/as_client')
+class SellerFirmAsClientResource(Resource):
+    @login_required
+    #@accepted_u_types('admin')
+    @ns.marshal_list_with(seller_firm_dto)
+    def get(self) -> List[SellerFirm]:
+        '''Get One SellerFirm'''
+        accounting_firm_id = g.user.employer_id
+        return SellerFirmService.get_by_accounting_firm_id(accounting_firm_id)
+
+
+
 
 @ns.route("/csv")
 class SellerFirmInformationResource(Resource):
-    @login_required
-    @employer_required
+    # @login_required
+    # @employer_required
     # @confirmation_required
     # !!! @ns.expect(tax_record_dto, validate=True)
     def post(self):

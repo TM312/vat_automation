@@ -3,7 +3,7 @@ from datetime import date
 from typing import List
 
 
-class TaxCodeInterface(TypedDict, total=False):
+class TaxTreatmentInterface(TypedDict, total=False):
     code: str
     name: str
     description: str

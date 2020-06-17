@@ -1,6 +1,7 @@
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import Country
 from . import country_dto
@@ -12,7 +13,7 @@ ns = Namespace("Country", description="Country Related Operations")  # noqa
 ns.add_model(country_dto.name, country_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class CountryResource(Resource):
     """Countrys"""
     @ns.marshal_list_with(country_dto, envelope='data')
@@ -27,8 +28,8 @@ class CountryResource(Resource):
         return CountryService.create(request.parsed_obj)
 
 
-@api.route("/<str:country_code>")
-@api.param("country_code", "Country database code")
+@ns.route("/<string:country_code>")
+@ns.param("country_code", "Country database code")
 class CountryIdResource(Resource):
     def get(self, country_code: str) -> Country:
         """Get Single Country"""

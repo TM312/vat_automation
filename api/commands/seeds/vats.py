@@ -38,6 +38,7 @@ class VatSeedService:
                     'valid_from': SERVICE_START_DATE,
                     'valid_to': TAX_DEFAULT_VALIDITY,
                     'country_code': country,
+                    'tax_code_code': tax_code,
                     'tax_rate_type_code': tax_rate_type_code,
                     'rate': rate
                 }

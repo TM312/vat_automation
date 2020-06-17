@@ -45,8 +45,6 @@ class Country(db.Model):  # type: ignore
     vats = db.relationship('Vat', backref='country', lazy=True)
 
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<Country: {}>'.format(self.code)

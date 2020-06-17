@@ -15,9 +15,6 @@ class Account(db.Model):
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship('Transaction', backref='account', lazy=True)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
 
     def update(self, data_changes):
         for key, val in data_changes.items():

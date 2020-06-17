@@ -19,8 +19,10 @@
     "@nuxtjs/toast": "^3.3.0",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.9.0",
+    "chart.js": "^2.9.3",
     "file-system": "^2.2.2",
-    "nuxt": "latest"
+    "nuxt": "latest",
+    "vue-chartjs": "^3.5.0"
   },
   "devDependencies": {
     "@nuxtjs/dotenv": "^1.4.1",

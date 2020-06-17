@@ -6,16 +6,16 @@ from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
 
-from .schema import accounting_firm_dto
+from . import Admin
+from . import admin_dto
 from .service import AdminService
-from .model import Admin
 from .interface import AdminInterface
 
 from ...utils.decorators import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("Admin", description="Accounting Firm Related Operations")  # noqa
-ns.add_model(accounting_firm_dto.name, accounting_firm_dto)
+ns.add_model(admin_dto.name, admin_dto)
 
 
 @ns.route('/')

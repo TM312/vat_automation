@@ -17,9 +17,6 @@ class TransactionType(db.Model):  # type: ignore
         back_populates="transaction_types"
      )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def __repr__(self):
         return '<TransactionType: {}>'.format(self.code)
 
@@ -89,8 +86,7 @@ class Transaction(db.Model):  # type: ignore
     departure_seller_vatin_id = db.Column(db.Integer)
     seller_vatin_id = db.Column(db.Integer)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+
 
 
     def __repr__(self):

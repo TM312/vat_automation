@@ -1,7 +1,7 @@
 
 
 from app.extensions import db  # noqa
-from ..model_parent import User
+from .. import User
 
 
 class TaxAuditor(User):

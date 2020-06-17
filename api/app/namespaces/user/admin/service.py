@@ -3,7 +3,7 @@ from flask import current_app
 
 from app.extensions import db
 
-from .model import Admin
+from . import Admin
 from .interface import AdminInterface
 
 class AdminService:

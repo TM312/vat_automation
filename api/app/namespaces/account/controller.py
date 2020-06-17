@@ -1,6 +1,7 @@
 from typing import List, BinaryIO
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import Account
 from . import account_dto
@@ -14,7 +15,7 @@ ns.add_model(account_dto.name, account_dto)
 
 
 
-@api.route("/")
+@ns.route("/")
 class AccountResource(Resource):
     """Accounts"""
     @ns.marshal_list_with(account_dto, envelope='data')
@@ -29,8 +30,8 @@ class AccountResource(Resource):
         return AccountService.create(request.parsed_obj)
 
 
-@api.route("/<int:account_id>")
-@api.param("account_id", "Account database ID")
+@ns.route("/<int:account_id>")
+@ns.param("account_id", "Account database ID")
 class AccountIdResource(Resource):
     def get(self, account_id: int) -> Account:
         """Get Single Account"""
@@ -55,8 +56,6 @@ class AccountIdResource(Resource):
 
 @ns.route("/csv")
 class AccountInformationResource(Resource):
-    @login_required
-    @employer_required
     # @confirmation_required
     #@ns.expect(tax_record_dto, validate=True)
     def post(self):

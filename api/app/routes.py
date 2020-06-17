@@ -2,9 +2,11 @@ def register_routes(api, app):
     from app.namespaces.account import attach_account
     from app.namespaces.auth import attach_auth
     from app.namespaces.bundle import attach_bundle
+    from app.namespaces.business import attach_business
     from app.namespaces.channel import attach_channel
     from app.namespaces.country import attach_country
     from app.namespaces.currency import attach_currency
+    from app.namespaces.distance_sale import attach_distance_sale
     from app.namespaces.email import attach_email
     from app.namespaces.exchange_rate import attach_exchange_rate
     from app.namespaces.item import attach_item
@@ -22,9 +24,11 @@ def register_routes(api, app):
     attach_account(api, app)
     attach_auth(api, app)
     attach_bundle(api, app)
+    attach_business(api, app)
     attach_channel(api, app)
     attach_country(api, app)
     attach_currency(api, app)
+    attach_distance_sale(api, app)
     attach_email(api, app)
     attach_exchange_rate(api, app)
     attach_item(api, app)

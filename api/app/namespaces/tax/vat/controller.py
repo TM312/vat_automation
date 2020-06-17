@@ -1,17 +1,19 @@
 from typing import List
 from flask_restx import Namespace, Resource
-from .service import VatService
+from flask.wrappers import Response
+
 from . import Vat
 from . import vat_dto
+from .service import VatService
 
-from ..utils.decorators import login_required, employer_required
+from ...utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Vat", description="Vat Related Operations")  # noqa
-#ns.add_model(seller_firm_dto.name, seller_firm_dto)
+ns.add_model(vat_dto.name, vat_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class VatResource(Resource):
     """Vats"""
     @ns.marshal_list_with(vat_dto, envelope='data')
@@ -26,8 +28,8 @@ class VatResource(Resource):
         return VatService.create(request.parsed_obj)
 
 
-@api.route("/<int:vat_id>")
-@api.param("vat_id", "Vat database ID")
+@ns.route("/<int:vat_id>")
+@ns.param("vat_id", "Vat database ID")
 class VatIdResource(Resource):
     def get(self, vat_id: int) -> Vat:
         """Get Single Vat"""

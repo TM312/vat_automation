@@ -4,9 +4,9 @@ from flask import request
 
 from flask_restx import Namespace, Resource
 
+from . import tax_record_dto
+from . import TaxRecord
 from .service import TaxRecordService
-from .schema import tax_record_dto
-from .model import TaxRecord
 
 from ..utils.decorators import login_required, employer_required, accepted_u_types
 
@@ -14,14 +14,14 @@ ns = Namespace("TaxRecord", description="Tax Record Related Operations")  # noqa
 ns.add_model(tax_record_dto.name, tax_record_dto)
 
 
-@api.route("/")
-class VatResource(Resource):
-    """Vats"""
+@ns.route("/")
+class TaxRecordResource(Resource):
+    """TaxRecords"""
     @accepted_u_types('admin')
     @ns.marshal_list_with(tax_record_dto, envelope='data')
-    def get(self) -> List[Vat]:
-        """Get all Vats"""
-        return VatService.get_all()
+    def get(self) -> List[TaxRecord]:
+        """Get all TaxRecords"""
+        return TaxRecordService.get_all()
 
 
 

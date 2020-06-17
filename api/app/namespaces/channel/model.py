@@ -1,6 +1,5 @@
 
 from app.extensions import db
-from ..tax.tax_code.model import TaxCode
 from ..utils.ATs import channel_tax_code_AT
 
 class Channel(db.Model):
@@ -17,6 +16,3 @@ class Channel(db.Model):
         secondary=channel_tax_code_AT,
         back_populates="channels"
     )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)

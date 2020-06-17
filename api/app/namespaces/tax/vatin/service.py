@@ -1,7 +1,6 @@
 from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import date, timedelta
-from zeep import Client, helpers
 import time
 
 from flask import current_app
@@ -9,10 +8,10 @@ from werkzeug.exceptions import HTTPException
 
 from app.extensions import db
 
-from . import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, logger
-from .model import VATIN
+from .helpers import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH
+from . import VATIN
+from .interface import VATINInterface
 
-from ...utils.schema import response_object_dto
 from ...transaction_input import TransactionInput
 
 
@@ -122,7 +121,7 @@ class VATINService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], **kwargs) -> response_object_dto:
+    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], **kwargs) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='vat_numbers'
@@ -143,7 +142,7 @@ class VATINService:
 
     # celery task !!
     @staticmethod
-    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> List[response_object_dto]:
+    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding)
         response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
@@ -154,7 +153,7 @@ class VATINService:
 
     # **kwargs['seller_firm_pulic_id'] may hold a seller firm's public id
     @staticmethod
-    def create_vatins(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[response_object_dto]:
+    def create_vatins(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[Dict]:
         from ...business.seller_firm.service import SellerFirmService
 
         VATIN_LIFESPAN = current_app.config["VATIN_LIFESPAN"]
@@ -320,6 +319,8 @@ class VIESService:
 
     @staticmethod #!! async??
     def send_request(country_code: str, number: str) -> Dict:
+        from zeep import Client, helpers
+
         """VIES API response data."""
         client = Client(VIES_WSDL_URL)
         try:

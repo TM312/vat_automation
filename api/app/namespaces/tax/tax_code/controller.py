@@ -1,19 +1,21 @@
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
+
 
 from . import TaxCode
 from . import tax_code_dto
 from .service import TaxCodeService
 
-from ..utils.decorators import login_required, employer_required
+from ...utils.decorators import login_required, employer_required
 
 
 ns = Namespace("TaxCode", description="TaxCode Related Operations")  # noqa
 ns.add_model(tax_code_dto.name, tax_code_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class TaxCodeResource(Resource):
     """TaxCodes"""
     @ns.marshal_list_with(tax_code_dto, envelope='data')
@@ -28,8 +30,8 @@ class TaxCodeResource(Resource):
         return TaxCodeService.create(request.parsed_obj)
 
 
-@api.route("/<str:tax_code_code>")
-@api.param("tax_code_code", "TaxCode database code")
+@ns.route("/<string:tax_code_code>")
+@ns.param("tax_code_code", "TaxCode database code")
 class TaxCodeIdResource(Resource):
     def get(self, tax_code_code: str) -> TaxCode:
         """Get Single TaxCode"""

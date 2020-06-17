@@ -1,5 +1,11 @@
 from typing import Union, List
-from . import Business, AccountingFirm, SellerFirm, CustomerFirm
+from . import Business
+from .accounting_firm import AccountingFirm
+from .seller_firm import SellerFirm
+from .customer_firm import CustomerFirm
+
+from .interface_parent import BusinessInterface
+
 
 class BusinessService:
 

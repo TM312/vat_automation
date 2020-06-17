@@ -103,8 +103,6 @@ class TransactionInput(db.Model):
     check_invoice_exchange_rate_date = db.Column(db.Date)
     check_export = db.Column(db.Boolean)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TransactionInput: {} – {}>'.format(self.source, self.transaction_id)

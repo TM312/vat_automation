@@ -6,14 +6,14 @@ from typing import List, Dict
 from app.extensions import db
 
 
-from app.namespaces.currency.model import Currency
-from app.namespaces.country.model import EU, Country
-from app.namespaces.transaction.model import TransactionType
-from app.namespaces.tax.tax_code.model import TaxCode
-from app.namespaces.tax.tax_treatment.model import TaxTreatment
-from app.namespaces.tax.vat.model import Vat, TaxRateType
-from app.namespaces.platform.amazon.model import Amazon
-from app.namespaces.channel.model import Channel
+from app.namespaces.currency import Currency
+from app.namespaces.country import EU, Country
+from app.namespaces.transaction import TransactionType
+from app.namespaces.tax.tax_code import TaxCode
+from app.namespaces.tax.tax_treatment import TaxTreatment
+from app.namespaces.tax.vat import Vat, TaxRateType
+from app.namespaces.platform import Platform
+from app.namespaces.channel import Channel
 #from app.namespaces.user.admin.model import Admin
 #from app.namespaces.user.tax_auditor.model import TaxAuditor
 #from app.namespaces.business.accounting_firm.model import AccountingFirm
@@ -49,7 +49,7 @@ things_list = {
     'tax_rates': [Vat, tax_rates],
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
-    'platforms': [Amazon, platforms],
+    'platforms': [Platform, platforms],
     'channels': [Channel, channels],
 #    'admins': [Admin, admins],
     #'accounting_firms': [AccountingFirm, accounting_firms],
@@ -136,7 +136,7 @@ class SeedCommand(Command):
             db.session.commit()
 
             print('Creating Exchange Rates...')
-            response_object_exchange_rates = ExchangeRatesSeedService.create_exchange_rate_collections()
+            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
 
             response_objects.append(response_object_exchange_rates)
 

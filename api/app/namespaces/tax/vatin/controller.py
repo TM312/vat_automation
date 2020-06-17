@@ -1,17 +1,20 @@
 from typing import List, BinaryIO
 from flask_restx import Namespace, Resource
-from .service import VATINService
+from flask.wrappers import Response
+
 from . import VATIN
 from . import vatin_dto
+from .service import VATINService
 
-from ..utils.decorators import login_required, employer_required
+
+from ...utils.decorators import login_required, employer_required
 
 
 ns = Namespace("VATIN", description="VATIN Related Operations")  # noqa
-#ns.add_model(seller_firm_dto.name, seller_firm_dto)
+ns.add_model(vatin_dto.name, vatin_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class VATINResource(Resource):
     """VATINs"""
     @ns.marshal_list_with(vatin_dto, envelope='data')
@@ -26,8 +29,8 @@ class VATINResource(Resource):
         return VATINService.create(request.parsed_obj)
 
 
-@api.route("/<str:vatin_id>")
-@api.param("vatin_id", "VATIN database ID")
+@ns.route("/<int:vatin_id>")
+@ns.param("vatin_id", "VATIN database ID")
 class VATINIdResource(Resource):
     def get(self, vatin_id: int) -> VATIN:
         """Get Single VATIN"""
@@ -52,8 +55,8 @@ class VATINIdResource(Resource):
 
 @ns.route("/csv")
 class VATNumbersResource(Resource):
-    @login_required
-    @employer_required
+    # @login_required
+    # @employer_required
     # @confirmation_required
     def post(self):
         vat_numbers_files: List[BinaryIO] = request.files.getlist("files")

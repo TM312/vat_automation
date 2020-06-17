@@ -2,7 +2,7 @@ from mypy_extensions import TypedDict
 
 from datetime import date, datetime
 
-class VATINInterface(TypedDict, tota:False):
+class VATINInterface(TypedDict, total=False):
     created_on: datetime
     valid_from: date
     valid_to: date
