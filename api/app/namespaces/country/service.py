@@ -60,11 +60,11 @@ class CountryService:
     def create(country_data: CountryInterface) -> Country:
 
         new_country = Country(
-            code = country_data.get('code')
-            vat_country_code = country_data.get('vat_country_code')
-            name = country_data.get('name')
-            valid_from = country_data.get('valid_from')
-            valid_to = country_data.get('valid_to')
+            code = country_data.get('code'),
+            vat_country_code = country_data.get('vat_country_code'),
+            name = country_data.get('name'),
+            valid_from = country_data.get('valid_from'),
+            valid_to = country_data.get('valid_to'),
             currency_code = country_data.get('currency_code')
         )
 

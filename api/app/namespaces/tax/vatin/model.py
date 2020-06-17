@@ -2,7 +2,7 @@ from datetime import datetime, date
 #from ...business.model_parent import Business
 from app.extensions import db
 
-from . import VIES_OPTIONS
+from .helpers import VIES_OPTIONS
 
 
 
@@ -26,8 +26,6 @@ class VATIN(db.Model):
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship('Transaction', backref='vatin', lazy=True)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
     # https://www.python-course.eu/python3_properties.php

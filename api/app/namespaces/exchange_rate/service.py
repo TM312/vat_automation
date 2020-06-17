@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Dict
+from flask import current_app
 
 from . import ExchangeRate
-from . import ExchangeRateInterface
+from .interface import ExchangeRateInterface
 
 from werkzeug.exceptions import InternalServerError, NotFound
 
@@ -54,30 +55,25 @@ class ExchangeRateService:
 
         db.session.add(new_exchange_rate)
         db.session.commit()
+        # !!!
+        exchange_rate = ExchangeRate.query.filter_by(date = exchange_rate_data.get('date'), base = exchange_rate_data.get('base'), target = exchange_rate_data.get('target')).first()
+        print('Exchange Rate Added: ')
+        print(exchange_rate)
+        print("")
 
         return new_exchange_rate
-
-    @staticmethod
-    def create_ecb_rate(rate: float, base: str, target: float) -> ExchangeRate:
-            exchange_rate_data = {
-                'source': 'ECB',
-                'base': base,
-                'target': currency_code,
-                'rate': rate
-            }
-
-            ExchangeRateService.create(exchange_rate_data)
 
 
     @staticmethod
     def create_between_rate(date: date, base: str, target: str) -> ExchangeRate:
-        rate_base_eur = ExchangeRate.query.filter_by(date=date, base=base, target='EUR').first()
-        rate_eur_target = ExchangeRate.query.filter_by(date=date, base='EUR', target=target).first()
+        rate_base_eur = ExchangeRate.query.filter_by(date=date, base=base, target='EUR').first().rate
+        rate_eur_target = ExchangeRate.query.filter_by(date=date, base='EUR', target=target).first().rate
 
-        rate_base_target = rate_base_eur * rate_eur_target
+        rate_base_target = round(rate_base_eur * rate_eur_target, 5)
 
         exchange_rate_data = {
             'source': 'ECB',
+            'date': date,
             'base': base,
             'target': target,
             'rate': rate_base_target
@@ -87,9 +83,8 @@ class ExchangeRateService:
 
     @staticmethod
     def create_exchange_rates() -> List[ExchangeRate]:
-        import more_itertools as mit
+        SUPPORTED_CURRENCIES = current_app.config['SUPPORTED_CURRENCIES']
 
-        supported_currencies = ['GBP', 'CZK', 'PLN']
         date = date.today()
 
         exchange_rates_eur = ExchangeRate.query.filter_by(date, base='EUR').all()
@@ -98,15 +93,7 @@ class ExchangeRateService:
             #api call to ECB
             exchange_rate_dict = ExchangeRateService.retrieve_ecb_exchange_rates()
 
-            for currency_code in supported_currencies:
-                value = exchange_rate_dict[currency_code]
-                ExchangeRateService.create_ecb_rate(rate=value, base='EUR', target=currency_code)
-                # creating reverse rates
-                ExchangeRateService.create_ecb_rate(rate=1/value, base=currency_code, target='EUR')
-
-            currency_tuples = list(mit.distinct_combinations(supported_currencies, 2))
-            for currency_tuple in currency_tuples:
-                ExchangeRateService.create_between_rates(date, base=currency_tuple[0], target=currency_tuple[1])
+            ExchangeRateService.process_ecb_rates(date, exchange_rate_dict, SUPPORTED_CURRENCIES)
 
 
         else:
@@ -117,9 +104,38 @@ class ExchangeRateService:
             raise InternalServerError(response_object)
 
 
+
+    @staticmethod
+    def process_ecb_rates(date, exchange_rate_dict: Dict, supported_currencies: List[str]) -> None:
+        import more_itertools as mit
+
+        for currency_code in supported_currencies:
+            value = round(exchange_rate_dict[currency_code], 5)
+            exchange_rate_data = {
+                'source': 'ECB',
+                'date': date,
+                'base': 'EUR',
+                'target': currency_code,
+                'rate': value
+            }
+            ExchangeRateService.create(exchange_rate_data)
+
+            # creating reverse rates
+            exchange_rate_data['base'] = currency_code
+            exchange_rate_data['target'] = 'EUR'
+            exchange_rate_data['rate'] = round(1/value, 5)
+
+            ExchangeRateService.create(exchange_rate_data)
+
+
+        currency_tuples = list(mit.distinct_combinations(supported_currencies, 2))
+        for currency_tuple in currency_tuples:
+            ExchangeRateService.create_between_rate(date, base=currency_tuple[0], target=currency_tuple[1])
+
+
     @staticmethod
     def get_rate_by_base_target_date(base: str, target: str, date: date):
-        exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first()
+        exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first().rate
 
         if not exchange_rate:
             raise NotFound('The currency pair {}-{} for {} is not available'.format(base, target, date))

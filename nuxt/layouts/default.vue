@@ -1,7 +1,8 @@
 <template>
   <div>
-    <Navbar />
+    <NavbarUnauth />
     <div class="app-body">
+      <h1>THIS IS THE DEFAULT LAYOUT</h1>
       <nuxt />
     </div>
     <Footer />
@@ -9,10 +10,12 @@
 </template>
 
 <script>
-import { Navbar, Footer } from '@/components/'
+import NavbarUnauth from '@/components/Navbar/NavbarUnauth'
+import Footer from '@/components/Footer'
+
 export default {
   components: {
-    Navbar,
+    NavbarUnauth,
     Footer,
   },
 }

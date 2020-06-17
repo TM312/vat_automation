@@ -344,7 +344,7 @@ class TransactionService:
 
     @staticmethod
     def get_tax_treatment_code(transaction_type: TransactionType, account: Account, transaction_input: TransactionInput, eu: EU, customer_relationship: str, departure_country: Country, arrival_country: Country, amazon_vat_calculation_service: bool, **kwargs) -> str:
-        from ..platform.amazon.service import DistanceSaleService
+        from ..distance_sale.service import DistanceSaleService
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             if (transaction_input.check_export or arrival_country not in eu.countries):
@@ -366,7 +366,7 @@ class TransactionService:
 
 
             elif customer_relationship == "B2C":
-                if departure_country.code != arrival_country.code and DistanceSaleService.get_distance_sale_status(platform_code=account.platform_code, seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
+                if departure_country.code != arrival_country.code and DistanceSaleService.get_status(platform_code=account.platform_code, seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
                     tax_treatment_code = 'DISTANCE_SALE'
 
                 else:
@@ -611,7 +611,7 @@ class TransactionService:
 
         if invoice_exchange_rate_date:
             from ..exchange_rate.service import ExchangeRateService
-            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date)
+            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date).rate
 
         else:
             invoice_exchange_rate = float(1)

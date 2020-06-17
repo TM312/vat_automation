@@ -103,6 +103,3 @@ class Action(db.Model):  # type: ignore
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     method_name = db.Column(db.String(32))
     service_context = db.Column(db.String(32))
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)

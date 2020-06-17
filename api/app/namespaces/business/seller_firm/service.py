@@ -15,7 +15,6 @@ from .interface import SellerFirmInterface
 from .schema import seller_firm_dto
 
 from ...utils.service import InputService, NotificationService
-from ...utils import response_object_dto
 
 
 class SellerFirmService:
@@ -23,6 +22,12 @@ class SellerFirmService:
     def get_all() -> List[SellerFirm]:
         seller_firms = SellerFirm.query.all()
         return seller_firms
+
+    @staticmethod
+    def get_by_accounting_firm_id(accounting_firm_id) -> List[SellerFirm]:
+        seller_firms = SellerFirm.query.filter_by(accounting_firm_id=accounting_firm_id).all()
+        return seller_firms
+
 
     @staticmethod
     def get_by_public_id(public_id: UUID) -> SellerFirm:
@@ -41,7 +46,7 @@ class SellerFirmService:
         return seller_firm
 
     @staticmethod
-    def delete_by_id(seller_firm_id: int) -> response_object_dto:
+    def delete_by_id(seller_firm_id: int) -> Dict:
         #check if accounting business exists in db
         seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
         if seller_firm:
@@ -103,7 +108,7 @@ class SellerFirmService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> response_object_dto:
+    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'
@@ -128,7 +133,7 @@ class SellerFirmService:
 
     # celery task !!
     @staticmethod
-    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = SellerFirmService.create_seller_firms(df, file_path_in, user_id, **kwargs)
@@ -142,7 +147,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]: #upload only for tax auditors
+    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]: #upload only for tax auditors
         error_counter = 0
         total_number_items = len(df.index)
         input_type = 'seller firm'  # only used for response objects

@@ -1,13 +1,13 @@
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import Bundle
 from . import bundle_dto
 from .service import BundleService
 from .interface import BundleInterface
 
-from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Bundle", description="Bundle Related Operations")  # noqa
@@ -15,7 +15,7 @@ ns.add_model(bundle_dto.name, bundle_dto)
 
 
 
-@api.route("/")
+@ns.route("/")
 class BundleResource(Resource):
     """Bundles"""
     @ns.marshal_list_with(bundle_dto, envelope='data')
@@ -30,8 +30,8 @@ class BundleResource(Resource):
         return BundleService.create()
 
 
-@api.route("/<int:bundle_id>")
-@api.param("bundle_id", "Bundle database ID")
+@ns.route("/<int:bundle_id>")
+@ns.param("bundle_id", "Bundle database ID")
 class BundleIdResource(Resource):
     def get(self, bundle_id: int) -> Bundle:
         """Get Single Bundle"""

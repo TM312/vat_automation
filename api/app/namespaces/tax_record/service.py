@@ -11,7 +11,6 @@ from . import TaxRecord
 
 from ..utils.service import HelperService, NotificationService, InputService
 from ..utils import TransactionNotification
-from ..utils import response_object_dto
 from ..transaction import Transaction
 from ..transaction_input import TransactionInput
 #from ..transaction_input.service import TransactionInputService
@@ -19,9 +18,9 @@ from ..transaction_input import TransactionInput
 
 class TaxRecordService:
     @staticmethod
-    def get_all() -> List[Vat]:
-        vats = Vat.query.all()
-        return vats
+    def get_all() -> List[TaxRecord]:
+        tax_recordss = TaxRecord.query.all()
+        return tax_recordss
 
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
@@ -60,7 +59,7 @@ class TaxRecordService:
 
 
     @staticmethod
-    def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> response_object_dto:
+    def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> Dict:
         from ..business.seller_firm import SellerFirm
         BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config['BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM']
 

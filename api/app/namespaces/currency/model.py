@@ -11,9 +11,10 @@ class Currency(db.Model):  # type: ignore
     items = db.relationship('Item', backref='currency', lazy=True)
     transactions = db.relationship('Transaction', backref='currency', lazy=True)
 
+    bases = db.relationship('ExchangeRate', primaryjoin='Currency.code==ExchangeRate.base', lazy=True)
+    targets = db.relationship('ExchangeRate', primaryjoin='Currency.code==ExchangeRate.target', lazy=True)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+
 
     def __repr__(self):
         return '<Currency: {}>'.format(self.code)

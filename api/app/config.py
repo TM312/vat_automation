@@ -48,6 +48,9 @@ class Config(object):
     VATIN_LIFESPAN = 32 # in days
     OLD_TRANSACTION_TOLERANCE_DAYS = 100
     SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
+
+    SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN'] #besides 'EUR'
+
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
 

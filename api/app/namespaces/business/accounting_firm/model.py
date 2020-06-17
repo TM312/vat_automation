@@ -17,8 +17,5 @@ class AccountingFirm(Business):
     clients = db.relationship('SellerFirm', backref=db.backref('accounting_firm', remote_side=[Business.id]))
 
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def __repr__(self):
         return '<Accounting Firm: %r>' % self.name

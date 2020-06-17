@@ -8,7 +8,7 @@ transaction_input_dto = Model('transaction_input', {
     'original_filename': fields.String,
     'bundle_id': fields.Integer,
     'created_on': fields.DateTime,
-    'created_by': fields.Integer
+    'created_by': fields.Integer,
     'processed': fields.Boolean,
     'processed_on': fields.DateTime,
     'transactions': fields.List(fields.Nested(transaction_dto)),
@@ -64,14 +64,16 @@ transaction_input_dto = Model('transaction_input', {
     'check_item_price_vat': fields.Float,
     'check_item_price_total_net': fields.Float,
     'check_item_price_total_vat': fields.Float,
-    'check_item_price_vat': fields.Float,_rate
+    'check_item_price_vat': fields.Float,
+    'check_item_price_vat_rate': fields.Float,
     'check_shipment_price_discount_net': fields.Float,
     'check_shipment_price_discount_vat': fields.Float,
     'check_shipment_price_net': fields.Float,
     'check_shipment_price_vat': fields.Float,
     'check_shipment_price_total_net': fields.Float,
     'check_shipment_price_total_vat': fields.Float,
-    'check_shipment_price_vat': fields.Float,_rate
+    'check_shipment_price_vat': fields.Float,
+    'check_shipment_price_vat_rate': fields.Float,
     'check_sale_total_value_net': fields.Float,
     'check_sale_total_value_vat': fields.Float,
     'check_gift_wrap_price_discount_net': fields.Float,

@@ -10,15 +10,7 @@ notification_dto = Model('notification', {
     'n_type': fields.String(readonly=True)
 })
 
-transaction_notification_dto = notification_dto.clone('transaction_notification', {
+transaction_notification_dto = notification_dto.inherit('transaction_notification', {
     'transaction_input_id': fields.Integer(readonly=True),
     'original_filename': fields.String,
 })
-
-
-response_object_dto: {
-    'status': fields.String,
-    'message': fields.String,
-    'token': fields.String,
-
-}

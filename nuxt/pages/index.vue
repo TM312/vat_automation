@@ -2,9 +2,9 @@
   <div class="container p-5">
     <b-container class="mt-5">
       <p class="display-2">
-        Pit crew for your
+        VAT Calculations to support tax auditors in the field of
         <span class="text-primary">
-          online business
+          e-commerce
         </span>
       </p>
       <p class="lead text-muted">

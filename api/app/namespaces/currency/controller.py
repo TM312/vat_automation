@@ -1,6 +1,7 @@
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import Currency
 from . import currency_dto
@@ -11,7 +12,7 @@ ns = Namespace("Currency", description="Currency Related Operations")  # noqa
 ns.add_model(currency_dto.name, currency_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class CurrencyResource(Resource):
     """Currencys"""
     @ns.marshal_list_with(currency_dto, envelope='data')
@@ -26,8 +27,8 @@ class CurrencyResource(Resource):
         return CurrencyService.create(request.parsed_obj)
 
 
-@api.route("/<str:currency_code>")
-@api.param("currency_code", "Currency database code")
+@ns.route("/<string:currency_code>")
+@ns.param("currency_code", "Currency database code")
 class CurrencyIdResource(Resource):
     def get(self, currency_code: str) -> Currency:
         """Get Single Currency"""

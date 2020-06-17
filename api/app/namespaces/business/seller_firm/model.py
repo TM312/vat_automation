@@ -32,8 +32,5 @@ class SellerFirm(Business):
 
 
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def __repr__(self):
         return '<SellerFirm: {} | Address: {}>'.format(self.name, self.name)

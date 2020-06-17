@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List
+from typing import List, Dict
 
 from . import CustomerFirm
 from .interface import CustomerFirmInterface
@@ -11,7 +11,7 @@ from ...tax.vatin.service import VATINService, VIESService
 
 
 class CustomerFirmService:
-     @staticmethod
+    @staticmethod
     def get_all() -> List[CustomerFirm]:
         seller_firms = CustomerFirm.query.all()
         return seller_firms
@@ -29,7 +29,7 @@ class CustomerFirmService:
         return seller_firm
 
     @staticmethod
-    def delete_by_id(seller_firm_id: int) -> response_object_dto:
+    def delete_by_id(seller_firm_id: int) -> Dict:
         #check if accounting business exists in db
         seller_firm = CustomerFirm.query.filter_by(id = seller_firm_id).first()
         if seller_firm:

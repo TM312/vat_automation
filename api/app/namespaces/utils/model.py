@@ -13,8 +13,6 @@ class Notification(db.Model):
     __mapper_args__ = {'polymorphic_on': n_type}
 
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 

@@ -14,7 +14,7 @@ ns = Namespace("Transaction", description="Transaction Related Operations")  # n
 ns.add_model(transaction_dto.name, transaction_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class TransactionResource(Resource):
     """Transactions"""
     @accepted_u_types('admin')

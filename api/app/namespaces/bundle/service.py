@@ -1,5 +1,6 @@
 from typing import List
 from . import Bundle
+from .interface import BundleInterface
 
 class BundleService:
 

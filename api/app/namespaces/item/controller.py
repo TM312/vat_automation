@@ -1,5 +1,7 @@
 from typing import List, BinaryIO
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
+
 from .service import ItemService
 from . import Item
 from . import item_dto
@@ -8,10 +10,10 @@ from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Item", description="Item Related Operations")  # noqa
-#ns.add_model(seller_firm_dto.name, seller_firm_dto)
+ns.add_model(item_dto.name, item_dto)
 
 
-@api.route("/")
+@ns.route("/")
 class ItemResource(Resource):
     """Items"""
     @ns.marshal_list_with(item_dto, envelope='data')
@@ -26,8 +28,8 @@ class ItemResource(Resource):
         return ItemService.create(request.parsed_obj)
 
 
-@api.route("/<int:item_id>")
-@api.param("item_id", "Item database ID")
+@ns.route("/<int:item_id>")
+@ns.param("item_id", "Item database ID")
 class ItemIdResource(Resource):
     def get(self, item_id: int) -> Item:
         """Get Single Item"""
@@ -53,7 +55,7 @@ class ItemIdResource(Resource):
 @ns.route("/csv")
 class ItemInformationResource(Resource):
     @login_required
-    @employer_required
+    #@employer_required
     # @confirmation_required
     #@ns.expect(tax_record_dto, validate=True)
     def post(self):

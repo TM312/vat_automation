@@ -44,6 +44,7 @@ export default {
    */
   plugins: [
     // '~/plugins/file-system'
+    '~/plugins/repositories.js'
   ],
 
   /*
@@ -87,7 +88,7 @@ export default {
             method: 'post',
           },
           user: {
-            url: '/seller/self',
+            url: 'user/seller/self',
             method: 'get',
             propertyName: 'data',
           },
@@ -108,7 +109,7 @@ export default {
             method: 'post',
           },
           user: {
-            url: '/tax_auditor/self',
+            url: 'user/tax_auditor/self',
             method: 'get',
             propertyName: 'data',
           },

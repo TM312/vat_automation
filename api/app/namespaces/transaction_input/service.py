@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import pandas as pd
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Dict
 
 from flask import g, current_app
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
@@ -11,7 +11,6 @@ from .model import TransactionInput
 from .interface import TransactionInputInterface
 
 from ..utils.service import InputService
-from ..utils.schema import response_object_dto
 
 
 
@@ -34,7 +33,7 @@ class TransactionInputService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> response_object_dto:
+    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> Dict:
         BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -60,7 +59,7 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, **kwargs)
@@ -73,7 +72,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
         from ..transaction.service import TransactionService
 
 

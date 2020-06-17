@@ -16,9 +16,6 @@ class Vat(db.Model):  # type: ignore
     rate = db.Column(db.Numeric(scale=4))
 
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def __repr__(self):
         return '<Vat: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
 
@@ -33,9 +30,6 @@ class TaxRateType(db.Model):  # type: ignore
     vats = db.relationship('Vat', backref='tax_rate_type', lazy=True)
     transaction_items = db.relationship('Transaction', backref='tax_rate_type', lazy=True)
 
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     def __repr__(self):
         return '<TaxRateType: {}'.format(self.code)

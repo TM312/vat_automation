@@ -1,5 +1,5 @@
 from app.namespaces.channel.model import Channel
-from app.namespaces.platform.amazon.model import Amazon
+from app.namespaces.platform import Platform
 
 platforms = [
     {
@@ -14,8 +14,8 @@ class PlatformSeedService:
     def append_channels_to_platform():
         mfn = Channel.query.filter_by(code='MFN').first()
         afn = Channel.query.filter_by(code='AFN').first()
-        amazon = Amazon.query.filter_by(code='AMZ').first()
-        if not isinstance(afn, Channel) or not isinstance(mfn, Channel) or not isinstance(amazon, Amazon):
+        amazon = Platform.query.filter_by(code='AMZ').first()
+        if not isinstance(afn, Channel) or not isinstance(mfn, Channel) or not isinstance(amazon, Platform):
             raise
 
         else:

@@ -1,6 +1,6 @@
 import os
 from datetime import date, timedelta
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Dict
 import pandas as pd
 
 from flask import g, current_app
@@ -12,7 +12,6 @@ from .interface import ItemInterface
 
 from ..account import Account
 from ..utils.service import InputService, NotificationService
-from ..utils.schema import response_object_dto
 from ..transaction_input import TransactionInput
 
 
@@ -92,7 +91,7 @@ class ItemService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> response_object_dto:
+    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -116,7 +115,7 @@ class ItemService:
 
     # celery task !!
     @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = ItemService.create_items(df, file_path_in, user_id, **kwargs)
@@ -130,7 +129,7 @@ class ItemService:
 
 
     @staticmethod
-    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[response_object_dto]:
+    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
         from ..business.seller_firm.service import SellerFirmService
 
         TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]

@@ -5,8 +5,7 @@ import pandas as pd
 from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
-from .interface import response_object_dto
-from .model import TransactionNotification
+from . import TransactionNotification
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
@@ -133,7 +132,7 @@ class InputService:
 
 
     @staticmethod
-    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs) -> List[response_object_dto]:
+    def create_input_response_objects(file_path, input_type: str, total_number_inputs: int, error_counter: int, **kwargs):
         response_objects = []
         success_status = 'successfully'
         notification = ''

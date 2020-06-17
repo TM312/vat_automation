@@ -1,6 +1,8 @@
 
 from os import path
 import pandas as pd
+import more_itertools as mit
+
 from datetime import date, datetime
 from app.extensions import db
 from app.namespaces.exchange_rate.service import ExchangeRateService
@@ -9,7 +11,6 @@ from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
 
 
-file = 'hist_exchange_rates.csv'
 
 
 class ExchangeRatesSeedService:
@@ -30,8 +31,12 @@ class ExchangeRatesSeedService:
         return date
 
     @staticmethod
-    def create_exchange_rate_collections():
+    def create_historic_exchange_rates():
+        file = 'hist_exchange_rates.csv'
+        SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN']
         from . import BASE_PATH_SEEDS
+
+
         dirpath = path.join(BASE_PATH_SEEDS, file)
         df = pd.read_csv(dirpath)
 
@@ -44,42 +49,33 @@ class ExchangeRatesSeedService:
                 }
                 raise InternalServerError(response_object)
 
-            else:
-                try:
-                    exchange_rate_collection = ExchangeRateService.create_exchange_rate_collection(date)
+            for currency_code in SUPPORTED_CURRENCIES:
+                value = round(df.iloc[row][currency_code], 5)
+                exchange_rate_data = {
+                    'source': 'ECB',
+                    'date': date,
+                    'base': 'EUR',
+                    'target': currency_code,
+                    'rate': value
+                }
+                ExchangeRateService.create(exchange_rate_data)
 
-                    exchange_rates_EUR = ExchangeRatesEUR(
-                        source='ECB',
-                        created_on=datetime.utcnow(),
-                        date=date,
-                        exchange_rate_collection_id=exchange_rate_collection.id,
-                        eur=1.0000,
-                        gbp=df.iloc[row]['GBP'],
-                        czk=df.iloc[row]['CZK'],
-                        pln=df.iloc[row]['PLN']
-                    )
+                # creating reverse rates
+                exchange_rate_data['base'] = currency_code
+                exchange_rate_data['target'] = 'EUR'
+                exchange_rate_data['rate'] = round(1/value, 5)
 
-                    #add exchange_rate_collection to db
-                    db.session.add(exchange_rates_EUR)
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    raise
+                ExchangeRateService.create(exchange_rate_data)
 
-                try:
-                    ExchangeRateService.create_exchange_rates_GBP(date)
-                    ExchangeRateService.create_exchange_rates_CZK(date)
-                    ExchangeRateService.create_exchange_rates_PLN(date)
 
-                    response_object = {
-                        'status': 'success',
-                        'message': 'Successfully seeded.'
-                    }
-                    return response_object
+            currency_tuples = list(mit.distinct_combinations(SUPPORTED_CURRENCIES, 2))
+            for currency_tuple in currency_tuples:
+                ExchangeRateService.create_between_rate(
+                    date, base=currency_tuple[0], target=currency_tuple[1])
 
-                except:
-                    response_object = {
-                        'status': 'error',
-                        'message': 'Failed to create GBP CZK PLN exchange rates.'
-                    }
-                    raise InternalServerError(response_object)
+
+        response_object = {
+            'status': 'success',
+            'message': 'Successfully created historic exchange rates.'
+        }
+        return response_object

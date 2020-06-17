@@ -26,9 +26,5 @@ class TaxRecord(db.Model):
     tax_jurisdiction_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
 
 
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def __repr__(self):
         return '<SellerFirm: {} | validity: {}-{}>'.format(self.seller_firm.name, str(start_date), str(end_date))

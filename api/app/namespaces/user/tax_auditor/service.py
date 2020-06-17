@@ -1,3 +1,4 @@
+from typing import List
 import pandas as pd
 
 from app.extensions import db
@@ -18,6 +19,7 @@ class TaxAuditorService:
     @staticmethod
     def get_by_id(tax_auditor_id: int) -> TaxAuditor:
         return TaxAuditor.query.filter(TaxAuditor.id == tax_auditor_id).first()
+
 
 
 

@@ -7,18 +7,12 @@ from flask import current_app, g
 from werkzeug.exceptions import InternalServerError, NotFound, Unauthorized
 
 from app.extensions import db
-from .model import Token
+from . import Token
 from .interface import TokenInterface
 
-from ..user.model_parent import User
+from ..user import User
 from ..user.service_parent import UserService
 from ..user.interface_parent import UserInterface
-from ..utils.schema import response_object_dto
-
-from ..user.admin.model import Admin
-from ..user.seller.model import Seller
-from ..user.tax_auditor.model import TaxAuditor
-
 
 
 class TokenService:
@@ -37,13 +31,12 @@ class TokenService:
 
 
     @staticmethod
-    def login_user(user_data: UserInterface) -> response_object_dto:
+    def login_user(user_data: UserInterface) -> Dict:
         # fetch the user data
         user = User.query.filter_by(email=user_data.get('email')).first()
         if user and user.check_password(user_data.get('password')):
             token_lifespan = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
-            auth_token = TokenService.encode_auth_token(
-                public_id=str(user.public_id), token_lifespan=token_lifespan)
+            auth_token = TokenService.encode_auth_token(public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
                 UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
                 response_object = {
@@ -56,18 +49,18 @@ class TokenService:
             raise Unauthorized('Invalid Email or Password.')
 
     @staticmethod
-    def current_user(auth_token: TokenInterface) -> Union[TaxAuditor, Admin, Seller]:
-            payload = TokenService.decode_auth_token(auth_token)
-            if not isinstance(payload, str):
-                user = User.query.filter(User.public_id == payload['sub']).first()
-                if user:
-                    return user
-                else:
-                    raise NotFound('This user does not exist.')
-            raise Unauthorized(payload)  # ('Provide a valid auth token.')
+    def current_user(auth_token: TokenInterface) -> User:
+        payload = TokenService.decode_auth_token(auth_token)
+        if not isinstance(payload, str):
+            user = User.query.filter_by(public_id = payload['sub']).first()
+            if user:
+                return user
+            else:
+                raise NotFound('This user does not exist.')
+        raise Unauthorized(payload)  # ('Provide a valid auth token.')
 
     @staticmethod
-    def logout_user(auth_token: TokenInterface) -> response_object_dto:
+    def logout_user(auth_token: TokenInterface) -> Dict:
         # update a user's last_seen attribute & creates a new action object
         # the inspect module needs to be imported whenever ping is called
 
@@ -127,7 +120,7 @@ class TokenService:
         :return: integer|string
         """
         try:
-            key = SECRET_KEY
+            key = current_app.config["SECRET_KEY"]
             payload = jwt.decode(auth_token, key)
             is_blacklisted_token = TokenService.check_blacklisted(auth_token)
             if is_blacklisted_token:
@@ -142,4 +135,4 @@ class TokenService:
     @staticmethod
     def check_blacklisted(auth_token: TokenInterface) -> bool:
         # check whether auth token has been blacklisted
-        return True if Token.query.filter_by(token=str(auth_token)).first() != None else False
+        return db.session.query(Token.query.filter_by(auth_token=str(auth_token)).exists()).scalar()

@@ -2,11 +2,10 @@ import datetime
 from uuid import UUID
 from typing import List
 
-from werkzeug.exceptions import Conflict, NotFound, Unauthorized
+from werkzeug.exceptions import Conflict, NotFound
 
 from app.extensions import db
-from .model_parent import User, Action
-from .schema_parent import user_dto
+from . import User, Action
 
 
 class UserService:
