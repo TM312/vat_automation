@@ -35,7 +35,7 @@ class VATINService:
         return vatin
 
     @staticmethod
-    def delete_by_id(vatin_id: str):
+    def delete_by_id(vatin_id: int):
         vatin = VATIN.query.filter(VATIN.id == vatin_id).first()
         if vatin:
             db.session.delete(vatin)

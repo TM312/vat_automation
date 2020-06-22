@@ -22,3 +22,11 @@ class TransactionResource(Resource):
     def get(self) -> List[Transaction]:
         """Get all Transactions"""
         return TransactionService.get_all()
+
+
+@ns.route("/<int:transaction_id>")
+@ns.param("transaction_id", "Transaction database ID")
+class TransactionIdResource(Resource):
+    def get(self, transaction_id: int) -> Transaction:
+        """Get Single Transaction"""
+        return TransactionService.get_by_id(transaction_id)

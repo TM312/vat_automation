@@ -40,6 +40,12 @@ class TransactionService:
         return vats
 
     @staticmethod
+    def get_by_id(transaction_id: int) -> Transaction:
+        return Transaction.query.filter_by(id = transaction_id).first()
+
+
+
+    @staticmethod
     def create_transaction_s(transaction_input_data: TransactionInputInterface) -> Transaction:
         from ..account.service import AccountService
         from ..tax.vat.service import VatService

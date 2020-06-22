@@ -1,4 +1,3 @@
-import TaxAuditorRepository from './AccountRepository'
 import AccountRepository from './AccountRepository'
 import BundleRepository from './BundleRepository'
 import BusinessRepository from './BusinessRepository'
@@ -17,9 +16,13 @@ import TaxTreatmentRepository from './TaxTreatmentRepository'
 import VatRepository from './VatRepository'
 import VATINRepository from './VATINRepository'
 import TaxRecordRepository from './TaxRecordRepository'
-
-
+import TransactionRepository from './TransactionRepository'
+import TransactionInputRepository from './TransactionInputRepository'
+import UserRepository from './UserRepository'
+import AdminRepository from './AdminRepository'
+import SellerRepository from './SellerRepository'
 import TaxAuditorRepository from './TaxAuditorRepository'
+import TemplateRepository from './TemplateRepository'
 
 
 export default ($axios) => ({
@@ -41,7 +44,11 @@ export default ($axios) => ({
     vat: VatRepository($axios),
     vatin: VATINRepository($axios),
     tax_record: TaxRecordRepository($axios),
-
-
+    transaction: TransactionRepository($axios),
+    transaction_input: TransactionInputRepository($axios),
+    user: UserRepository($axios),
+    admin: AdminRepository($axios),
+    seller: SellerRepository($axios),
     tax_auditor: TaxAuditorRepository($axios),
+    template: TemplateRepository($axios),
 })

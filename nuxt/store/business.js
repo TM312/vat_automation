@@ -23,16 +23,6 @@ export const actions = {
         }
     },
 
-    // async create({ commit }, business_data) {
-    //     const res = await this.$repositories.business.create(business_data)
-    //     const { status, data } = res
-    //     if (status === 200 && data.data) {
-    //         commit('SET_BUSINESS', data.data)
-    //     } else {
-    //         // Handle error here
-    //     }
-    // },
-
     async get_by_id({ commit }, business_id) {
 
         const res = await this.$repositories.business.get_by_id(business_id)
