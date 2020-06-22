@@ -23,15 +23,6 @@ class TaxRecordResource(Resource):
         """Get all TaxRecords"""
         return TaxRecordService.get_all()
 
-
-
-@ns.route("/<string:public_id>")
-class TaxRecordResource(Resource):
-    @login_required
-    @employer_required
-    def get(self, public_id):
-        return TaxRecordService.download_tax_record(public_id)
-
     @login_required
     @employer_required
     @ns.expect(tax_record_dto, validate=True)
@@ -42,6 +33,14 @@ class TaxRecordResource(Resource):
         seller_firm_public_id = request.args.get('seller_firm_public_id')
         tax_jurisdiction_code = request.args.get('tax_jurisdiction_code')
         return generate_tax_record(start_date_str, end_date_str, seller_firm_public_id, tax_jurisdiction_code)
+
+
+@ns.route("/<string:public_id>")
+class TaxRecordResource(Resource):
+    @login_required
+    @employer_required
+    def get(self, public_id):
+        return TaxRecordService.download_tax_record(public_id)
 
 
 @ns.route("/seller_firm/<string:seller_firm_public_id>")

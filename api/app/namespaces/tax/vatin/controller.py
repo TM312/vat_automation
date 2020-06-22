@@ -1,6 +1,7 @@
 from typing import List, BinaryIO
 from flask_restx import Namespace, Resource
 from flask.wrappers import Response
+from flask import request
 
 from . import VATIN
 from . import vatin_dto

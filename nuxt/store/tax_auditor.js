@@ -13,54 +13,61 @@ export const mutations = {
 }
 
 export const actions = {
-    async get_tax_auditors({ commit }) {
+    async get_all({ commit }) {
         const res = await this.$repositories.tax_auditor.get_all()
         const { status, data } = res
-        if (status === 200 && data.success && data.code) {
-            const { data } = data
-            commit('SET_TAX_AUDITORS', data)
+        if (status === 200 && data.data) {
+            commit('SET_TAX_AUDITORS', data.data)
         } else {
             // Handle error here
         }
     },
 
-    async get_tax_auditor({ commit }, tax_auditor) {
-        const res = await this.$repositories.tax_auditor.get_by_id(tax_auditor)
+    async get_by_id({ commit }, tax_auditor_id) {
+
+        const res = await this.$repositories.tax_auditor.get_by_id(tax_auditor_id)
         const { status, data } = res
-        if (status === 200 && data.success && data.code) {
-            const { data } = data
-            commit('SET_TAX_AUDITOR', data)
+        if (status === 200 && data.data) {
+            commit('SET_TAX_AUDITOR', data.data)
         } else {
             // Handle error here
         }
     },
 
-    async create_tax_auditor({ commit }, id, tax_auditor) {
-        const res = await this.$repositories.tax_auditor.create(id, tax_auditor)
+    async get_self({ commit }) {
+        const res = await this.$repositories.tax_auditor.get_self()
         const { status, data } = res
-        if (status === 200 && data.success && data.code) {
-            const { data } = data
-            commit('SET_TAX_AUDITOR', data)
+        if (status === 200 && data.data) {
+            commit('SET_TAX_AUDITOR', data.data)
         } else {
             // Handle error here
         }
     },
 
-    async update_tax_auditor({ commit }, id, tax_auditor) {
-        const res = await this.$repositories.tax_auditor.update(id, tax_auditor)
+    async create({ commit }, tax_auditor_data) {
+        const res = await this.$repositories.tax_auditor.create(tax_auditor_data)
         const { status, data } = res
-        if (status === 200 && data.success && data.code) {
-            const { data } = data
-            commit('SET_TAX_AUDITOR', data)
+        if (status === 200 && data.data) {
+            commit('SET_TAX_AUDITOR', data.data)
         } else {
             // Handle error here
         }
     },
 
-    async delete_tax_auditor({ commit }, id) {
-        const res = await this.$repositories.tax_auditor.delete(id)
+    async update({ commit }, tax_auditor_id, data_changes) {
+        const res = await this.$repositories.tax_auditor.update(tax_auditor_id, data_changes)
         const { status, data } = res
-        if (status === 200 && data.success && data.code) {
+        if (status === 200 && data.data) {
+            commit('SET_TAX_AUDITOR', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+    async delete_tax_auditor({ commit }, tax_auditor_id) {
+        const res = await this.$repositories.tax_auditor.delete(tax_auditor_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
             // Remove from store
             commit('SET_TAX_AUDITOR', [])
         } else {

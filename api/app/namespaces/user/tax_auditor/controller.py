@@ -1,6 +1,6 @@
 from typing import List, BinaryIO
 
-from flask import request, g, current_app
+from flask import request, g
 from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
@@ -49,7 +49,6 @@ class TaxAuditorSelfResource(Resource):
     @ns.marshal_list_with(tax_auditor_dto, envelope='data')
     def get(self) -> List[TaxAuditor]:
         '''List Of Registered TaxAuditor Firms'''
-        print('GUSERID: ', g.user.id, flush=True)
         return TaxAuditorService.get_by_id(g.user.id)
 
 
@@ -59,7 +58,7 @@ class TaxAuditorSelfResource(Resource):
 class TaxAuditorIdResource(Resource):
     #@login_required
     #@accepted_u_types('admin')
-    @ns.marshal_with(tax_auditor_dto)
+    @ns.marshal_with(tax_auditor_dto, envelope='data')
     def get(self, tax_auditor_id: int) -> TaxAuditor:
         '''Get One TaxAuditor'''
         return TaxAuditorService.get_by_id(tax_auditor_id)

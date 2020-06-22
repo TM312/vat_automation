@@ -25,20 +25,7 @@ class TaxRecordService:
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
         tax_records = TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
-        # tax_record_list = [
-        #     {
-        #         'Public ID': str(tax_record.public_id),
-        #         'Created On': str(tax_record.created_on),
-        #         'Created By': str(tax_record.creator.name),
-        #         'Start Date': str(tax_record.start_date),
-        #         'End Date': str(tax_record.end_date),
-        #         'Filename': str(tax_record.filename),
-        #         'Seller Firm': str(tax_record.seller_firm.name),
-        #         'Tax Jurisdiction': str(tax_record.tax_jurisdiction.name)
-        #     }
-        #     for tax_record in tax_records
-        # ]
-        return tax_records #tax_record_list
+        return tax_records
 
 
     def download_tax_record(public_id: str):

@@ -48,7 +48,6 @@ class UserLogin(Resource):
     def post(self):
         """ Login User """
         user_data: UserInterface = request.json
-        print(user_data, flush=True)
         return TokenService.login_user(user_data)
 
 

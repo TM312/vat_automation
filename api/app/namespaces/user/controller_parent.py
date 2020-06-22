@@ -46,7 +46,7 @@ class AdminUserActionsResource(Resource):
 class AdminUserIdResource(Resource):
     #@login_required
     #@accepted_u_types('admin')
-    @ns.marshal_with(user_dto_admin)
+    @ns.marshal_with(user_dto_admin, envelope='data')
     def get(self, public_id: str) -> User:
         """Get One User"""
         return UserService.get_by_public_id(UUID(public_id))
@@ -63,6 +63,6 @@ class UserSelfResource(Resource):
     @login_required
     #@accepted_u_types('admin')
     @ns.marshal_with(user_dto)
-    def get(self) -> User:
+    def get(self, envelope='data') -> User:
         """Get One User"""
         return UserService.get_by_id(g.user.id)
