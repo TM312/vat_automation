@@ -51,17 +51,3 @@ class AccountingFirmIdResource(Resource):
     def delete(self, accounting_firm_id: int) -> Response:
         '''Delete A Single AccountingFirm'''
         return AccountingFirmService.delete_by_id(accounting_firm_id)
-
-
-
-
-@ns.route("/clients")
-class AccountingFirmClientListResource(Resource):
-    """Get all Company Clients"""
-    @login_required
-    # @accepted_u_types('admin', 'tax_auditor')
-    #@confirmation_required
-    @ns.marshal_list_with(accounting_firm_dto, envelope='data')
-    def get(self) -> List[AccountingFirm]:
-        """List Of Registered Accountings"""
-        return AccountingFirmService.get_clients(tax_auditor=g.user)

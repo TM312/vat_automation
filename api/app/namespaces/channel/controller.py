@@ -40,8 +40,8 @@ class ChannelIdResource(Resource):
         """Delete Single Channel"""
         from flask import jsonify
 
-        id = ChannelService.delete_by_code(channel_code)
-        return jsonify(dict(status="Success", id=id))
+        code = ChannelService.delete_by_code(channel_code)
+        return jsonify(dict(status="Success", code=code))
 
     @ns.expect(channel_dto, validate=True)
     @ns.marshal_with(channel_dto)

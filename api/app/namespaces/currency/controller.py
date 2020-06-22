@@ -38,8 +38,8 @@ class CurrencyIdResource(Resource):
         """Delete Single Currency"""
         from flask import jsonify
 
-        id = CurrencyService.delete_by_code(currency_code)
-        return jsonify(dict(status="Success", id=id))
+        code = CurrencyService.delete_by_code(currency_code)
+        return jsonify(dict(status="Success", code=code))
 
     @ns.expect(currency_dto, validate=True)
     @ns.marshal_with(currency_dto)
