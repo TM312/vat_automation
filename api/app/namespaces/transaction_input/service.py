@@ -7,7 +7,7 @@ from flask import g, current_app
 from werkzeug.exceptions import UnsupportedMediaType, NotFound
 from app.extensions import db
 
-from .model import TransactionInput
+from . import TransactionInput
 from .interface import TransactionInputInterface
 
 from ..utils.service import InputService
@@ -17,6 +17,37 @@ from ..utils.service import InputService
 
 
 class TransactionInputService:
+
+    @staticmethod
+    def get_all() -> List[TransactionInput]:
+        transaction_inputs = TransactionInput.query.all()
+        return transaction_inputs
+
+    @staticmethod
+    def get_by_id(transaction_input_id: int) -> TransactionInput:
+        return TransactionInput.query.filter(TransactionInput.id == transaction_input_id).first()
+
+    @staticmethod
+    def update(transaction_input_id: int, data_changes: TransactionInputInterface) -> TransactionInput:
+        transaction_input = TransactionInputService.get_by_id(transaction_input_id)
+        transaction_input.update(data_changes)
+        db.session.commit()
+        return transaction_input
+
+    @staticmethod
+    def delete_by_id(transaction_input_id: int):
+        transaction_input = TransactionInput.query.filter(TransactionInput.id == transaction_input_id).first()
+        if transaction_input:
+            db.session.delete(transaction_input)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Transaction input (id: {}) has been successfully deleted.'.format(transaction_input_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This transaction input does not exist.')
 
     @staticmethod
     def get_df_transaction_input_delimiter(file: BinaryIO) -> str:

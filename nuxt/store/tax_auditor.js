@@ -1,6 +1,7 @@
 export const state = () => ({
     tax_auditors: [],
-    tax_auditor: []
+    tax_auditor: [],
+    self_tax_auditor: []
 })
 
 export const mutations = {
@@ -9,6 +10,9 @@ export const mutations = {
     },
     SET_TAX_AUDITOR(state, tax_auditor) {
         state.tax_auditor = tax_auditor
+    },
+    SET_SELF_TAX_AUDITOR(state, tax_auditor) {
+        state.self_tax_auditor = tax_auditor
     }
 }
 
@@ -38,7 +42,7 @@ export const actions = {
         const res = await this.$repositories.tax_auditor.get_self()
         const { status, data } = res
         if (status === 200 && data.data) {
-            commit('SET_TAX_AUDITOR', data.data)
+            commit('SET_SELF_TAX_AUDITOR', data.data)
         } else {
             // Handle error here
         }
@@ -64,7 +68,7 @@ export const actions = {
         }
     },
 
-    async delete_tax_auditor({ commit }, tax_auditor_id) {
+    async delete_by_id({ commit }, tax_auditor_id) {
         const res = await this.$repositories.tax_auditor.delete(tax_auditor_id)
         const { status, data } = res
         if (status === 200 && data.data) {
