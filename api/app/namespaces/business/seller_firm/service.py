@@ -94,7 +94,7 @@ class SellerFirmService:
             seller_firm_public_id = kwargs['seller_firm_public_id']
 
         elif ('df' and 'i') in kwargs and isinstance(kwargs['df'], pd.DataFrame) and isinstance(kwargs['i'], int):
-            seller_firm_public_id = InputService.get_str_or_None(df, i, column='seller_firm_public_id')
+            seller_firm_public_id = InputService.get_str_or_None(df=kwargs['df'], i, column='seller_firm_public_id')
 
         else:
             raise

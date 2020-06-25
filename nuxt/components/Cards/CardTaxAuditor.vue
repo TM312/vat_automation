@@ -14,6 +14,7 @@
 
 <script>
     export default {
+        name: 'CardTaxAuditor',
         props: { taxAuditor: { type: [Array, Object] } }
     }
 </script>

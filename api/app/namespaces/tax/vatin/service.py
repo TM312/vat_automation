@@ -2,17 +2,19 @@ from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import date, timedelta
 import time
+import re
 
 from flask import current_app
 from werkzeug.exceptions import HTTPException
 
 from app.extensions import db
 
-from .helpers import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH
+from .helpers import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, VIES_OPTIONS
 from . import VATIN
 from .interface import VATINInterface
 
 from ...transaction_input import TransactionInput
+from ...utils.service import InputService
 
 
 
@@ -126,11 +128,12 @@ class VATINService:
 
         file_type='vat_numbers'
         df_encoding = 'utf-8'
+        delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         for file in vat_numbers_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, basepath, **kwargs)
+            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, **kwargs)
 
         response_object = {
             'status': 'success',
@@ -142,9 +145,9 @@ class VATINService:
 
     # celery task !!
     @staticmethod
-    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding, basepath: str, **kwargs) -> List[Dict]:
+    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[Dict]:
 
-        df = InputService.read_file_path_into_df(file_path_in, df_encoding)
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
 
         InputService.move_file_to_out(file_path_in, file_type)
@@ -174,7 +177,7 @@ class VATINService:
             if not valid_to:
                 valid_to = valid_from + timedelta(days=VATIN_LIFESPAN)
 
-            vatin = VATIN.query.filter(country_code=country_code, number=number).first()
+            vatin = VATIN.query.filter_by(country_code=country_code, number=number).first()
 
             if vatin:
                 if vatin.valid and valid_to > vatin.valid_to:
@@ -220,8 +223,11 @@ class VATINService:
 
     @staticmethod
     def get_vat_from_df(df: pd.DataFrame, i: int) -> List[str]:
-        country_code_temp = InputService.get_str(df, i, column='country_code'),
-        number_temp = InputService.get_str(df, i, column='number')
+        country_code_temp = InputService.get_str(df, i, column='country_code')
+        number_temp = InputService.get_str(df, i, column='vatin')
+
+        print('country_code_temp:', country_code_temp, flush=True)
+        print('number_temp:', number_temp, flush=True)
         country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
         return country_code, number
 
@@ -263,14 +269,17 @@ class VATINService:
             return None
 
         elif not re.match(r"^[a-zA-Z]", number_temp):
+            print('Case 1', flush=True)
             VATINService.verify(country_code, number_temp)
             country_code, number = country_code_temp, number_temp
 
         elif country_code_temp == number_temp[:2].strip():
-            VATINService.verify(country_code_temp, number_temp)
-            country_code, number = country_code_temp, number_temp
+            print('Case 2', flush=True)
+            VATINService.verify(country_code_temp, number_temp[2:].strip())
+            country_code, number = country_code_temp, number_temp[2:].strip()
 
         else:
+            print('Case 3', flush=True)
             country_code = number_temp[:2].strip()
             number = number_temp[2:].strip()
             VATINService.verify(country_code, number)
@@ -298,6 +307,8 @@ class VATINService:
 
     @staticmethod
     def verify_regex(country_code: str, number: str) -> None:
+        print('country_code:', country_code, flush=True)
+        print('number:', number, flush=True)
         country = dict(
             map(
                 lambda x, y: (x, y),
@@ -305,6 +316,8 @@ class VATINService:
                 VIES_OPTIONS[country_code],
             )
         )
+        print('VIES_OPTIONS[country_code]: ', VIES_OPTIONS[country_code], flush=True)
+        print('country:', country, flush=True)
         if not country["validator"].match("{}{}".format(country_code, number)):
             msg = "{} does not match the country's VAT ID specifications.".format(
                 country_code)
@@ -326,6 +339,7 @@ class VIESService:
         try:
             vat_zeep_object = client.service.checkVat(country_code, number)
             vat = helpers.serialize_object(vat_zeep_object)
+            print('VIES API! | vat:', vat)
             return vat
 
         except Exception as e:

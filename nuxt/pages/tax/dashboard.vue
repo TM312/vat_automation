@@ -10,11 +10,10 @@
         </div>
         <div class="row">
             <!-- <tax-auditor v-for="(tax_auditor, i) in tax_auditors" :key="i" :taxAuditor="tax_auditor" /> -->
-            <tax-auditor :taxAuditor="tax_auditor" />
+            <card-tax-auditor :taxAuditor="tax_auditor" />
         </div>
         <!-- <p>{{ tax_auditor.email }}</p> -->
         <hr />
-        <DashboardMetrics />
     </b-container>
 </template>
 

@@ -22,7 +22,7 @@ import UserRepository from './UserRepository'
 import AdminRepository from './AdminRepository'
 import SellerRepository from './SellerRepository'
 import TaxAuditorRepository from './TaxAuditorRepository'
-import TemplateRepository from './TemplateRepository'
+// import TemplateRepository from './TemplateRepository'
 
 
 export default ($axios) => ({
@@ -50,5 +50,5 @@ export default ($axios) => ({
     admin: AdminRepository($axios),
     seller: SellerRepository($axios),
     tax_auditor: TaxAuditorRepository($axios),
-    template: TemplateRepository($axios),
+    // template: TemplateRepository($axios),
 })

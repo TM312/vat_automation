@@ -1,6 +1,6 @@
 <template>
 <b-container fluid>
-    <div class="mt-5">
+    <!-- <div class="mt-5">
       <b-table
         striped
         hover
@@ -13,7 +13,6 @@
 
         <template v-slot:cell(platform)>
           <p>Amazon</p>
-          <!-- <b-form-select v-model="selected" :options="options"></b-form-select> -->
         </template>
 
         <template v-slot:cell(keep?)="data">
@@ -36,7 +35,7 @@
         <b-icon icon="box-arrow-in-right" />
         Upload Files
       </b-button>
-    </div>
+    </div> -->
 </b-container>
 
 </template>

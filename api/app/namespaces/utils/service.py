@@ -82,6 +82,7 @@ class InputService:
                     try:
                         date = datetime.strptime(df.iloc[i][column], '%d.%m.%y').date()
                     except:
+                        print('get_date_or_None', date, flush=True)
                         raise UnsupportedMediaType('Can not read date format.')
         return date
 
@@ -103,6 +104,7 @@ class InputService:
             try:
                 string = str(df.iloc[i][column])
             except:
+                print('get_str_or_None', flush=True)
                 raise UnsupportedMediaType('Can not read date format.')
 
         return string
@@ -116,6 +118,7 @@ class InputService:
             try:
                 flt = float(df.iloc[i][column])
             except:
+                print('get_float', flt, flush=True)
                 raise UnsupportedMediaType('Can not read float format.')
 
         return flt
@@ -126,6 +129,7 @@ class InputService:
         try:
             boolean = bool(df.iloc[i][column] == value_true)
         except:
+            print('get_bool', boolean, flush=True)
             raise UnsupportedMediaType('Can not read bool format.')
 
         return boolean
@@ -189,7 +193,7 @@ class InputService:
 
 
     @staticmethod
-    def store_static_data_upload(file, file_type: str) -> str:
+    def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
         STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
@@ -214,21 +218,24 @@ class InputService:
         MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
 
         file_size = os.stat(file_path).st_size
+
+
         if not file_size <= MAX_FILE_SIZE_INPUT:
             os.remove(file_path)
+
+        return file_size <= MAX_FILE_SIZE_INPUT
 
 
     @staticmethod
     def store_file(file: BinaryIO, allowed_extensions: List, basepath: str, **kwargs) -> str:
-        if allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
-            filename = secure_filename(file.filename)
-            stored_filename = "{}.{}".format(filename, filename.rsplit('.', 1)[1].lower())
+        if InputService.allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
+            stored_filename = secure_filename(file.filename)
 
             if 'file_type' in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
-                basepath_in = os.path.join(basepath, file_type, 'in')
+                basepath_in = os.path.join(basepath, kwargs['file_type'], 'in')
 
             elif 'file_type' in kwargs and 'in_out' in kwargs and kwargs.get('in_out') == False:
-                basepath_in = os.path.join(basepath, file_type)
+                basepath_in = os.path.join(basepath, kwargs['file_type'])
 
             elif 'file_type' not in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
                 basepath_in = os.path.join(basepath, 'in')
@@ -240,6 +247,7 @@ class InputService:
             os.makedirs(basepath_in, exist_ok=True)
 
             file_path_in = os.path.join(basepath_in, stored_filename)
+            print('file_path_in: ', file_path_in, flush=True)
             file.save(file_path_in)
 
             if InputService.allowed_filesize(file_path=file_path_in):
@@ -249,6 +257,7 @@ class InputService:
                 raise RequestEntityTooLarge('Uploaded files exceed the file limit. Please reduce the number of files to be processed at once.')
 
         else:
+            print('Case "Store file else"', flush=True)
             raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
 
 
@@ -270,14 +279,19 @@ class InputService:
     def read_file_path_into_df(file_path: str, df_encoding: str, delimiter: str) -> pd.DataFrame:
         if os.path.isfile(file_path):
             file_name = os.path.basename(file_path)
+            print('file_name: ', file_name, flush=True)
             try:
                 if file_name.lower().endswith('.csv'):
                     df = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
+                    print(df.head(), flush=True)
                 else:
+                    print('Case "Read File Path: File extension invalid"', flush=True)
                     raise UnsupportedMediaType(
                         'File extension invalid (file: {}).'.format(file_name))
                 return df
             except:
+                print('Case "Read File Path: Cannot read file"', flush=True)
+
                 raise UnsupportedMediaType(
                     'Cannot read file {}.'.format(file_name))
 

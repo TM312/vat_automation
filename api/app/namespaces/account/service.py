@@ -61,7 +61,7 @@ class AccountService:
 
         file_type = 'account_list'
         df_encoding = 'utf-8'
-        delimiter = None
+        delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
 
