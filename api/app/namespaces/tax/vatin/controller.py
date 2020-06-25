@@ -61,4 +61,5 @@ class VATNumbersResource(Resource):
     # @confirmation_required
     def post(self):
         vat_numbers_files: List[BinaryIO] = request.files.getlist("files")
+        print(vat_numbers_files, flush=True)
         return VATINService.process_vat_numbers_files_upload(vat_numbers_files)
