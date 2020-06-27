@@ -19,16 +19,16 @@ class SellerFirm(Business):
         return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
 
     distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy=True)
-    items = db.relationship('Item', backref='seller_firm', lazy=True)
+    items = db.relationship('Item', backref='seller_firm', lazy='joined')
 
     # IDs for supported platforms
-    accounts = db.relationship('Account', backref='seller_firm', lazy=True)
+    accounts = db.relationship('Account', backref='seller_firm', lazy='joined')
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
 
-    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy=True)
+    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined')
 
 
 

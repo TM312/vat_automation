@@ -1,15 +1,14 @@
 <template>
     <b-nav-item-dropdown right no-caret>
         <template slot="button-content">
-            <b-avatar variant="primary" text="U" />
+            <b-avatar variant="primary" :text="initials" />
         </template>
         <b-dropdown-header tag="div" class="text-center" variant="primary">
             <strong>Account</strong>
         </b-dropdown-header>
 
         <b-dropdown-item to="/settings">
-            <b-icon icon="gear" />
-            Settings
+            <b-icon icon="gear" /> Settings
         </b-dropdown-item>
         <!-- <b-dropdown-item to="/payments">
             <b-icon icon="credit-card" />
@@ -18,8 +17,7 @@
         </b-dropdown-item> -->
         <b-dropdown-divider />
         <b-dropdown-item @click="logout">
-            <b-icon icon="power" />
-            Logout
+            <b-icon icon="power" /> Logout
         </b-dropdown-item>
     </b-nav-item-dropdown>
 </template>
@@ -41,7 +39,12 @@
                 await this.$auth.logout();
                 this.$router.push("/logout");
             }
-        }
+        },
+        computed: {
+            initials() {
+                return this.$auth.user.initials
+            }
+        },
     }
 </script>
 

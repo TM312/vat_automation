@@ -94,7 +94,7 @@ class SellerFirmService:
             seller_firm_public_id = kwargs['seller_firm_public_id']
 
         elif ('df' and 'i') in kwargs and isinstance(kwargs['df'], pd.DataFrame) and isinstance(kwargs['i'], int):
-            seller_firm_public_id = InputService.get_str_or_None(df=kwargs['df'], i, column='seller_firm_public_id')
+            seller_firm_public_id = InputService.get_str_or_None(df=kwargs['df'], i=kwargs['i'], column='seller_firm_public_id')
 
         else:
             raise
@@ -113,7 +113,7 @@ class SellerFirmService:
 
         file_type = 'seller_firm'
         df_encoding = 'utf-8'
-        delimiter = None
+        delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
         accounting_firm_id = g.user.employer_id
@@ -138,7 +138,7 @@ class SellerFirmService:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = SellerFirmService.create_seller_firms(df, file_path_in, user_id, **kwargs)
 
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
 
         return response_objects

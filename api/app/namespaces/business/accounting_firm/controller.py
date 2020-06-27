@@ -36,18 +36,18 @@ class AccountingFirmResource(Resource):
         return AccountingFirmService.create(accounting_firm_data)
 
 
-@ns.route('/<int:accounting_firm_id>')
-@ns.param('accounting_firm_id', 'Seller firm ID')
+@ns.route('/<string:accounting_firm_public_id>')
+@ns.param('accounting_firm_public_id', 'Seller firm ID')
 class AccountingFirmIdResource(Resource):
     # @login_required
     # @accepted_u_types('admin')
-    @ns.marshal_with(accounting_firm_dto)
-    def get(self, accounting_firm_id: int) -> AccountingFirm:
+    @ns.marshal_with(accounting_firm_dto, envelope='data')
+    def get(self, accounting_firm_public_id: str) -> AccountingFirm:
         '''Get One AccountingFirm'''
-        return AccountingFirmService.get_by_id(accounting_firm_id)
+        return AccountingFirmService.get_by_public_id(accounting_firm_public_id)
 
     # @login_required
     # @accepted_u_types('admin')
-    def delete(self, accounting_firm_id: int) -> Response:
+    def delete(self, accounting_firm_public_id: int) -> Response:
         '''Delete A Single AccountingFirm'''
-        return AccountingFirmService.delete_by_id(accounting_firm_id)
+        return AccountingFirmService.delete_by_public_id(accounting_firm_public_id)

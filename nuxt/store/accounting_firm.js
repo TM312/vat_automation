@@ -12,6 +12,10 @@ export const mutations = {
     }
 }
 
+export const getters = {
+    countEmployees: state => state.accounting_firm.employees.length
+}
+
 export const actions = {
     async get_all({ commit }) {
         const res = await this.$repositories.accounting_firm.get_all()
@@ -33,9 +37,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, accounting_firm_id) {
+    async get_by_public_id({ commit }, accounting_firm_public_id) {
 
-        const res = await this.$repositories.accounting_firm.get_by_id(accounting_firm_id)
+        const res = await this.$repositories.accounting_firm.get_by_public_id(accounting_firm_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_ACCOUNTING_FIRM', data.data)
@@ -54,8 +58,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, accounting_firm_id) {
-        const res = await this.$repositories.accounting_firm.delete(accounting_firm_id)
+    async delete_by_public_id({ commit }, accounting_firm_public_id) {
+        const res = await this.$repositories.accounting_firm.delete(accounting_firm_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store

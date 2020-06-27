@@ -121,7 +121,7 @@ class ItemService:
         response_objects = ItemService.create_items(df, file_path_in, user_id, **kwargs)
 
         # celery task !!
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_objects
 

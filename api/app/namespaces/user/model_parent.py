@@ -48,6 +48,10 @@ class User(db.Model):  # type: ignore
     u_type = db.Column(db.String(56))
     __mapper_args__ = {'polymorphic_on': u_type}
 
+    @property
+    def initials(self):
+        return ''.join(name[0].upper() for name in self.name.split())
+
 
     @property
     def password(self):

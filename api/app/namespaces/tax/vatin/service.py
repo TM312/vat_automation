@@ -150,7 +150,7 @@ class VATINService:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
 
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_objects
 

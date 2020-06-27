@@ -14,9 +14,6 @@ from app.namespaces.tax.tax_treatment import TaxTreatment
 from app.namespaces.tax.vat import Vat, TaxRateType
 from app.namespaces.platform import Platform
 from app.namespaces.channel import Channel
-#from app.namespaces.user.admin.model import Admin
-#from app.namespaces.user.tax_auditor.model import TaxAuditor
-#from app.namespaces.business.accounting_firm.model import AccountingFirm
 
 
 from .seeds.currencies import currencies
@@ -30,7 +27,6 @@ from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
 from .seeds.exchange_rates import ExchangeRatesSeedService
 from .seeds.platforms import platforms, PlatformSeedService
 from .seeds.channels import channels
-#from .seeds.users import tax_auditors#, admins
 from .seeds.accounting_firms import AccountingFirmSeedService
 from .seeds.users import AdminSeedService, TaxAuditorSeedService
 
@@ -76,20 +72,6 @@ class SeedService:
 
         return response_objects
 
-
-    # @staticmethod
-    # def seed_thing(key:str, klass, object_dict: Dict) -> Dict:
-    #     try:
-    #         db.session.bulk_insert_mappings(klass, object_dict)
-    #         db.session.commit()
-    #         response_object = {
-    #             'status': 'success',
-    #             'message': 'Successfully seeded {} ({} objects).'.format(key, len(object_dict.items()))
-    #         }
-    #         return response_object
-    #     except:
-    #         db.session.rollback()
-    #         raise InternalServerError('Error seeding {}'.format(key))
 
 
 

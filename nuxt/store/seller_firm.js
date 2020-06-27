@@ -4,6 +4,13 @@ export const state = () => ({
     seller_firm: []
 })
 
+export const getters = {
+    countClients: state => state.client_seller_firms.length,
+
+    client_by_public_id: state => public_id => state.client_seller_firms.find(client => client.public_id === public_id)
+
+}
+
 export const mutations = {
     SET_SELLER_FIRMS(state, seller_firms) {
         state.seller_firms = seller_firms
@@ -37,9 +44,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, seller_firm_id) {
+    async get_by_public_id({ commit }, seller_firm_public_id) {
 
-        const res = await this.$repositories.seller_firm.get_by_id(seller_firm_id)
+        const res = await this.$repositories.seller_firm.get_by_public_id(seller_firm_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_SELLER_FIRM', data.data)
@@ -73,6 +80,7 @@ export const actions = {
         const res = await this.$repositories.seller_firm.get_clients()
         const { status, data } = res
         if (status === 200 && data.data) {
+            console.log(data.data)
             commit('SET_CLIENT_SELLER_FIRMS', data.data)
         } else {
             // Handle error here

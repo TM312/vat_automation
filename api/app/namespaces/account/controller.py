@@ -56,6 +56,7 @@ class AccountIdResource(Resource):
 
 @ns.route("/csv")
 class AccountInformationResource(Resource):
+    @login_required
     # @confirmation_required
     #@ns.expect(tax_record_dto, validate=True)
     def post(self):

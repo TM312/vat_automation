@@ -2,28 +2,32 @@
     <b-card no-body>
         <b-tabs pills card vertical>
             <b-tab title='Overview' active>
-                <Overview />
+                <p>self name: {{ self.name }}</p>
+                <overview :self="self" />
             </b-tab>
             <b-tab title='Add Clients'>
-                <AddClient />
+                <add-client />
             </b-tab>
             <b-tab title='Add Data'>
-                <AddSellerFirmData />
+                <add-seller-firm-data />
             </b-tab>
         </b-tabs>
     </b-card>
 </template>
 
 <script>
-    // import AddClient from '@/components/TaxAuditor/Clients/AddClient';
-    // import Overview from '@/components/TaxAuditor/Clients/Overview';
+    import { mapState } from "vuex";
 
     export default {
         layout: 'tax',
-        // components: {
-        //     AddClient,
-        //     Overview
-        // },
+        middleware: "auth-tax",
+        computed: {
+            ...mapState({
+                self: state => state.auth.user,
+            })
+        },
+
+
         // async fetch({ $axios, store }) {
         //     let [response_self, response_employer_clients] = await Promise.all([
         //         $axios.$get('/user/tax_auditor/self'),

@@ -16,9 +16,10 @@ class AccountingFirmSeedService:
     @staticmethod
     def append_tax_auditor_to_accounting_firm():
         gvc = AccountingFirm.query.filter_by(name='Global VAT Compliance').first()
-        gvc_main = TaxAuditor.query.filter_by(name='GVC Main').first()
-        if not isinstance(gvc, AccountingFirm) or not isinstance(gvc_main, TaxAuditor):
+        gvc_all = TaxAuditor.query.all()
+        if not isinstance(gvc, AccountingFirm):
             raise
 
         else:
-            gvc.employees.append(gvc_main)
+            for tax_auditor in gvc_all:
+                gvc.employees.append(tax_auditor)

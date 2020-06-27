@@ -37,15 +37,16 @@ class SellerFirmResource(Resource):
         return SellerFirmService.create(seller_firm_data)
 
 
-@ns.route('/<int:seller_firm_id>')
-@ns.param('seller_firm_id', 'Seller firm ID')
+@ns.route('/<string:seller_firm_public_id>')
+@ns.param('seller_firm_public_id', 'Seller firm ID')
 class SellerFirmIdResource(Resource):
-    #@login_required
+    @login_required
     #@accepted_u_types('admin')
-    @ns.marshal_with(seller_firm_dto)
-    def get(self, seller_firm_id: int) -> SellerFirm:
+    @ns.marshal_with(seller_firm_dto, envelope='data')
+    def get(self, seller_firm_public_id: int) -> SellerFirm:
         '''Get One SellerFirm'''
-        return SellerFirmService.get_by_id(seller_firm_id)
+        print(SellerFirmService.get_by_public_id(seller_firm_public_id), flush=True)
+        return SellerFirmService.get_by_public_id(seller_firm_public_id)
 
     # @login_required
     # @accepted_u_types('admin')
@@ -58,7 +59,7 @@ class SellerFirmIdResource(Resource):
 class SellerFirmAsClientResource(Resource):
     @login_required
     #@accepted_u_types('admin')
-    @ns.marshal_list_with(seller_firm_dto)
+    @ns.marshal_list_with(seller_firm_dto, envelope='data')
     def get(self) -> List[SellerFirm]:
         '''Get One SellerFirm'''
         accounting_firm_id = g.user.employer_id
@@ -69,7 +70,7 @@ class SellerFirmAsClientResource(Resource):
 
 @ns.route("/csv")
 class SellerFirmInformationResource(Resource):
-    # @login_required
+    @login_required
     # @employer_required
     # @confirmation_required
     # !!! @ns.expect(tax_record_dto, validate=True)

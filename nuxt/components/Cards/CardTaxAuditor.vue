@@ -1,12 +1,10 @@
 <template>
-    <b-col cols="4">
-        <b-card :title="taxAuditor.name">
+    <b-col cols="4" md="3">
+        <b-card :header="taxAuditor.name" header-bg-variant="primary" header-text-variant="white">
             <b-card-text>
-                <ul>
-                    <li>{{ taxAuditor.email }}</li>
-                    <li>{{ taxAuditor.public_id }}</li>
-                    <li>{{ taxAuditor.last_seen }}</li>
-                </ul>
+                <b>Email:</b> {{ taxAuditor.email }} <br>
+                <b>Employer:</b> {{ taxAuditor.employer_name }} <br>
+                <b>Registered On:</b> {{ taxAuditor.registered_on }} <br>
             </b-card-text>
         </b-card>
     </b-col>
@@ -15,6 +13,7 @@
 <script>
     export default {
         name: 'CardTaxAuditor',
+        // eslint-disable-next-line
         props: { taxAuditor: { type: [Array, Object] } }
     }
 </script>
