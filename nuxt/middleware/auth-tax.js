@@ -7,5 +7,8 @@ export default function ({ $auth, redirect }) {
 
     } else if (user && user.u_type === 'seller') {
         redirect('/dashboard')
+
+    } else {
+        redirect('/tax/login')
     }
 }

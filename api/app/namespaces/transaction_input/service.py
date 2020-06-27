@@ -96,7 +96,7 @@ class TransactionInputService:
         response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, **kwargs)
 
 
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_objects
 

@@ -56,7 +56,7 @@ class VATINIdResource(Resource):
 
 @ns.route("/csv")
 class VATNumbersResource(Resource):
-    # @login_required
+    @login_required
     # @employer_required
     # @confirmation_required
     def post(self):

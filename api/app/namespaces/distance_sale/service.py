@@ -69,7 +69,7 @@ class DistanceSaleService:
 
         response_objects = DistanceSaleService.create_distance_sales(df, file_path_in, user_id, **kwargs)
 
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
 
         return response_objects
@@ -79,7 +79,7 @@ class DistanceSaleService:
 
     @staticmethod
     def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
-        from ...business.seller_firm.service import SellerFirmService
+        from ..business.seller_firm.service import SellerFirmService
 
         TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
 

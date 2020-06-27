@@ -1,5 +1,9 @@
 <template>
-    <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" />
+    <div>
+        <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" />
+        <br />
+        <card-data-upload :urlEndpointUpload="urlEndpointUpload" />
+    </div>
 </template>
 
 <script>
@@ -15,7 +19,8 @@ export default {
                 { field_name: 'valid_to', example: '31.12.2025', field_formatting: 'Date', required: 'false', complementary_information: "This information is used when processing client's transaction reports." },
                 { field_name: 'arrival_country_code', example: 'FR', field_formatting: 'Text', required: 'true', complementary_information: "Is being used for instance for a convenient naming of your clients' tax records." },
                 { field_name: 'status', example: 'TRUE', field_formatting: 'Text', required: 'false', complementary_information: "Is being used for instance for a convenient naming of your clients' tax records." }
-            ]
+            ],
+            urlEndpointUpload: "/distance_sale/csv"
         }
     }
 }

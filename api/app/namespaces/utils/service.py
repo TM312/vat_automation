@@ -283,6 +283,7 @@ class InputService:
             try:
                 if file_name.lower().endswith('.csv'):
                     df = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
+                    print('df.head()', flush=True)
                     print(df.head(), flush=True)
                 else:
                     print('Case "Read File Path: File extension invalid"', flush=True)

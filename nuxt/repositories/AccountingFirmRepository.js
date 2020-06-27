@@ -8,15 +8,15 @@ export default ($axios) => ({
         return $axios.post(`${resource}/`, payload)
     },
 
-    get_by_id(accounting_firm_id) {
-        return $axios.get(`${resource}/${accounting_firm_id}`)
+    get_by_public_id(accounting_firm_public_id) {
+        return $axios.get(`${resource}/${accounting_firm_public_id}`)
     },
 
-    update(accounting_firm_id, payload) {
-        return $axios.put(`${resource}/${accounting_firm_id}`, payload)
-    },
+    // update(accounting_firm_id, payload) {
+    //     return $axios.put(`${resource}/${accounting_firm_id}`, payload)
+    // },
 
-    delete_by_id(accounting_firm_id) {
-        return $axios.delete(`${resource}/${accounting_firm_id}`)
+    delete_by_public_id(accounting_firm_public_id) {
+        return $axios.delete(`${resource}/${accounting_firm_public_id}`)
     }
 })

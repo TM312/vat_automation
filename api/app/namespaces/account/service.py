@@ -86,7 +86,7 @@ class AccountService:
 
         response_objects = AccountService.create_accounts(df, file_path_in, user_id, **kwargs)
 
-        InputService.move_file_to_out(file_path_in, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
 
         return response_objects

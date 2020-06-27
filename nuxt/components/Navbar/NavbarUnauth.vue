@@ -20,7 +20,7 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <!-- Using 'button-content' slot -->
-        <b-button variant="outline-success" to="/login">
+        <b-button variant="outline-success" to="/tax/login">
           Sign In
         </b-button>
       </b-navbar-nav>

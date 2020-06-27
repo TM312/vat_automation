@@ -2,8 +2,8 @@ from flask_restx import Model, fields
 
 item_dto = Model('item', {
     'id': fields.Integer(readonly=True),
-    'created_by': fields.Integer,
-    'created_on': fields.DateTime,
+    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
+    'created_on': fields.Date,
     'original_filename': fields.String,
     'sku': fields.String,
     'seller_firm_id': fields.Integer,
