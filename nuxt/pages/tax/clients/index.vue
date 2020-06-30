@@ -1,9 +1,9 @@
 <template>
     <b-card no-body>
         <b-tabs pills card vertical>
-            <b-tab title='Overview' active>
-                <p>self name: {{ self.name }}</p>
-                <overview :self="self" />
+            <b-tab title='Overview' @click="refresh" active>
+                <clients-dashboard />
+                <view-clients class="mt-5"/>
             </b-tab>
             <b-tab title='Add Clients'>
                 <add-client />
@@ -21,11 +21,25 @@
     export default {
         layout: 'tax',
         middleware: "auth-tax",
+
         computed: {
             ...mapState({
-                self: state => state.auth.user,
+                accounting_firm: state => state.accounting_firm.accounting_firm
             })
         },
+
+
+        methods: {
+            setLoadingToFalse() {
+                this.loading = false
+            },
+            async refresh() {
+                const { store } = this.$nuxt.context
+                await store.dispatch("accounting_firm/get_by_public_id", this.accounting_firm.public_id)
+            }
+        }
+
+
 
 
         // async fetch({ $axios, store }) {

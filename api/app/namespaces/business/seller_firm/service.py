@@ -46,16 +46,31 @@ class SellerFirmService:
         return seller_firm
 
     @staticmethod
-    def delete_by_id(seller_firm_id: int) -> Dict:
-        #check if accounting business exists in db
-        seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
+    def delete_by_public_id(seller_firm_public_id: str) -> Dict:
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             db.session.delete(seller_firm)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Seller firm (Public ID: {}) has been successfully deleted.'.format(public_id)
+                'message': 'Seller firm (Public ID: {}) has been successfully deleted.'.format(seller_firm_public_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This accounting firm does not exist.')
+
+    @staticmethod
+    def delete_by_id(seller_firm_id: int) -> Dict:
+        #check if accounting business exists in db
+        seller_firm = SellerFirmService.get_by_id(seller_firm_id)
+        if seller_firm:
+            db.session.delete(seller_firm)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Seller firm (Public ID: {}) has been successfully deleted.'.format(seller_firm_id)
             }
             return response_object
         else:

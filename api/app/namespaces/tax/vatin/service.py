@@ -193,7 +193,7 @@ class VATINService:
 
 
 
-        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_vatins, error_counter)
+        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)
 
         return response_objects
 

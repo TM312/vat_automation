@@ -17,6 +17,10 @@
                 type: String,
                 required: true
             },
+            // urlRouterPush: {
+            //     type: String,
+            //     required: false
+            // },
             files: {
                 type: Array,
                 required: true
@@ -50,22 +54,24 @@
                     }.bind(this)
                 };
 
-                // this.$axios.setHeader('Content-Type', 'multipart/form-data', ['post'])
                 await this.$axios
                     .post(this.urlEndpointUpload, data, config)
 
                     .then(response => {
-                        let response_objects = response.data;
-                        response_objects.map(data => {
-                            if (data.status == "success") {
-                                console.log(data);
-                                this.$toast.success(data.message, {
-                                    duration: 5000
-                                });
-                            } else {
-                                this.$toast.error(data.message, { duration: 5000 });
-                            }
-                        });
+                        let response_object = response.data;
+
+                        if (response_object.status == "success") {
+                            // this.$router.push(this.urlRouterPush);
+
+                            this.$toast.success(response_object.message, {
+                                duration: 5000
+                            });
+
+                            this.$emit('resetFileList')
+
+                        } else {
+                            this.$toast.error(response_object.message, { duration: 5000 });
+                        }
                     })
 
                     .catch(err => {
@@ -76,8 +82,9 @@
                         );
                         this.progressBarStyle = "danger";
                     });
-                // console.log(err))
-                // this.$toast.error(err.message, {duration: 5000,}))
+
+
+
 
                 // this.files = [];
             }

@@ -2,7 +2,7 @@
     <b-card
         :title="counter"
         :sub-title="subTitle"
-        border-variant="primary"
+        border-variant="info"
 
     >
     </b-card>
@@ -11,15 +11,17 @@
 <script>
     export default {
         name: "CardTotalCount",
-
         props: {
             counterNumber: {
                 type: Number,
-                required: true
+                required: true,
+                default: 0
             },
+
             subTitle: {
                 type: String,
-                required: false
+                required: false,
+                default: ''
             }
         },
         data() {
@@ -27,6 +29,8 @@
                 counter: this.counterNumber.toString()
             }
         },
+
+
     };
 </script>
 

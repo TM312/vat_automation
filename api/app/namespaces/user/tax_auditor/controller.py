@@ -6,7 +6,7 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from . import TaxAuditor
-from . import tax_auditor_dto, tax_auditor_dto_admin
+from . import tax_auditor_dto, tax_auditor_dto_admin, tax_auditor_sub_dto
 from .service import TaxAuditorService
 from .interface import TaxAuditorInterface
 
@@ -18,6 +18,7 @@ from ...utils.service import TemplateService
 ns = Namespace("TaxAuditor", description="TaxAuditor Related Operations")  # noqa
 ns.add_model(tax_auditor_dto.name, tax_auditor_dto)
 ns.add_model(tax_auditor_dto_admin.name, tax_auditor_dto_admin)
+ns.add_model(tax_auditor_sub_dto.name, tax_auditor_sub_dto)
 # https://flask-restx.readthedocs.io/en/latest/api.html#flask_restx.Model
 # https://github.com/python-restx/flask-restx/blob/014eb9591e61cd3adbbd29a38b76df6a688f067b/flask_restx/namespace.py
 

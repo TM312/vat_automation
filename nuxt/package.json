@@ -14,7 +14,7 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
-    "@nuxt/components": "^0.3.4",
+    "@nuxt/components": "^1.0.5",
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.11.0",
     "@nuxtjs/toast": "^3.3.0",

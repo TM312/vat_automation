@@ -17,7 +17,7 @@
                 <!-- <b-button variant="primary" @click="uploadFiles">
                     <b-icon icon="box-arrow-in-right" /> Upload
                 </b-button> -->
-                <button-upload :urlEndpointUpload="urlEndpointUpload" :files="files" />
+                <button-upload :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" />
 
                 <b-button id="selectButton" variant="outline-primary" @click="$refs.files.click()">
                     <b-icon icon="file-plus" /> Files
@@ -67,7 +67,12 @@
             urlEndpointUpload: {
                 type: String,
                 required: true
-            }
+            },
+
+            // urlRouterPush: {
+            //     type: String,
+            //     required: true
+            // },
         },
         data() {
             return {
@@ -108,6 +113,10 @@
                 this.files.splice(key, 1);
                 console.log(this.files);
             },
+
+            resetFileList() {
+                this.files = []
+            }
             // async uploadFiles() {
             //     // FormData is a standard JS object
             //     const data = new FormData();

@@ -6,7 +6,7 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from . import User, Action
-from . import user_dto, user_dto_admin, action_dto
+from . import user_dto, user_dto_admin, user_sub_dto, action_dto
 from .service_parent import UserService
 
 from ..utils.decorators import login_required, accepted_u_types, confirmation_required
@@ -15,6 +15,7 @@ from ..utils.decorators import login_required, accepted_u_types, confirmation_re
 ns = Namespace("User", description="User Related Operations")  # noqa
 ns.add_model(user_dto.name, user_dto)
 ns.add_model(user_dto_admin.name, user_dto_admin)
+ns.add_model(user_sub_dto.name, user_sub_dto)
 ns.add_model(action_dto.name, action_dto)
 
 # https://flask-restx.readthedocs.io/en/latest/api.html#flask_restx.Model

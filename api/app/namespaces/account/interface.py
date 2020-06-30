@@ -9,4 +9,3 @@ class AccountInterface(TypedDict, total=False):
     modified_at: datetime
     channel_code: str
     seller_firm_id: int
-    transactions: List['app.namespaces.transaction.Transaction']

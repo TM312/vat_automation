@@ -46,7 +46,7 @@ class DistanceSaleService:
         df_encoding = 'utf-8'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
-        delimiter = None
+        delimiter = ';'
 
         for file in distance_sale_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
@@ -94,7 +94,7 @@ class DistanceSaleService:
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            active = InputService.get_str(df, i, column='active')
+            active = InputService.get_str(df, i, column='status')
 
             if not valid_from:
                 valid_from = date.today()
@@ -102,8 +102,7 @@ class DistanceSaleService:
                 valid_to = valid_from + timedelta(days=TAX_DEFAULT_VALIDITY)
 
             if seller_firm_id:
-                redundancy_counter += DistanceSaleService.handle_redundancy(public_id, channel_code)
-
+                redundancy_counter += DistanceSaleService.handle_redundancy(seller_firm_id, arrival_country_code, valid_from)
                 distance_sale_data = {
                     'created_by': user_id,
                     'original_filename' : os.path.basename(file_path_in),
@@ -114,11 +113,16 @@ class DistanceSaleService:
                     'arrival_country_code': arrival_country_code,
                     'active': active
                 }
+                print('distance_sale_data', distance_sale_data, flush=True)
+
 
                 try:
+                    print('Enter TRY', flush=True)
                     new_distance_sale = DistanceSaleService.create(distance_sale_data)
+                    print('new_distance_sale created:', new_distance_sale)
 
                 except:
+                    print('Enter EXCEPT', flush=True)
                     db.session.rollback()
 
                     error_counter += 1
@@ -126,8 +130,7 @@ class DistanceSaleService:
             else:
                 error_counter += 1
 
-
-        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
+        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
 
         return response_objects
 
@@ -135,19 +138,28 @@ class DistanceSaleService:
     @staticmethod
     def create(distance_sale_data: DistanceSaleInterface) -> DistanceSale:
 
+        print('Enter Create', flush=True)
+
         new_distance_sale = DistanceSale(
             created_by = distance_sale_data.get('created_by'),
             original_filename = distance_sale_data.get('original_filename'),
-            seller_firm_id = distance_sale_data.get('seller_firm_id'),
             valid_from = distance_sale_data.get('valid_from'),
             valid_to = distance_sale_data.get('valid_to'),
+            platform_code = distance_sale_data.get('platform_code'),
+            seller_firm_id=distance_sale_data.get('seller_firm_id'),
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
             active = distance_sale_data.get('active')
         )
+        print('new_distance_sale', new_distance_sale, flush=True)
 
         #add seller firm to db
         db.session.add(new_distance_sale)
+
+        print('Before Commit', flush=True)
+
         db.session.commit()
+
+        print('After Commit', flush=True)
 
         return new_distance_sale
 
@@ -155,8 +167,7 @@ class DistanceSaleService:
 
     @staticmethod
     def handle_redundancy(seller_firm_id: int, arrival_country_code: str, valid_from: date) -> int:
-        distance_sale: DistanceSale = DistanceSale.query.filter(DistanceSale.arrival_country_code == arrival_country_code, DistanceSale.seller_firm_id == seller_firm_id, DistanceSale.valid_to >= valid_from).first()
-
+        distance_sale = DistanceSale.query.filter(DistanceSale.arrival_country_code == arrival_country_code, DistanceSale.seller_firm_id == seller_firm_id, DistanceSale.valid_to >= valid_from).first()
         # if an distance_sale with the same sku for the specified validity period already exists, it is being updated or deleted.
         if distance_sale:
             if distance_sale.valid_from >= valid_from:

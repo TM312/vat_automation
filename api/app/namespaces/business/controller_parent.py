@@ -8,7 +8,7 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from . import Business
-from . import business_dto
+from . import business_dto, business_sub_dto
 from .service_parent import BusinessService
 
 from ..utils.decorators import login_required, accepted_u_types
@@ -16,6 +16,7 @@ from ..utils.decorators import login_required, accepted_u_types
 
 ns = Namespace('Business', description='Business Related Operations')  # noqa
 ns.add_model(business_dto.name, business_dto)
+ns.add_model(business_sub_dto.name, business_sub_dto)
 
 
 @ns.route('/')

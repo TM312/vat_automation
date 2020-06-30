@@ -2,7 +2,7 @@
     <b-tabs content-class="mt-3">
         <b-tab title="All Tax Records" active>
             <b-row cols="3" md="4">
-                <card-tax-record v-for="(client_tax_record, i) in client_tax_records" :key="i" :tax_record="tax_record" />
+                <card-tax-record v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
             </b-row>
         </b-tab>
         <b-tab title="Generate New Tax Record">
@@ -17,9 +17,16 @@
     export default {
         name:'OverviewTaxRecords',
 
+        props: {
+            business: {
+                type: [Array, Object],
+                required: true
+            }
+        },
+
         computed: {
             ...mapState({
-                client_seller_firms: state => state.seller_firm.client_seller_firms
+                tax_records: state => state.seller_firm.seller_firm.tax_records
             }),
         }
     }

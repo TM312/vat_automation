@@ -1,5 +1,5 @@
 export default function ({ $auth, redirect }) {
     if ($auth.loggedIn) {
-        return redirect('/dashboard')
+        return redirect('/tax/dashboard')
     }
 }

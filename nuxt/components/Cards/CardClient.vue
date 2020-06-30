@@ -1,13 +1,12 @@
 <template>
-    <b-card header="Base Data">
+    <b-card header="Base Data" :title="business.name">
         <b-card-text>
-            <b>Company Name:</b> {{ client.name  }} <br>
-            <b>Public ID:</b> <span class="text-primary" v-b-popover.hover.top="'Use this ID when referring to this client in the templates.'">{{ client.public_id }}</span><br>
-            <b>Address:</b> {{ client.address  }} <br>
-            <b>Created On:</b> {{ client.created_on }} <br>
-            <b>Created By:</b> {{ client.created_by }} <br>
+            <b>Public ID:</b> <span class="text-primary" v-b-popover.hover.top="'Use this ID when referring to this business in the templates.'">{{ business.public_id }}</span><br>
+            <b>Address:</b> {{ business.address  }} <br>
+            <b>Establishment Country:</b> {{ business.establishment_country }}<br>
             <br>
-            <b>Establishment Country:</b> {{ client.establishment_country }} <i>[<u>{{ client.establishment_country_code }}</u>]</i><br>
+            <b>Created On:</b> {{ business.created_on }} <br>
+            <b>Created By:</b> {{ business.created_by }} <br>
         </b-card-text>
     </b-card>
 </template>
@@ -17,6 +16,6 @@
     export default {
         name: 'CardClient',
         // eslint-disable-next-line
-        props: { client: { type: [Array, Object] } }
+        props: { business: { type: [Array, Object] } }
     }
 </script>
