@@ -21,10 +21,6 @@ export default ($axios) => ({
         return $axios.delete(`${resource}/${seller_firm_id}`)
     },
 
-    get_clients() {
-        return $axios.get(`${resource}/as_client`)
-    },
-
     upload(payload) {
         return $axios.post(`${resource}/csv`, payload)
     }

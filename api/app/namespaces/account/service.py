@@ -130,7 +130,7 @@ class AccountService:
                 error_counter += 1
 
 
-        response_objects = InputService.create_input_response_objects(file_path, input_type, total_number_accounts, error_counter, redundancy_counter=redundancy_counter)
+        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_accounts, error_counter, redundancy_counter=redundancy_counter)
 
         return response_objects
 

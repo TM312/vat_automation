@@ -197,6 +197,8 @@ class InputService:
         STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
+        print('STATIC_DATA_ALLOWED_EXTENSIONS:', STATIC_DATA_ALLOWED_EXTENSIONS, flush=True)
+
         try:
             file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
         except:
@@ -207,10 +209,8 @@ class InputService:
 
 
     @staticmethod
-    def allowed_file(filename: str, allowed_extensions: List) -> bool:
-        return '.' in filename and \
-            filename.rsplit('.', 1)[1].lower(
-            ) in allowed_extensions
+    def allowed_file(filename: str, allowed_extensions: List[str]) -> bool:
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
     @staticmethod
@@ -227,7 +227,7 @@ class InputService:
 
 
     @staticmethod
-    def store_file(file: BinaryIO, allowed_extensions: List, basepath: str, **kwargs) -> str:
+    def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, **kwargs) -> str:
         if InputService.allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             stored_filename = secure_filename(file.filename)
 
@@ -247,7 +247,6 @@ class InputService:
             os.makedirs(basepath_in, exist_ok=True)
 
             file_path_in = os.path.join(basepath_in, stored_filename)
-            print('file_path_in: ', file_path_in, flush=True)
             file.save(file_path_in)
 
             if InputService.allowed_filesize(file_path=file_path_in):
@@ -257,7 +256,6 @@ class InputService:
                 raise RequestEntityTooLarge('Uploaded files exceed the file limit. Please reduce the number of files to be processed at once.')
 
         else:
-            print('Case "Store file else"', flush=True)
             raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
 
 

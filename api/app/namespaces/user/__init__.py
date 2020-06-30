@@ -1,5 +1,5 @@
 from .model_parent import User, Action
-from .schema_parent import user_dto, user_dto_admin, action_dto
+from .schema_parent import user_dto, user_dto_admin, user_sub_dto, action_dto
 
 
 BASE_ROUTE = "user"

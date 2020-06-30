@@ -20,7 +20,7 @@ export default {
                 { field_name: 'establishment_country_code', example: 'ES', field_formatting: 'Text', required: 'true', complementary_information: "This information is used when processing client's transaction reports." },
                 { field_name: 'accounting_firm_client_id', example: '1c24d175-c3a3-4611-be24-2b7537f5b62e', field_formatting: 'Text', required: 'false', complementary_information: "Is being used for instance for a convenient naming of your clients' tax records." }
             ],
-            urlEndpointUpload: '/business/seller_firm/csv'
+            urlEndpointUpload: '/business/seller_firm/csv',
         }
      }
 }

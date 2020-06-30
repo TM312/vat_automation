@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import Account
-from . import account_dto
+from . import account_dto, account_sub_dto
 from .service import AccountService
 
 from ..utils.decorators import login_required, employer_required
@@ -12,6 +12,7 @@ from ..utils.decorators import login_required, employer_required
 
 ns = Namespace("Account", description="Account Related Operations")  # noqa
 ns.add_model(account_dto.name, account_dto)
+ns.add_model(account_sub_dto.name, account_sub_dto)
 
 
 
@@ -58,7 +59,6 @@ class AccountIdResource(Resource):
 class AccountInformationResource(Resource):
     @login_required
     # @confirmation_required
-    #@ns.expect(tax_record_dto, validate=True)
     def post(self):
         account_information_files: List[BinaryIO] = request.files.getlist("files")
         return AccountService.process_account_files_upload(account_information_files)

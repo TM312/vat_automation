@@ -13,7 +13,9 @@ export const mutations = {
 }
 
 export const getters = {
-    countEmployees: state => state.accounting_firm.employees.length
+    countEmployees: state => state.accounting_firm.employees.length,
+    countClients: state => state.accounting_firm.clients.length
+
 }
 
 export const actions = {

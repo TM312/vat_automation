@@ -42,26 +42,26 @@ class TaxAuditorSeedService:
         db.session.add(new_tax_auditor)
 
         new_tax_auditor1 = TaxAuditor(
-            name='GVC Employee 1',
-            email='gvc_employee1@mail.com',
+            name='GVC Tax Auditor 1',
+            email='gvc_tax_auditor1@mail.com',
             password='change_once_in_use',
-            role='employee',
+            role='tax_auditor',
         )
         db.session.add(new_tax_auditor1)
 
         new_tax_auditor2 = TaxAuditor(
-            name='GVC Employee 2',
-            email='gvc_employee2@mail.com',
+            name='GVC Tax Auditor 2',
+            email='gvc_tax_auditor2@mail.com',
             password='change_once_in_use',
-            role='employee',
+            role='tax_auditor',
         )
         db.session.add(new_tax_auditor2)
 
         new_tax_auditor3 = TaxAuditor(
-            name='GVC Employee 3',
-            email='gvc_employee3@mail.com',
+            name='GVC Tax Auditor 3',
+            email='gvc_tax_auditor3@mail.com',
             password='change_once_in_use',
-            role='employee',
+            role='tax_auditor',
         )
         db.session.add(new_tax_auditor3)
 

@@ -1,26 +1,22 @@
 export const state = () => ({
     seller_firms: [],
-    client_seller_firms: [],
     seller_firm: []
 })
 
-export const getters = {
-    countClients: state => state.client_seller_firms.length,
-
-    client_by_public_id: state => public_id => state.client_seller_firms.find(client => client.public_id === public_id)
-
-}
 
 export const mutations = {
     SET_SELLER_FIRMS(state, seller_firms) {
         state.seller_firms = seller_firms
     },
-    SET_CLIENT_SELLER_FIRMS(state, seller_firms) {
-        state.client_seller_firms = seller_firms
-    },
     SET_SELLER_FIRM(state, seller_firm) {
         state.seller_firm = seller_firm
     }
+}
+
+export const getters = {
+    countEmployees: state => state.seller_firm.employees.length,
+    countAccounts: state => state.accounting_firm.accounts.length
+
 }
 
 export const actions = {
@@ -76,16 +72,6 @@ export const actions = {
         }
     },
 
-    async get_clients({ commit }) {
-        const res = await this.$repositories.seller_firm.get_clients()
-        const { status, data } = res
-        if (status === 200 && data.data) {
-            console.log(data.data)
-            commit('SET_CLIENT_SELLER_FIRMS', data.data)
-        } else {
-            // Handle error here
-        }
-    },
 
     async upload(seller_firm_information_files) {
         const res = await this.$repositories.seller_firm.upload(seller_firm_information_files)
