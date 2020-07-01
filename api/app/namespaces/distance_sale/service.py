@@ -22,24 +22,47 @@ class DistanceSaleService:
         return DistanceSale.query.get(distance_sale_id)
 
     @staticmethod
+    def get_by_public_id(distance_sale_public_id: str) -> DistanceSale:
+        return DistanceSale.query.filter_by(public_id = distance_sale_public_id).first()
+
+    @staticmethod
     def update(distance_sale: DistanceSale, data_changes: DistanceSaleInterface) -> DistanceSale:
         distance_sale.update(data_changes)
         db.session.commit()
         return distance_sale
 
     @staticmethod
+    def update_by_public_id(distance_sale_public_id: str, data_changes: DistanceSaleInterface) -> DistanceSale:
+        distance_sale = DistanceSaleService.get_by_public_id(distance_sale_public_id)
+        if distance_sale:
+            distance_sale.update(data_changes)
+            db.session.commit()
+            return distance_sale
+
+
+    @staticmethod
     def delete_by_id(distance_sale_id: int) -> List[int]:
-        distance_sale = DistanceSale.query.filter(DistanceSale.distance_sale_id == distance_sale_id).first()
+        distance_sale = DistanceSaleService.get_by_id(distance_sale_id)
         if not distance_sale:
             return []
         db.session.delete(distance_sale)
         db.session.commit()
         return [distance_sale_id]
 
+    @staticmethod
+    def delete_by_public_id(distance_sale_public_id: str) -> List[int]:
+        distance_sale = DistanceSaleService.get_by_public_id(distance_sale_public_id)
+        if not distance_sale:
+            return []
+        db.session.delete(distance_sale)
+        db.session.commit()
+        return [distance_sale_public_id]
+
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
     def process_distance_sale_files_upload(distance_sale_information_files: List[BinaryIO], **kwargs) -> Dict:
+
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'distance_sale_list'
@@ -49,7 +72,9 @@ class DistanceSaleService:
         delimiter = ';'
 
         for file in distance_sale_information_files:
+
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+
             DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
         response_object = {
@@ -94,7 +119,7 @@ class DistanceSaleService:
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            active = InputService.get_str(df, i, column='status')
+            active = InputService.get_bool(df, i, column='active', value_true='TRUE')
 
             if not valid_from:
                 valid_from = date.today()
@@ -113,16 +138,12 @@ class DistanceSaleService:
                     'arrival_country_code': arrival_country_code,
                     'active': active
                 }
-                print('distance_sale_data', distance_sale_data, flush=True)
 
 
                 try:
-                    print('Enter TRY', flush=True)
                     new_distance_sale = DistanceSaleService.create(distance_sale_data)
-                    print('new_distance_sale created:', new_distance_sale)
 
                 except:
-                    print('Enter EXCEPT', flush=True)
                     db.session.rollback()
 
                     error_counter += 1
@@ -138,8 +159,6 @@ class DistanceSaleService:
     @staticmethod
     def create(distance_sale_data: DistanceSaleInterface) -> DistanceSale:
 
-        print('Enter Create', flush=True)
-
         new_distance_sale = DistanceSale(
             created_by = distance_sale_data.get('created_by'),
             original_filename = distance_sale_data.get('original_filename'),
@@ -150,16 +169,10 @@ class DistanceSaleService:
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
             active = distance_sale_data.get('active')
         )
-        print('new_distance_sale', new_distance_sale, flush=True)
-
         #add seller firm to db
         db.session.add(new_distance_sale)
 
-        print('Before Commit', flush=True)
-
         db.session.commit()
-
-        print('After Commit', flush=True)
 
         return new_distance_sale
 

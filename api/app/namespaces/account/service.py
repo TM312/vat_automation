@@ -22,15 +22,28 @@ class AccountService:
         return Account.query.filter(Account.id == account_id).first()
 
     @staticmethod
-    def update(account_id: int, data_changes: AccountInterface) -> Account:
-        account = AccountService.get_by_id(account_id)
-        account.update(data_changes)
-        db.session.commit()
-        return account
+    def get_by_public_id(account_public_id: str) -> Account:
+        return Account.query.filter_by(public_id = account_public_id).first()
 
     @staticmethod
-    def delete_by_id(account_id: str):
-        account = Account.query.filter(Account.id == item_id).first()
+    def update(account_id: int, data_changes: AccountInterface) -> Account:
+        account = AccountService.get_by_id(account_id)
+        if account:
+            account.update(data_changes)
+            db.session.commit()
+            return account
+
+    @staticmethod
+    def update_by_public_id(account_public_id: str, data_changes: AccountInterface) -> Account:
+        account = AccountService.get_by_public_id(account_public_id)
+        if account:
+            account.update(data_changes)
+            db.session.commit()
+            return account
+
+    @staticmethod
+    def delete_by_id(account_id: int):
+        account = AccountService.get_by_id(account_id)
         if account:
             db.session.delete(account)
             db.session.commit()
@@ -38,6 +51,21 @@ class AccountService:
             response_object = {
                 'status': 'success',
                 'message': 'Account (code: {}) has been successfully deleted.'.format(account_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This account does not exist.')
+
+    @staticmethod
+    def delete_by_public_id(account_public_id: str):
+        account = AccountService.get_by_public_id(account_public_id)
+        if account:
+            db.session.delete(account)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Account (code: {}) has been successfully deleted.'.format(account_public_id)
             }
             return response_object
         else:

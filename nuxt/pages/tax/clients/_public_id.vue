@@ -6,7 +6,8 @@
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title='Base Data' active @click="$fetch">
-                    <overview-base-data :business="seller_firm" />
+                    <p v-if="$fetchState.pending">Fetching posts...</p>
+                    <overview-base-data v-else :business="seller_firm" />
                 </b-tab>
                 <b-tab title='Tax Records'>
                     <overview-tax-records :business="seller_firm" />

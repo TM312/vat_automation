@@ -23,11 +23,7 @@
                 default: ''
             }
         },
-        // data() {
-        //     return {
-        //         counter: this.counterNumber.toString()
-        //     }
-        // },
+
         computed: {
             counter() {
                 return this.counterFunction().toString()

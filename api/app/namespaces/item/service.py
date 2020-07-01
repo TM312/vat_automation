@@ -26,6 +26,10 @@ class ItemService:
     def get_by_id(item_id: int) -> Item:
         return Item.query.filter(Item.id == item_id).first()
 
+    @staticmethod
+    def get_by_public_id(item_public_id: str) -> Item:
+        return Item.query.filter_by(public_id = item_public_id).first()
+
 
     @staticmethod
     def update(item_id: int, data_changes: ItemInterface) -> Item:
@@ -33,6 +37,14 @@ class ItemService:
         item.update(data_changes)
         db.session.commit()
         return item
+
+    @staticmethod
+    def update_by_public_id(item_public_id: str, data_changes: ItemInterface) -> Item:
+        item = ItemService.get_by_public_id(item_public_id)
+        if item:
+            item.update(data_changes)
+            db.session.commit()
+            return item
 
     @staticmethod
     def delete_by_id(item_id: str):
@@ -44,6 +56,21 @@ class ItemService:
             response_object = {
                 'status': 'success',
                 'message': 'Item (code: {}) has been successfully deleted.'.format(item_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This item does not exist.')
+
+    @staticmethod
+    def delete_by_public_id(item_public_id: str):
+        item = ItemService.get_by_public_id(item_public_id)
+        if item:
+            db.session.delete(item)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Item (code: {}) has been successfully deleted.'.format(item_public_id)
             }
             return response_object
         else:

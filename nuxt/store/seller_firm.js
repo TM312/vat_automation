@@ -15,8 +15,10 @@ export const mutations = {
 
 export const getters = {
     countEmployees: state => state.seller_firm.employees.length,
-    countAccounts: state => state.accounting_firm.accounts.length
-
+    countAccounts: state => state.seller_firm.accounts.length,
+    countDistanceSales: state => state.seller_firm.distance_sales.length,
+    countItems: state => state.seller_firm.items.length,
+    countVatNumbers: state => state.seller_firm.vat_numbers.length
 }
 
 export const actions = {

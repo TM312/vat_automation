@@ -31,28 +31,27 @@ class AccountResource(Resource):
         return AccountService.create(request.parsed_obj)
 
 
-@ns.route("/<int:account_id>")
-@ns.param("account_id", "Account database ID")
+@ns.route("/<string:account_public_id>")
+@ns.param("account_public_id", "Account database ID")
 class AccountIdResource(Resource):
-    def get(self, account_id: int) -> Account:
+    def get(self, account_public_id: int) -> Account:
         """Get Single Account"""
-        return AccountService.get_by_id(account_id)
+        return AccountService.get_by_public_id(account_public_id)
 
-    def delete(self, account_id: int) -> Response:
+    def delete(self, account_public_id: int) -> Response:
         """Delete Single Account"""
         from flask import jsonify
 
-        id = AccountService.delete_by_id(account_id)
+        id = AccountService.delete_by_public_id(account_public_id)
         return jsonify(dict(status="Success", id=id))
 
     @ns.expect(account_dto, validate=True)
     @ns.marshal_with(account_dto)
-    def put(self, account_id: int) -> Account:
+    def put(self, account_public_id: int) -> Account:
         """Update Single Account"""
 
         data_changes: AccountInterface = request.parsed_obj
-        Account = AccountService.get_by_id(account_id)
-        return AccountService.update(Account, data_changes)
+        return AccountService.update_by_public_id(account_public_id, data_changes)
 
 
 @ns.route("/csv")

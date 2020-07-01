@@ -1,7 +1,7 @@
 from flask_restx import Model, fields
 from ..schema_parent import business_dto, business_sub_dto
 
-from ...distance_sale import distance_sale_dto
+from ...distance_sale import distance_sale_sub_dto
 from ...account import account_sub_dto
 from ...item import item_dto
 
@@ -16,7 +16,7 @@ seller_firm_dto = business_dto.inherit('seller_firm', {
     'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
     'accounting_firm_client_id': fields.String,
     'items': fields.List(fields.Nested(item_dto)),
-    'distance_sales': fields.List(fields.Nested(distance_sale_dto)),
+    'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),
     'accounts': fields.List(fields.Nested(account_sub_dto))
     # 'tax_records': fields.List(fields.Nested('app.namespaces.tax_record.tax_record_dto'))
 })

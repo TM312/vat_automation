@@ -8,16 +8,16 @@ export default ($axios) => ({
         return $axios.post(`${resource}/`, payload)
     },
 
-    get_by_id(item_id) {
-        return $axios.get(`${resource}/${item_id}`)
+    get_by_public_id(item_public_id) {
+        return $axios.get(`${resource}/${item_public_id}`)
     },
 
-    update(item_id, payload) {
-        return $axios.put(`${resource}/${item_id}`, payload)
+    update_by_public_id(item_public_id, payload) {
+        return $axios.put(`${resource}/${item_public_id}`, payload)
     },
 
-    delete_by_id(item_id) {
-        return $axios.delete(`${resource}/${item_id}`)
+    delete_by_public_id(item_public_id) {
+        return $axios.delete(`${resource}/${item_public_id}`)
     },
 
     upload(payload) {
