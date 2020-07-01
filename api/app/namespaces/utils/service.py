@@ -127,7 +127,8 @@ class InputService:
     @staticmethod
     def get_bool(df: pd.DataFrame, i: int, column: str, value_true) -> bool:
         try:
-            boolean = bool(df.iloc[i][column] == value_true)
+            df_value = df.iloc[i][column].upper()
+            boolean = bool(df_value == value_true.upper())
         except:
             print('get_bool', boolean, flush=True)
             raise UnsupportedMediaType('Can not read bool format.')

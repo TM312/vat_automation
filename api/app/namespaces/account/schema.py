@@ -17,6 +17,7 @@ account_dto = Model('account', {
 
 
 account_sub_dto = Model('account_sub', {
+    'public_id': fields.String(readonly=True),
     'given_id': fields.String,
     'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
     'created_on': fields.Date(readonly=True),

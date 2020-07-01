@@ -1,5 +1,8 @@
 from datetime import datetime
+import uuid
+
 from app.extensions import db
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Account(db.Model):
@@ -7,6 +10,7 @@ class Account(db.Model):
     __tablename__ = "account"
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4)
     given_id = db.Column(db.String(24), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)

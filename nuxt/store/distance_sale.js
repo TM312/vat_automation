@@ -33,9 +33,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, distance_sale_id) {
+    async get_by_public_id({ commit }, distance_sale_public_id) {
 
-        const res = await this.$repositories.distance_sale.get_by_id(distance_sale_id)
+        const res = await this.$repositories.distance_sale.get_by_public_id(distance_sale_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_DISTANCE_SALE', data.data)
@@ -44,8 +44,8 @@ export const actions = {
         }
     },
 
-    async update({ commit }, distance_sale_id, data_changes) {
-        const res = await this.$repositories.distance_sale.update(distance_sale_id, data_changes)
+    async update_by_public_id({ commit }, distance_sale_public_id, data_changes) {
+        const res = await this.$repositories.distance_sale.update_by_public_id(distance_sale_public_id, data_changes)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_DISTANCE_SALE', data.data)
@@ -54,8 +54,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, distance_sale_id) {
-        const res = await this.$repositories.distance_sale.delete(distance_sale_id)
+    async delete_by_public_id({ commit }, distance_sale_public_id) {
+        const res = await this.$repositories.distance_sale.delete_by_public_id(distance_sale_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store

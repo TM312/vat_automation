@@ -33,9 +33,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, account_id) {
+    async get_by_public_id({ commit }, account_public_id) {
 
-        const res = await this.$repositories.account.get_by_id(account_id)
+        const res = await this.$repositories.account.get_by_public_id(account_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_ACCOUNT', data.data)
@@ -44,8 +44,8 @@ export const actions = {
         }
     },
 
-    async update({ commit }, account_id, data_changes) {
-        const res = await this.$repositories.account.update(account_id, data_changes)
+    async update_by_public_id({ commit }, account_public_id, data_changes) {
+        const res = await this.$repositories.account.update_by_public_id(account_public_id, data_changes)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_ACCOUNT', data.data)
@@ -54,8 +54,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, account_id) {
-        const res = await this.$repositories.account.delete(account_id)
+    async delete_by_public_id({ commit }, account_public_id) {
+        const res = await this.$repositories.account.delete_by_public_id(account_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store
