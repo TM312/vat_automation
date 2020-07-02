@@ -119,7 +119,7 @@ class DistanceSaleService:
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            active = InputService.get_bool(df, i, column='active', value_true='TRUE')
+            active = InputService.get_bool(df, i, column='active', value_true=True)
 
             if not valid_from:
                 valid_from = date.today()

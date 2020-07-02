@@ -4,7 +4,7 @@ from flask.wrappers import Response
 from flask import request
 
 from . import VATIN
-from . import vatin_dto
+from . import vatin_dto, vatin_sub_dto
 from .service import VATINService
 
 
@@ -13,6 +13,7 @@ from ...utils.decorators import login_required, employer_required
 
 ns = Namespace("VATIN", description="VATIN Related Operations")  # noqa
 ns.add_model(vatin_dto.name, vatin_dto)
+ns.add_model(vatin_sub_dto.name, vatin_sub_dto)
 
 
 @ns.route("/")

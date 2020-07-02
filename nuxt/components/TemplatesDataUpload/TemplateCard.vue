@@ -5,7 +5,7 @@
             <p>
                 For multi-data uploads we provide the template below to allow for a smooth experience.<br>
                 If you have not used the template yet, have a look at the details before downloading.<br>
-                <b>Notice:</b> <i>Use right-click 'Paste Special --> Values' to adhere to the column formatting used in the template.</i>
+                <b>Notice:</b> Please make sure to save your file as 'csv'.
             </p>
             <button-download :urlEndpointTemplate="urlEndpointTemplate" />
             <b-button v-b-toggle="titleJoined" variant="outline-secondary"><b-icon icon="info" /> Details</b-button>

@@ -2,7 +2,7 @@
     <div>
         <NavbarTax />
         <div class="app-body">
-            <h1>THIS IS THE TAX LAYOUT</h1>
+            <!-- <h1>THIS IS THE TAX LAYOUT</h1> -->
             <nuxt />
         </div>
         <Footer />

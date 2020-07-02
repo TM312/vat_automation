@@ -3,13 +3,13 @@
     <b-row class="mt-5" align-h="center">
       <b-col cols="6" md="4">
         <b-card>
-          <b-card-title class="text-center text-primary">
+          <b-card-title class="text-center text-dark">
             Sign in
           </b-card-title>
           <client-only placeholder="Loading...">
             <b-card-body>
               <b-form @submit.prevent="login">
-                <b-form-group id="input-group-email" label="Email address:" label-for="input-email">
+                <b-form-group id="input-group-email" label="Email Address" label-for="input-email">
                   <b-form-input
                     id="input-email"
                     v-model="form.email"
@@ -18,7 +18,7 @@
                   />
                 </b-form-group>
 
-                <b-form-group id="input-group-password" label="Password:" label-for="input-password">
+                <b-form-group id="input-group-password" label="Password" label-for="input-password">
                   <b-form-input
                     id="input-password"
                     v-model="form.password"
@@ -42,6 +42,8 @@
 <script>
 export default {
   middleware: 'guest',
+  layout: 'clean',
+
   data() {
     return {
       showPassword: false,

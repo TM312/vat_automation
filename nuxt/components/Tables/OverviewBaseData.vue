@@ -1,17 +1,16 @@
 <template>
     <b-tabs content-class="mt-3">
         <b-tab title="Company Data" active>
-            <b-row>
-                <b-col><card-client :business="business" class="mb-5"/></b-col>
+            <b-card-group deck>
+                <card-client :business="business" class="mb-5"/>
+                <card-client :business="business" class="mb-5"/>
                 <!-- <b-col><card-vat-numbers :vat_numbers="vat_numbers" class="mb-5"/></b-col> -->
-            </b-row>
-            <b-row>
+            </b-card-group>
+            <b-card-group deck>
                 <!-- <b-col><b-container fluid>{{ distanceSales }}</b-container></b-col> -->
-                <b-col><card-accounts :accounts="accounts" class="mb-5"/></b-col>
-                <b-col><card-distance-sales :distanceSales="distanceSales" class="mb-5"/></b-col>
-            </b-row>
-
-
+                <card-accounts :accounts="accounts" class="mb-5"/>
+                <card-distance-sales :distanceSales="distanceSales" class="mb-5"/>
+            </b-card-group>
         </b-tab>
         <b-tab title="Items">
             <card-items :items="items" class="mb-5"/>

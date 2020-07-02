@@ -2,6 +2,16 @@
 <div>
         <b-row>
             <b-col cols="3">
+                <!-- <b-button
+                        name="check-button"
+                        v-model="checked"
+                        switch
+                        v-b-toggle.collapse-edit-mode
+                        >Edit Mode
+                </b-button>
+                 <b-collapse v-model="checked" id="collapse-edit-mode">
+                    <b-card>I am collapsible content!</b-card>
+                </b-collapse> -->
                 <!-- <card-total-count :counterNumber="countEmployees" subTitle="Total Number of Colleagues" /> -->
 
             </b-col>
@@ -31,6 +41,12 @@
         async fetch() {
             const { store } = this.$nuxt.context
             await store.dispatch("accounting_firm/get_by_public_id", this.tax_auditor.employer_public_id);
+        },
+
+        data() {
+            return {
+                checked: false
+            }
         },
 
 
