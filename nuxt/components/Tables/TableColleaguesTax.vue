@@ -11,15 +11,6 @@ export default {
 
     data() {
         return {
-            colleagues: [
-                {
-                    'name': '',
-                    'role': '',
-                    'last_seen': '',
-                    'registered_on': ''
-                }
-            ],
-
             fields: [
                 {
                     key: 'name',
@@ -29,7 +20,7 @@ export default {
                     key: 'role',
                     sortable: true,
                     formatter: (value) => {
-                        return value.replace(/\b\w/g, c => c.toUpperCase());
+                        return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
                 {

@@ -3,16 +3,17 @@
         <b-table
             selectable
             select-mode="single"
+            selected-variant="info"
             ref="editTable"
             borderless
             :items="items"
-            :fields="fieldsEditable"
+            :fields="fields"
             @row-selected="onRowSelected"
         >
-            <template v-slot:cell(edit)="{ rowSelected }">
+            <!-- <template v-slot:cell(edit)="{ rowSelected }">
                 <template v-if="rowSelected">
                     <span aria-hidden="true">
-                        <button-remove-entry />
+                        <button-remove-entry :publicId="selected.public_id" />
                     </span>
                     <span class="sr-only">Selected</span>
                 </template>
@@ -20,7 +21,7 @@
                     <span aria-hidden="true">&nbsp;</span>
                     <span class="sr-only">Not selected</span>
                 </template>
-            </template>
+            </template> -->
             <!-- <template v-slot:cell(edit)="row">
                 <button-remove-entry :data="data" />
             </template> -->
@@ -29,6 +30,12 @@
         <p>
             Selected Rows:<br>
             {{ selected }}
+
+            <br>
+            Type of Selected: {{ typeofselected }}
+            <br>
+
+            Public ID: {{ publicid }}
         </p>
     </div>
 </template>
@@ -48,8 +55,8 @@ export default {
         },
     data() {
         return {
-            fieldsEditable: this.fields.concat({ key: 'edit', sortable: false}),
-            selected: []
+            // fieldsEditable: this.fields.concat({ key: 'edit', sortable: false}),
+            selected: ''
         }
     },
 
@@ -59,9 +66,23 @@ export default {
             //     console.log(this.files);
             // },
             onRowSelected(items) {
-                this.selected = items
+                if (items !== "[]") {
+                    this.selected = items
+                } else {
+                    this.selected = ''
+                }
+                console.log('selected: ', this.selected)
+                this.$emit('objectSelected', this.selected)
             }
+        },
+    computed: {
+        typeofselected() {
+            return typeof this.selected
+        },
+        publicid() {
+            return this.selected.public_id
         }
+    },
 
 }
 </script>

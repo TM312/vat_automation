@@ -8,12 +8,12 @@
         </b-card>
         <b-tabs v-else content-class="mt-3">
             <b-tab title="Card View" active>
-                <b-row cols="3" md="4">
+                <b-row class="mb-3" cols="1" cols-md="2" cols-lg="4" cols-xl="5">
                     <card-client-short v-for="(client, i) in clients" :key="i" :business="client" />
                 </b-row>
             </b-tab>
             <b-tab title="Table View">
-                <table-clients-tax />
+                <table-clients-tax :clients="clients" />
             </b-tab>
         </b-tabs>
     </div>

@@ -1,12 +1,12 @@
 <template>
-    <!-- <b-button
+    <b-button
         size="sm"
         variant="outline-danger"
         class="remove-file"
-        @click="removeFile(data.index)"
-    > -->
-    <b-button>
-        <b-icon icon="trash" variant="error" font-scale="1"/>
+    >
+
+        <b-icon icon="trash" scale="1"/>
+        Delete {{ publicID }}
     </b-button>
 
 </template>
@@ -20,13 +20,18 @@
             BIcon
         },
 
-        // props: {
-        //     data: {
-        //         type: String,
-        //         required: true
-        //     }
+        props: {
+            object: {
+                type: [Object, Array],
+                required: true
+            }
 
-        // },
+        },
+        data() {
+            return {
+                publicID: this.object.public_id
+            }
+        },
 
         // methods: {
         //     async refresh() {

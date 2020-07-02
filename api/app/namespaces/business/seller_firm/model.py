@@ -30,6 +30,9 @@ class SellerFirm(Business):
 
     tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined')
 
+    @property
+    def transaction_ready(self):
+        return (len(self.items) > 0 and len(self.distance_sales) > 0 and len(self.accounts) > 0)
 
 
     def __repr__(self):
