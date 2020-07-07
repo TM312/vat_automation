@@ -37,22 +37,32 @@ class DistanceSaleResource(Resource):
 class DistanceSaleIdResource(Resource):
     def get(self, distance_sale_public_id: str) -> DistanceSale:
         """Get Single DistanceSale"""
-        return DistanceSaleService.get_by_id(distance_sale_public_id)
+        return DistanceSaleService.get_by_public_id(distance_sale_public_id)
 
     def delete(self, distance_sale_public_id: str) -> Response:
         """Delete Single DistanceSale"""
         from flask import jsonify
 
-        id = DistanceSaleService.delete_by_id(distance_sale_public_id)
-        return jsonify(dict(status="Success", id=id))
+        public_id = DistanceSaleService.delete_by_public_id(distance_sale_public_id)
+        return jsonify(dict(status="Success", public_id=public_id))
 
     @ns.expect(distance_sale_dto, validate=True)
     @ns.marshal_with(distance_sale_dto)
     def put(self, distance_sale_public_id: str) -> DistanceSale:
         """Update Single DistanceSale"""
-        data_changes: DistanceSaleInterface = request.parsed_obj
+        data_changes: DistanceSaleInterface = request.json
         return DistanceSaleService.update_by_public_id(distance_sale_public_id, data_changes)
 
+
+@ns.route("/seller_firm/<string:seller_firm_public_id>")
+class DistanceSaleSellerFirmPublicIdResource(Resource):
+    """ Create Distance Sale for a Specific Seller Firm based on its Public ID"""
+
+    # @ns.expect(distance_sale_dto, validate=True)
+    @login_required
+    @ns.marshal_with(distance_sale_sub_dto, envelope='data')
+    def post(self, seller_firm_public_id: str) -> DistanceSale:
+        return DistanceSaleService.process_single_submit(seller_firm_public_id, distance_sale_data=request.json)
 
 
 

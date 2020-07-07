@@ -1,6 +1,6 @@
 <template>
-    <b-button variant="primary" @click="uploadFiles">
-        <b-icon icon="box-arrow-in-right" /> Upload
+    <b-button variant="primary" @click="submitPayload">
+        <b-icon icon="box-arrow-in-right" /> Submit
     </b-button>
 </template>
 
@@ -8,17 +8,17 @@
     import { BIcon } from "bootstrap-vue";
 
     export default {
-        name: 'ButtonUpload',
+        name: 'ButtonSubmit',
         components: {
             BIcon
         },
         props: {
-            urlEndpointUpload: {
+            urlEndpointSubmit: {
                 type: String,
                 required: true
             },
 
-            files: {
+            payload: {
                 type: Array,
                 required: true
             }
@@ -30,29 +30,9 @@
             };
         },
         methods: {
-            async uploadFiles() {
-                // FormData is a standard JS object
-                const data = new FormData();
-                for (var i = 0; i < this.files.length; i++) {
-                    let file = this.files[i];
-                    data.append("files", file);
-                }
-                // https://github.com/axios/axios/blob/master/examples/upload/index.html
-                var config = {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    },
-                    onUploadProgress: function(progressEvent) {
-                        this.progress = parseInt(
-                            Math.round(
-                                (progressEvent.loaded / progressEvent.total) * 100
-                            )
-                        );
-                    }.bind(this)
-                };
-
+            async submitPayload() {
                 await this.$axios
-                    .post(this.urlEndpointUpload, data, config)
+                    .post(this.urlEndpointUpload, this.payload)
 
                     .then(response => {
                         let response_object = response.data;
@@ -63,7 +43,6 @@
                                 duration: 5000
                             });
 
-                            this.$emit('resetFileList')
 
                         } else {
                             this.$toast.error(response_object.message, { duration: 5000 });

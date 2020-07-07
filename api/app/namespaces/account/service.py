@@ -26,6 +26,15 @@ class AccountService:
         return Account.query.filter_by(public_id = account_public_id).first()
 
     @staticmethod
+    def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
+        account = Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
+        if account:
+            return account
+        else:
+            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
+
+
+    @staticmethod
     def update(account_id: int, data_changes: AccountInterface) -> Account:
         account = AccountService.get_by_id(account_id)
         if account:
@@ -73,12 +82,27 @@ class AccountService:
 
 
     @staticmethod
-    def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
-        account = Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
-        if account:
-            return account
-        else:
-            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
+    def process_single_submit(seller_firm_public_id: str, account_data: AccountInterface):
+
+        account_data['created_by'] = g.user.id
+
+        new_account = AccountService.create_by_seller_firm_public_id(seller_firm_public_id, account_data)
+
+        return new_account
+
+
+    @staticmethod
+    def create_by_seller_firm_public_id(seller_firm_public_id: str, account_data: AccountInterface) -> Account:
+        from ..business.seller_firm.service import SellerFirmService
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if seller_firm:
+            account_data['seller_firm_id'] = seller_firm.id
+            AccountService.handle_redundancy(account_data['given_id'], account_data['channel_code'])
+
+            new_account = AccountService.create(account_data)
+
+        return new_account
 
 
 
@@ -186,14 +210,13 @@ class AccountService:
 
     @staticmethod
     def handle_redundancy(given_id: str, channel_code: str) -> int:
-        account: Account = Account.query.filter(Account.given_id == given_id,  Account.channel_code == channel_code).first()
+        redundancy_counter = 0
+
+        account = Account.query.filter(Account.given_id == given_id,  Account.channel_code == channel_code).first()
 
         # if an account with the same given_id and channel_code already exists, it is being deleted.
         if account:
             db.session.delete(account)
-            redundancy_counter = 1
-
-        else:
-            redundancy_counter = 0
+            redundancy_counter += 1
 
         return redundancy_counter

@@ -6,11 +6,11 @@
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title='Base Data' active @click="$fetch">
-                    <p v-if="$fetchState.pending">Fetching posts...</p>
-                    <overview-base-data v-else :business="seller_firm" />
+                    <overview-base-data-loading v-if="$fetchState.pending" />
+                    <overview-base-data v-else />
                 </b-tab>
                 <b-tab title='Tax Records'>
-                    <overview-tax-records :business="seller_firm" />
+                    <lazy-overview-tax-records :business="seller_firm" />
                 </b-tab>
                 <b-tab title='Transactions'>
                     <p>tbd</p>
@@ -25,8 +25,6 @@
 <script>
     import { mapState } from 'vuex'
     import { BIcon } from "bootstrap-vue";
-
-
 
     export default {
         layout: "tax",

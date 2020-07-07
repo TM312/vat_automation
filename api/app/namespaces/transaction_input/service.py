@@ -361,13 +361,13 @@ class TransactionInputService:
 
     @staticmethod
     def handle_redundancy(account_given_id: str, channel_code: str, given_id: str) -> int:
+        redundancy_counter = 0
+
         transation_input: TransactionInput = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
 
         # if an item with the same sku for the specified validity period already exists, it is being deleted.
         if transation_input:
             db.session.delete(transation_input)
-            redundancy_counter = 1
-        else:
-            redundancy_counter = 0
+            redundancy_counter += 1
 
         return redundancy_counter

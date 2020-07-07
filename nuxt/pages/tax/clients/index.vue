@@ -28,14 +28,12 @@
             })
         },
 
-
         methods: {
             async refresh() {
                 const { store } = this.$nuxt.context
                 await store.dispatch("accounting_firm/get_by_public_id", this.accounting_firm.public_id)
             }
-        }
-
+        },
 
 
 

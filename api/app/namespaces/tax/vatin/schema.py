@@ -17,6 +17,11 @@ vatin_dto = Model('vatin', {
     'business_name': fields.String(attribute=lambda x: x.business.name)
 })
 
+vatin_verify_dto = Model('vatin', {
+    'country_code': fields.String,
+    'number': fields.String
+})
+
 vatin_sub_dto = Model('vatin_sub', {
     'created_on': fields.DateTime,
     'modified_at': fields.DateTime,

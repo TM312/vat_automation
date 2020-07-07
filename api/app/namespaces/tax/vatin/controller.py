@@ -4,7 +4,7 @@ from flask.wrappers import Response
 from flask import request
 
 from . import VATIN
-from . import vatin_dto, vatin_sub_dto
+from . import vatin_dto, vatin_sub_dto, vatin_verify_dto
 from .service import VATINService
 
 
@@ -14,6 +14,8 @@ from ...utils.decorators import login_required, employer_required
 ns = Namespace("VATIN", description="VATIN Related Operations")  # noqa
 ns.add_model(vatin_dto.name, vatin_dto)
 ns.add_model(vatin_sub_dto.name, vatin_sub_dto)
+ns.add_model(vatin_verify_dto.name, vatin_verify_dto)
+
 
 
 @ns.route("/")
@@ -53,6 +55,14 @@ class VATINIdResource(Resource):
         data_changes: VATINInterface = request.parsed_obj
         return VATINService.update(vatin_id, data_changes)
 
+
+@ns.route("/verify")
+class VATINVerifyResource(Resource):
+    @ns.expect(vatin_verify_dto, validate=True)
+    def post(self) -> bool:
+        """Verify VATIN"""
+        print('request.json: ', request.json, flush=True)
+        return VATINService.process_regex_verification_request(request.json)
 
 
 @ns.route("/csv")

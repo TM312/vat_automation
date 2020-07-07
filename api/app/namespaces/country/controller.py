@@ -1,16 +1,21 @@
 from typing import List
+from datetime import datetime
 from flask import request
 from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
-from . import Country
-from . import country_dto
+from . import Country, EU
+from . import country_dto, country_sub_dto, eu_dto
 from .service import CountryService
+
+from ..utils.decorators import login_required
 
 
 
 ns = Namespace("Country", description="Country Related Operations")  # noqa
 ns.add_model(country_dto.name, country_dto)
+ns.add_model(country_sub_dto.name, country_sub_dto)
+ns.add_model(eu_dto.name, eu_dto)
 
 
 @ns.route("/")
@@ -49,3 +54,14 @@ class CountryIdResource(Resource):
 
         data_changes: CountryInterface = request.parsed_obj
         return CountryService.update(country_code, data_changes)
+
+
+@ns.route("/eu/<string:date_string>")
+class CountryEUResource(Resource):
+    """EU Countrys"""
+    @login_required
+    @ns.marshal_with(eu_dto, envelope='data')
+    def get(self, date_string) -> EU:
+        """Get all Countrys"""
+        date = datetime.strptime(date_string, "%Y-%m-%d")
+        return CountryService.get_eu_by_date(date)

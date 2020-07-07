@@ -54,6 +54,17 @@ class AccountIdResource(Resource):
         return AccountService.update_by_public_id(account_public_id, data_changes)
 
 
+@ns.route("/seller_firm/<string:seller_firm_public_id>")
+class DistanceSaleResource(Resource):
+    """ Create Account for a Specific Seller Firm based on its Public ID"""
+
+    # @ns.expect(distance_sale_dto, validate=True)
+    @login_required
+    @ns.marshal_with(account_sub_dto, envelope='data')
+    def post(self, seller_firm_public_id: str) -> Account:
+        return AccountService.process_single_submit(seller_firm_public_id, account_data=request.json)
+
+
 @ns.route("/csv")
 class AccountInformationResource(Resource):
     @login_required
