@@ -12,6 +12,10 @@ export default ($axios) => ({
         return $axios.get(`${resource}/${country_code}`)
     },
 
+    get_eu_by_date(date_string) {
+        return $axios.get(`${resource}/eu/${date_string}`)
+    },
+
     update(country_code, payload) {
         return $axios.put(`${resource}/${country_code}`, payload)
     },

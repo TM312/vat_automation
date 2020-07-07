@@ -54,6 +54,17 @@ class ItemIdResource(Resource):
         return ItemService.update_by_public_id(item_public_id, data_changes)
 
 
+@ns.route("/seller_firm/<string:seller_firm_public_id>")
+class ItemSellerFirmPublicIdResource(Resource):
+    """ Create Item for a Specific Seller Firm based on its Public ID"""
+
+    # @ns.expect(distance_sale_dto, validate=True)
+    @login_required
+    @ns.marshal_with(item_sub_dto, envelope='data')
+    def post(self, seller_firm_public_id: str) -> Item:
+        return ItemService.process_single_submit(seller_firm_public_id, item_data=request.json)
+
+
 
 @ns.route("/csv")
 class ItemInformationResource(Resource):

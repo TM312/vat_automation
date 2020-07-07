@@ -1,4 +1,5 @@
 export const state = () => ({
+    eu: [],
     countries: [],
     country: []
 })
@@ -9,6 +10,9 @@ export const mutations = {
     },
     SET_COUNTRY(state, country) {
         state.country = country
+    },
+    SET_EU(state, eu) {
+        state.eu = eu
     }
 }
 
@@ -39,6 +43,17 @@ export const actions = {
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_COUNTRY', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+    async get_eu_by_date({ commit }, date_string) {
+
+        const res = await this.$repositories.country.get_eu_by_date(date_string)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_EU', data.data)
         } else {
             // Handle error here
         }

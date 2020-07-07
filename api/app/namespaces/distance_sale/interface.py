@@ -2,7 +2,7 @@ from mypy_extensions import TypedDict
 from datetime import date, datetime
 
 class DistanceSaleInterface(TypedDict, total=False):
-    created_by: int
+    created_by: str
     created_on: datetime
     original_filename: str
     valid_from: date

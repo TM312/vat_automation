@@ -28,6 +28,21 @@ export const actions = {
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_DISTANCE_SALE', data.data)
+
+        } else {
+            // Handle error here
+        }
+    },
+
+    async create_by_seller_firm_public_id({ commit }, data_array) {
+        const seller_firm_public_id = data_array.shift()
+        const distance_sale_data = data_array[0]
+
+        const res = await this.$repositories.distance_sale.create_by_seller_firm_public_id(seller_firm_public_id, distance_sale_data)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_DISTANCE_SALE', data.data)
+
         } else {
             // Handle error here
         }
@@ -56,10 +71,12 @@ export const actions = {
 
     async delete_by_public_id({ commit }, distance_sale_public_id) {
         const res = await this.$repositories.distance_sale.delete_by_public_id(distance_sale_public_id)
-        const { status, data } = res
+        const { status, message, data } = res
         if (status === 200 && data.data) {
             // Remove from store
             commit('SET_DISTANCE_SALE', [])
+            return message
+
         } else {
             // Handle error here
         }

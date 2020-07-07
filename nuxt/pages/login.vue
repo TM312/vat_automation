@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row class="mt-5" align-h="center">
       <b-col cols="6" md="4">
-        <b-card>
+        <b-card class="my-5">
           <b-card-title class="text-center text-primary">
             Sign in
           </b-card-title>
@@ -64,7 +64,7 @@ export default {
 
         this.$router.push('/dashboard')
 
-        await this.$toast.success('Successfully signed in!', {
+        this.$toast.success('Successfully signed in!', {
           duration: 5000,
         })
       } catch (err) {

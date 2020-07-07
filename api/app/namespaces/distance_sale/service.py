@@ -1,7 +1,7 @@
 from typing import List, Dict, BinaryIO
 import os
 import pandas as pd
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from flask import g, current_app
 from app.extensions import db
 
@@ -26,7 +26,7 @@ class DistanceSaleService:
         return DistanceSale.query.filter_by(public_id = distance_sale_public_id).first()
 
     @staticmethod
-    def update(distance_sale: DistanceSale, data_changes: DistanceSaleInterface) -> DistanceSale:
+    def update(distance_sale_public_id: DistanceSale, data_changes: DistanceSaleInterface) -> DistanceSale:
         distance_sale.update(data_changes)
         db.session.commit()
         return distance_sale
@@ -38,6 +38,21 @@ class DistanceSaleService:
             distance_sale.update(data_changes)
             db.session.commit()
             return distance_sale
+
+    @staticmethod
+    def create_by_seller_firm_public_id(seller_firm_public_id: str, distance_sale_data: DistanceSaleInterface) -> DistanceSale:
+        from ..business.seller_firm.service import SellerFirmService
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if seller_firm:
+            DistanceSaleService.handle_redundancy(seller_firm.id, distance_sale_data['arrival_country_code'], distance_sale_data['valid_from'])
+
+            distance_sale_data['seller_firm_id'] = seller_firm.id
+            distance_sale = DistanceSaleService.create(distance_sale_data)
+
+        return distance_sale
+
+
 
 
     @staticmethod
@@ -57,6 +72,24 @@ class DistanceSaleService:
         db.session.delete(distance_sale)
         db.session.commit()
         return [distance_sale_public_id]
+
+    @staticmethod
+    def process_single_submit(seller_firm_public_id: str, distance_sale_data: DistanceSaleInterface):
+
+        distance_sale_data['created_by'] = g.user.id
+        distance_sale_data['valid_from'] = datetime.strptime(distance_sale_data['valid_from'], "%Y-%m-%d").date()
+
+        if not 'valid_to' in distance_sale_data:
+            TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+            distance_sale_data['valid_to'] = TAX_DEFAULT_VALIDITY
+
+        else:
+            distance_sale_data['valid_to'] = datetime.strptime(distance_sale_data['valid_to'], "%Y-%m-%d").date()
+
+        distance_sale = DistanceSaleService.create_by_seller_firm_public_id(seller_firm_public_id, distance_sale_data)
+
+        return distance_sale
+
 
 
     @staticmethod
@@ -106,8 +139,6 @@ class DistanceSaleService:
     def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
         from ..business.seller_firm.service import SellerFirmService
 
-        TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
-
         redundancy_counter = 0
         error_counter = 0
         total_number_distance_sales = len(df.index)
@@ -124,7 +155,8 @@ class DistanceSaleService:
             if not valid_from:
                 valid_from = date.today()
             if not valid_to:
-                valid_to = valid_from + timedelta(days=TAX_DEFAULT_VALIDITY)
+                TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+                valid_to = TAX_DEFAULT_VALIDITY
 
             if seller_firm_id:
                 redundancy_counter += DistanceSaleService.handle_redundancy(seller_firm_id, arrival_country_code, valid_from)
@@ -169,6 +201,7 @@ class DistanceSaleService:
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
             active = distance_sale_data.get('active')
         )
+
         #add seller firm to db
         db.session.add(new_distance_sale)
 
@@ -180,6 +213,7 @@ class DistanceSaleService:
 
     @staticmethod
     def handle_redundancy(seller_firm_id: int, arrival_country_code: str, valid_from: date) -> int:
+        redundancy_counter = 0
         distance_sale = DistanceSale.query.filter(DistanceSale.arrival_country_code == arrival_country_code, DistanceSale.seller_firm_id == seller_firm_id, DistanceSale.valid_to >= valid_from).first()
         # if an distance_sale with the same sku for the specified validity period already exists, it is being updated or deleted.
         if distance_sale:
@@ -191,9 +225,7 @@ class DistanceSaleService:
                     'valid_to': valid_from - timedelta(days=1)
                 }
                 distance_sale.update(data_changes)
-                redundancy_counter = 1
-        else:
-            redundancy_counter = 0
+                redundancy_counter += 1
 
         return redundancy_counter
 

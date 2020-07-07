@@ -287,13 +287,44 @@ class VATINService:
 
         return country_code, number
 
+    @staticmethod
+    def process_regex_verification_request(vatin_data: VATINInterface) -> bool:
+        country_code_temp = vatin_data['country_code']
+        number_temp = vatin_data['number']
+        country_code, number = VATINService.vat_precheck(country_code_temp: str, number_temp: str)
 
+        country = dict(
+            map(
+                lambda x, y: (x, y),
+                ("country", "validator", "formatter"),
+                VIES_OPTIONS[country_code],
+            )
+        )
+        match = country["validator"].match("{}{}".format(country_code, number))
+        print('match: ', isinstance(match, re.Match), flush=True)
+
+
+    @staticmethod
+    def create_by_seller_firm_public_id(vatin_data: VATINInterface) -> VATIN:
+        # vatin = VATIN.query.filter_by(country_code=country_code, number=number).first()
+
+        #     if vatin:
+        #         if vatin.valid and valid_to > vatin.valid_to:
+        #             vatin.valid_to = valid_to
+        #             db.session.commit()
+        #             continue
+
+        #     else:
+        #         seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
+        #         vatin = VATINService.create_vatin_by_request(country_code, number, valid_from, valid_to, business_id=seller_firm_id)
+        #         if not isinstance(vatin, VATIN):
+        #             error_counter += 1
 
 
     @staticmethod
     def verify(country_code: str, number: str) -> None:
-        VATINService.verify_country_code(country_code)
-        VATINService.verify_regex(country_code, number)
+            VATINService.verify_country_code(country_code)
+            VATINService.verify_regex(country_code, number)
 
     @staticmethod
     def verify_country_code(country_code: str) -> None:

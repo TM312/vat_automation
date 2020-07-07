@@ -2,8 +2,6 @@
     <div>
         <b-table :fields="fields" :items="clients" hover>
             <template v-slot:cell(name)="data">
-                <!-- `data.value` is the value after formatted by the Formatter -->
-
                 <nuxt-link :to="data.item.public_id" append >{{ data.value }}</nuxt-link>
             </template>
         </b-table>
@@ -24,29 +22,12 @@ export default {
 
     data() {
         return {
-
             fields: [
-                {
-                    key: 'name',
-                    sortable: true
-                },
-                {
-                    key: 'address',
-                    sortable: false
-                },
-                {
-                    key: 'len_vat_numbers',
-                    label: '# Vat Numbers',
-                    sortable: false
-                },
-                {
-                    key: 'created_on',
-                    sortable: true
-                },
-                {
-                    key: 'created_by',
-                    sortable: true
-                }
+                { key: 'name', sortable: true },
+                { key: 'address', sortable: false },
+                { key: 'len_vat_numbers', label: '# Vat Numbers', sortable: false },
+                { key: 'created_on', sortable: true },
+                { key: 'created_by', sortable: true },
             ],
         }
     }

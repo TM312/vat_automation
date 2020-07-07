@@ -12,6 +12,10 @@ export default ($axios) => ({
         return $axios.get(`${resource}/${vatin_id}`)
     },
 
+    verify(payload) {
+        return $axios.post(`${resource}/verify/`, payload)
+    },
+
     update(vatin_id, payload) {
         return $axios.put(`${resource}/${vatin_id}`, payload)
     },

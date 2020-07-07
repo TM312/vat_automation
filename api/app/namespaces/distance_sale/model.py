@@ -24,7 +24,10 @@ class DistanceSale(db.Model):  # type: ignore
     active = db.Column(db.Boolean, nullable=False)
 
 
-
-
     def __repr__(self):
         return '<DistanceSale: {} {} {} {}>'.format(self.seller_firm_id, self.arrival_country_code, self.valid_from, self.valid_to)
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

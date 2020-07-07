@@ -4,13 +4,17 @@
       <!-- <h1>THIS IS THE DEFAULT LAYOUT</h1> -->
       <nuxt />
     </div>
-    <footer />
+    <Footer />
   </div>
 </template>
 
-<script>
 
+<script>
+import Footer from '@/components/Footer'
 
 export default {
+  components: {
+    Footer
+  },
 }
 </script>

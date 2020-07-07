@@ -2,18 +2,16 @@
     <b-tabs content-class="mt-3">
         <b-tab title="Company Data" active>
             <b-card-group deck>
-                <card-client :business="business" class="mb-5"/>
-                <card-client :business="business" class="mb-5"/>
-                <!-- <b-col><card-vat-numbers :vat_numbers="vat_numbers" class="mb-5"/></b-col> -->
+                <card-client class="mb-5"/>
+                <card-accounts class="mb-5"/>
             </b-card-group>
             <b-card-group deck>
-                <!-- <b-col><b-container fluid>{{ distanceSales }}</b-container></b-col> -->
-                <card-accounts :accounts="accounts" class="mb-5"/>
-                <card-distance-sales :distanceSales="distanceSales" class="mb-5"/>
+                <card-vat-numbers cols="8"  class="mb-5"/>
+                <card-distance-sales cols="4" class="mb-5"/>
             </b-card-group>
         </b-tab>
         <b-tab title="Items">
-            <card-items :items="items" class="mb-5"/>
+            <lazy-card-items class="mb-5"/>
         </b-tab>
     </b-tabs>
 </template>
@@ -22,52 +20,7 @@
     // import { mapState } from "vuex";
 
     export default {
-        name:'OverviewBaseData',
-        props: {
-            business: {
-                type: [Array, Object],
-                required: true
-            }
-        },
-        data() {
-            return {
-                distanceSales: this.business.distance_sales,
-                accounts: this.business.accounts,
-                // distance_sales: [
-                //     { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                //     { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                //     { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                //     { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                // ],
-                items: [
-                    { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                    { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                    { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                    { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                ],
-                // accounts: [
-                //     { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                //     { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                //     { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                //     { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                // ],
-                vat_numbers: [
-                    { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-                    { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-                    { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                    { age: 38, first_name: 'Jami', last_name: 'Carney' }
-                ]
-            }
-        },
-
-        // computed: {
-        //     // ...mapState({
-        //     //     // items: state => state.seller_firm.seller_firm.items,
-        //     //     // distance_sales: state => state.seller_firm.seller_firm.distance_sales,
-        //     //     // accounts: state => state.seller_firm.seller_firm.accounts,
-        //     //     // vat_numbers: state => state.seller_firm.seller_firm.vat_numbers,
-        //     // }),
-        // }
+        name:'OverviewBaseData'
     }
 </script>
 

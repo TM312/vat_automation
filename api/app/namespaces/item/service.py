@@ -1,5 +1,5 @@
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from typing import List, BinaryIO, Dict
 import pandas as pd
 
@@ -29,6 +29,17 @@ class ItemService:
     @staticmethod
     def get_by_public_id(item_public_id: str) -> Item:
         return Item.query.filter_by(public_id = item_public_id).first()
+
+    @staticmethod
+    def get_by_sku_account_date(item_sku: str, account: Account, date: date) -> Item:
+        if account.channel.platform_code == 'AMZ':
+            item = Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id, Item.valid_from<=date, Item.valid_to>=date).first()
+            if item:
+                return item
+            else:
+                raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
+
+
 
 
     @staticmethod
@@ -76,16 +87,45 @@ class ItemService:
         else:
             raise NotFound('This item does not exist.')
 
+    @staticmethod
+    def process_single_submit(seller_firm_public_id: str, item_data: ItemInterface):
 
+        item_data['created_by'] = g.user.id
+        item_data['valid_from'] = datetime.strptime(item_data['valid_from'], "%Y-%m-%d").date()
+        try:
+            item_data['weight_kg'] = float(item_data['weight_kg'])
+            item_data['unit_cost_price_net'] = float(item_data['unit_cost_price_net'])
+
+        except:
+            raise
+
+        if not 'valid_to' in item_data:
+            TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+            item_data['valid_to'] = TAX_DEFAULT_VALIDITY
+
+        else:
+            item_data['valid_to'] = datetime.strptime(item_data['valid_to'], "%Y-%m-%d").date()
+
+        item = ItemService.create_by_seller_firm_public_id(seller_firm_public_id, item_data)
+
+        return item
 
     @staticmethod
-    def get_by_sku_account_date(item_sku: str, account: Account, date: date) -> Item:
-        if account.channel.platform_code == 'AMZ':
-            item = Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id, Item.valid_from<=date, Item.valid_to>=date).first()
-            if item:
-                return item
-            else:
-                raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
+    def create_by_seller_firm_public_id(seller_firm_public_id: str, item_data: ItemInterface) -> Item:
+        from ..business.seller_firm.service import SellerFirmService
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if seller_firm:
+            item_data['seller_firm_id'] = seller_firm.id
+            ItemService.handle_redundancy(item_data['sku'], item_data['seller_firm_id'], item_data['valid_from'])
+
+            new_item = ItemService.create(item_data)
+
+        return new_item
+
+
+
+
 
 
     @staticmethod
@@ -159,9 +199,6 @@ class ItemService:
     def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
         from ..business.seller_firm.service import SellerFirmService
 
-        TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
-
-
         redundancy_counter = 0
         error_counter = 0
         total_number_items = len(df.index)
@@ -179,7 +216,8 @@ class ItemService:
                 if not valid_from:
                     valid_from = date.today()
                 if not valid_to:
-                    valid_to = valid_from + timedelta(days=TAX_DEFAULT_VALIDITY)
+                    TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
+                    valid_to = TAX_DEFAULT_VALIDITY
 
                 redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
                 item_data = {
@@ -248,7 +286,9 @@ class ItemService:
 
     @staticmethod
     def handle_redundancy(sku: str, seller_firm_id: int, valid_from: date) -> int:
-        item: Item = Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id, Item.valid_to >= valid_from).first()
+        redundancy_counter = 0
+
+        item = Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id, Item.valid_to >= valid_from).first()
 
         # if an item with the same sku for the specified validity period already exists, it is being updated or deleted.
         if item:
@@ -260,8 +300,6 @@ class ItemService:
                     'valid_to': valid_from - timedelta(days=1)
                 }
                 item.update(data_changes)
-                redundancy_counter = 1
-        else:
-            redundancy_counter = 0
+                redundancy_counter += 1
 
         return redundancy_counter
