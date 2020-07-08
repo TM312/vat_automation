@@ -17,9 +17,23 @@ vatin_dto = Model('vatin', {
     'business_name': fields.String(attribute=lambda x: x.business.name)
 })
 
-vatin_verify_dto = Model('vatin', {
+vatin_verify_dto = Model('vatin_verify', {
+    'status': fields.String,
+    'verified': fields.Boolean,
     'country_code': fields.String,
     'number': fields.String
+
+})
+
+vatin_validate_dto = Model('vatin_validate', {
+    'status': fields.String,
+    'country_code': fields.String,
+    'number': fields.String,
+    'valid_from': fields.Date,
+    'valid_to': fields.Date,
+    'valid': fields.Boolean,
+    'name': fields.String,
+    'address': fields.String
 })
 
 vatin_sub_dto = Model('vatin_sub', {

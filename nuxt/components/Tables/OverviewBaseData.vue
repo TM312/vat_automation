@@ -6,8 +6,8 @@
                 <card-accounts class="mb-5"/>
             </b-card-group>
             <b-card-group deck>
-                <card-vat-numbers cols="8"  class="mb-5"/>
-                <card-distance-sales cols="4" class="mb-5"/>
+                <card-vat-numbers class="mb-5"/>
+                <card-distance-sales class="mb-5"/>
             </b-card-group>
         </b-tab>
         <b-tab title="Items">

@@ -112,13 +112,9 @@
 
         async fetch() {
             const { store } = this.$nuxt.context;
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, "0");
-            var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-            var yyyy = today.getFullYear();
-
-            const today_string = yyyy + "-" + mm + "-" + dd;
-            await store.dispatch("country/get_eu_by_date", today_string);
+            // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
+            var todayDate = new Date().toISOString().slice(0,10);
+            await store.dispatch("country/get_eu_by_date", todayDate);
         },
 
         computed: {
@@ -139,7 +135,9 @@
 
             validation_valid_to() {
                 if (this.payload.valid_to !== null) {
+
                     return this.payload.valid_from <= this.payload.valid_to;
+
                 } else {
                     return null;
                 }
