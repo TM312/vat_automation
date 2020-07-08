@@ -4,7 +4,7 @@ from flask.wrappers import Response
 from flask import request
 
 from . import VATIN
-from . import vatin_dto, vatin_sub_dto, vatin_verify_dto
+from . import vatin_dto, vatin_sub_dto, vatin_verify_dto, vatin_validate_dto
 from .service import VATINService
 
 
@@ -15,6 +15,7 @@ ns = Namespace("VATIN", description="VATIN Related Operations")  # noqa
 ns.add_model(vatin_dto.name, vatin_dto)
 ns.add_model(vatin_sub_dto.name, vatin_sub_dto)
 ns.add_model(vatin_verify_dto.name, vatin_verify_dto)
+ns.add_model(vatin_validate_dto.name, vatin_validate_dto)
 
 
 
@@ -59,10 +60,22 @@ class VATINIdResource(Resource):
 @ns.route("/verify")
 class VATINVerifyResource(Resource):
     @ns.expect(vatin_verify_dto, validate=True)
+    @ns.marshal_with(vatin_verify_dto)
     def post(self) -> bool:
         """Verify VATIN"""
+        return VATINService.process_verification_request(request.json)
+
+
+@ns.route("/validate")
+class VATINValidateResource(Resource):
+    @ns.expect(vatin_verify_dto, validate=True)
+    @ns.marshal_with(vatin_validate_dto)
+
+    def post(self) -> bool:
+        """Validate VATIN"""
         print('request.json: ', request.json, flush=True)
-        return VATINService.process_regex_verification_request(request.json)
+        return VATINService.process_validation_request(request.json)
+
 
 
 @ns.route("/csv")

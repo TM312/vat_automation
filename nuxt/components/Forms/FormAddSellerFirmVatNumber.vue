@@ -1,7 +1,14 @@
 <template>
     <b-card bg-variant="white">
+        <p>payload.valid_from: {{ payload.valid_from }}</p>
+        <p>payload.valid_to: {{ payload.valid_to }}</p>
+        <p>this.payload.valid: {{ payload.valid }}</p>
+        <p>vatinVerified: {{ vatinVerified }}</p>
+        <p>vatinValidated: {{ vatinValidated }}</p>
+        <p>validationValidTo: {{ validationValidTo }}</p>
+        <br>
         <b-form-group
-            label-cols-lg="3"
+            label-cols-lg="2"
             label="New Vat Number"
             label-size="lg"
             label-class="font-weight-bold pt-0"
@@ -11,31 +18,51 @@
                 label-cols-sm="3"
                 label-align-sm="right"
                 label="VATIN"
+                :invalid-feedback="vatinInvalidFeedback"
             >
                 <b-row>
-                    <b-col cols="2">
+                    <b-col cols="4">
                         <b-form-select
                             id="country_code"
                             :options="optionsCountryCode"
                             v-model="payload.country_code"
+                            :state="vatinVerified"
+                            :disabled="buttonVerifyDisabled"
                         ></b-form-select>
                     </b-col>
-                    <b-col cols="7">
+                    <b-col cols="4">
                         <b-form-input
                             id="number"
                             type="text"
+                            :disabled="buttonVerifyDisabled"
                             v-model="payload.number"
-                        ></b-form-input>
+                            :state="vatinVerified"
+                        >
+                            <b-form-invalid-feedback :state="vatinVerified">
+                                {{ vatinInvalidFeedback }}
+                            </b-form-invalid-feedback>
+                        </b-form-input>
                     </b-col>
                     <b-col cols="2">
                         <b-button
                             variant="outline-primary"
-                            :disabled="buttonDisabled"
+                            class="mr-auto"
+                            :disabled="buttonVerifyDisabled"
                             @click="verify"
-                            :state="payload.valid"
+                            block
                         >
-                            <span v-if="!buttonBusy">Verify</span>
+                            <span v-if="!buttonVerifyBusy">Verify</span>
                             <span v-else><b-spinner small></b-spinner></span>
+                        </b-button>
+                    </b-col>
+                    <b-col cols="2">
+                        <b-button
+                            variant="outline-secondary"
+                            class="mr-auto"
+                            @click="reset"
+                            block
+                        >
+                            <span>Reset</span>
                         </b-button>
                     </b-col>
                 </b-row>
@@ -45,22 +72,50 @@
             <b-form-group
                 label-cols-sm="3"
                 label-align-sm="right"
+                label="Status"
+            >
+                <b-collapse v-model="vatinVerified ">
+                    <b-button v-if="!vatinValidated" @click="validate" variant="outline-primary" block>Validate VATIN</b-button>
+                    <div v-else>
+                        <b-form-input id="valid" :state="payload.valid" type="text" cols-sm="3" v-model="payloadValidString" disabled>
+                            <b-form-invalid-feedback :state="payload.valid">Only valid vat numbers are accepted for seller firms. Please enter a different one.</b-form-invalid-feedback>
+                        </b-form-input>
+                        <p class="text-secondary my-2">
+                            <small>{{ payload.name }}</small>
+                            <span
+                                v-if="payload.address !== null"
+                                class="text-secondary">
+                                <small>{{ payload.address }}</small>
+                            </span>
+                        </p>
+
+                        <!-- <b-form-input id="name" type="text" cols-sm="3" disabled v-model="payload.name" />
+                        <b-form-input id="address" type="text" cols-sm="3" disabled v-model="payload.address" /> -->
+                    </div>
+                </b-collapse>
+            </b-form-group>
+
+            <b-form-group
+                label-cols-sm="3"
+                label-align-sm="right"
                 label-for="valid_from"
                 label="Valid From"
             >
-                <b-row align-h="between">
+                <b-row>
                     <b-col cols="9">
                         <b-form-datepicker
                             cols-sm="3"
                             id="valid_from"
                             v-model="payload.valid_from"
-                            @context="onContext"
+                            :disabled="!payload.valid"
                         ></b-form-datepicker>
                     </b-col>
                     <b-col cols="3">
                         <b-button
+                            v-if="vatinValidated"
                             variant="outline-primary"
-                            class="ml-auto"
+                            class="mr-auto"
+                            block
                             @click="setToday"
                         >Set Today</b-button>
                     </b-col>
@@ -73,15 +128,20 @@
                 label-align-sm="right"
                 label-for="valid_to"
                 invalid-feedback="'Valid From' needs to predate 'Valid To'"
-                :state="validation_valid_to"
+                :state="validationValidTo"
                 label="Valid To"
-                :description="getValidToDescription"
             >
-                <b-form-datepicker
-                    id="valid_to"
-                    :state="validation_valid_to"
-                    v-model="payload.valid_to"
-                ></b-form-datepicker>
+                <b-row>
+                    <b-col cols="9">
+                        <b-form-datepicker
+                            id="valid_to"
+                            :state="validationValidTo"
+                            :disabled="!payload.valid"
+                            v-model="payload.valid_to"
+                        ></b-form-datepicker>
+                    </b-col>
+                </b-row>
+
             </b-form-group>
         </b-form-group>
 
@@ -89,7 +149,7 @@
         <b-button
             variant="primary"
             @click="submitPayload()"
-            :disabled="validation_submit"
+            :disabled="submitDisabled"
             block
         >
             <b-icon icon="box-arrow-in-up" /> Add New Vat Number
@@ -115,11 +175,14 @@
                     valid_to: null
                 },
 
-                valid_to_formatted: null,
-                valid_from_selected: null,
+                vatinVerified: null,
+                vatinValidated: false,
 
-                buttonDisabled: false,
-                buttonBusy: false
+                buttonVerifyDisabled: false,
+                buttonVerifyBusy: false,
+
+                buttonValidateDisabled : false,
+                buttonValidateBusy : false
             }
         },
 
@@ -133,17 +196,15 @@
                 countries: state => state.country.countries
             }),
 
-            getValidToDescription() {
-                if (this.valid_to === null) {
-                    var today = new Date();
-                    const array = [this.valid_from_selected, today]
-                    var valid_to_base = Math.max.apply(Math, array);
-                    var valid_to_calc = new Date().setDate(valid_to_base.getDate()+30)
-                    return `If you do not pass a final validity date, the vat number will be considered valid until ${ valid_to_calc } and rechecked if necessary.`
-                } else {
-                    return null
-                }
+            payloadValidString() {
+                return this.payload.valid ? 'Valid' : 'Invalid'
             },
+
+
+            vatinInvalidFeedback() {
+                return `${this.payload.number} does not match the country's VAT ID specifications.`
+            },
+
 
             optionsCountryCode() {
                 const countriesShort = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
@@ -159,18 +220,25 @@
                 return options;
             },
 
-            validation_valid_to() {
-                if (this.payload.valid_to !== null) {
-                    return this.payload.valid_from <= this.payload.valid_to;
+            validationValidTo() {
+                if (this.payload.valid_to === null) {
+                    return null
                 } else {
-                    return null;
+                    var valid_from = this.payload.valid_from.split('-');
+                    var valid_from_date = new Date(valid_from[0], valid_from[1] - 1, valid_from[2]);
+
+                    var valid_to = this.payload.valid_to.split('-');
+                    var valid_to_date = new Date(valid_to[0], valid_to[1] - 1, valid_to[2]);
+
+                    return valid_from_date <= valid_to_date;
                 }
             },
 
-            validation_submit() {
+            submitDisabled() {
                 if (
-                    this.payload.country_code !== null &&
-                    this.payload.number !== null
+                    this.payload.valid === true &&
+                    this.vatinVerified === true &&
+                    this.vatinValidated === true
                 ) {
                     return false;
                 } else {
@@ -182,16 +250,73 @@
         methods: {
 
             async verify() {
-                this.buttonDisabled = true
-                this.buttonBusy = true
+                this.buttonVerifyDisabled = true
+                this.buttonVerifyBusy = true
 
-                console.log('this.payload: ', this.payload)
-                this.valid = await this.$axios.post('/tax/vatin/verify', this.payload)
+                // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
+                Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k]);
 
-                if (!this.valid) {
-                    this.buttonDisabled = false
+                const res = await this.$axios.post('/tax/vatin/verify', this.payload)
+                const { status, data } = res
+                if (status === 200 && data) {
+                    this.vatinVerified = data.verified
+                    this.buttonVerifyDisabled = data.verified
+                    this.payload.country_code = data.country_code
+                    this.payload.number = data.number
+                    this.payload.valid_from = data.valid_from
+                    this.payload.valid_to = data.valid_to
+
+                    console.log('data.valid_from: ', data.valid_from)
+                    console.log('data.valid_to: ', data.valid_to)
+
+                    console.log('as string? to: ', new Date(data.valid_to).toISOString().slice(0,10))
+                    console.log('as string? from: ', new Date(data.valid_from).toISOString().slice(0,10))
+
                 }
-                this.buttonBusy = false
+
+                this.buttonVerifyBusy = false
+                this.payload.valid_from = null
+                this.payload.valid_to = null
+            },
+
+            reset() {
+                this.buttonVerifyDisabled = false
+                this.vatinVerified = null
+                this.vatinValidated = false
+
+                this.payload.country_code = null
+                this.payload.number = null
+                this.payload.valid = null
+                this.payload.name = null
+                this.payload.address = null
+                this.payload.valid_from = null
+                this.payload.valid_to = null
+            },
+
+            async validate() {
+                this.buttonValidateDisabled = true
+                this.buttonValidateBusy = true
+
+                // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
+                Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k]);
+
+                const res = await this.$axios.post('/tax/vatin/validate', this.payload)
+                const { status, data } = res
+                if (status === 200 && data) {
+                    this.payload.country_code = data.country_code,
+                    this.payload.number = data.number,
+                    this.payload.valid = data.valid,
+                    this.payload.name = data.name,
+                    this.payload.address = data.address
+
+                    this.vatinValidated = true
+
+                } else {
+                    await this.$toast.error(data.message, {
+                        duration: 1000
+                    });
+                }
+                this.buttonValidateBusy = false
             },
 
             setToday() {
@@ -200,21 +325,16 @@
                 console.log('set Today this.valid_from: ', this.payload.valid_from)
             },
 
-            onContext(ctx) {
-                // The following will be an empty string until a valid date is entered
-                this.valid_from_selected = ctx.selectedYMD
-            },
+            // getTodayAsYYYYMMDD() {
+            //     var today = new Date();
+            //     var dd = String(today.getDate()).padStart(2, "0");
+            //     var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+            //     var yyyy = today.getFullYear();
 
-            getTodayAsYYYYMMDD() {
-                var today = new Date();
-                var dd = String(today.getDate()).padStart(2, "0");
-                var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-                var yyyy = today.getFullYear();
+            //     const today_string = yyyy + "-" + mm + "-" + dd;
+            //     return today_string
 
-                const today_string = yyyy + "-" + mm + "-" + dd;
-                return today_string
-
-            },
+            // },
 
             async submitPayload() {
                 try {
