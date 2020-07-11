@@ -27,8 +27,8 @@ class Business(db.Model):  # type: ignore
 
 
     def update(self, data_changes):
-        for key, val in data_changes.items():
-            setattr(self, key, val)
+        for k, v in data_changes.items():
+            setattr(self, k, v)
         self.modified_at = datetime.utcnow()
         self.times_modified += 1
         return self

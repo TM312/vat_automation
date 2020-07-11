@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List, BinaryIO, Dict
+from typing import List, BinaryIO, Dict, Union
 import pandas as pd
 from datetime import datetime, date
 
@@ -148,7 +148,7 @@ class InputService:
 
             response_object_info = {
                 'status': 'info',
-                'message': '{} {}s had been uploaded earlier already and were skipped.'.format(str(redundancy_counter), input_type)
+                'message': '{} {}s had been uploaded earlier already and were skipped.'.format(str(kwargs.get('redundancy_counter')), input_type)
             }
             response_objects.append(response_object_info)
 
@@ -283,7 +283,8 @@ class InputService:
             print('file_name: ', file_name, flush=True)
             try:
                 if file_name.lower().endswith('.csv'):
-                    df = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
+                    df_raw = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
+                    df = df_raw.dropna(how='all')
                     print('df.head()', flush=True)
                     print(df.head(), flush=True)
                 else:

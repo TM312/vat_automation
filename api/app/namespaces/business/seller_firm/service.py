@@ -78,6 +78,49 @@ class SellerFirmService:
 
 
     @staticmethod
+    def create_as_client(seller_firm_data_as_client: SellerFirmInterface) -> SellerFirm:
+
+        name = seller_firm_data_as_client.get('name')
+        establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
+        accounting_firm_client_id = seller_firm_data_as_client.get('accounting_firm_client_id')
+
+        if (accounting_firm_client_id != None and name != None and establishment_country_code != None):
+            seller_firm = SellerFirm.query.filter_by(name=name, establishment_country_code=establishment_country_code, accounting_firm_client_id=accounting_firm_client_id).first()
+
+        elif (name != None and establishment_country_code != None):
+            seller_firm = SellerFirm.query.filter_by(name=name, establishment_country_code=establishment_country_code).first()
+
+        if seller_firm:
+
+            data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None or k != 'name')}
+
+            seller_firm.update(data_changes)
+            db.session.commit()
+
+            return seller_firm
+
+        else:
+            seller_firm_data = {
+                'claimed': False,
+                'created_by': g.user.id,
+                'name': name,
+                'address': seller_firm_data_as_client.get('address'),
+                'establishment_country_code': establishment_country_code,
+                'accounting_firm_id': g.user.employer_id,
+                'accounting_firm_client_id': accounting_firm_client_id
+            }
+
+            try:
+                new_seller_firm = SellerFirmService.create(seller_firm_data)
+                return new_seller_firm
+
+            except:
+                db.session.rollback()
+                raise
+
+
+
+    @staticmethod
     def create(seller_firm_data: SellerFirmInterface) -> SellerFirm:
 
         new_seller_firm = SellerFirm(

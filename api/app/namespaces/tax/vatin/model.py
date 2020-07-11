@@ -1,9 +1,11 @@
-from datetime import datetime, date
-#from ...business.model_parent import Business
+from datetime import datetime, date, timedelta
+import uuid
+
 from app.extensions import db
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import UUID
 
 from .helpers import VIES_OPTIONS
-
 
 
 
@@ -12,45 +14,30 @@ class VATIN(db.Model):
     __tablename__ = "vatin"
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
+    last_validated = db.Column(db.Date, nullable=False)
     valid_from = db.Column(db.Date, nullable=False)
-    valid_to = db.Column(db.Date)
+
     initial_tax_date = db.Column(db.Date)
 
-    _country_code = db.Column(db.String(4), nullable=False)
-    _number = db.Column(db.String(16), nullable=False)
+    country_code = db.Column(db.String(4), nullable=False)
+    number = db.Column(db.String(16), nullable=False)
     valid = db.Column(db.Boolean, nullable=False)
-    name = db.Column(db.String(32))
-    address = db.Column(db.String(80))
+    name = db.Column(db.String(128))
+    address = db.Column(db.String(256))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     transactions = db.relationship('Transaction', backref='vatin', lazy=True)
 
-
-
-    # https://www.python-course.eu/python3_properties.php
-    @property
-    def country_code(self):
-        return self._country_code
-
-    @country_code.setter
-    def country_code(self, value):
-        self._country_code = value.upper()
-
-    @property
-    def number(self):
-        return self._number
-
-    @number.setter
-    def number(self, value):
-        self._number = value.upper().replace(" ", "")
-
+    @hybrid_property
+    def valid_to(self):
+        return self.valid_from + timedelta(days=30) #!!! timedelta needs to be updated manually
 
 
     def __str__(self):
-        unformated_number = "{country_code}{number}".format(
-            country_code=self.country_code, number=self.number,
-        )
+        unformated_number = "{}{}".format(self.country_code, self.number,)
 
         country = VIES_OPTIONS.get(self.country_code, {})
         if len(country) == 3:
