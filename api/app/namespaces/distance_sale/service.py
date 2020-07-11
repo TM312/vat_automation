@@ -105,9 +105,7 @@ class DistanceSaleService:
         delimiter = ';'
 
         for file in distance_sale_information_files:
-
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-
             DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
 
         response_object = {
@@ -124,7 +122,6 @@ class DistanceSaleService:
     def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-
         response_objects = DistanceSaleService.create_distance_sales(df, file_path_in, user_id, **kwargs)
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
@@ -170,6 +167,7 @@ class DistanceSaleService:
                     'arrival_country_code': arrival_country_code,
                     'active': active
                 }
+
 
 
                 try:

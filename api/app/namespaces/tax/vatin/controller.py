@@ -34,32 +34,33 @@ class VATINResource(Resource):
         return VATINService.create(request.parsed_obj)
 
 
-@ns.route("/<int:vatin_id>")
-@ns.param("vatin_id", "VATIN database ID")
+@ns.route("/<string:vatin_public_id>")
+@ns.param("vatin_public_id", "VATIN database ID")
 class VATINIdResource(Resource):
-    def get(self, vatin_id: int) -> VATIN:
+    def get(self, vatin_public_id: str) -> VATIN:
         """Get Single VATIN"""
-        return VATINService.get_by_id(vatin_id)
+        return VATINService.get_by_public_id(vatin_public_id)
 
-    def delete(self, vatin_id: int) -> Response:
+    def delete(self, vatin_public_id: str) -> Response:
         """Delete Single VATIN"""
         from flask import jsonify
 
-        id = VATINService.delete_by_id(vatin_id)
+        id = VATINService.delete_by_public_id(vatin_public_id)
         return jsonify(dict(status="Success", id=id))
 
     @ns.expect(vatin_dto, validate=True)
     @ns.marshal_with(vatin_dto)
-    def put(self, vatin_id: int) -> VATIN:
+    def put(self, vatin_public_id: str) -> VATIN:
         """Update Single VATIN"""
 
         data_changes: VATINInterface = request.parsed_obj
-        return VATINService.update(vatin_id, data_changes)
+        return VATINService.update_by_public_id(vatin_public_id, data_changes)
 
 
 @ns.route("/verify")
 class VATINVerifyResource(Resource):
-    @ns.expect(vatin_verify_dto, validate=True)
+    #@login_required
+    @ns.expect(vatin_verify_dto, validate=False)
     @ns.marshal_with(vatin_verify_dto)
     def post(self) -> bool:
         """Verify VATIN"""
@@ -68,6 +69,7 @@ class VATINVerifyResource(Resource):
 
 @ns.route("/validate")
 class VATINValidateResource(Resource):
+    #@login_required
     @ns.expect(vatin_verify_dto, validate=True)
     @ns.marshal_with(vatin_validate_dto)
 
@@ -76,6 +78,16 @@ class VATINValidateResource(Resource):
         print('request.json: ', request.json, flush=True)
         return VATINService.process_validation_request(request.json)
 
+
+@ns.route("/seller_firm/<string:seller_firm_public_id>")
+class DistanceSaleResource(Resource):
+    """ Create VATIN for a Specific Seller Firm based on its Public ID"""
+
+    # @ns.expect(vatin_dto, validate=True)
+    @login_required
+    @ns.marshal_with(vatin_sub_dto, envelope='data')
+    def post(self, seller_firm_public_id: str) -> VATIN:
+        return VATINService.process_single_submit(seller_firm_public_id, vatin_data_raw=request.json)
 
 
 @ns.route("/csv")

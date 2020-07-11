@@ -100,9 +100,13 @@ class AccountService:
             account_data['seller_firm_id'] = seller_firm.id
             AccountService.handle_redundancy(account_data['given_id'], account_data['channel_code'])
 
-            new_account = AccountService.create(account_data)
+            try:
+                new_account = AccountService.create(account_data)
+                return new_account
 
-        return new_account
+            except:
+                db.session.rollback()
+                raise
 
 
 
@@ -214,7 +218,7 @@ class AccountService:
 
         account = Account.query.filter(Account.given_id == given_id,  Account.channel_code == channel_code).first()
 
-        # if an account with the same given_id and channel_code already exists, it is being deleted.
+        # if an account with the same given_id and channel_code already exists, it is being deleted. !!!! need to take care of
         if account:
             db.session.delete(account)
             redundancy_counter += 1

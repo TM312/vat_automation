@@ -5,6 +5,6 @@
 #         env_file:
 #             - .test.env
 
-#     nuxt:
+#     front:
 #         env_file:
 #             - .test.env

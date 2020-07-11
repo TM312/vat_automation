@@ -55,15 +55,16 @@ class SellerFirmIdResource(Resource):
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)
 
 
-# @ns.route('/as_client')
-# class SellerFirmAsClientResource(Resource):
-#     @login_required
-#     #@accepted_u_types('admin')
-#     @ns.marshal_list_with(seller_firm_dto, envelope='data')
-#     def get(self) -> List[SellerFirm]:
-#         '''Get One SellerFirm'''
-#         accounting_firm_id = g.user.employer_id
-#         return SellerFirmService.get_by_accounting_firm_id(accounting_firm_id)
+@ns.route('/as_client')
+class SellerFirmAsClientResource(Resource):
+    @login_required
+    #@accepted_u_types('admin')
+    @ns.expect(SellerFirmInterface, validate=True)
+    @ns.marshal_with(seller_firm_sub_dto, envelope='data')
+    def post(self) -> SellerFirm:
+        """Create A Single Seller Firm"""
+        seller_firm_data: SellerFirmInterface = request.json
+        return SellerFirmService.create_as_client(seller_firm_data)
 
 
 
