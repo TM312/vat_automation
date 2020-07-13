@@ -9,7 +9,7 @@ vatin_verify_dto = Model('vatin_verify', {
 })
 
 vatin_validate_dto = vatin_verify_dto.inherit('vatin_validate', {
-    'last_validated': fields.Date,
+    'request_data': fields.Date,
     'valid': fields.Boolean,
     'name': fields.String,
     'address': fields.String

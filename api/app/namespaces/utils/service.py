@@ -175,22 +175,35 @@ class InputService:
         return response_objects
 
 
+    @staticmethod
+    def determine_file_type(file_path_in: BinaryIO) -> str:
 
-    # # NEVER TRUST USER INPUT
-    # @staticmethod
-    # def store_files(uploaded_files):
-    #     # create a message list (used for notifications in the frontend)
-    #     response_objects = []
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding='utf-8', delimiter=';')
+        column_name_list = list(df.columns.values)
 
-    #     if uploaded_files == []:
-    #         raise NotFound('No files submitted.')
+        if ('channel_code' in column_name_list and 'channel_code' in column_name_list):
+            return 'account_list'
 
-    #     else:
-    #         for file in uploaded_files:
-    #             file_path = InputService.store_file(file, allowed_extensions)
-    #             file_paths.append(file_path)
+        elif ('arrival_country' in column_name_list and 'active' in column_name_list):
+            return 'distance_sale_list'
 
-    #         return file_paths
+        elif ('SKU' in column_name_list and 'name' in column_name_list and 'tax_code' in column_name_list and 'unit_cost_price_currency_code' in column_name_list):
+            return 'item_list'
+
+        elif ('country_code' in column_name_list and 'number' in column_name_list):
+            return 'vat_numbers'
+
+        else:
+            os.remove(file_path_in)
+            raise UnprocessableEntity('Unable to identify the file type')
+
+
+    @staticmethod
+    def determine_data_type(file_type: str) -> str:
+        if file_type in ['account_list', 'distance_sale_list', 'item_list', 'vat_numbers']:
+            return 'static'
+        else:
+            raise
 
 
 
@@ -199,9 +212,6 @@ class InputService:
     def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
         STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
-
-        print('STATIC_DATA_ALLOWED_EXTENSIONS:', STATIC_DATA_ALLOWED_EXTENSIONS, flush=True)
-
         try:
             file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
         except:
@@ -260,6 +270,26 @@ class InputService:
 
         else:
             raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
+
+
+    def move_data_to_file_type(file_path_in: str, data_type: str, file_type: str):
+        BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
+
+        if data_type == 'static':
+            basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+        elif data_type == 'transaction':
+            basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+
+        basepath_tbd = os.path.join(BASE_PATH_DATA_SELLER_FIRM, 'tbd')
+        basepath_file_type = os.path.join(basepath, file_type, 'in')
+        os.makedirs(basepath_file_type, exist_ok=True)
+
+        file_name = os.path.basename(file_path_in)
+        file_path_file_type = os.path.join(basepath_file_type, file_name)
+        try:
+            shutil.move(file_path_in, file_path_file_type)
+        except:
+            raise
 
 
     @staticmethod

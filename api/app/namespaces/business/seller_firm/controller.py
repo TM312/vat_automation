@@ -55,6 +55,15 @@ class SellerFirmIdResource(Resource):
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)
 
 
+@ns.route("/<string:seller_firm_public_id>/upload")
+class SellerFirmInformationResource(Resource):
+    @login_required
+    def post(self, seller_firm_public_id):
+        """Upload data for the indicated seller firm"""
+        seller_firm_files: List[BinaryIO] = request.files.getlist("files")
+        return SellerFirmService.process_static_data_upload(seller_firm_public_id, seller_firm_files)
+
+
 @ns.route('/as_client')
 class SellerFirmAsClientResource(Resource):
     @login_required
@@ -72,13 +81,7 @@ class SellerFirmAsClientResource(Resource):
 @ns.route("/csv")
 class SellerFirmInformationResource(Resource):
     @login_required
-    # @employer_required
-    # @confirmation_required
-    # !!! @ns.expect(tax_record_dto, validate=True)
     def post(self):
         """Create an unclaimed seller firm as a client"""
         seller_firm_information_files: List[BinaryIO] = request.files.getlist("files")
-        print("POST file received")
-        print('uploaded_files')
-        print(seller_firm_information_files)
         return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed=False)

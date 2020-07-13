@@ -32,6 +32,7 @@ class Config(object):
     BASE_PATH_SEEDS = '/home/data/seeds'
     BASE_PATH_LOGS = '/home/data/logs'
     BASE_PATH_TEMPLATES = '/home/data/templates'
+    BASE_PATH_DATA_SELLER_FIRM = '/home/data/seller_firm_data'
     BASE_PATH_STATIC_DATA_SELLER_FIRM = '/home/data/seller_firm_data/static'
     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/home/data/seller_firm_data/transaction'
     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/home/data/seller_firm_data/tax_record'
@@ -44,7 +45,7 @@ class Config(object):
     TRANSACTION_DATA_ALLOWED_EXTENSIONS = ['txt', 'csv']
 
     STANDARD_SERVICE_TAX_RATE_TYPE = 'S'
-    TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2099', '%d-%m-%Y').date()
+    TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2030', '%d-%m-%Y').date()
     VATIN_LIFESPAN = 32 # in days
     OLD_TRANSACTION_TOLERANCE_DAYS = 100
     SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
