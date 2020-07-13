@@ -73,9 +73,13 @@
                                 <b-form-input id="valid" :state="payload.valid" type="text" cols-sm="3" v-model="payloadValidString" disabled>
                                     <b-form-invalid-feedback :state="payload.valid">Only valid vat numbers are accepted for seller firms. Please enter a different one.</b-form-invalid-feedback>
                                 </b-form-input>
+                                <b-card border-variant="warning">
+                                    <b-card-header bg-variant="warning"><b-icon icon="info" /> Attention</b-card-header>
+                                    <b-card-text v-if="vatinValidated === null">We have been unable to validate the provided vat number. You can either try to manually resend the validation request again or submit the data now and validate it later. Just make sure that the number has been validated before submitting your transaction reports.</b-card-text>
+                                </b-card>
                             </b-col>
                             <b-col cols="9" md="6">
-                                <b-form-group description="Last Validated"><b-form-input id="last_validated" type="text" cols-sm="3" :value="payload.last_validated" disabled /></b-form-group>
+                                <b-form-group description="Last Validated"><b-form-input id="request_data" type="text" cols-sm="3" :value="payload.request_data" disabled /></b-form-group>
                             </b-col>
                         </b-row>
 
@@ -88,8 +92,6 @@
                             </span>
                         </p>
 
-                        <!-- <b-form-input id="name" type="text" cols-sm="3" disabled v-model="payload.name" />
-                        <b-form-input id="address" type="text" cols-sm="3" disabled v-model="payload.address" /> -->
                     </div>
                 </b-collapse>
             </b-form-group>
@@ -117,6 +119,7 @@
         </b-form-group>
 
 
+
         <b-button
             variant="primary"
             @click="submitPayload()"
@@ -130,6 +133,7 @@
 
 <script>
     import { mapState } from "vuex";
+    import { BIcon } from "bootstrap-vue";
 
     export default {
         name: 'FormAddSellerFirmVatNumber',
@@ -140,7 +144,7 @@
                     country_code: null,
                     number: null,
                     valid: null,
-                    last_validated: null,
+                    request_data: null,
                     name: null,
                     address: null,
                     valid_from: null,
@@ -148,7 +152,7 @@
                 },
 
                 vatinVerified: null,
-                vatinValidated: false,
+                vatinValidated: null,
 
                 buttonVerifyDisabled: false,
                 buttonVerifyBusy: false,
@@ -169,7 +173,13 @@
             }),
 
             payloadValidString() {
-                return this.payload.valid ? 'Valid' : 'Invalid'
+                if (this.payload.valid === true) {
+                    return 'Valid'
+                } else if (this.payload.valid === false) {
+                    return 'Invalid'
+                } else {
+                    return 'Validation Failed'
+                }
             },
 
 
@@ -241,14 +251,14 @@
                     country_code: null,
                     number: null,
                     valid: null,
-                    last_validated: null,
+                    request_data: null,
                     name: null,
                     address: null,
                     valid_from: null,
                 },
 
                 this.vatinVerified = null,
-                this.vatinValidated = false,
+                this.vatinValidated = null,
 
                 this.buttonVerifyDisabled = false,
                 this.buttonVerifyBusy = false,
@@ -271,13 +281,13 @@
                         country_code: data.country_code,
                         number: data.number,
                         valid: data.valid,
-                        last_validated: data.last_validated,
+                        request_data: data.request_data,
                         name: data.name,
                         address: data.address,
                         valid_from: this.$dateFns.format(new Date(), 'yyyy-MM-dd')
                         }
 
-                    this.vatinValidated = true
+                    this.vatinValidated = data.valid ? true : false
 
                 } else {
                     await this.$toast.error(data.message, {

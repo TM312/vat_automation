@@ -18,14 +18,14 @@ class VATIN(db.Model):
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
-    last_validated = db.Column(db.Date, nullable=False)
-    valid_from = db.Column(db.Date, nullable=False)
+    request_data = db.Column(db.Date, nullable=False)
+    valid_from = db.Column(db.Date)
 
     initial_tax_date = db.Column(db.Date)
 
     country_code = db.Column(db.String(4), nullable=False)
     number = db.Column(db.String(16), nullable=False)
-    valid = db.Column(db.Boolean, nullable=False)
+    valid = db.Column(db.Boolean)
     name = db.Column(db.String(128))
     address = db.Column(db.String(256))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))

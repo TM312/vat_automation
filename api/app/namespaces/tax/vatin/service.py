@@ -5,7 +5,7 @@ import time
 import re
 
 from flask import current_app
-from werkzeug.exceptions import HTTPException, FailedDependency
+from werkzeug.exceptions import HTTPException, FailedDependency, UnprocessableEntity, NotFound
 
 from app.extensions import db
 
@@ -95,11 +95,11 @@ class VATINService:
                 country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
                 vatin = VATINService.get_vatin(country_code, number, date)
                 if not isinstance(vatin, VATIN):
-                    vatin_date = VIESService.send_request(country_code, number)
+                    vatin_data = VIESService.send_request(country_code, number)
 
-                    vatin_date['country_code'] = country_code,
-                    vatin_date['number'] = number,
-                    vatin_date['valid_from'] = date if vatin_date.get('valid') else None
+                    vatin_data['country_code'] = country_code,
+                    vatin_data['number'] = number,
+                    vatin_data['valid_from'] = date if vatin_data.get('valid') else None
 
                     try:
                         vatin = VATINService.create(vatin_data)
@@ -119,7 +119,7 @@ class VATINService:
             number = vatin_data.get('number'),
             initial_tax_date = vatin_data.get('initial_tax_date'),
             valid_from = vatin_data.get('valid_from'),
-            last_validated = vatin_data.get('last_validated'),
+            request_data = vatin_data.get('request_data'),
             valid = vatin_data.get('valid'),
             name = vatin_data.get('name'),
             address = vatin_data.get('address'),
@@ -135,21 +135,9 @@ class VATINService:
     def get_vatin_or_None_and_verify(transaction_input: TransactionInput, country_code_temp: str, number_temp: str, date: date) -> VATIN:
         from ...business.service_parent import BusinessService
 
-
         vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-        if isinstance(vatin, VATIN):
-            business = BusinessService.get_by_name_address_or_None(vatin.name, vatin.address)
-
-        # if isinstance(business, SellerFirm):
-            # if not business.id != vatin.business_id: #potentially a notification
-            #     notification_data = {
-            #         'subject': '{}s Not Matching'.format(main_subject),
-            #         'original_filename': original_filename,
-            #         'status': 'warning',
-            #         'message': 'The '.format(reference_value, calculated_value),
-            #         'transaction_input_id': transaction_input_id
-            #     }
-            #     NotificationService.create_transaction_notification(notification_data)
+        # if isinstance(vatin, VATIN):
+        #     business = BusinessService.get_by_name_address_or_None(vatin.name, vatin.address)
 
         return vatin
 
@@ -206,15 +194,15 @@ class VATINService:
             vatin = VATIN.query.filter(VATIN.country_code==country_code, VATIN.number==number, VATIN.valid_to >= date.today()).first()
 
             if vatin:
-                today = date.today()
-                if (vatin.valid and vatin.last_validated < today):
-                    vatin.last_validated = today
-                    db.session.commit()
-                    continue
+                # today = date.today()
+                # if (vatin.valid and vatin.request_data < today):
+                #     vatin.request_data = today
+                #     db.session.commit()
+                continue
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
-                sleep(1)
+                sleep(3)
                 vatin_data = VIESService.send_request(country_code, number)
 
                 vatin_data['business_id'] = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
@@ -242,7 +230,7 @@ class VATINService:
     @staticmethod
     def get_vat_from_df(df: pd.DataFrame, i: int) -> List[str]:
         country_code_temp = InputService.get_str(df, i, column='country_code')
-        number_temp = InputService.get_str(df, i, column='vatin')
+        number_temp = InputService.get_str(df, i, column='number')
         country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
         return country_code, number
 
@@ -253,29 +241,24 @@ class VATINService:
             or number_temp_unform == 'nan'
             or not number_temp_unform
         ):
-            return None
-
+            return None, None
 
         if not country_code_temp:
             country_code_temp = number_temp_unform[:2].strip()
-
         else:
             country_code_temp.upper().replace(" ", "")
 
         number_temp = number_temp_unform.upper().replace(" ", "")
 
         if not re.match(r"^[a-zA-Z][a-zA-Z]", number_temp):
-            # print('Case 1', flush=True)
             VATINService.verify(country_code_temp, number_temp)
             country_code, number = country_code_temp, number_temp
 
         elif country_code_temp == number_temp[:2].strip():
-            # print('Case 2', flush=True)
             VATINService.verify(country_code_temp, number_temp[2:].strip())
             country_code, number = country_code_temp, number_temp[2:].strip()
 
         else:
-            # print('Case 3', flush=True)
             country_code = number_temp[:2].strip()
             number = number_temp[2:].strip()
             VATINService.verify(country_code, number)
@@ -318,89 +301,63 @@ class VATINService:
             return response_object
 
     @staticmethod
-    def process_validation_request(vatin_data: VATINInterface) -> Dict:
+    def process_validation_request(vatin_data: VATINInterface) -> VATIN:
         country_code_temp = vatin_data.get('country_code')
         number_temp = vatin_data.get('number')
 
         country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
         if not country_code or not number:
-            response_object = {
-                'status': 'error',
-                'message': 'Could not retrieve VATIN data.'
-            }
+            raise UnprocessableEntity('The submitted country code or number do not conform with the required standard.')
 
         vatin = VATINService.get_vatin(country_code, number, date.today())
+
         if vatin:
-            response_object = {
-                'status': 'success',
-                'country_code': country_code,
-                'number': number,
-                'valid': vatin.valid,
-                'last_validated': vatin.last_validated,
-                'valid_from': vatin.valid_from,
-                'name': vatin.name,
-                'address': vatin.address
-            }
+            return vatin
 
         else:
             try:
-                response_object = VIESService.send_request(country_code, number)
+                vatin_data = VIESService.send_request(country_code, number)
+                try:
+                    vatin = VATINService.create(vatin_data)
+                    return vatin
 
-                response_object['status'] = 'success'
-                response_object['country_code'] = country_code
-                response_object['number'] = number
+                except:
+                    raise UnprocessableEntity('Can not create VATIN.')
 
             except:
-                response_object = {
-                    'status': 'error',
-                    'message': 'Could not retrieve VATIN data.'
-                }
+                raise FailedDependency('Could not validate country code and number at the VIES database.')
 
-            finally:
-                return response_object
 
 
     @staticmethod
     def process_single_submit(seller_firm_public_id: str, vatin_data_raw: VATINInterface) -> VATIN:
         from ...business.seller_firm.service import SellerFirmService
 
-        country_code_temp = vatin_data_raw.get('country_code')
-        number_temp = vatin_data_raw.get('number')
-        country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
+        country_code, number = VATINService.vat_precheck(country_code_temp=vatin_data_raw.get('country_code'), number_temp=vatin_data_raw.get('number'))
 
-        if not country_code or not number_temp:
+        if not country_code or not number:
             raise
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
+            vatin_data = vatin_data_raw
+            vatin_data['country_code'] = country_code
+            vatin_data['number'] = number
+            vatin_data['business_id'] = seller_firm.id
 
             vatin = VATIN.query.filter_by(country_code=country_code, number=number).first()
 
-            if vatin:
-                data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None)}
+            if not vatin:
+                vatin = VATINService.process_validation_request(vatin_data_raw)
+
+            data_changes = {k:v for k,v in vatin_data.items() if (v is not None and v != getattr(vatin, k))}
+            if data_changes:
                 vatin.update(data_changes)
                 db.session.commit()
-                return vatin
+            return vatin
 
-            else:
-                vatin_data = {
-                    'country_code': country_code,
-                    'number': number,
-                    'valid_from': vatin_data_raw.get('valid_from'),
-                    'last_validated':vatin_data_raw.get('last_validated'),
-                    'valid': vatin_data_raw.get('valid'),
-                    'name': vatin_data_raw.get('name'),
-                    'address': vatin_data_raw.get('address'),
-                    'business_id': seller_firm.id
-                }
-                try:
-                    new_vatin = VATINService.create(vatin_data)
-                    return new_vatin
-
-                except:
-                    db.session.rollback()
-                    raise
-
+        else:
+            raise NotFound('The indicated seller firm does not exist.')
 
 
 
@@ -448,18 +405,20 @@ class VIESService:
 
         """VIES API response data."""
         try:
-            response_object = VIESService.send_request_via_urllib(country_code, number)
-            current_app.logger.warning('Exception: {} | URLLIB Request failed for VATIN: {}-{}'.format(e, country_code, number))
+            vatin_data = VIESService.send_request_via_urllib(country_code, number)
 
         except Exception as e:
+            current_app.logger.warning('Exception: {} | URLLIB Request failed for VATIN: {}-{}'.format(e, country_code, number))
             try:
                 # VIES DB is unreliable therefore reducing requests per second
                 from time import sleep
                 sleep(3)
-                response_object = VIESService.send_request_via_zeep(country_code, number)
+                vatin_data = VIESService.send_request_via_zeep(country_code, number)
 
             except:
-                response_object = {
+                vatin_data = {
+                    'country_code': country_code,
+                    'number': number,
                     'valid': None,
                     'request_date': date.today()
                     'name': None,
@@ -468,52 +427,54 @@ class VIESService:
                 current_app.logger.warning('Exception: {} | ZEEP Request failed for VATIN: {}-{}'.format(e, country_code, number))
 
         finally:
-            return response_object
+            return vatin_data
 
 
     @staticmethod
     def send_request_via_urllib(country_code: str, number: str):
-    #adapted from here: https://github.com/ajcerejeira/vat-validator/blob/master/vat_validator/vies.py
-    from urllib import request
-    import xml.etree.ElementTree as ET
+        #adapted from here: https://github.com/ajcerejeira/vat-validator/blob/master/vat_validator/vies.py
+        from urllib import request
+        import xml.etree.ElementTree as ET
 
-    # Prepare the SOAP request
-    envelope = ET.Element(
-        "soapenv:Envelope",
-        attrib={
-            "xmlns:hs": "urn:ec.europa.eu:taxud:vies:services:checkVat:types",
-            "xmlns:soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
-        },
-    )
-    body = ET.SubElement(envelope, "soapenv:Body")
-    action = ET.SubElement(body, "hs:checkVat")
-    ET.SubElement(action, "hs:countryCode").text = country_code
-    ET.SubElement(action, "hs:vatNumber").text = number
-    payload = ET.tostring(envelope, encoding="utf-8")
+        # Prepare the SOAP request
+        envelope = ET.Element(
+            "soapenv:Envelope",
+            attrib={
+                "xmlns:hs": "urn:ec.europa.eu:taxud:vies:services:checkVat:types",
+                "xmlns:soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
+            },
+        )
+        body = ET.SubElement(envelope, "soapenv:Body")
+        action = ET.SubElement(body, "hs:checkVat")
+        ET.SubElement(action, "hs:countryCode").text = country_code
+        ET.SubElement(action, "hs:vatNumber").text = number
+        payload = ET.tostring(envelope, encoding="utf-8")
 
-    # Send the SOAP request to VIES Webservice
-    url = "http://ec.europa.eu/taxation_customs/vies/services/checkVatService"
-    req = request.Request(url, data=payload)
-    res = request.urlopen(req)
+        # Send the SOAP request to VIES Webservice
+        url = "http://ec.europa.eu/taxation_customs/vies/services/checkVatService"
+        req = request.Request(url, data=payload)
+        res = request.urlopen(req)
 
-    # Parse the result
-    res_envelope = ET.fromstring(res.read())
-    namespace = "urn:ec.europa.eu:taxud:vies:services:checkVat:types"
-    request_date = res_envelope.find(".//{{{}}}requestDate".format(namespace))
-    valid = res_envelope.find(".//{{{}}}valid".format(namespace))
-    name = res_envelope.find(".//{{{}}}name".format(namespace))
-    address = res_envelope.find(".//{{{}}}address".format(namespace))
+        # Parse the result
+        res_envelope = ET.fromstring(res.read())
+        namespace = "urn:ec.europa.eu:taxud:vies:services:checkVat:types"
+        request_date = res_envelope.find(".//{{{}}}requestDate".format(namespace))
+        valid = res_envelope.find(".//{{{}}}valid".format(namespace))
+        name = res_envelope.find(".//{{{}}}name".format(namespace))
+        address = res_envelope.find(".//{{{}}}address".format(namespace))
 
-    response_object = {
-        'valid': valid is not None and valid.text == "true",
-        'request_date': datetime.strptime(request_date.text, "%Y-%m-%d%z").date()
-                        if request_date is not None and request_date.text is not None
-                        else None,
-        'name': name.text if name is not None else None,
-        'address': address.text if address is not None else None
-    }
+        vatin_data = {
+            'country_code': country_code,
+            'number': number,
+            'valid': valid is not None and valid.text == "true",
+            'request_date': datetime.strptime(request_date.text, "%Y-%m-%d%z").date()
+                            if request_date is not None and request_date.text is not None
+                            else None,
+            'name': name.text if name is not None else None,
+            'address': address.text if address is not None else None
+        }
 
-    return response_object
+        return vatin_data
 
     @staticmethod
     def send_request_via_zeep(country_code: str, number: str) -> Dict:
@@ -521,14 +482,16 @@ class VIESService:
         client = Client(VIES_WSDL_URL)
         vat_zeep_object = client.service.checkVat(country_code, number)
         vat = helpers.serialize_object(vat_zeep_object)
-        response_object = {
+        vatin_data = {
+            'country_code': country_code,
+            'number': number,
             'valid': vat['valid'],
             'request_date': vat['requestDate'] if isinstance(vat.get(['requestDate']), date) else None,
             'name': None if vat['address'] == '---' else vat['address'],
             'address': None if vat['name'] == '---' else vat['name']
         }
 
-        return response_object
+        return vatin_data
 
 
     @staticmethod

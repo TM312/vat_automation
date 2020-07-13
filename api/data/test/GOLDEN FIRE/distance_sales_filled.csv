@@ -1,4 +1,4 @@
-﻿seller_firm_public_id;valid_from;valid_to;arrival_country_code;status
+﻿seller_firm_public_id;valid_from;valid_to;arrival_country_code;active
 ;01.06.2018;;CZ;TRUE
 ;01.06.2018;;DE;TRUE
 ;01.06.2018;;ES;TRUE

@@ -73,7 +73,7 @@ class VATINValidateResource(Resource):
     @ns.expect(vatin_verify_dto, validate=True)
     @ns.marshal_with(vatin_validate_dto)
 
-    def post(self) -> bool:
+    def post(self) -> VATIN:
         """Validate VATIN"""
         print('request.json: ', request.json, flush=True)
         return VATINService.process_validation_request(request.json)

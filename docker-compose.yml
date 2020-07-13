@@ -35,6 +35,55 @@ services:
             - web
         command: "npm run start"
 
+
+
+
+    # ## new
+    # rabbitmq:
+    #     image: rabbitmq:3-alpine
+    #     expose:
+    #         - "15672"
+    #         - "5672"
+    #     environment:
+    #         RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+    #         RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+    #         RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    #         RABBITMQ_NODE_PORT: ${RABBITMQ_NODE_PORT}
+    #     healthcheck:
+    #         test: ['CMD', 'rabbitmqctl', 'status']
+    #         interval: 30s
+    #         timeout: 15s
+    #         retries: 3
+
+    # redis:
+    #     image: redis:5-alpine
+    #     expose:
+    #         - "6379"
+    #     healthcheck:
+    #         test: ['CMD', 'redis-cli', 'ping']
+    #         interval: 30s
+    #         timeout: 15s
+    #         retries: 3
+
+    # celery-worker:
+    # # build:
+    # #   context: .
+    # #   dockerfile: docker/app/Dockerfile
+    # image: celery:latest
+    # command: ['app-celery-worker']
+    # environment:
+    #     CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+    #     CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    #     CACHE_REDIS_URL: ${CACHE_REDIS_URL}
+    #     SESSION_TYPE: ${SESSION_TYPE}
+    #     SESSION_REDIS_URL: ${SESSION_REDIS_URL}
+    # depends_on:
+    #     - rabbitmq
+    #     - redis
+
+    # ##^#new
+
+
     api:
         container_name: api
         build:
@@ -48,6 +97,9 @@ services:
             - "5000"
         depends_on: # depends_on defines the order in which the services are started
             - postgres
+            # - rabbitmq #new
+            # - redis #new
+            # - celery-worker #new
         volumes:
             - logs:/logs
             - seeds:/seeds

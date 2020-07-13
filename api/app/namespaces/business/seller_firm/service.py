@@ -157,11 +157,58 @@ class SellerFirmService:
         else:
             raise
 
-        seller_firm = SellerFirm.query.filter_by(public_id=seller_firm_public_id).first()
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
         if seller_firm:
             seller_firm_id = seller_firm.id
             return seller_firm_id
+
+
+    @staticmethod
+    def process_static_data_upload(seller_firm_public_id, seller_firm_files: List[BinaryIO]):
+        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
+        BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
+        df_encoding = 'utf-8'
+        delimiter = ';'
+        user_id = g.user.id
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+
+        for file in seller_firm_information_files:
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
+
+            file_type = InputService.determine_file_type(file_path_tbd)
+            data_type = InputService.determine_data_type(file_type)
+
+            file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
+            if data_type == 'static':
+                basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
+                if file_type == 'account_list':
+                    from ...account.service import AccountService
+                    response_objects = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+
+                elif file_type == 'distance_sale_list':
+                    from ...distance_sale.service import DistanceSaleService
+                    response_objects = DistanceSaleService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id=seseller_firm_public_id)
+
+                elif file_type == 'item_list':
+                    from ...item.service import ItemService
+                    response_objects = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+
+                elif file_type == 'vat_numbers':
+                    from ...tax.vatin.service import VATINService
+                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+
+            else:
+                raise
+
+        response_object = {
+            'status': 'success',
+            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_files)))
+        }
+
+        return response_object
 
 
     @staticmethod
@@ -213,7 +260,7 @@ class SellerFirmService:
         for i in range(total_number_items):
 
             seller_firm_data = {
-                'claimed': kwargs['claimed'],
+                'claimed': kwargs.get('claimed'),
                 'created_by': user_id,
                 'name': InputService.get_str_or_None(df, i, column='seller_firm_name'),
                 'address': InputService.get_str_or_None(df, i, column='address'),

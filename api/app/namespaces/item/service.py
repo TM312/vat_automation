@@ -206,7 +206,7 @@ class ItemService:
 
         for i in range(total_number_items):
 
-            sku = InputService.get_str(df, i, column='sku')
+            sku = InputService.get_str(df, i, column='SKU')
             seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
@@ -233,7 +233,7 @@ class ItemService:
                     'asin' : InputService.get_str_or_None(df, i, column='asin'),
                     'fnsku' : InputService.get_str_or_None(df, i, column='fnsku'),
                     'weight_kg' : InputService.get_float(df, i, column='weight_kg'),
-                    'tax_code_code' :InputService.get_str_or_None(df, i, column='tax_code_code'),
+                    'tax_code_code' :InputService.get_str_or_None(df, i, column='tax_code'),
                     'unit_cost_price_currency_code' :InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
                     'unit_cost_price_net' :InputService.get_float(df, i, column='unit_cost_price_net')
                 }
