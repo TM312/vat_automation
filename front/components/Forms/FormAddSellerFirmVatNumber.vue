@@ -79,7 +79,7 @@
                                 </b-card>
                             </b-col>
                             <b-col cols="9" md="6">
-                                <b-form-group description="Last Validated"><b-form-input id="request_data" type="text" cols-sm="3" :value="payload.request_data" disabled /></b-form-group>
+                                <b-form-group description="Last Validated"><b-form-input id="request_date" type="text" cols-sm="3" :value="payload.request_date" disabled /></b-form-group>
                             </b-col>
                         </b-row>
 
@@ -138,13 +138,17 @@
     export default {
         name: 'FormAddSellerFirmVatNumber',
 
+        components: {
+            BIcon
+        },
+
         data() {
             return {
                 payload: {
                     country_code: null,
                     number: null,
                     valid: null,
-                    request_data: null,
+                    request_date: null,
                     name: null,
                     address: null,
                     valid_from: null,
@@ -251,7 +255,7 @@
                     country_code: null,
                     number: null,
                     valid: null,
-                    request_data: null,
+                    request_date: null,
                     name: null,
                     address: null,
                     valid_from: null,
@@ -281,7 +285,7 @@
                         country_code: data.country_code,
                         number: data.number,
                         valid: data.valid,
-                        request_data: data.request_data,
+                        request_date: data.request_date,
                         name: data.name,
                         address: data.address,
                         valid_from: this.$dateFns.format(new Date(), 'yyyy-MM-dd')

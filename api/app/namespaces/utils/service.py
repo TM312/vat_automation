@@ -176,7 +176,7 @@ class InputService:
 
 
     @staticmethod
-    def determine_file_type(file_path_in: BinaryIO) -> str:
+    def determine_file_type(file_path_in: str) -> str:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding='utf-8', delimiter=';')
         column_name_list = list(df.columns.values)
@@ -184,7 +184,7 @@ class InputService:
         if ('channel_code' in column_name_list and 'channel_code' in column_name_list):
             return 'account_list'
 
-        elif ('arrival_country' in column_name_list and 'active' in column_name_list):
+        elif ('arrival_country_code' in column_name_list and 'active' in column_name_list):
             return 'distance_sale_list'
 
         elif ('SKU' in column_name_list and 'name' in column_name_list and 'tax_code' in column_name_list and 'unit_cost_price_currency_code' in column_name_list):
@@ -272,7 +272,7 @@ class InputService:
             raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
 
 
-    def move_data_to_file_type(file_path_in: str, data_type: str, file_type: str):
+    def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str):
         BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
 
         if data_type == 'static':
@@ -284,10 +284,11 @@ class InputService:
         basepath_file_type = os.path.join(basepath, file_type, 'in')
         os.makedirs(basepath_file_type, exist_ok=True)
 
-        file_name = os.path.basename(file_path_in)
+        file_name = os.path.basename(file_path_tbd)
         file_path_file_type = os.path.join(basepath_file_type, file_name)
         try:
-            shutil.move(file_path_in, file_path_file_type)
+            shutil.move(file_path_tbd, file_path_file_type)
+            return file_path_file_type
         except:
             raise
 

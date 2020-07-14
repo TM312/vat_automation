@@ -18,7 +18,9 @@ export const getters = {
     countAccounts: state => state.seller_firm.accounts.length,
     countDistanceSales: state => state.seller_firm.distance_sales.length,
     countItems: state => state.seller_firm.items.length,
-    countVatNumbers: state => state.seller_firm.vat_numbers.length
+    countVatNumbers: state => state.seller_firm.vat_numbers.length,
+    publicId: state => state.seller_firm.public_id
+
 }
 
 export const actions = {
@@ -85,13 +87,25 @@ export const actions = {
     },
 
 
-    async upload(seller_firm_information_files) {
-        const res = await this.$repositories.seller_firm.upload(seller_firm_information_files)
-        const { status, message } = res
-        if (status === 200 && message) {
-            // Display Notification
-        } else {
-            // Handle error here
-        }
-    }
+    // async upload_create(seller_firm_information_files) {
+    //     const res = await this.$repositories.seller_firm.upload_create(seller_firm_information_files)
+    //     const { status, message } = res
+    //     if (status === 200 && message) {
+    //         // Display Notification
+    //     } else {
+    //         // Handle error here
+    //     }
+    // },
+
+    // async upload(account_information_files) {
+    //     const res = await this.$repositories.account.upload(account_information_files)
+    //     const { status, message } = res
+    //     if (status === 200 && message) {
+    //         // Display Notification
+    //     } else {
+    //         // Handle error here
+    //     }
+    // }
+
+
 }

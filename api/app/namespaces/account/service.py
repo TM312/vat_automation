@@ -6,7 +6,6 @@ import pandas as pd
 from . import Account
 from .interface import AccountInterface
 from ..utils.service import InputService
-from ..business.seller_firm.service import SellerFirmService
 
 
 
@@ -111,8 +110,9 @@ class AccountService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_public_id
-    def process_account_files_upload(account_information_files: List[BinaryIO], **kwargs) -> Dict:
+    def process_account_files_upload(account_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
+        from ..business.seller_firm.service import SellerFirmService
+
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'account_list'
@@ -120,10 +120,11 @@ class AccountService:
         delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
         for file in account_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
+            AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
         response_object = {
             'status': 'success',
@@ -136,11 +137,11 @@ class AccountService:
 
     # celery task !!
     @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
+    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
 
-        response_objects = AccountService.create_accounts(df, file_path_in, user_id, **kwargs)
+        response_objects = AccountService.create_accounts(df, file_path_in, user_id, seller_firm_id)
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
@@ -151,7 +152,7 @@ class AccountService:
 
 
     @staticmethod
-    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
+    def create_accounts(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -160,29 +161,26 @@ class AccountService:
 
         for i in range(total_number_accounts):
 
-            seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
             given_id = InputService.get_str(df, i, column='account_id')
             channel_code = InputService.get_str(df, i, column='channel_code')
 
 
-            if seller_firm_id:
-                redundancy_counter += AccountService.handle_redundancy(given_id, channel_code)
-                account_data = {
-                    'created_by': user_id,
-                    'seller_firm_id' : seller_firm_id,
-                    'given_id' : given_id,
-                    'channel_code' : channel_code
-                }
+            redundancy_counter += AccountService.handle_redundancy(given_id, channel_code)
+            account_data = {
+                'created_by': user_id,
+                'seller_firm_id' : seller_firm_id,
+                'given_id' : given_id,
+                'channel_code' : channel_code
+            }
 
-                try:
-                    new_account = AccountService.create(account_data)
+            try:
+                new_account = AccountService.create(account_data)
+                print('new_account:', new_account, flush=True)
+                print('account_data:', account_data, flush=True)
 
-                except:
-                    db.session.rollback()
+            except:
+                db.session.rollback()
 
-                    error_counter += 1
-
-            else:
                 error_counter += 1
 
 

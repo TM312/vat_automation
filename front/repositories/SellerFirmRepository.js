@@ -25,7 +25,7 @@ export default ($axios) => ({
         return $axios.delete(`${resource}/${seller_firm_id}`)
     },
 
-    upload(payload) {
-        return $axios.post(`${resource}/csv`, payload)
-    }
+    // upload_create(payload) {
+    //     return $axios.post(`${resource}/csv`, payload)
+    // }
 })

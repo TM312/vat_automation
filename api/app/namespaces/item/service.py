@@ -157,8 +157,9 @@ class ItemService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_public_id
-    def process_item_files_upload(item_information_files: List[BinaryIO], **kwargs) -> Dict:
+    def process_item_files_upload(item_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
+        from ..business.seller_firm.service import SellerFirmService
+
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -166,10 +167,12 @@ class ItemService:
         delimiter = None
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+
 
         for file in item_information_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
+            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
         response_object = {
             'status': 'success',
@@ -182,10 +185,10 @@ class ItemService:
 
     # celery task !!
     @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
+    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = ItemService.create_items(df, file_path_in, user_id, **kwargs)
+        response_objects = ItemService.create_items(df, file_path_in, user_id, seller_firm_id: int)
 
         # celery task !!
         InputService.move_file_to_out(file_path_in, basepath, file_type)
@@ -196,8 +199,7 @@ class ItemService:
 
 
     @staticmethod
-    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
-        from ..business.seller_firm.service import SellerFirmService
+    def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
         redundancy_counter = 0
         error_counter = 0
@@ -207,7 +209,6 @@ class ItemService:
         for i in range(total_number_items):
 
             sku = InputService.get_str(df, i, column='SKU')
-            seller_firm_id = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
 
             valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             valid_to = InputService.get_date_or_None(df, i, column='valid_to')
@@ -229,9 +230,9 @@ class ItemService:
                     'valid_to' : valid_to,
                     'brand_name' : InputService.get_str_or_None(df, i, column='brand_name'),
                     'name' : InputService.get_str_or_None(df, i, column='name'),
-                    'ean' : InputService.get_str_or_None(df, i, column='ean'),
-                    'asin' : InputService.get_str_or_None(df, i, column='asin'),
-                    'fnsku' : InputService.get_str_or_None(df, i, column='fnsku'),
+                    # 'ean' : InputService.get_str_or_None(df, i, column='ean'),
+                    # 'asin' : InputService.get_str_or_None(df, i, column='asin'),
+                    # 'fnsku' : InputService.get_str_or_None(df, i, column='fnsku'),
                     'weight_kg' : InputService.get_float(df, i, column='weight_kg'),
                     'tax_code_code' :InputService.get_str_or_None(df, i, column='tax_code'),
                     'unit_cost_price_currency_code' :InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
@@ -269,9 +270,9 @@ class ItemService:
             valid_to = item_data.get('valid_to'),
             brand_name = item_data.get('brand_name'),
             name = item_data.get('name'),
-            ean = item_data.get('ean'),
-            asin = item_data.get('asin'),
-            fnsku = item_data.get('fnsku'),
+            # ean = item_data.get('ean'),
+            # asin = item_data.get('asin'),
+            # fnsku = item_data.get('fnsku'),
             weight_kg = item_data.get('weight_kg'),
             tax_code_code = item_data.get('tax_code_code'),
             unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),

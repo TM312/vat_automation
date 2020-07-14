@@ -60,7 +60,7 @@
                 fields: [
                     { key: "vatin", label: "VATIN", sortable: false },
                     { key: "valid", sortable: false },
-                    { key: "request_data", sortable: true },
+                    { key: "request_date", sortable: true },
                     { key: "valid_from", sortable: true },
                     { key: "valid_to", sortable: true },
                     { key: "initial_tax_date", sortable: true },
