@@ -6,10 +6,10 @@
                 <view-clients class="mt-5"/>
             </b-tab>
             <b-tab title='Add Clients'>
-                <add-client />
+                <lazy-add-client />
             </b-tab>
             <b-tab title='Add Data' :disabled="countClients===0">
-                <add-seller-firm-data />
+                <lazy-add-seller-firm-data />
             </b-tab>
         </b-tabs>
     </b-card>
