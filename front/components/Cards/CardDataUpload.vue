@@ -14,10 +14,9 @@
                     @change="onFilesSelected"
                 />
 
-                <!-- <b-button variant="primary" @click="uploadFiles">
-                    <b-icon icon="box-arrow-in-right" /> Upload
-                </b-button> -->
-                <button-upload :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" />
+                <!-- <button-upload :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" /> -->
+                <button-upload-seller-firm :files="files" @resetFileList="files=[]" />
+
 
                 <b-button id="selectButton" variant="outline-primary" @click="$refs.files.click()">
                     <b-icon icon="file-plus" /> Files
@@ -69,10 +68,6 @@
                 required: true
             },
 
-            // urlRouterPush: {
-            //     type: String,
-            //     required: true
-            // },
         },
         data() {
             return {

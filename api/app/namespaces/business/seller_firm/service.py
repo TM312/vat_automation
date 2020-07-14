@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 import os
 import datetime
-from uuid import UUID
 
 from typing import List, BinaryIO, Dict
 import pandas as pd
@@ -30,7 +29,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def get_by_public_id(public_id: UUID) -> SellerFirm:
+    def get_by_public_id(public_id: str) -> SellerFirm:
         return SellerFirm.query.filter_by(public_id = public_id).first()
 
     @staticmethod
@@ -142,13 +141,16 @@ class SellerFirmService:
 
     @staticmethod
     def get_seller_firm_id(**kwargs) -> int:
+        print("kwargs.get('seller_firm_public_id'):", kwargs.get('seller_firm_public_id'), flush=True)
+        print("type: kwargs.get('seller_firm_public_id'):", type(kwargs.get('seller_firm_public_id')), flush=True)
+
         """
         Function may take either:
             - a pd.Dataframe kwargs['df'] and an integer kwargs['i'] as the row index
         or  - a UUID kwargs['seller_firm_public_id']
         If both, the later one is prioritized.
         """
-        if isinstance(kwargs.get('seller_firm_public_id'), UUID):
+        if isinstance(kwargs.get('seller_firm_public_id'), str):
             seller_firm_public_id = kwargs['seller_firm_public_id']
 
         elif ('df' and 'i') in kwargs and isinstance(kwargs['df'], pd.DataFrame) and isinstance(kwargs['i'], int):
@@ -165,7 +167,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def process_static_data_upload(seller_firm_public_id, seller_firm_files: List[BinaryIO]):
+    def process_data_upload(seller_firm_public_id, seller_firm_files: List[BinaryIO]):
         STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
         df_encoding = 'utf-8'
@@ -174,23 +176,25 @@ class SellerFirmService:
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
-        for file in seller_firm_information_files:
+        for file in seller_firm_files:
             file_path_tbd = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
 
             file_type = InputService.determine_file_type(file_path_tbd)
             data_type = InputService.determine_data_type(file_type)
 
             file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
+
             if data_type == 'static':
                 basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
                 if file_type == 'account_list':
                     from ...account.service import AccountService
+                    print('seller_firm_public_id:', seller_firm_public_id, flush=True)
                     response_objects = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
 
                 elif file_type == 'distance_sale_list':
                     from ...distance_sale.service import DistanceSaleService
-                    response_objects = DistanceSaleService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id=seseller_firm_public_id)
+                    response_objects = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id=seller_firm_public_id)
 
                 elif file_type == 'item_list':
                     from ...item.service import ItemService
@@ -198,7 +202,8 @@ class SellerFirmService:
 
                 elif file_type == 'vat_numbers':
                     from ...tax.vatin.service import VATINService
-                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm_public_id = seller_firm_public_id)
+
 
             else:
                 raise
@@ -213,7 +218,7 @@ class SellerFirmService:
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, UUID]) -> Dict:
+    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, str]) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'

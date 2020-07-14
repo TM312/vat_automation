@@ -18,7 +18,7 @@ class VATIN(db.Model):
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
-    request_data = db.Column(db.Date, nullable=False)
+    request_date = db.Column(db.Date, nullable=False)
     valid_from = db.Column(db.Date)
 
     initial_tax_date = db.Column(db.Date)

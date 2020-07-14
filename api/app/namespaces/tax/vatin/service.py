@@ -1,6 +1,6 @@
 from typing import List, BinaryIO, Dict
 import pandas as pd
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import time
 import re
 
@@ -119,7 +119,7 @@ class VATINService:
             number = vatin_data.get('number'),
             initial_tax_date = vatin_data.get('initial_tax_date'),
             valid_from = vatin_data.get('valid_from'),
-            request_data = vatin_data.get('request_data'),
+            request_date = vatin_data.get('request_date'),
             valid = vatin_data.get('valid'),
             name = vatin_data.get('name'),
             address = vatin_data.get('address'),
@@ -143,18 +143,20 @@ class VATINService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_public_id
-    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], **kwargs) -> Dict:
+    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
+        from ...business.seller_firm.service import SellerFirmService
+
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
 
         file_type='vat_numbers'
         df_encoding = 'utf-8'
         delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
         for file in vat_numbers_files:
             file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, **kwargs)
+            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
 
         response_object = {
             'status': 'success',
@@ -166,19 +168,17 @@ class VATINService:
 
     # celery task !!
     @staticmethod
-    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, **kwargs) -> List[Dict]:
+    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, seller_firm_id: int) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = VATINService.create_vatins(df, file_path_in, **kwargs)
+        response_objects = VATINService.create_vatins(df, file_path_in, seller_firm_id)
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_objects
 
-    # **kwargs['seller_firm_pulic_id'] may hold a seller firm's public id
     @staticmethod
-    def create_vatins(df: pd.DataFrame, file_path_in: str, **kwargs) -> List[Dict]:
-        from ...business.seller_firm.service import SellerFirmService
+    def create_vatins(df: pd.DataFrame, file_path_in: str, seller_firm_id: int) -> List[Dict]:
         from time import sleep
 
         error_counter = 0
@@ -194,10 +194,6 @@ class VATINService:
             vatin = VATIN.query.filter(VATIN.country_code==country_code, VATIN.number==number, VATIN.valid_to >= date.today()).first()
 
             if vatin:
-                # today = date.today()
-                # if (vatin.valid and vatin.request_data < today):
-                #     vatin.request_data = today
-                #     db.session.commit()
                 continue
 
             else:
@@ -205,7 +201,8 @@ class VATINService:
                 sleep(3)
                 vatin_data = VIESService.send_request(country_code, number)
 
-                vatin_data['business_id'] = SellerFirmService.get_seller_firm_id(df=df, i=i, **kwargs)
+                if seller_firm:
+                    vatin_data['business_id'] = seller_firm.id
 
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
 
@@ -420,7 +417,7 @@ class VIESService:
                     'country_code': country_code,
                     'number': number,
                     'valid': None,
-                    'request_date': date.today()
+                    'request_date': date.today(),
                     'name': None,
                     'address': None
                 }
@@ -431,7 +428,7 @@ class VIESService:
 
 
     @staticmethod
-    def send_request_via_urllib(country_code: str, number: str):
+    def send_request_via_urllib(country_code: str, number: str) -> Dict:
         #adapted from here: https://github.com/ajcerejeira/vat-validator/blob/master/vat_validator/vies.py
         from urllib import request
         import xml.etree.ElementTree as ET

@@ -61,7 +61,7 @@ class SellerFirmInformationResource(Resource):
     def post(self, seller_firm_public_id):
         """Upload data for the indicated seller firm"""
         seller_firm_files: List[BinaryIO] = request.files.getlist("files")
-        return SellerFirmService.process_static_data_upload(seller_firm_public_id, seller_firm_files)
+        return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_files)
 
 
 @ns.route('/as_client')

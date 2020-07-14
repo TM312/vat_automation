@@ -9,12 +9,14 @@
                     <overview-base-data-loading v-if="$fetchState.pending" />
                     <overview-base-data v-else />
                 </b-tab>
+                <b-tab title='Transactions'>
+                    <p>tbd</p>
+                </b-tab>
                 <b-tab title='Tax Records'>
                     <lazy-overview-tax-records :business="seller_firm" />
                 </b-tab>
-                <b-tab title='Transactions'>
-                    <p>tbd</p>
-                    <!-- <p>{{ $route }}</p> -->
+                <b-tab title='Data Upload' :disabled="$fetchState.pending">
+                    <lazy-add-data-files :seller_firm_public_id="seller_firm.public_id" />
                 </b-tab>
 
             </b-tabs>
