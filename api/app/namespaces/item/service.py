@@ -188,7 +188,7 @@ class ItemService:
     def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = ItemService.create_items(df, file_path_in, user_id, seller_firm_id: int)
+        response_objects = ItemService.create_items(df, file_path_in, user_id, seller_firm_id)
 
         # celery task !!
         InputService.move_file_to_out(file_path_in, basepath, file_type)

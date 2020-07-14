@@ -189,20 +189,19 @@ class SellerFirmService:
 
                 if file_type == 'account_list':
                     from ...account.service import AccountService
-                    print('seller_firm_public_id:', seller_firm_public_id, flush=True)
-                    response_objects = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+                    response_objects = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
                 elif file_type == 'distance_sale_list':
                     from ...distance_sale.service import DistanceSaleService
-                    response_objects = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id=seller_firm_public_id)
+                    response_objects = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
                 elif file_type == 'item_list':
                     from ...item.service import ItemService
-                    response_objects = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id = seller_firm_public_id)
+                    response_objects = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
                 elif file_type == 'vat_numbers':
                     from ...tax.vatin.service import VATINService
-                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm_public_id = seller_firm_public_id)
+                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
 
 
             else:

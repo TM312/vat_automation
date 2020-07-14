@@ -173,8 +173,7 @@ class DistanceSaleService:
 
             except:
                 db.session.rollback()
-
-                    error_counter += 1
+                error_counter += 1
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)

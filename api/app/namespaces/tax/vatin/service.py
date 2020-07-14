@@ -199,10 +199,11 @@ class VATINService:
             else:
                 # VIES DB is unreliable therefore reducing requests per second
                 sleep(3)
+                print("SLEEP(3) in create_vatins", flush=True)
                 vatin_data = VIESService.send_request(country_code, number)
 
-                if seller_firm:
-                    vatin_data['business_id'] = seller_firm.id
+                if seller_firm_id:
+                    vatin_data['business_id'] = seller_firm_id
 
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
 

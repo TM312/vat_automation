@@ -14,8 +14,8 @@
                     @change="onFilesSelected"
                 />
 
-                <!-- <button-upload :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" /> -->
-                <button-upload-seller-firm :files="files" @resetFileList="files=[]" />
+                <button-upload v-if="urlEndpointUpload" :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" />
+                <button-upload-seller-firm v-else :files="files" @resetFileList="files=[]" />
 
 
                 <b-button id="selectButton" variant="outline-primary" @click="$refs.files.click()">
@@ -65,9 +65,8 @@
         props: {
             urlEndpointUpload: {
                 type: String,
-                required: true
-            },
-
+                required: false
+            }
         },
         data() {
             return {
