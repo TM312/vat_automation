@@ -5,22 +5,28 @@ transaction_type_dto = Model('transaction_type', {
     'description': fields.String
 })
 
-transaction_dto = Model('transaction', {
-    'id': fields.Integer(readonly=True),
-    'created_on': fields.DateTime,
-    'transaction_input_id': fields.Integer,
-    'account_id': fields.Integer,
-    'item_id': fields.Integer,
-    'amazon_vat_calculation_service': fields.Boolean,
-    'customer_relationship_checked': fields.Boolean,
-    'customer_relationship': fields.String,
-    'customer_firm_id': fields.Integer,
-    'customer_firm_vatin_id': fields.Integer,
-    'tax_jurisdiction_code': fields.String,
+transaction_sub_dto = Model('transaction_sub', {
+    'tax_jurisdiction': fields.String(attribute=lambda x: x.tax_jurisdiction.name, readonly=True),
     'type_code': fields.String,
     'tax_treatment_code': fields.String,
     'tax_date': fields.Date,
     'tax_calculation_date': fields.Date,
+    'transaction_currency': fields.String(attribute=lambda x: x.transaction_currency.name, readonly=True),
+})
+
+transaction_dto = transaction_sub_dto.inherit('transaction', {
+    'created_on': fields.DateTime,
+    'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
+    'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),
+    'item_public_id': fields.String(attribute=lambda x: x.item.public_id, readonly=True),
+    'amazon_vat_calculation_service': fields.Boolean,
+    'customer_relationship_checked': fields.Boolean,
+    'customer_relationship': fields.String,
+    'customer_firm_public_id': fields.String(attribute=lambda x: x.customer_firm.public_id, readonly=True),
+    'customer_firm_name': fields.String(attribute=lambda x: x.customer_firm.name, readonly=True),
+    'customer_firm_vatin_id': fields.Integer,
+    'customer_firm_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.customer_firm_vatin.country_code, x.customer_firm_vatin.number), readonly=True),
+    'tax_jurisdiction_code': fields.String,
     'item_tax_code_code': fields.String,
     'item_tax_rate_type_code': fields.String,
     'shipment_tax_rate_type_code': fields.String,
@@ -49,7 +55,9 @@ transaction_dto = Model('transaction', {
     'total_value_net': fields.Float,
     'total_value_vat': fields.Float,
     'total_value_gross': fields.Float,
+    'transaction_currency': fields.String(attribute=lambda x: x.transaction_currency.name, readonly=True),
     'transaction_currency_code': fields.String,
+    'invoice_currency': fields.String(attribute=lambda x: x.invoice_currency.name, readonly=True),
     'invoice_currency_code': fields.String,
     'invoice_exchange_rate_date': fields.Date,
     'invoice_exchange_rate': fields.Float,
@@ -61,4 +69,13 @@ transaction_dto = Model('transaction', {
     'arrival_seller_vatin_id': fields.Integer,
     'departure_seller_vatin_id': fields.Integer,
     'seller_vatin_id': fields.Integer
+})
+
+
+transaction_admin_dto = transaction_dto.inherit('transaction_admin', {
+    'id': fields.Integer(readonly=True),
+    'account_id': fields.Integer,
+    'transaction_input_id': fields.Integer,
+    'item_id': fields.Integer,
+    'customer_firm_id': fields.Integer,
 })

@@ -1,7 +1,11 @@
 from datetime import datetime
+from uuid import uuid4
+
+from sqlalchemy.dialects.postgresql import UUID
+from app.extensions import db  # noqa
+
 from ..utils.ATs import tax_treatment_transaction_type_AT
 
-from app.extensions import db  # noqa
 
 
 class TransactionType(db.Model):  # type: ignore
@@ -26,6 +30,8 @@ class Transaction(db.Model):  # type: ignore
     __tablename__ = "transaction"
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(UUID(as_uuid=True), default=uuid4)
+
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
 
     transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))

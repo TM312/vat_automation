@@ -27,7 +27,9 @@ export default {
                     key: 'last_seen',
                     sortable: true,
                     formatter: (value, key, item) => {
-                        return new Date(item.last_seen).toLocaleString();
+                        return this.$dateFns.formatDistanceToNow(new Date(item.last_seen))
+                        // this.$dateFns.format(new Date(), 'yyyy-MM-dd')
+                        // return new Date(item.last_seen).toLocaleString();
                     }
                 },
                 {

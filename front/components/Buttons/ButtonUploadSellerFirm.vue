@@ -2,7 +2,7 @@
     <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
         <b-icon v-if="!buttonDisabled" icon="box-arrow-in-right" />
         <b-spinner v-else small label="Spinning"></b-spinner>
-         Upload to: {{ urlEndpointUpload }}
+         Upload
     </b-button>
 </template>
 

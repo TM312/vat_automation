@@ -104,7 +104,7 @@ class InputService:
             try:
                 string = str(df.iloc[i][column])
             except:
-                print('get_str_or_None', flush=True)
+                print('get_str_or_None', str(df.iloc[i][column]), flush=True)
                 raise UnsupportedMediaType('Can not read date format.')
 
         return string
@@ -118,8 +118,14 @@ class InputService:
             try:
                 flt = float(df.iloc[i][column])
             except:
-                print('get_float', flt, flush=True)
-                raise UnsupportedMediaType('Can not read float format.')
+                try:
+                    string = df.iloc[i][column]
+                    string_trimmed = string.replace(' ', '').replace(',', '').replace("'", "")
+                    flt = float(string_trimmed)
+
+                except:
+                    print('get_float', float(df.iloc[i][column]), flush=True)
+                    raise UnsupportedMediaType('Can not read float format.')
 
         return flt
 
@@ -176,10 +182,9 @@ class InputService:
 
 
     @staticmethod
-    def determine_file_type(file_path_in: str) -> str:
-
-        df = InputService.read_file_path_into_df(file_path_in, df_encoding='utf-8', delimiter=';')
-        column_name_list = list(df.columns.values)
+    def determine_file_type(df: pd.DataFrame) -> str:
+        #!!!! argument should be only : df
+        column_name_list = df.columns.tolist()
 
         if ('channel_code' in column_name_list and 'channel_code' in column_name_list):
             return 'account_list'
@@ -315,9 +320,9 @@ class InputService:
             try:
                 if file_name.lower().endswith('.csv'):
                     df_raw = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
-                    df = df_raw.dropna(how='all')
-                    print('df.head()', flush=True)
-                    print(df.head(), flush=True)
+
+                    df = InputService.clean_df(df_raw)
+                    print('df.head()', df.head(), flush=True)
                 else:
                     print('Case "Read File Path: File extension invalid"', flush=True)
                     raise UnsupportedMediaType(
@@ -331,3 +336,14 @@ class InputService:
 
         else:
             raise  # !!! (not a file)
+
+
+    @staticmethod
+    def clean_df(df_raw: pd.DataFrame) -> pd.DataFrame:
+
+        df = df_raw.dropna(how='all')
+        #formatting to handle bad input
+        df.columns = df.columns.str.strip('')
+        df.columns = df.columns.str.replace('(,$)|(^,)', '_', regex=True) #removes , from both ends of column
+
+        return df

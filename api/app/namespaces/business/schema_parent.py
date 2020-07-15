@@ -9,8 +9,7 @@ business_sub_dto = Model('business_sub', {
     'name': fields.String,
     'address': fields.String,
     'b_type': fields.String(readonly=True),
-    'len_vat_numbers': fields.String(attribute=lambda x: len(x.vat_numbers), readonly=True)
-
+    'len_vat_numbers': fields.String(attribute=lambda x: len(x.vat_numbers), readonly=True),
 })
 
 business_dto = business_sub_dto.inherit('business', {})

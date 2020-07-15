@@ -179,7 +179,9 @@ class SellerFirmService:
         for file in seller_firm_files:
             file_path_tbd = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
 
-            file_type = InputService.determine_file_type(file_path_tbd)
+            df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
+
+            file_type = InputService.determine_file_type(df)
             data_type = InputService.determine_data_type(file_type)
 
             file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)

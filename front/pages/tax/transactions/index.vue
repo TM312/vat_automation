@@ -1,8 +1,5 @@
 <template>
-    <div>tbd
-
-    </div>
-
+  <div>tbd</div>
 </template>
 
 <script>

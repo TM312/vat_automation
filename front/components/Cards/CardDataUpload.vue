@@ -63,6 +63,7 @@
             BIcon
         },
         props: {
+            // eslint-disable-next-line
             urlEndpointUpload: {
                 type: String,
                 required: false
