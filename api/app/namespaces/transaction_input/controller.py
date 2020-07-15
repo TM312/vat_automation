@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 
-from . import transaction_input_dto
+from . import transaction_input_dto, transaction_input_sub_dto, transaction_input_admin_dto
 from . import TransactionInput
 from .service import TransactionInputService
 
@@ -14,6 +14,8 @@ from ..utils.decorators import login_required, employer_required
 
 ns = Namespace("TransactionInput", description="Transaction Input Related Operations")  # noqa
 ns.add_model(transaction_input_dto.name, transaction_input_dto)
+ns.add_model(transaction_input_admin_dto.name, transaction_input_admin_dto)
+ns.add_model(transaction_input_sub_dto.name, transaction_input_sub_dto)
 
 
 @ns.route("/")

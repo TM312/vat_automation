@@ -8,9 +8,9 @@
             <b-tab title='Add Clients'>
                 <lazy-add-client />
             </b-tab>
-            <b-tab title='Add Data' :disabled="countClients===0">
+            <!-- <b-tab title='Add Data' :disabled="countClients===0">
                 <lazy-add-seller-firm-data />
-            </b-tab>
+            </b-tab> -->
         </b-tabs>
     </b-card>
 </template>

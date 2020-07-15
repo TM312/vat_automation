@@ -1,5 +1,5 @@
 from datetime import datetime, date, timedelta
-import uuid
+from uuid import uuid4
 
 from app.extensions import db
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -14,7 +14,7 @@ class VATIN(db.Model):
     __tablename__ = "vatin"
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
+    public_id = db.Column(UUID(as_uuid=True), default=uuid4)
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
@@ -29,7 +29,7 @@ class VATIN(db.Model):
     name = db.Column(db.String(128))
     address = db.Column(db.String(256))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    transactions = db.relationship('Transaction', backref='vatin', lazy=True)
+    transactions = db.relationship('Transaction', backref='customer_firm_vatin', lazy=True)
 
     @hybrid_property
     def valid_to(self):

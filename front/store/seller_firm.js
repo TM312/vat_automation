@@ -14,13 +14,18 @@ export const mutations = {
 }
 
 export const getters = {
-    countEmployees: state => state.seller_firm.employees.length,
+    // countEmployees: state => state.seller_firm.employees.length,
     countAccounts: state => state.seller_firm.accounts.length,
     countDistanceSales: state => state.seller_firm.distance_sales.length,
-    countItems: state => state.seller_firm.items.length,
+    countItems: state => state.seller_firm.len_items, //!!! does this work?
     countVatNumbers: state => state.seller_firm.vat_numbers.length,
-    publicId: state => state.seller_firm.public_id
-
+    //countTransactionInputsSellerFirm: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
+    publicId: state => state.seller_firm.public_id,
+    // transactionInputs: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
+    // transactions: state => state.seller_firm.accounts.map(account => account.transactions)
+    accountTransactionInputs: state => channelCode => {
+        return state.seller_firm.accounts.filter(account => account.channel_code === channelCode).transaction_inputs
+    }
 }
 
 export const actions = {

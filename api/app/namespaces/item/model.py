@@ -1,5 +1,5 @@
 from datetime import datetime
-import uuid
+from uuid import uuid4
 
 from app.extensions import db
 from sqlalchemy.dialects.postgresql import UUID
@@ -10,7 +10,7 @@ class Item(db.Model):  # type: ignore
     __tablename__ = "item"
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid4)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     original_filename = db.Column(db.String(128))

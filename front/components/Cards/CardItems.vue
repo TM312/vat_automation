@@ -9,11 +9,11 @@
             </b-row>
         </template>
         <b-card-text>
-            <h5 v-if="countItems === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
+            <h5 v-if="seller_firm.len_items === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
                 <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ countItems }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ countItems }}</span></small>
+                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ seller_firm.len_items }}</small>
+                    <small v-else>TOTAL: <span class="text-primary">{{ seller_firm.len_items }}</span></small>
                 </p>
 
 
@@ -28,7 +28,7 @@
 
                         </b-tab>
 
-                        <b-tab title="Delete" :disabled="countItems === 0">
+                        <b-tab title="Delete" :disabled="seller_firm.len_items === 0">
                             <lazy-table-delete-seller-firm-item :fields="fieldsEditable" @flash="flashCount"/>
                         </b-tab>
                     </b-tabs>
@@ -70,11 +70,12 @@
         computed: {
             ...mapState({
                 items: state => state.seller_firm.seller_firm.items,
+                seller_firm: state => state.seller_firm.seller_firm,
             }),
 
-            countItems() {
-                return this.$store.getters["seller_firm/countItems"];
-            },
+            // countItems() {
+            //     return this.$store.getters["seller_firm/countItems"];
+            // },
 
             cardBorder() {
                 return this.editMode ? "info" : "";

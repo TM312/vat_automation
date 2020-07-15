@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import Account
-from . import account_dto, account_sub_dto
+from . import account_dto, account_sub_dto, account_admin_dto
 from .service import AccountService
 
 from ..utils.decorators import login_required, employer_required
@@ -13,6 +13,7 @@ from ..utils.decorators import login_required, employer_required
 ns = Namespace("Account", description="Account Related Operations")  # noqa
 ns.add_model(account_dto.name, account_dto)
 ns.add_model(account_sub_dto.name, account_sub_dto)
+ns.add_model(account_admin_dto.name, account_admin_dto)
 
 
 

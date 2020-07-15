@@ -1,6 +1,8 @@
 from datetime import datetime
+from uuid import uuid4
 
 from app.extensions import db
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class TransactionInput(db.Model):
@@ -8,6 +10,7 @@ class TransactionInput(db.Model):
     __tablename__ = "transaction_input"
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(UUID(as_uuid=True), default=uuid4)
     original_filename = db.Column(db.String(128), nullable=False)
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
@@ -18,6 +21,7 @@ class TransactionInput(db.Model):
     transactions = db.relationship('Transaction', backref='transaction_input', lazy=True)
     notifications = db.relationship('TransactionNotification', backref='transaction_input', order_by="desc(TransactionNotification.created_on)", lazy=True)
 
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
     account_given_id = db.Column(db.String(128), nullable=False)
     public_activity_period = db.Column(db.String(64))
     channel_code = db.Column(db.String(64))

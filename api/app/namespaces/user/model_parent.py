@@ -1,6 +1,6 @@
 from datetime import datetime
-import uuid
-import hashlib
+from uuid import uuid4
+from hashlib import md5
 from ..business.model_parent import Business
 
 from flask import current_app
@@ -16,7 +16,7 @@ class User(db.Model):  # type: ignore
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4)
 
     registered_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
@@ -67,7 +67,7 @@ class User(db.Model):  # type: ignore
         return bcrypt.check_password_hash(self.password_hash, password)
 
     def gravatar_hash(self):
-        return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+        return md5(self.email.lower().encode('utf-8')).hexdigest()
 
     def gravatar(self, size=100, default='identicon', rating='g'):
         url = 'https://secure.gravatar.com/avatar'
@@ -103,6 +103,7 @@ class Action(db.Model):  # type: ignore
     __tablename__ = "action"
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     method_name = db.Column(db.String(32))

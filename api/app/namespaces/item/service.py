@@ -225,18 +225,18 @@ class ItemService:
                     'created_by': user_id,
                     'original_filename': os.path.basename(file_path_in),
                     'sku': sku,
-                    'seller_firm_id' : seller_firm_id,
-                    'valid_from' : valid_from,
-                    'valid_to' : valid_to,
-                    'brand_name' : InputService.get_str_or_None(df, i, column='brand_name'),
-                    'name' : InputService.get_str_or_None(df, i, column='name'),
-                    # 'ean' : InputService.get_str_or_None(df, i, column='ean'),
-                    # 'asin' : InputService.get_str_or_None(df, i, column='asin'),
-                    # 'fnsku' : InputService.get_str_or_None(df, i, column='fnsku'),
-                    'weight_kg' : InputService.get_float(df, i, column='weight_kg'),
-                    'tax_code_code' :InputService.get_str_or_None(df, i, column='tax_code'),
-                    'unit_cost_price_currency_code' :InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
-                    'unit_cost_price_net' :InputService.get_float(df, i, column='unit_cost_price_net')
+                    'seller_firm_id': seller_firm_id,
+                    'valid_from': valid_from,
+                    'valid_to': valid_to,
+                    'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
+                    'name': InputService.get_str_or_None(df, i, column='name'),
+                    # 'ean': InputService.get_str_or_None(df, i, column='ean'),
+                    # 'asin': InputService.get_str_or_None(df, i, column='asin'),
+                    # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
+                    'weight_kg': InputService.get_float(df, i, column='weight_kg'),
+                    'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
+                    'unit_cost_price_currency_code': InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
+                    'unit_cost_price_net': InputService.get_float(df, i, column='unit_cost_price_net')
                 }
 
                 try:

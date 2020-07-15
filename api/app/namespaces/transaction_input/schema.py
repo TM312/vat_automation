@@ -3,18 +3,11 @@ from flask_restx import Model, fields
 from ..transaction import transaction_dto
 from ..utils import transaction_notification_dto
 
-transaction_input_dto = Model('transaction_input', {
-    'id': fields.Integer(readonly=True),
-    'original_filename': fields.String,
-    'bundle_id': fields.Integer,
-    'created_on': fields.DateTime,
-    'created_by': fields.Integer,
+
+transaction_input_sub_dto = Model('transaction_input_sub', {
     'processed': fields.Boolean,
     'processed_on': fields.DateTime,
-    'transactions': fields.List(fields.Nested(transaction_dto)),
-    'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'account_given_id': fields.String,
-    'public_activity_period': fields.String,
     'channel_code': fields.String,
     'marketplace': fields.String,
     'transaction_type_public_code': fields.String,
@@ -25,8 +18,25 @@ transaction_input_dto = Model('transaction_input', {
     'complete_date': fields.Date,
     'item_sku': fields.String,
     'item_name': fields.String,
-    'item_manufacture_country': fields.String,
     'item_quantity': fields.Integer,
+    'sale_total_value_gross': fields.Float,
+    'currency_code': fields.String,
+    'currency': fields.String(attribute=lambda x: x.currency.name, readonly=True),
+    'departure_country_code': fields.String,
+    'arrival_country_code': fields.String,
+
+})
+
+
+transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
+    'original_filename': fields.String,
+    'bundle_id': fields.Integer,
+    'created_on': fields.DateTime,
+    'created_by': fields.Integer,
+    'transactions': fields.List(fields.Nested(transaction_dto)),
+    'notifications': fields.List(fields.Nested(transaction_notification_dto)),
+    'public_activity_period': fields.String,
+    'item_manufacture_country': fields.String,
     'item_weight_kg': fields.Float,
     'item_weight_kg_total': fields.Float,
     'item_price_discount_gross': fields.Float,
@@ -35,15 +45,11 @@ transaction_input_dto = Model('transaction_input', {
     'shipment_price_discount_gross': fields.Float,
     'shipment_price_gross': fields.Float,
     'shipment_price_total_gross': fields.Float,
-    'sale_total_value_gross': fields.Float,
     'gift_wrap_price_discount_gross': fields.Float,
     'gift_wrap_price_gross': fields.Float,
     'gift_wrap_price_total_gross': fields.Float,
-    'currency_code': fields.String,
-    'departure_country_code': fields.String,
     'departure_postal_code': fields.String,
     'departure_city': fields.String,
-    'arrival_country_code': fields.String,
     'arrival_postal_code': fields.String,
     'arrival_city': fields.String,
     'arrival_address': fields.String,
@@ -98,4 +104,9 @@ transaction_input_dto = Model('transaction_input', {
     'check_invoice_exchange_rate': fields.Float,
     'check_invoice_exchange_rate_date': fields.Date,
     'check_export': fields.Boolean
+})
+
+
+transaction_input_admin_dto = transaction_input_dto.inherit('transaction_input_admin', {
+   'id': fields.Integer(readonly=True)
 })

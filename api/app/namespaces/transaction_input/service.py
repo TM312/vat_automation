@@ -63,8 +63,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    #kwargs can contain: seller_firm_public_id
-    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], **kwargs) -> Dict:
+    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
         BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -76,7 +75,7 @@ class TransactionInputService:
             delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
             allowed_extensions = ['csv']
             file_path_in = InputService.store_file(file, allowed_extensions, basepath)
-            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, **kwargs)
+            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id)
 
 
         response_object = {
@@ -90,10 +89,10 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_public_id: str) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, **kwargs)
+        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, seller_firm_public_id)
 
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
@@ -103,8 +102,9 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_public_id: str) -> List[Dict]:
         from ..transaction.service import TransactionService
+        from ..account.service import AccountService
 
 
         redundancy_counter = 0
@@ -115,6 +115,7 @@ class TransactionInputService:
         for i in range(total_number_transaction_inputs):
             account_given_id = InputService.get_str(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, identifier='SALES_CHANNEL')
+            account_id = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
             given_id = InputService.get_str(df, i, identifier='TRANSACTION_EVENT_ID')
             activity_id = InputService.get_str(df, i, identifier='ACTIVITY_TRANSACTION_ID')
             item_sku = InputService.get_str(df, i, identifier='SELLER_SKU')
@@ -126,6 +127,7 @@ class TransactionInputService:
                     'created_by': user_id,
                     'original_filename': os.path.basename(file_path_in),
 
+                    'account_id': account_id,
                     'account_given_id': account_given_id,
                     'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(),
                     'channel_code': channel_code,
@@ -268,6 +270,7 @@ class TransactionInputService:
         new_transaction_input = TransactionInput(
             created_by = transaction_input_data.get('created_by'),
             original_filename = transaction_input_data.get('original_filename'),
+            account_id = transaction_input_data.get('account_id'),
             account_given_id = transaction_input_data.get('account_given_id'),
             public_activity_period = transaction_input_data.get('public_activity_period'),
             channel_code = transaction_input_data.get('channel_code'),
@@ -363,7 +366,7 @@ class TransactionInputService:
     def handle_redundancy(account_given_id: str, channel_code: str, given_id: str) -> int:
         redundancy_counter = 0
 
-        transation_input: TransactionInput = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
+        transation_input = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
 
         # if an item with the same sku for the specified validity period already exists, it is being deleted.
         if transation_input:

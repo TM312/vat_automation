@@ -1,19 +1,9 @@
 <template>
 <div>
+        <h1>{{ greeting }}</h1>
+        <br>
         <b-row>
             <b-col cols="3">
-                <!-- <b-button
-                        name="check-button"
-                        v-model="checked"
-                        switch
-                        v-b-toggle.collapse-edit-mode
-                        >Edit Mode
-                </b-button>
-                 <b-collapse v-model="checked" id="collapse-edit-mode">
-                    <b-card>I am collapsible content!</b-card>
-                </b-collapse> -->
-                <!-- <card-total-count :counterNumber="countEmployees" subTitle="Total Number of Colleagues" /> -->
-
             </b-col>
             <b-col cols="3">
             </b-col>
@@ -66,7 +56,24 @@
 
         created() {
             this.tax_auditor = this.$auth.user;
-        }
+            this.nowHours = new Date().getHours()
+        },
+
+        computed: {
+            greeting: function() {
+                if (this.nowHours <= 5) {
+                    return `Good Morning or Good Night, ${ this.tax_auditor.name } ?`
+                } else if (6 <= this.nowHours && this.nowHours <= 11) {
+                    return `Good Morning, ${ this.tax_auditor.name } !`
+                } else if (12 <= this.nowHours && this.nowHours <= 14) {
+                    return `Happy Lunch Time, ${ this.tax_auditor.name } !`
+                } else if (15 <= this.nowHours && this.nowHours <= 17) {
+                    return `Good Afternoon, ${ this.tax_auditor.name } !`
+                } else {
+                    return `Good Evening, ${ this.tax_auditor.name } !`
+                }
+            }
+        },
 
 
     };

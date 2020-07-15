@@ -1,5 +1,5 @@
 from .model import Account
-from .schema import account_dto, account_sub_dto
+from .schema import account_dto, account_sub_dto, account_admin_dto
 
 BASE_ROUTE = "account"
 

@@ -14,9 +14,17 @@ class AdminSeedService:
             name = 'Thomas M.',
             email = 'thomas.moellers@rwth-aachen.de',
             password = '21358***',
-            role = 'boss',
+            role = 'the_guy_w_the_secret_key',
         )
         db.session.add(new_admin)
+
+        new_admin2 = Admin(
+            name='Nico P.',
+            email='nico@email.com',
+            password='check_the_mic',
+            role='employee',
+        )
+        db.session.add(new_admin2)
         db.session.commit()
 
     @staticmethod
@@ -64,6 +72,5 @@ class TaxAuditorSeedService:
             role='tax_auditor',
         )
         db.session.add(new_tax_auditor3)
-
 
         db.session.commit()

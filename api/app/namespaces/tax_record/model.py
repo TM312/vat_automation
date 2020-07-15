@@ -1,5 +1,5 @@
 from datetime import datetime, date
-import uuid
+from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db
@@ -12,7 +12,7 @@ class TaxRecord(db.Model):
     __tablename__ = 'tax_record'
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4)
+    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid4)
     active = db.Column(db.Boolean, default=True)
     created_on = db.Column(db.Date, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

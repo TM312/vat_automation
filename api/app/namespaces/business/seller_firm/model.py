@@ -1,5 +1,7 @@
 from app.extensions import db  # noqa
 from ..model_parent import Business
+from ...transaction_input import TransactionInput
+from ...account import Account
 from sqlalchemy.ext.declarative import declared_attr
 
 
@@ -18,22 +20,25 @@ class SellerFirm(Business):
         # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
         return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
 
-    distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy=True)
-    items = db.relationship('Item', backref='seller_firm', lazy='joined')
+    distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy='joined', cascade = 'all, delete-orphan')
+    items = db.relationship('Item', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
 
     # IDs for supported platforms
-    accounts = db.relationship('Account', backref='seller_firm', lazy='joined')
+    accounts = db.relationship('Account', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
 
-    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined')
+    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
 
     @property
     def transaction_ready(self):
         return (len(self.items) > 0 and len(self.distance_sales) > 0 and len(self.accounts) > 0)
 
+    @property
+    def transaction_inputs(self):
+        return TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm).filter(Business.id == self.id).all()
 
     def __repr__(self):
         return '<SellerFirm: {} | Address: {}>'.format(self.name, self.name)
