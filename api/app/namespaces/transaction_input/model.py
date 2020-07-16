@@ -32,12 +32,15 @@ class TransactionInput(db.Model):
     shipment_date = db.Column(db.Date)
     arrival_date = db.Column(db.Date)
     complete_date = db.Column(db.Date)
+
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     item_sku = db.Column(db.String(128))
     item_name = db.Column(db.String(128))
     item_manufacture_country = db.Column(db.String(128))
     item_quantity = db.Column(db.Integer)
     item_weight_kg = db.Column(db.Numeric(scale=4))
     item_weight_kg_total = db.Column(db.Numeric(scale=4))
+
     item_price_discount_gross = db.Column(db.Numeric(scale=2))
     item_price_gross = db.Column(db.Numeric(scale=2))
     item_price_total_gross = db.Column(db.Numeric(scale=2))
@@ -48,7 +51,7 @@ class TransactionInput(db.Model):
     gift_wrap_price_discount_gross = db.Column(db.Numeric(scale=2))
     gift_wrap_price_gross = db.Column(db.Numeric(scale=2))
     gift_wrap_price_total_gross = db.Column(db.Numeric(scale=2))
-    currency_code = db.Column(db.String(8))
+    currency_code = db.Column(db.String(8), db.ForeignKey('currency.code'))
     departure_country_code = db.Column(db.String(8))
     departure_postal_code = db.Column(db.String(24))
     departure_city = db.Column(db.String(32))
@@ -68,6 +71,7 @@ class TransactionInput(db.Model):
 
     check_tax_calculation_date = db.Column(db.Date)
     check_unit_cost_price_net = db.Column(db.Numeric(scale=2))
+
     check_item_price_discount_net = db.Column(db.Numeric(scale=2))
     check_item_price_discount_vat = db.Column(db.Numeric(scale=2))
     check_item_price_net = db.Column(db.Numeric(scale=2))
@@ -109,7 +113,11 @@ class TransactionInput(db.Model):
 
 
     def __repr__(self):
-        return '<TransactionInput: {} – {}>'.format(self.source, self.transaction_id)
+        return '<TransactionInput {}: Account: {} | Activity Period: {} | Channel: {} | Marketplace: {}>'.format(self.id, self.account_given_id ,self.public_activity_period ,self.channel_code ,self.marketplace)
+
+
+
+
 
 
     def update_processed(self):

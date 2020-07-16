@@ -1,6 +1,4 @@
-from datetime import date, timedelta
 import os
-import datetime
 
 from typing import List, BinaryIO, Dict
 import pandas as pd
@@ -168,19 +166,18 @@ class SellerFirmService:
 
     @staticmethod
     def process_data_upload(seller_firm_public_id, seller_firm_files: List[BinaryIO]):
-        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
+        DATA_ALLOWED_EXTENSIONS = current_app.config['DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
-        df_encoding = 'utf-8'
-        delimiter = ';'
         user_id = g.user.id
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
         for file in seller_firm_files:
-            file_path_tbd = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
 
+            df_encoding = 'utf-8'
+            delimiter = ';' if InputService.infer_delimiter(file_path_tbd) != '\t' else '\t'
             df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
-
             file_type = InputService.determine_file_type(df)
             data_type = InputService.determine_data_type(file_type)
 
@@ -205,6 +202,13 @@ class SellerFirmService:
                     from ...tax.vatin.service import VATINService
                     response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
 
+            elif data_type == 'recurring':
+                basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+
+                if file_type == 'transactions_amazon':
+
+                    from ...transaction_input.service import TransactionInputService
+                    response_objects = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
 
             else:
                 raise

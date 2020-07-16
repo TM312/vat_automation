@@ -49,7 +49,7 @@ class SellerFirmIdResource(Resource):
         return SellerFirmService.get_by_public_id(seller_firm_public_id)
 
     @login_required
-    # @accepted_u_types('admin')
+    @accepted_u_types('admin')
     def delete(self, seller_firm_public_id: str) -> Response:
         '''Delete A Single SellerFirm'''
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)

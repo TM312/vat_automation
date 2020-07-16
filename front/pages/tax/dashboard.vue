@@ -1,6 +1,6 @@
 <template>
 <div>
-        <h1>{{ greeting }}</h1>
+        <card-greeting-dashboard />
         <br>
         <b-row>
             <b-col cols="3">
@@ -28,10 +28,6 @@
         layout: "tax",
         middleware: "auth-tax",
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            await store.dispatch("accounting_firm/get_by_public_id", this.tax_auditor.employer_public_id);
-        },
 
         data() {
             return {
@@ -53,28 +49,6 @@
         //         return this.$store.getters['accounting_firm/countEmployees']
         //     },
         // },
-
-        created() {
-            this.tax_auditor = this.$auth.user;
-            this.nowHours = new Date().getHours()
-        },
-
-        computed: {
-            greeting: function() {
-                if (this.nowHours <= 5) {
-                    return `Good Morning or Good Night, ${ this.tax_auditor.name } ?`
-                } else if (6 <= this.nowHours && this.nowHours <= 11) {
-                    return `Good Morning, ${ this.tax_auditor.name } !`
-                } else if (12 <= this.nowHours && this.nowHours <= 14) {
-                    return `Happy Lunch Time, ${ this.tax_auditor.name } !`
-                } else if (15 <= this.nowHours && this.nowHours <= 17) {
-                    return `Good Afternoon, ${ this.tax_auditor.name } !`
-                } else {
-                    return `Good Evening, ${ this.tax_auditor.name } !`
-                }
-            }
-        },
-
 
     };
 </script>

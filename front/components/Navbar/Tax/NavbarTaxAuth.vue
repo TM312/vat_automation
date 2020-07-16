@@ -7,9 +7,9 @@
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
                 <b-nav-item to="/tax/dashboard">Dashboard</b-nav-item>
-                <!-- ^integrate v-if for multiple user types -->
-                <b-nav-item to="/tax/clients">Clients</b-nav-item>
-                <b-nav-item to="/tax/tax_records">Tax Records</b-nav-item>
+                <!-- ^integrate v-if for multiple user roles -->
+                <b-nav-item to="/tax/clients" :disabled="!accounting_firm">Clients</b-nav-item>
+                <b-nav-item to="/tax/tax_records" :disabled="!accounting_firm">Tax Records</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
@@ -22,9 +22,17 @@
 
 <script>
     // import { BIcon } from 'bootstrap-vue'
+    import { mapState } from 'vuex'
     export default {
-        name: "NavbarTaxAuth"
+        name: "NavbarTaxAuth",
+        computed: {
+            ...mapState({
+                accounting_firm: state => state.accounting_firm.accounting_firm
+            })
+
+        }
     };
+
 </script>
 
 <style></style>

@@ -24,7 +24,6 @@ from ..country import Country, EU
 from ..country.service import CountryService
 from ..business.customer_firm import CustomerFirm
 from ..business.customer_firm.service import CustomerFirmService
-from ..tax.vat import Vat
 from ..tax.vatin import VATIN
 from ..business.seller_firm import SellerFirm
 from ..utils.service import HelperService
@@ -35,45 +34,54 @@ from ..utils.service import HelperService
 
 class TransactionService:
     @staticmethod
-    def get_all() -> List[Vat]:
-        vats = Vat.query.all()
-        return vats
+    def get_all() -> List[Transaction]:
+        transactions = Transaction.query.all()
+        return transactions
 
     @staticmethod
     def get_by_id(transaction_id: int) -> Transaction:
         return Transaction.query.filter_by(id = transaction_id).first()
 
+    @staticmethod
+    def get_by_public_id(transaction_public_id: str) -> Transaction:
+        return Transaction.query.filter_by(public_id = transaction_public_id).first()
 
 
     @staticmethod
     def create_transaction_s(transaction_input_data: TransactionInputInterface) -> Transaction:
         from ..account.service import AccountService
-        from ..tax.vat.service import VatService
+        from ..transaction_input.service import TransactionInputService
+
+        print("", flush=True)
+        print("Here we go Transaction Service", flush=True)
 
 
-
-        account_given_id = transaction_input_data.get('transaction_input_data')
+        account_given_id = transaction_input_data.get('account_given_id')
         channel_code = transaction_input_data.get('channel_code')
         given_id = transaction_input_data.get('given_id')
         activity_id = transaction_input_data.get('activity_id')
         item_sku = transaction_input_data.get('item_sku')
 
-        transaction_input: TransactionInput = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
-        account: Account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
-        transaction_type: TransactionType = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, account)
+        transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
 
+        print("transaction_input", transaction_input, flush=True)
+        account: Account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
+        print("account", account, flush=True)
+        transaction_type: TransactionType = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, account)
+        print("transaction_type", transaction_type, flush=True)
         # define foundational vars
-        tax_date: date = TransactionService.get_tax_date(transaction_type, transaction_input)
-        item: Item = ItemService.get_by_sku_account_date(transaction_input.item_sku, account, tax_date)
-        bundle: Bundle = BundleService.get_or_create(account, item, transaction_input.transaction_given_id)
-        arrival_country: Country = CountryService.get_by_code(transaction_input.arrival_country_code)
-        departure_country: Country = CountryService.get_by_code(transaction_input.departure_country_code)
-        eu: EU = CountryService.get_eu_by_date(tax_date)
+        tax_date = TransactionService.get_tax_date(transaction_type, transaction_input)
+        item = ItemService.get_by_sku_account_date(transaction_input.item_sku, account, tax_date)
+        bundle = BundleService.get_by_id(transaction_input.bundle_id)
+        arrival_country = CountryService.get_by_code(transaction_input.arrival_country_code)
+        departure_country = CountryService.get_by_code(transaction_input.departure_country_code)
+        eu = CountryService.get_eu_by_date(tax_date)
 
         customer_vat_check_required: bool = TransactionService.vat_check_required(transaction_input, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
+        print("Transaction Type Code", transaction_type.code, flush=True)
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service)
@@ -85,21 +93,20 @@ class TransactionService:
                 new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
         elif transaction_type.code == 'RETURN':
-            return None
+            pass
 
         elif transaction_type.code == 'ACQUISITION':
             tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service)
             new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
-            a = TransactionService.cal
 
         elif transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             tax_treatment_codes = ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']
             for tax_treatment_code in tax_treatment_codes:
                 new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_relationship_checked, amazon_vat_calculation_service)
 
-        return None
-
+        transaction_input.update_processed()
+        db.session.commit()
 
 
 
@@ -107,7 +114,8 @@ class TransactionService:
     @staticmethod
     def calculate_transaction_vars(transaction_input: TransactionInput, transaction_type: TransactionType, account: Account, tax_treatment_code: str, tax_date: date, item: Item, bundle: Bundle, arrival_country: Country, departure_country: Country, eu: EU, customer_relationship: str, customer_relationship_checked: bool, amazon_vat_calculation_service: bool):
         from ..tax.vatin.service import VATINService
-
+        from ..tax.vat.service import VatService
+        print("Here we go TransactionService: calculate_transaction_vars", flush=True)
 
         customer_firm_vatin: VATIN = CustomerFirmService.get_vatin_or_None(customer_vat_check_required, country_code=transaction_input.customer_firm_vat_number_country_code, number=transaction_input.customer_firm_vat_number, date=tax_date)
         customer_relationship: str = CustomerFirmService.get_customer_relationship(customer_firm_vatin, check_required=customer_vat_check_required)
@@ -117,7 +125,7 @@ class TransactionService:
         tax_jurisdiction: Country = TransactionService.get_tax_jurisdiction(tax_treatment_code, departure_country, arrival_country)
 
         item_tax_code_code: str = TransactionService.get_item_tax_code_code(transaction_input, item, reference_tax_code=transaction_input.check_item_tax_code_code)
-        item_vat_temp: Vat = VatService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction, tax_date)
+        item_vat_temp = VatService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction, tax_date)
 
         item_tax_rate_type_code=item_vat_temp.tax_rate_type_code
         shipment_tax_rate_type_code = current_app.config['STANDARD_SERVICE_TAX_RATE_TYPE']
@@ -252,6 +260,11 @@ class TransactionService:
             'seller_vatin_id': seller_vatin.id
 
         }
+
+        print("", flush=True)
+        print("transaction_data:", transaction_data, flush=True)
+        print("", flush=True)
+
 
         try:
             new_transaction = TransactionService.create_transaction(transaction_data)

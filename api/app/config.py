@@ -41,6 +41,7 @@ class Config(object):
     # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
     MAX_FILE_SIZE_INPUT = 50 * 1024 * 1024  # 50 --> 50MB
+    DATA_ALLOWED_EXTENSIONS = ['csv', 'txt']
     STATIC_DATA_ALLOWED_EXTENSIONS = ['csv']
     TRANSACTION_DATA_ALLOWED_EXTENSIONS = ['txt', 'csv']
 

@@ -95,6 +95,15 @@ class InputService:
             raise UnsupportedMediaType('Can not read str format.')
         return string
 
+    @staticmethod
+    def get_single_str_compact(df: pd.DataFrame, i: int, column: str) -> str:
+        try:
+            string_unform = str(df.iloc[i][column])
+            string = InputService.clean_str(string_unform)
+        except:
+            raise UnsupportedMediaType('Can not read str format.')
+        return string
+
 
     @staticmethod
     def get_str_or_None(df: pd.DataFrame, i:int, column:str) -> str:
@@ -109,22 +118,28 @@ class InputService:
 
         return string
 
+    @staticmethod
+    def clean_str(string: str) -> str:
+        string_trimmed = string.replace(',', '')
+        string_trimmed = string_trimmed.replace(' ', '')
+        string_trimmed = string_trimmed.replace("'", "")
+        return string_trimmed
 
     @staticmethod
     def get_float(df: pd.DataFrame, i:int, column:str) -> float:
         if pd.isnull(df.iloc[i][column]):
-            return 0.0
+            return None
         else:
             try:
                 flt = float(df.iloc[i][column])
             except:
                 try:
                     string = df.iloc[i][column]
-                    string_trimmed = string.replace(' ', '').replace(',', '').replace("'", "")
+                    string = InputService.clean_str(string)
                     flt = float(string_trimmed)
 
                 except:
-                    print('get_float', float(df.iloc[i][column]), flush=True)
+                    print('get_float: ', df.head(), 'column: ', column, flush=True)
                     raise UnsupportedMediaType('Can not read float format.')
 
         return flt
@@ -167,6 +182,7 @@ class InputService:
             }
             response_objects.append(response_object_error)
 
+        # problem if file is already deleted
         filename = os.path.basename(file_path)
 
         ending = 's' if total_number_inputs != 1 else ''
@@ -198,6 +214,13 @@ class InputService:
         elif ('country_code' in column_name_list and 'number' in column_name_list):
             return 'vat_numbers'
 
+        elif ('UNIQUE_ACCOUNT_IDENTIFIER' in column_name_list
+              and 'SALES_CHANNEL' in column_name_list
+              and 'TRANSACTION_EVENT_ID' in column_name_list
+              and 'ACTIVITY_TRANSACTION_ID' in column_name_list
+              and 'SELLER_SKU' in column_name_list ):
+              return 'transactions_amazon'
+
         else:
             os.remove(file_path_in)
             raise UnprocessableEntity('Unable to identify the file type')
@@ -207,9 +230,17 @@ class InputService:
     def determine_data_type(file_type: str) -> str:
         if file_type in ['account_list', 'distance_sale_list', 'item_list', 'vat_numbers']:
             return 'static'
+
+        elif file_type in ['transactions_amazon']:
+            return 'recurring'
         else:
             raise
 
+    @staticmethod
+    def infer_delimiter(file_path_in: str) -> str:
+        reader = pd.read_csv(file_path_in, sep=None, iterator=True, engine='python')
+        inferred_sep = reader._engine.data.dialect.delimiter
+        return inferred_sep
 
 
 
@@ -282,8 +313,10 @@ class InputService:
 
         if data_type == 'static':
             basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
-        elif data_type == 'transaction':
+        elif data_type == 'recurring':
             basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+
+        print('basepath:', basepath, flush=True)
 
         basepath_tbd = os.path.join(BASE_PATH_DATA_SELLER_FIRM, 'tbd')
         basepath_file_type = os.path.join(basepath, file_type, 'in')
@@ -318,10 +351,12 @@ class InputService:
             file_name = os.path.basename(file_path)
             print('file_name: ', file_name, flush=True)
             try:
-                if file_name.lower().endswith('.csv'):
+                if file_name.lower().endswith('.csv') or file_name.lower().endswith('.txt'):
                     df_raw = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
 
                     df = InputService.clean_df(df_raw)
+                    # """ below: delete later !!! """
+                    # pd.set_option('display.max_columns', None)
                     print('df.head()', df.head(), flush=True)
                 else:
                     print('Case "Read File Path: File extension invalid"', flush=True)
@@ -330,9 +365,7 @@ class InputService:
                 return df
             except:
                 print('Case "Read File Path: Cannot read file"', flush=True)
-
-                raise UnsupportedMediaType(
-                    'Cannot read file {}.'.format(file_name))
+                raise UnsupportedMediaType('Cannot read file {}.'.format(file_name))
 
         else:
             raise  # !!! (not a file)
@@ -344,6 +377,6 @@ class InputService:
         df = df_raw.dropna(how='all')
         #formatting to handle bad input
         df.columns = df.columns.str.strip('')
-        df.columns = df.columns.str.replace('(,$)|(^,)', '_', regex=True) #removes , from both ends of column
+        df.columns = df.columns.str.replace('(,$)|(^,)', '', regex=True) #removes , from both ends of column
 
         return df

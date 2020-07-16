@@ -94,10 +94,8 @@ class Transaction(db.Model):  # type: ignore
 
 
 
-
     def __repr__(self):
-        return '<{}: id:{} – given_id:{} - created_on:{}>'.format(self.type_code, self.id, self.given_id, self.created_on)
-
+        return '<Transaction {}: Created On: {} | Type: {} | Tax Treatment: {}>'.format(self.id, self.created_on, self.type_code, self.tax_treatment_code)
 
 
 #### ENUM ???ß

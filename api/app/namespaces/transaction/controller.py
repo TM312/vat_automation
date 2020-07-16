@@ -8,7 +8,7 @@ from . import Transaction
 from .service import TransactionService
 from .schema import transaction_dto, transaction_admin_dto, transaction_sub_dto, transaction_type_dto
 
-from ..utils.decorators import login_required, employer_required, accepted_u_types
+from ..utils.decorators import login_required
 
 ns = Namespace("Transaction", description="Transaction Related Operations")  # noqa
 ns.add_model(transaction_dto.name, transaction_dto)
@@ -20,16 +20,16 @@ ns.add_model(transaction_type_dto.name, transaction_type_dto)
 @ns.route("/")
 class TransactionResource(Resource):
     """Transactions"""
-    @accepted_u_types('admin')
     @ns.marshal_list_with(transaction_dto, envelope='data')
+    @login_required
     def get(self) -> List[Transaction]:
         """Get all Transactions"""
         return TransactionService.get_all()
 
 
-@ns.route("/<int:transaction_id>")
+@ns.route("/<string:transaction_public_id>")
 @ns.param("transaction_id", "Transaction database ID")
 class TransactionIdResource(Resource):
-    def get(self, transaction_id: int) -> Transaction:
+    def get(self, transaction_public_id: str) -> Transaction:
         """Get Single Transaction"""
-        return TransactionService.get_by_id(transaction_id)
+        return TransactionService.get_by_public_id(transaction_public_id)
