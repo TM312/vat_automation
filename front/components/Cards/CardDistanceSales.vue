@@ -11,16 +11,23 @@
             </b-row>
         </template>
         <b-card-text>
-            <h5 v-if="countDistanceSales === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
+            <h5 v-if="lenDistanceSales === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
                 <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ countDistanceSales }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ countDistanceSales }}</span></small>
+                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ lenDistanceSales }}</small>
+                    <small v-else>TOTAL: <span class="text-primary">{{ lenDistanceSales }}</span></small>
                 </p>
 
 
                 <div v-if="editMode===false">
-                    <b-table borderless :items="distanceSales" :fields="fields" hover></b-table>
+                    <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover>
+                         <template v-slot:table-busy>
+                            <div class="text-center text-secondary my-2">
+                                <b-spinner class="align-middle"></b-spinner>
+                                <strong>Loading...</strong>
+                            </div>
+                        </template>
+                    </b-table>
                 </div>
 
                 <div v-else>
@@ -30,7 +37,7 @@
 
                         </b-tab>
 
-                        <b-tab title="Delete" :disabled="countDistanceSales === 0">
+                        <b-tab title="Delete" :disabled="lenDistanceSales === 0">
                             <lazy-table-delete-seller-firm-distance-sale :fields="fieldsEditable" @flash="flashCount"/>
                         </b-tab>
                     </b-tabs>
@@ -67,11 +74,8 @@
         computed: {
             ...mapState({
                 distanceSales: state => state.seller_firm.seller_firm.distance_sales,
+                lenDistanceSales: state => state.seller_firm.seller_firm.len_distance_sales
             }),
-
-            countDistanceSales() {
-                return this.$store.getters["seller_firm/countDistanceSales"];
-            },
 
             cardBorder() {
                 return this.editMode ? "info" : "";

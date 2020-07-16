@@ -27,6 +27,11 @@ class TransactionInputService:
     def get_by_id(transaction_input_id: int) -> TransactionInput:
         return TransactionInput.query.filter(TransactionInput.id == transaction_input_id).first()
 
+
+    @staticmethod
+    def get_by_identifiers(account_given_id: str, channel_code: str, given_id: str, activity_id: str, item_sku: str) -> TransactionInput:
+        return TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
+
     @staticmethod
     def update(transaction_input_id: int, data_changes: TransactionInputInterface) -> TransactionInput:
         transaction_input = TransactionInputService.get_by_id(transaction_input_id)
@@ -53,7 +58,7 @@ class TransactionInputService:
     def get_df_transaction_input_delimiter(file: BinaryIO) -> str:
         if file.lower().endswith('.txt'):
             delimiter='\t'
-        elif file.lower().endswith('.txt'):
+        elif file.lower().endswith('.csv'):
             delimiter=None
         else:
             filename = os.path.basename(file)
@@ -63,7 +68,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
+    def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO]) -> Dict:
         BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
 
         file_type='item_list'
@@ -75,7 +80,7 @@ class TransactionInputService:
             delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
             allowed_extensions = ['csv']
             file_path_in = InputService.store_file(file, allowed_extensions, basepath)
-            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_public_id)
+            TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
 
 
         response_object = {
@@ -89,10 +94,10 @@ class TransactionInputService:
 
     # celery task !!
     @staticmethod
-    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_public_id: str) -> List[Dict]:
+    def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int) -> List[Dict]:
 
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, seller_firm_public_id)
+        response_objects = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id)
 
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
@@ -102,9 +107,11 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_public_id: str) -> List[Dict]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int) -> List[Dict]:
         from ..transaction.service import TransactionService
         from ..account.service import AccountService
+        from ..bundle.service import BundleService
+        from ..item.service import ItemService
 
 
         redundancy_counter = 0
@@ -112,24 +119,34 @@ class TransactionInputService:
         total_number_transaction_inputs = len(df.index)
         input_type = 'transaction' # only used for response objects
 
-        for i in range(total_number_transaction_inputs):
-            account_given_id = InputService.get_str(df, i, identifier='UNIQUE_ACCOUNT_IDENTIFIER')
-            channel_code = InputService.get_str(df, i, identifier='SALES_CHANNEL')
-            account_id = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
-            given_id = InputService.get_str(df, i, identifier='TRANSACTION_EVENT_ID')
-            activity_id = InputService.get_str(df, i, identifier='ACTIVITY_TRANSACTION_ID')
-            item_sku = InputService.get_str(df, i, identifier='SELLER_SKU')
+        for i in range(3):  # !!! total_number_transaction_inputs
+            account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
+            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
+            account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
+            given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
+            activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
+            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
+
+            shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
+            arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
+            complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
+
+            item_date = ItemService.select_date_from_transaction_report(shipment_date, arrival_date, complete_date)
+
+            item = ItemService.get_by_sku_account_date(item_sku, account, item_date)
+            bundle = BundleService.get_or_create(account.id, item.id, given_id)
 
             if account_given_id and channel_code and given_id and activity_id and item_sku:
 
                 redundancy_counter += TransactionInputService.handle_redundancy(account_given_id, channel_code, given_id, activity_id, item_sku)
                 transaction_input_data = {
                     'created_by': user_id,
+                    'bundle_id': bundle.id,
                     'original_filename': os.path.basename(file_path_in),
 
-                    'account_id': account_id,
+                    'account_id': account.id,
                     'account_given_id': account_given_id,
-                    'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD').upper(),
+                    'public_activity_period': InputService.get_str(df, i, column='ACTIVITY_PERIOD'),
                     'channel_code': channel_code,
                     'marketplace': InputService.get_str_or_None(df, i, column='MARKETPLACE'),
                     'transaction_type_public_code': InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE'),
@@ -137,10 +154,11 @@ class TransactionInputService:
                     'activity_id': activity_id,
 
                     'check_tax_calculation_date': InputService.get_date_or_None(df, i, column='TAX_CALCULATION_DATE'),
-                    'shipment_date': InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE'),
-                    'arrival_date': InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE'),
-                    'complete_date': InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE'),
+                    'shipment_date': shipment_date,
+                    'arrival_date': arrival_date,
+                    'complete_date': complete_date,
 
+                    'item_id': item.id,
                     'item_sku': item_sku,
                     'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
                     'item_manufacture_country': InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY'),
@@ -203,11 +221,11 @@ class TransactionInputService:
 
 
                     'departure_country_code': InputService.get_str(df, i, column='DEPARTURE_COUNTRY'),
-                    'departure_postal_code': InputService.get_str(df, i, column='DEPARTURE_POST_CODE'),
+                    'departure_postal_code': InputService.get_single_str_compact(df, i, column='DEPARTURE_POST_CODE'),
                     'departure_city': InputService.get_str(df, i, column='DEPATURE_CITY'),
 
                     'arrival_country_code': InputService.get_str(df, i, column='ARRIVAL_COUNTRY'),
-                    'arrival_postal_code': InputService.get_str(df, i, column='ARRIVAL_POST_CODE'),
+                    'arrival_postal_code': InputService.get_single_str_compact(df, i, column='ARRIVAL_POST_CODE'),
                     'arrival_city': InputService.get_str(df, i, column='ARRIVAL_CITY'),
                     'arrival_address': InputService.get_str_or_None(df, i, column='ARRIVAL_ADDRESS'),
 
@@ -249,9 +267,15 @@ class TransactionInputService:
 
                 try:
                     new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
+                    print('get new_transaction_input:', flush=True)
+                    transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
+                    print(transaction_input, flush=True)
+                    print('')
+
                     TransactionService.create_transaction_s(transaction_input_data)
 
                 except:
+                    print("FAIL AT TRANSACITON SERVICE", flush=True)
                     db.session.rollback()
 
                     error_counter += 1
@@ -260,15 +284,17 @@ class TransactionInputService:
                 error_counter += 1
 
 
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)
+        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_transaction_inputs, error_counter, redundancy_counter=redundancy_counter)
 
         return response_objects
 
 
     @staticmethod
     def create_transaction_input(transaction_input_data: TransactionInputInterface) -> TransactionInput:
+
         new_transaction_input = TransactionInput(
             created_by = transaction_input_data.get('created_by'),
+            bundle_id = transaction_input_data.get('bundle_id'),
             original_filename = transaction_input_data.get('original_filename'),
             account_id = transaction_input_data.get('account_id'),
             account_given_id = transaction_input_data.get('account_given_id'),
@@ -282,6 +308,7 @@ class TransactionInputService:
             shipment_date = transaction_input_data.get('shipment_date'),
             arrival_date = transaction_input_data.get('arrival_date'),
             complete_date = transaction_input_data.get('complete_date'),
+            item_id = transaction_input_data.get('item_id'),
             item_sku = transaction_input_data.get('item_sku'),
             item_name = transaction_input_data.get('item_name'),
             item_manufacture_country = transaction_input_data.get('item_manufacture_country'),
@@ -356,21 +383,24 @@ class TransactionInputService:
             supplier_name = transaction_input_data.get('supplier_name')
         )
 
+
         db.session.add(new_transaction_input)
         db.session.commit()
+        print("create_transaction_input: db commit", flush=True)
+        print("", flush=True)
 
         return new_transaction_input
 
 
     @staticmethod
-    def handle_redundancy(account_given_id: str, channel_code: str, given_id: str) -> int:
+    def handle_redundancy(account_given_id: str, channel_code: str, given_id: str, activity_id: str, item_sku: str) -> int:
         redundancy_counter = 0
 
-        transation_input = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
+        transaction_input = TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
 
         # if an item with the same sku for the specified validity period already exists, it is being deleted.
-        if transation_input:
-            db.session.delete(transation_input)
+        if transaction_input:
+            db.session.delete(transaction_input)
             redundancy_counter += 1
 
         return redundancy_counter

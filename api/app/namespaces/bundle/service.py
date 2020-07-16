@@ -1,12 +1,14 @@
 from typing import List
+from app.extensions import db
+
 from . import Bundle
 from .interface import BundleInterface
 
 class BundleService:
 
     @staticmethod
-    def get_or_create(account: 'app.namespaces.account.Account', item: 'app.namespaces.item.Item', transaction_input_given_id: str) -> Bundle:
-        bundle = Bundle.query.join(Bundle.transaction_inputs, aliased=True).filter_by(account_id=account.id, item_id=item.id, given_id=transaction_input_given_id).first()
+    def get_or_create(account_id: int, item_id: int, transaction_input_given_id: str) -> Bundle:
+        bundle = Bundle.query.join(Bundle.transaction_inputs, aliased=True).filter_by(account_id=account_id, item_id=item_id, given_id=transaction_input_given_id).first()
         if bundle:
             return bundle
 

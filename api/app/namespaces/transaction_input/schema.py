@@ -21,10 +21,9 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
     'item_quantity': fields.Integer,
     'sale_total_value_gross': fields.Float,
     'currency_code': fields.String,
-    'currency': fields.String(attribute=lambda x: x.currency.name, readonly=True),
+    'currency': fields.String(attribute=lambda x: x.currency.name if x.currency != None else None, readonly=True),
     'departure_country_code': fields.String,
-    'arrival_country_code': fields.String,
-
+    'arrival_country_code': fields.String
 })
 
 

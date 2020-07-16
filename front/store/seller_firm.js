@@ -16,7 +16,7 @@ export const mutations = {
 export const getters = {
     // countEmployees: state => state.seller_firm.employees.length,
     countAccounts: state => state.seller_firm.accounts.length,
-    countDistanceSales: state => state.seller_firm.distance_sales.length,
+    // countDistanceSales: state => state.seller_firm.distance_sales.length,
     countItems: state => state.seller_firm.len_items, //!!! does this work?
     countVatNumbers: state => state.seller_firm.vat_numbers.length,
     //countTransactionInputsSellerFirm: state => state.seller_firm.accounts.map(account => account.transaction_inputs),

@@ -1,5 +1,12 @@
 <template>
-    <b-table :fields="fields" :items="employees" hover />
+    <b-table :fields="fields" :items="employees" :busy="$fetchState.pending && !accountingFirm" hover>
+        <template v-slot:table-busy>
+            <div class="text-center text-secondary my-2">
+                <b-spinner class="align-middle"></b-spinner>
+                <strong>Loading...</strong>
+            </div>
+        </template>
+    </b-table>
 
 </template>
 
@@ -19,7 +26,7 @@ export default {
                 {
                     key: 'role',
                     sortable: true,
-                    formatter: (value) => {
+                    formatter: value => {
                         return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
@@ -28,8 +35,6 @@ export default {
                     sortable: true,
                     formatter: (value, key, item) => {
                         return this.$dateFns.formatDistanceToNow(new Date(item.last_seen))
-                        // this.$dateFns.format(new Date(), 'yyyy-MM-dd')
-                        // return new Date(item.last_seen).toLocaleString();
                     }
                 },
                 {
@@ -40,9 +45,16 @@ export default {
         }
     },
 
+    async fetch() {
+        const { store } = this.$nuxt.context
+        await store.dispatch("accounting_firm/get_by_public_id", this.$auth.user.employer_public_id);
+    },
+
+
     computed: {
         ...mapState({
-            employees: state => state.accounting_firm.accounting_firm.employees
+            employees: state => state.accounting_firm.accounting_firm.employees,
+            accountingFirm: state => state.accounting_firm
         }),
 
 

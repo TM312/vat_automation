@@ -1,4 +1,4 @@
-seller_firm_public_id;valid_from;valid_to;SKU;brand_name;name;ean;asin;fnksu;weight_kg;tax_code;unit_cost_price_currency_code;unit_cost_price_net
+wseller_firm_public_id;valid_from;valid_to;SKU;brand_name;name;ean;asin;fnksu;weight_kg;tax_code;unit_cost_price_currency_code;unit_cost_price_net
 ;01.06.2018;;WE-01-02-01-10-30-115-41;weltenmann;WELTENMANN Premium Men Suede Slip-on Espadrilles, Kiel Blue, 41;8.43658E+12;B07DFH2TNQ;X000UVCP91;0.81;A_GEN_STANDARD;EUR;25.9
 ;01.06.2018;;WE-01-02-01-10-30-115-42;weltenmann;WELTENMANN Premium Men Suede Slip-on Espadrilles, Kiel Blue, 42;8.43658E+12;B07DFJ3S69;X000UVGX71;0.83;A_GEN_STANDARD;EUR;25.9
 ;01.06.2018;;WE-01-02-01-10-30-115-43;weltenmann;WELTENMANN Premium Men Suede Slip-on Espadrilles, Kiel Blue, 43;8.43658E+12;B07DFHRSYB;X000UVCTO7;0.85;A_GEN_STANDARD;EUR;25.9

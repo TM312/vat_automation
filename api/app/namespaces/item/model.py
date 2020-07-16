@@ -41,6 +41,7 @@ class Item(db.Model):  # type: ignore
     unit_cost_price_currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
     unit_cost_price_net = db.Column(db.Numeric(scale=2))
 
+    transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
     transactions = db.relationship('Transaction', backref='item', lazy=True)
 
 

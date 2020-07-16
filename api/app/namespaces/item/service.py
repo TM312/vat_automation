@@ -87,6 +87,17 @@ class ItemService:
         else:
             raise NotFound('This item does not exist.')
 
+
+    @staticmethod
+    def select_date_from_transaction_report(shipment_date: date, arrival_date: date, complete_date: date) -> date:
+        if isinstance(shipment_date, date):
+            item_date = shipment_date
+        elif isinstance(arrival_date, date):
+            item_date = arrival_date
+        else:
+            item_date = complete_date
+        return item_date
+
     @staticmethod
     def process_single_submit(seller_firm_public_id: str, item_data: ItemInterface):
 

@@ -9,6 +9,7 @@
                 Public Transaction Type: {{ data.value.transaction_type_public_code }} <br>
                 Public ID: {{ data.value.given_id }} <br>
                 Activity ID: {{ data.value.activity_id }}
+                Link: <nuxt-link :to="data.item.public_id" append >{{ data.value }}</nuxt-link>
             </template>
 
             <template v-slot:cell(dates)="data">
@@ -19,9 +20,6 @@
 
             <template v-slot:cell(item)="data">
                 Name: {{ data.value.item_name }} <i>(SKU: {{ data.value.item_sku }})</i><br>
-                <!-- <template v-slot:cell(name)="data">
-                    <nuxt-link :to="data.item.public_id" append >{{ data.value }}</nuxt-link>
-                </template> -->
                 Quantity: {{ data.value.item_quantity }} <br>
                 Weight: {{ data.value.item_weight_kg }}kg <br>
                 Weight Total: {{ data.value.item_weight_kg_total }}kg
