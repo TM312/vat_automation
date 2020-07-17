@@ -4,6 +4,7 @@ from typing import List, Dict
 from . import CustomerFirm
 from .interface import CustomerFirmInterface
 
+from .. import Business
 from ..service_parent import BusinessService
 
 from ...tax.vatin import VATIN
@@ -64,50 +65,57 @@ class CustomerFirmService:
 
     @staticmethod
     def get_customer_firm_or_None(customer_firm_vatin, customer_relationship):
-        if customer_firm_vatin.valid and customer_relationship == 'B2B':
+        if isinstance(customer_firm_vatin, VATIN) and customer_firm_vatin.valid and customer_relationship == 'B2B':
             try:
                 customer_firm= CustomerFirmService.get_or_create_customer_firm(customer_firm_vatin)
                 return customer
             except:
                 db.session.rollback()
                 raise
-        else:
-            return None
-
 
     @staticmethod
     def get_customer_relationship(customer_firm_vatin: VATIN, check_required: bool) -> str:
+        customer_relationship_checked = False
 
         if isinstance(customer_firm_vatin, VATIN):
             bool_as_code = 'B2B' if customer_firm_vatin.valid else 'B2C'
+            customer_relationship_checked = True
             customer_relationship = 'B2B' if not check_required else bool_as_code
+
             # Create Notification if bool_as_code != customer_relationship !!!!
 
 
         else:
             customer_relationship = 'B2C'
 
-        return customer_relationship
+        return customer_relationship, customer_relationship_checked
 
 
     @staticmethod
     def get_vatin_or_None(customer_vat_check_required: bool, country_code_temp: str, number_temp: str, date: date) -> VATIN:
+        print('customer_vat_check_required: ', customer_vat_check_required, flush=True)
         if not customer_vat_check_required:
             return None
         else:
             try:
                 customer_firm_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-                business = BusinessService.get_by_name_address_or_None(customer_firm_vatin.name, customer_firm_vatin.address)
+                if isinstance(customer_firm_vatin, VATIN):
+                    business = BusinessService.get_by_name_address_or_None(customer_firm_vatin.name, customer_firm_vatin.address)
 
-                if not isinstance(business, None):
-                    data_changes = {'business_id': business.id}
-                    customer_firm_vatin.update(data_changes)
-                    db.session.commit()
+                    if isinstance(business, Business):
+                        data_changes = {'business_id': business.id}
+                        customer_firm_vatin.update(data_changes)
+                        db.session.commit()
+
+                    return customer_firm_vatin
+
+                else:
+                    return None
+
 
             except:
                 raise
 
-            return customer_firm_vatin
 
 
 

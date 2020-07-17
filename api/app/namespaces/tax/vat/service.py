@@ -62,7 +62,7 @@ class VatService:
 
     @staticmethod
     def get_by_tax_code_country_tax_date(tax_code_code: str, country: 'app.namespaces.country.Country', tax_date: date) -> Vat:
-        vat: Vat = Vat.query.filter(Vat.tax_code==tax_code_code, Vat.country==country, Vat.valid_from<=tax_date, Vat.valid_to>=tax_date).first()
+        vat = Vat.query.filter(Vat.tax_code_code==tax_code_code, Vat.country==country, Vat.valid_from<=tax_date, Vat.valid_to>=tax_date).first()
         if vat:
             return vat
         else:
