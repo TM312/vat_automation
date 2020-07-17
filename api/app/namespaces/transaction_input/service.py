@@ -275,8 +275,9 @@ class TransactionInputService:
                     TransactionService.create_transaction_s(transaction_input_data)
 
                 except:
-                    print("FAIL AT TRANSACITON SERVICE", flush=True)
                     db.session.rollback()
+
+                    raise #!!! to be deleted later
 
                     error_counter += 1
 
@@ -386,8 +387,6 @@ class TransactionInputService:
 
         db.session.add(new_transaction_input)
         db.session.commit()
-        print("create_transaction_input: db commit", flush=True)
-        print("", flush=True)
 
         return new_transaction_input
 

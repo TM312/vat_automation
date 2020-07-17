@@ -41,11 +41,17 @@ class NotificationService:
 
     @staticmethod
     def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_input_id: int) -> Dict:
+        if isinstance(reference_value, str):
+            reference_value = reference_value[:19] + ' ... ' + reference_value[-19:]
+
+        if isinstance(calculated_value, str):
+            calculated_value = calculated_value[:19] + ' ... ' + calculated_value[-19:]
+
         notification_data = {
             'subject': '{}s Not Matching'.format(main_subject),
             'original_filename': original_filename,
             'status': status,
-            'message': 'The reference value from the original transaction report ({}) differs from the calculated value ({}). The original reference value has been used for subsequent processing.'.format(reference_value, calculated_value),
+            'message': 'The reference value from the original transaction report ({}) differs from the calculated value ({}). The original reference value has been used for subsequent processing.'.format(str(reference_value), str(calculated_value)),
             'transaction_input_id': transaction_input_id
         }
         return notification_data
@@ -199,7 +205,6 @@ class InputService:
 
     @staticmethod
     def determine_file_type(df: pd.DataFrame) -> str:
-        #!!!! argument should be only : df
         column_name_list = df.columns.tolist()
 
         if ('channel_code' in column_name_list and 'channel_code' in column_name_list):

@@ -18,8 +18,8 @@ class TransactionInput(db.Model):
 
     processed = db.Column(db.Boolean, default=False)
     processed_on = db.Column(db.DateTime)
-    transactions = db.relationship('Transaction', backref='transaction_input', lazy=True)
-    notifications = db.relationship('TransactionNotification', backref='transaction_input', order_by="desc(TransactionNotification.created_on)", lazy=True)
+    transactions = db.relationship('Transaction', backref='transaction_input', lazy=True, cascade='all, delete-orphan')
+    notifications = db.relationship('TransactionNotification', backref='transaction_input', order_by="desc(TransactionNotification.created_on)", lazy=True, cascade='all, delete-orphan')
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
     account_given_id = db.Column(db.String(128), nullable=False)
