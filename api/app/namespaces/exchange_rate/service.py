@@ -135,7 +135,7 @@ class ExchangeRateService:
 
     @staticmethod
     def get_rate_by_base_target_date(base: str, target: str, date: date):
-        exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first().rate
+        exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first()
 
         if not exchange_rate:
             raise NotFound('The currency pair {}-{} for {} is not available'.format(base, target, date))

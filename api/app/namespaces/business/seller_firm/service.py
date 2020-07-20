@@ -208,7 +208,10 @@ class SellerFirmService:
                 if file_type == 'transactions_amazon':
 
                     from ...transaction_input.service import TransactionInputService
-                    response_objects = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
+                    try:
+                        response_objects = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
+                    except:
+                        raise
 
             else:
                 raise

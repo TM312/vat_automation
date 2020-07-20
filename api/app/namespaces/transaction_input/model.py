@@ -113,10 +113,12 @@ class TransactionInput(db.Model):
 
 
     def __repr__(self):
-        return '<TransactionInput {}: Account: {} | Activity Period: {} | Channel: {} | Marketplace: {}>'.format(self.id, self.account_given_id ,self.public_activity_period ,self.channel_code ,self.marketplace)
+        return '<TransactionInput {}: Account: {} | Activity Period: {} | Channel: {} | Public Type: {} | Marketplace: {}>'.format(self.id, self.account_given_id, self.public_activity_period, self.channel_code, self.transaction_type_public_code, self.marketplace)
 
-
-
+    def update(self, data_changes):
+        for k, v in data_changes.items():
+            setattr(self, k, v)
+        return self
 
 
 

@@ -25,3 +25,15 @@ tax_record_user_AT = db.Table(
     db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id'), primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
     )
+
+tax_record_transaction_AT = db.Table(
+    'tax_record_transaction_AT',
+    db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id'), primary_key=True),
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
+)
+
+tax_auditor_seller_firm_AT = db.Table(
+    'tax_auditor_seller_firm_AT',
+    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True)
+)

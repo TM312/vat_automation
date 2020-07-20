@@ -110,6 +110,7 @@ services:
             - web
         command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn --bind 0.0.0.0:5000 wsgi:app"
 
+
     postgres:
         container_name: postgres
         build:
