@@ -22,11 +22,9 @@ transaction_dto = transaction_sub_dto.inherit('transaction', {
     'amazon_vat_calculation_service': fields.Boolean,
     'customer_relationship_checked': fields.Boolean,
     'customer_relationship': fields.String,
-    'customer_firm_public_id': fields.String(attribute=lambda x: x.customer_firm.public_id, readonly=True),
+    'customer_firm_public_id': fields.String(attribute=lambda x: x.customer_firm.public_id if x.customer_firm else None, readonly=True),
     'customer_firm_name': fields.String(attribute=lambda x: x.customer_firm.name, readonly=True),
-    'customer_firm_vatin_id': fields.Integer,
-    'customer_firm_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.customer_firm_vatin.country_code, x.customer_firm_vatin.number), readonly=True),
-    'tax_jurisdiction_code': fields.String,
+    'customer_firm_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.customer_firm_vatin.country_code, x.customer_firm_vatin.number) if x.customer_firm_vatin else None, readonly=True),
     'item_tax_code_code': fields.String,
     'item_tax_rate_type_code': fields.String,
     'shipment_tax_rate_type_code': fields.String,
@@ -48,14 +46,13 @@ transaction_dto = transaction_sub_dto.inherit('transaction', {
     'shipment_price_vat': fields.Float,
     'shipment_price_discount_vat': fields.Float,
     'shipment_price_total_vat': fields.Float,
-    'gift_wrap_vat_rate': fields.Float,
+    'gift_wrap_price_vat_rate': fields.Float,
     'gift_wrap_price_vat': fields.Float,
     'gift_wrap_price_discount_vat': fields.Float,
     'gift_wrap_price_total_vat': fields.Float,
     'total_value_net': fields.Float,
     'total_value_vat': fields.Float,
     'total_value_gross': fields.Float,
-    'transaction_currency': fields.String(attribute=lambda x: x.transaction_currency.name, readonly=True),
     'transaction_currency_code': fields.String,
     'invoice_currency': fields.String(attribute=lambda x: x.invoice_currency.name, readonly=True),
     'invoice_currency_code': fields.String,
@@ -66,9 +63,9 @@ transaction_dto = transaction_sub_dto.inherit('transaction', {
     'invoice_amount_gross': fields.Float,
     'vat_rate_reverse_charge': fields.Float,
     'invoice_amount_vat_reverse_charge': fields.Float,
-    'arrival_seller_vatin_id': fields.Integer,
-    'departure_seller_vatin_id': fields.Integer,
-    'seller_vatin_id': fields.Integer
+    'arrival_seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.arrival_seller_vatin.country_code, x.arrival_seller_vatin.number) if x.arrival_seller_vatin else None, readonly=True),
+    'departure_seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.departure_seller_vatin.country_code, x.departure_seller_vatin.number) if x.departure_seller_vatin else None, readonly=True),
+    'seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.seller_vatin.country_code, x.seller_vatin.number) if x.seller_vatin else None, readonly=True)
 })
 
 

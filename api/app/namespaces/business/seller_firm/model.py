@@ -3,6 +3,7 @@ from ..model_parent import Business
 from ...transaction_input import TransactionInput
 from ...account import Account
 from sqlalchemy.ext.declarative import declared_attr
+from ...utils.ATs import tax_auditor_seller_firm_AT
 
 
 
@@ -29,6 +30,8 @@ class SellerFirm(Business):
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
+    tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
+
 
     tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
 

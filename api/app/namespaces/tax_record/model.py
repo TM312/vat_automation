@@ -3,7 +3,7 @@ from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.extensions import db
-from ..utils.ATs import tax_record_user_AT
+from ..utils.ATs import tax_record_user_AT, tax_record_transaction_AT
 
 
 
@@ -24,6 +24,9 @@ class TaxRecord(db.Model):
 
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     tax_jurisdiction_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
+
+    # downloaded_by_users = db.relationship('User', secondary=tax_record_user_AT, back_populates='downloaded_tax_records')
+    transactions = db.relationship('Transaction', secondary=tax_record_transaction_AT, back_populates='tax_records')
 
 
     def __repr__(self):

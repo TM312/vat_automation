@@ -4,7 +4,7 @@ from .. import Business
 class CustomerFirm(Business):
     __mapper_args__ = {'polymorphic_identity': 'customer_firm'}
 
-    transactions = db.relationship('Transaction', backref='customer', lazy=True)
+    transactions = db.relationship('Transaction', backref='customer_firm', lazy=True)
 
 
     def __repr__(self):

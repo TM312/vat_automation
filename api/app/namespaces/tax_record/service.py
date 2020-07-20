@@ -350,12 +350,12 @@ class TaxRecordService:
                 'ITEM_PRICE_DISCOUNT_VAT': t.item_price_discount_vat,
                 'ITEM_PRICE_TOTAL_VAT': t.item_price_total_vat,
 
-                'SHIPMENT_PRICE_VAT_RATE': t.gift_wrap_vat_rate,
+                'SHIPMENT_PRICE_VAT_RATE': t.shipment_price_vat_rate,
                 'SHIPMENT_PRICE_VAT': t.shipment_price_vat,
                 'SHIPMENT_PRICE_DISCOUNT_VAT': t.shipment_price_discount_vat,
                 'SHIPMENT_PRICE_TOTAL_VAT': t.shipment_price_total_vat,
 
-                'GIFT_WRAP_PRICE_VAT_RATE': t.shipment_price_vat_rate,
+                'GIFT_WRAP_PRICE_VAT_RATE': t.gift_wrap_price_vat_rate,
                 'GIFT_WRAP_PRICE_VAT': t.gift_wrap_price_vat,
                 'GIFT_WRAP_PRICE_DISCOUNT_VAT': t.gift_wrap_price_discount_vat,
                 'GIFT_WRAP_PRICE_TOTAL_VAT': t.gift_wrap_price_total_vat,

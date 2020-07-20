@@ -20,7 +20,7 @@ class Business(db.Model):  # type: ignore
     name = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.String(256))
     # logo_image_name = db.Column(db.String(120), default=None)
-    vat_numbers = db.relationship('VATIN', backref='business', lazy=True, cascade='all, delete-orphan')
+    vat_numbers = db.relationship('VATIN', backref='business', lazy=True)
     b_type = db.Column(db.String(50))
     __mapper_args__ = {'polymorphic_on': b_type}
 

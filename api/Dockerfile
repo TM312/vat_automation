@@ -25,13 +25,15 @@ RUN pip3 install --upgrade pip && \
 	pip3 install gunicorn
 
 # copy project
-COPY . api/.
-# COPY app api/
-# COPY commands api/
-# COPY manage.py api/manage.py
-# COPY wsgi.py api/wsgi.py
-# COPY wait-for-it.sh api/wait-for-it.sh
+WORKDIR /home/api
+# COPY . api/.
+COPY app app
+COPY commands commands
+COPY manage.py manage.py
+COPY wsgi.py wsgi.py
+COPY wait-for-it.sh wait-for-it.sh
 
+WORKDIR /home
 #copy data
 COPY data data/
 
