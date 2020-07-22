@@ -19,8 +19,8 @@ transaction_sub_dto = Model('transaction_sub', {
 transaction_dto = transaction_sub_dto.inherit('transaction', {
     'created_on': fields.DateTime,
     'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
-    'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),
-    'item_public_id': fields.String(attribute=lambda x: x.item.public_id, readonly=True),
+    # 'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),
+    # 'item_public_id': fields.String(attribute=lambda x: x.item.public_id, readonly=True),
     'amazon_vat_calculation_service': fields.Boolean,
     'customer_relationship_checked': fields.Boolean,
     'customer_relationship': fields.String,

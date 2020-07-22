@@ -23,7 +23,7 @@ ns.add_model(seller_firm_sub_dto.name, seller_firm_sub_dto)
 @ns.route('/')
 class SellerFirmResource(Resource):
     '''Get all SellerFirm Firms'''
-    #@login_required
+    @login_required
     #@accepted_u_types('admin')
     @ns.marshal_list_with(seller_firm_dto, envelope='data')
     def get(self) -> List[SellerFirm]:

@@ -50,7 +50,7 @@ class TransactionService:
 
 
     @staticmethod
-    def create_transaction_s(transaction_input_data: TransactionInputInterface) -> Transaction:
+    def create_transaction_s(transaction_input: TransactionInputInterface) -> Transaction:
         from ..account.service import AccountService
         from ..transaction_input.service import TransactionInputService
 
@@ -58,19 +58,17 @@ class TransactionService:
         print("function start: create_transaction_s", flush=True)
 
 
-        account_given_id = transaction_input_data.get('account_given_id')
-        channel_code = transaction_input_data.get('channel_code')
-        given_id = transaction_input_data.get('given_id')
-        activity_id = transaction_input_data.get('activity_id')
-        item_sku = transaction_input_data.get('item_sku')
-
-        transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
+        account_given_id = transaction_input.account_given_id
+        channel_code = transaction_input.channel_code
+        given_id = transaction_input.given_id
+        activity_id = transaction_input.activity_id
+        item_sku = transaction_input.item_sku
 
         account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
         transaction_type = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, account)
 
         if transaction_type.code == 'RETURN':
-            return None
+            return True
 
         print("define foundational vars", flush=True)
         # define foundational vars
@@ -110,7 +108,7 @@ class TransactionService:
 
             # check for special case: non taxable distance sale
             if new_transaction.tax_treatment_code == 'DISTANCE_SALE':
-                print('SPECIAL CASE: ', "NON_TAXABLE_DISTANCE_SALE", flush=True)
+                print('SPECIAL CASE: NON_TAXABLE_DISTANCE_SALE', flush=True)
                 tax_treatment_code = 'NON_TAXABLE_DISTANCE_SALE'
                 new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
 
@@ -125,8 +123,7 @@ class TransactionService:
             for tax_treatment_code in tax_treatment_codes:
                 new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
 
-        transaction_input.update_processed()
-        db.session.commit()
+        return True
 
 
 
@@ -228,9 +225,9 @@ class TransactionService:
 
 
         transaction_data= {
-            'account_id': account.id,
+            # 'account_id': account.id,
             'transaction_input_id': transaction_input.id,
-            'item_id': item.id,
+            # 'item_id': item.id,
 
             'type_code': transaction_type.code,
             'amazon_vat_calculation_service': amazon_vat_calculation_service,
@@ -323,8 +320,8 @@ class TransactionService:
     def create(transaction_data: TransactionInterface) -> Transaction:
         new_transaction = Transaction(
             transaction_input_id = transaction_data.get('transaction_input_id'),
-            account_id=transaction_data.get('account_id'),
-            item_id = transaction_data.get('item_id'),
+            # account_id=transaction_data.get('account_id'),
+            # item_id = transaction_data.get('item_id'),
 
             type_code = transaction_data.get('type_code'),
             amazon_vat_calculation_service = transaction_data.get('amazon_vat_calculation_service'),
@@ -465,7 +462,7 @@ class TransactionService:
 
     @staticmethod
     def get_country(transaction_input: TransactionInput, account: Account, bundle: Bundle, transaction_type: TransactionType, country_type: str) -> Country:
-        if transaction_type.code == "REFUND":
+        if transaction_type.code == 'REFUND':
             sale_transaction = TransactionService.get_sale_transaction_by_bundle(account, bundle)
             print('REFUND corresponding SALE TRANSACTION?: ', sale_transaction, flush=True)
             if sale_transaction:
@@ -477,22 +474,16 @@ class TransactionService:
                 else:
                     raise
             else:
-                from ..transaction_input.service import TransactionInputService
-                sale_transaction_input = TransactionInputService.get_sale_transaction_input_by_bundle(bundle)
-                print('REFUND corresponding SALE TRANSACTION INPUT? ', sale_transaction_input, flush=True)
-                if sale_transaction_input:
-                    if country_type == 'arrival':
-                        country_code = sale_transaction_input.sale_arrival_country_code
-                    elif country_type == 'departure':
-                        country_code = sale_transaction_input.sale_departure_country_code
-
-                    else:
-                        raise
-
-                    country = CountryService.get_by_code(country_code)
+                if country_type == 'arrival':
+                    country_code = transaction_input.sale_arrival_country_code
+                elif country_type == 'departure':
+                    country_code = transaction_input.sale_departure_country_code
 
                 else:
                     raise
+
+                country = CountryService.get_by_code(country_code)
+
 
 
         else:

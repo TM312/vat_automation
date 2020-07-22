@@ -25,7 +25,7 @@ class TransactionInput(db.Model):
     account_given_id = db.Column(db.String(128), nullable=False)
     public_activity_period = db.Column(db.String(64))
     channel_code = db.Column(db.String(64))
-    marketplace = db.Column(db.String(96))
+    marketplace = db.Column(db.String(128))
     transaction_type_public_code = db.Column(db.String(40))
     given_id = db.Column(db.String(64))
     activity_id = db.Column(db.String(64))
@@ -51,19 +51,19 @@ class TransactionInput(db.Model):
     gift_wrap_price_discount_gross = db.Column(db.Numeric(scale=2))
     gift_wrap_price_gross = db.Column(db.Numeric(scale=2))
     gift_wrap_price_total_gross = db.Column(db.Numeric(scale=2))
-    currency_code = db.Column(db.String(8), db.ForeignKey('currency.code'))
+    currency_code = db.Column(db.String(8))
     departure_country_code = db.Column(db.String(8))
     departure_postal_code = db.Column(db.String(24))
-    departure_city = db.Column(db.String(32))
+    departure_city = db.Column(db.String(128))
     arrival_country_code = db.Column(db.String(8))
     arrival_postal_code = db.Column(db.String(24))
-    arrival_city = db.Column(db.String(32))
-    arrival_address = db.Column(db.String(64))
+    arrival_city = db.Column(db.String(128))
+    arrival_address = db.Column(db.String(128))
 
     sale_departure_country_code = db.Column(db.String(8))
     sale_arrival_country_code = db.Column(db.String(8))
 
-    shipment_mode = db.Column(db.String(40))
+    shipment_mode = db.Column(db.String(64))
     shipment_conditions = db.Column(db.String(24))
     invoice_number = db.Column(db.String(64))
     invoice_url = db.Column(db.String(256))
@@ -71,7 +71,7 @@ class TransactionInput(db.Model):
     customer_firm_vat_number = db.Column(db.String(24))
     customer_firm_vat_number_country_code = db.Column(db.String(8))
     supplier_vat_number = db.Column(db.String(24))
-    supplier_name = db.Column(db.String(64))
+    supplier_name = db.Column(db.String(128))
 
     check_tax_calculation_date = db.Column(db.Date)
     check_unit_cost_price_net = db.Column(db.Numeric(scale=2))
@@ -124,6 +124,13 @@ class TransactionInput(db.Model):
             setattr(self, k, v)
         return self
 
+    # @property
+    # def seller_firm_id(self):
+    #     return self.account.seller_firm_id
+
+    # @property
+    # def seller_firm(self):
+    #     return self.account.seller_firm
 
 
     def update_processed(self):

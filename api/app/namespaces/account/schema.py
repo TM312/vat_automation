@@ -10,17 +10,18 @@ account_sub_dto = Model('account_sub', {
     'created_on': fields.Date(readonly=True),
     'modified_at': fields.DateTime(readonly=True),
     'channel_code': fields.String,
-    'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
-    'transaction_inputs': fields.List(fields.Nested(transaction_input_sub_dto)),
-    'transactions': fields.List(fields.Nested(transaction_sub_dto))
+
 })
 
 
 account_dto = account_sub_dto.inherit('account', {
+    'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
+    'transaction_inputs': fields.List(fields.Nested(transaction_input_sub_dto)),
+    # 'transactions': fields.List(fields.Nested(transaction_sub_dto))
 })
 
 
 account_admin_dto = account_dto.inherit('account_admin', {
     'id': fields.Integer(readonly=True),
-    'seller_firm_id': fields.Integer
+    'seller_firm_id': fields.Integer(readonly=True)
 })
