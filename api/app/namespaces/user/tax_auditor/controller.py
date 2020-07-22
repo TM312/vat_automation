@@ -77,3 +77,12 @@ class TaxAuditorIdResource(Resource):
 
         changes: TaxAuditorInterface = request.parsed_obj
         return TaxAuditorService.update(tax_auditor_id, changes)
+
+
+@ns.route("/<string:seller_firm_public_id>/follow_unfollow")
+class SellerFirmInformationResource(Resource):
+    @login_required
+    @ns.marshal_with(tax_auditor_dto, envelope='data')
+    def get(self, seller_firm_public_id: str):
+        """Create A Single Seller Firm"""
+        return TaxAuditorService.append_delete_seller_firm_to_key_accounts(seller_firm_public_id)

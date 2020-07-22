@@ -22,5 +22,9 @@ export default ($axios) => ({
 
     delete_by_id(tax_auditor_id) {
         return $axios.delete(`${resource}/${tax_auditor_id}`)
-    }
+    },
+
+    follow_unfollow(seller_firm_public_id) {
+        return $axios.get(`${resource}/${seller_firm_public_id}/follow_unfollow`)
+    },
 })

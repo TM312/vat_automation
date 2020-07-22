@@ -77,6 +77,7 @@ export default {
         /*  "http://127.0.0.1:5000"  */
         headers: {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': true
         },
         https: false,
         withCredentials: true,
@@ -124,11 +125,20 @@ export default {
                 },
                 tokenRequired: true,
                 tokenType: '',
+                sameSite: 'secure'
             },
         },
         redirect: {
-            logout: '/login',
+            logout: '/tax/login',
         },
+        auth: {
+            cookie: {
+                prefix: 'auth.',
+                options: {
+                    path: '/'
+                }
+            }
+        }
     },
     toast: {
         register: [

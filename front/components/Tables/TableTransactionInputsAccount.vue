@@ -1,6 +1,7 @@
 <template>
     <div>
         Boom Boom {{ channelCode }}<br><br>
+        transactions() {{ transactions }} <br><br>
 
         <b-table :fields="fields" :items="transactions" hover>
 
@@ -78,7 +79,7 @@
 
 <script>
 export default {
-    name: 'TableTransactionsAccount',
+    name: 'TableTransactionInputsAccount',
 
     props: {
         // eslint-disable-next-line

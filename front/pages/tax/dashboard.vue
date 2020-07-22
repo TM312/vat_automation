@@ -1,6 +1,7 @@
 <template>
-<div>
+    <b-card no-body>
         <card-greeting-dashboard />
+        <dashboard-dashboard />
         <br>
         <b-row>
             <b-col cols="3">
@@ -15,14 +16,23 @@
             </b-col>
         </b-row>
 
-        <view-colleagues />
+        <b-tabs content-class="mt-3">
+            <b-tab title="Key Accounts" active>
+                <b-row class="mb-3" cols="1" cols-md="1" cols-lg="3" cols-xl="4">
+                    <card-client-short v-for="(client, i) in $auth.user.key_accounts" :key="i" :business="client" class="mb-2" />
+                </b-row>
+            </b-tab>
+            <b-tab title="Colleagues">
+                <view-colleagues />
+            </b-tab>
+        </b-tabs>
 
-    </div>
+    </b-card>
+
 
 </template>
 
 <script>
-    // import { mapState } from 'vuex'
 
     export default {
         layout: "tax",

@@ -47,7 +47,10 @@ class Transaction(db.Model):  # type: ignore
     customer_relationship = db.Column(db.String(16), nullable=False)
     customer_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     customer_firm_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
+
     tax_jurisdiction_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
+    arrival_country_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
+    departure_country_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
 
 
     tax_treatment_code = db.Column(db.String(40), db.ForeignKey('tax_treatment.code'), nullable=False)

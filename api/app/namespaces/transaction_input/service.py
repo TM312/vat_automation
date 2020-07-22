@@ -31,6 +31,16 @@ class TransactionInputService:
     def get_by_identifiers(account_given_id: str, channel_code: str, given_id: str, activity_id: str, item_sku: str) -> TransactionInput:
         return TransactionInput.query.filter_by(account_given_id=account_given_id, channel_code=channel_code, given_id=given_id, activity_id=activity_id, item_sku=item_sku).first()
 
+
+    @staticmethod
+    def get_sale_transaction_input_by_bundle(bundle: 'app.namespaces.bundle.Bundle') -> TransactionInput:
+        sale_transaction_input = TransactionInput.query.filter_by(bundle_id=bundle.id, transaction_type_public_code='SALE').first()
+        if not sale_transaction_input:
+            sale_transaction_input = TransactionInput.query.filter_by(bundle_id=bundle.id, transaction_type_public_code='COMMINGLING_BUY').first()
+
+        return sale_transaction_input
+
+
     @staticmethod
     def update(transaction_input_id: int, data_changes: TransactionInputInterface) -> TransactionInput:
         transaction_input = TransactionInputService.get_by_id(transaction_input_id)
@@ -232,9 +242,11 @@ class TransactionInputService:
                         'arrival_city': InputService.get_str(df, i, column='ARRIVAL_CITY'),
                         'arrival_address': InputService.get_str_or_None(df, i, column='ARRIVAL_ADDRESS'),
 
+                        'sale_departure_country_code': InputService.get_str(df, i, column='SALE_DEPART_COUNTRY'),
+                        'sale_arrival_country_code': InputService.get_str(df, i, column='SALE_ARRIVAL_COUNTRY'),
+
                         'shipment_mode': InputService.get_str_or_None(df, i, column='TRANSPORTATION_MODE'),
                         'shipment_conditions': InputService.get_str_or_None(df, i, column='DELIVERY_CONDITIONS'),
-
 
                         'check_departure_seller_vat_country_code': InputService.get_str_or_None(df, i, column='SELLER_DEPART_VAT_NUMBER_COUNTRY'),
                         'check_departure_seller_vat_number': InputService.get_str_or_None(df, i, column='SELLER_DEPART_COUNTRY_VAT_NUMBER'),
@@ -269,29 +281,36 @@ class TransactionInputService:
                     }
 
                     if transaction_input and not transaction_input.processed:
+                        # update transaction_input
 
                         data_changes = {k:v for k,v in transaction_input_data.items() if v is not None}
                         if data_changes != {}:
-                            print('Update unprocessed transaction inputs: data_changes:', data_changes, flush=True)
-                            transaction_input.update(data_changes)
-                            transaction_input.transactions = []
-                            db.session.commit()
+                            try:
+                                print('Update unprocessed transaction inputs: data_changes:', data_changes, flush=True)
+                                transaction_input.update(data_changes)
+                                transaction_input.transactions = []
+                                db.session.commit()
+                            except:
+                                db.session.rollback()
+                                raise
+
+                    else:
+                        # create new transaction input
+                        try:
+                            new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
+                            print('')
+                        except:
+                            db.session.rollback()
+                            raise
 
                     try:
-                        new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
-                        print('get new_transaction_input:', flush=True)
-                        transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku) #CAN BE REMOVED LATER
-                        print(transaction_input, flush=True)
-                        print('')
-
+                        # create transactions
                         TransactionService.create_transaction_s(transaction_input_data)
 
                     except:
                         db.session.rollback()
-
                         raise #!!! to be deleted later
 
-                        error_counter += 1
 
             else:
                 error_counter += 1
@@ -371,6 +390,8 @@ class TransactionInputService:
             arrival_postal_code = transaction_input_data.get('arrival_postal_code'),
             arrival_city = transaction_input_data.get('arrival_city'),
             arrival_address = transaction_input_data.get('arrival_address'),
+            sale_departure_country_code = transaction_input_data.get('sale_departure_country_code'),
+            sale_arrival_country_code = transaction_input_data.get('sale_arrival_country_code'),
             shipment_mode = transaction_input_data.get('shipment_mode'),
             shipment_conditions = transaction_input_data.get('shipment_conditions'),
             check_departure_seller_vat_country_code = transaction_input_data.get('check_departure_seller_vat_country_code'),

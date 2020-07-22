@@ -2,7 +2,7 @@ from typing import List
 import pandas as pd
 
 from app.extensions import db
-from flask import current_app
+from flask import current_app, g
 
 from .model import TaxAuditor
 
@@ -19,7 +19,6 @@ class TaxAuditorService:
     @staticmethod
     def get_by_id(tax_auditor_id: int) -> TaxAuditor:
         return TaxAuditor.query.filter(TaxAuditor.id == tax_auditor_id).first()
-
 
 
 
@@ -87,6 +86,27 @@ class TaxAuditorService:
         else:
             raise NotFound('This tax auditor does not exist.')
 
+
+    @staticmethod
+    def append_delete_seller_firm_to_key_accounts(seller_firm_public_id: str) -> TaxAuditor:
+        from ...business.seller_firm.service import SellerFirmService
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if seller_firm:
+            if seller_firm in g.user.key_accounts:
+                try:
+                    g.user.key_accounts.remove(seller_firm)
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    raise
+            else:
+                try:
+                    g.user.key_accounts.append(seller_firm)
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    raise
+        return g.user
 
 
     # @staticmethod

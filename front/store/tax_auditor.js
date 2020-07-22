@@ -16,6 +16,8 @@ export const mutations = {
     }
 }
 
+
+
 export const actions = {
     async get_all({ commit }) {
         const res = await this.$repositories.tax_auditor.get_all()
@@ -77,5 +79,18 @@ export const actions = {
         } else {
             // Handle error here
         }
-    }
+    },
+
+    async follow_unfollow({ commit }, seller_firm_public_id) {
+        const res = await this.$repositories.tax_auditor.follow_unfollow(seller_firm_public_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            // Remove from store
+            commit('SET_TAX_AUDITOR', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+
 }
