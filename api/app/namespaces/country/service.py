@@ -17,11 +17,13 @@ class CountryService:
     @staticmethod
     def get_by_code(country_code: str) -> Country:
         country = Country.query.filter_by(code=country_code).first()
+        print('country_code:', country_code, flush=True)
+        print('country:', country, flush=True)
+
         if country:
             return country
         else:
-            raise NotFound(
-                'The country "{}" is currently not supported by our database. Please get in contact with one of the admins.'.format(country_code))
+            raise
 
     @staticmethod
     def get_eu_by_date(date: date) -> EU:

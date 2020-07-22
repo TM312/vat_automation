@@ -7,6 +7,8 @@ transaction_type_dto = Model('transaction_type', {
 
 transaction_sub_dto = Model('transaction_sub', {
     'tax_jurisdiction': fields.String(attribute=lambda x: x.tax_jurisdiction.name, readonly=True),
+    'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True),
+    'departure_country': fields.String(attribute=lambda x: x.departure_country.name, readonly=True),
     'type_code': fields.String,
     'tax_treatment_code': fields.String,
     'tax_date': fields.Date,
@@ -23,7 +25,7 @@ transaction_dto = transaction_sub_dto.inherit('transaction', {
     'customer_relationship_checked': fields.Boolean,
     'customer_relationship': fields.String,
     'customer_firm_public_id': fields.String(attribute=lambda x: x.customer_firm.public_id if x.customer_firm else None, readonly=True),
-    'customer_firm_name': fields.String(attribute=lambda x: x.customer_firm.name, readonly=True),
+    'customer_firm_name': fields.String(attribute=lambda x: x.customer_firm.name if x.customer_firm else None, readonly=True),
     'customer_firm_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.customer_firm_vatin.country_code, x.customer_firm_vatin.number) if x.customer_firm_vatin else None, readonly=True),
     'item_tax_code_code': fields.String,
     'item_tax_rate_type_code': fields.String,

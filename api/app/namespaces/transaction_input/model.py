@@ -59,6 +59,10 @@ class TransactionInput(db.Model):
     arrival_postal_code = db.Column(db.String(24))
     arrival_city = db.Column(db.String(32))
     arrival_address = db.Column(db.String(64))
+
+    sale_departure_country_code = db.Column(db.String(8))
+    sale_arrival_country_code = db.Column(db.String(8))
+
     shipment_mode = db.Column(db.String(40))
     shipment_conditions = db.Column(db.String(24))
     invoice_number = db.Column(db.String(64))

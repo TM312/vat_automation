@@ -41,10 +41,10 @@ class NotificationService:
 
     @staticmethod
     def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_input_id: int) -> Dict:
-        if isinstance(reference_value, str):
+        if isinstance(reference_value, str) and len(reference_value) > 42:
             reference_value = reference_value[:19] + ' ... ' + reference_value[-19:]
 
-        if isinstance(calculated_value, str):
+        if isinstance(calculated_value, str) and len(calculated_value) > 42:
             calculated_value = calculated_value[:19] + ' ... ' + calculated_value[-19:]
 
         notification_data = {

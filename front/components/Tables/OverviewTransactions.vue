@@ -6,11 +6,12 @@
                     v-if="seller_firm.len_transaction_inputs === 0"
                     sub-title="An Overview Of Transactions Will Appear Here Once You Start Uploading Data"
                     class="text-center py-5"
-                >
-                </b-card>
+                ></b-card>
+                <table-transaction-inputs v-else></table-transaction-inputs>
+
             </b-tab>
             <b-tab v-for="account in seller_firm.accounts" :key="account.public_id" :title="account.channel_code" lazy>
-                <table-transactions-account :channelCode="account.channel_code" />
+                <table-transaction-inputs-account :channelCode="account.channel_code" />
                 <!-- {{ account.channel_code }} -->
             </b-tab>
         </b-tabs>

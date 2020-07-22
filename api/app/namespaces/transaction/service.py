@@ -80,12 +80,11 @@ class TransactionService:
         print("item:", item, flush=True)
         bundle = BundleService.get_by_id(transaction_input.bundle_id)
         print("bundle:", bundle, flush=True)
-        arrival_country = CountryService.get_by_code(transaction_input.arrival_country_code)
+        arrival_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='arrival')
         print("arrival_country:", arrival_country, flush=True)
-        departure_country = CountryService.get_by_code(transaction_input.departure_country_code)
+        departure_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='departure')
         print("departure_country:", departure_country, flush=True)
         eu = CountryService.get_eu_by_date(tax_date)
-        print("eu:", eu, flush=True)
 
         customer_vat_check_required: bool = TransactionService.vat_check_required(transaction_input, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
@@ -174,33 +173,36 @@ class TransactionService:
 
 
         print('for item_price_net: transaction_input.item_price_gross, item_price_vat_rate: ', transaction_input.item_price_gross, item_price_vat_rate, flush=True)
-        item_price_net: float = TransactionService.get_price_net(transaction_input.item_price_gross, item_price_vat_rate)
-        item_price_discount_net: float = TransactionService.get_price_net(transaction_input.item_price_discount_gross, item_price_vat_rate)
-        item_price_total_net: float = TransactionService.get_price_net(transaction_input.item_price_total_gross, item_price_vat_rate)
+        item_price_net: float = TransactionService.get_price_net(item, transaction_input.item_price_gross, item_price_vat_rate, transaction_type, price_type='item')
+        item_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type, price_type='item')
+        item_price_total_net: float = TransactionService.get_price_net(item, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type, price_type='item')
+        print('item_price_discount_net: ', item_price_discount_net, flush=True)
+        print('item_price_total_net: ', item_price_total_net, flush=True)
 
-        shipment_price_net: float = TransactionService.get_price_net(transaction_input.shipment_price_gross, shipment_price_vat_rate)
-        shipment_price_discount_net: float = TransactionService.get_price_net(transaction_input.shipment_price_discount_gross, shipment_price_vat_rate)
-        shipment_price_total_net: float = TransactionService.get_price_net(transaction_input.shipment_price_total_gross, shipment_price_vat_rate)
 
-        gift_wrap_price_net: float = TransactionService.get_price_net(transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate)
-        gift_wrap_price_discount_net: float = TransactionService.get_price_net(transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate)
-        gift_wrap_price_total_net: float = TransactionService.get_price_net(transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate)
+        shipment_price_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
+        shipment_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
+        shipment_price_total_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
 
-        item_price_vat: float = TransactionService.get_price_vat(transaction_input.item_price_gross, item_price_vat_rate)
-        item_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.item_price_discount_gross, item_price_vat_rate)
-        item_price_total_vat: float = TransactionService.get_price_vat(transaction_input.item_price_total_gross, item_price_vat_rate)
+        gift_wrap_price_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
+        gift_wrap_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
+        gift_wrap_price_total_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
 
-        shipment_price_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_gross, shipment_price_vat_rate)
-        shipment_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_discount_gross, shipment_price_vat_rate)
-        shipment_price_total_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_total_gross, shipment_price_vat_rate)
+        item_price_vat: float = TransactionService.get_price_vat(transaction_input.item_price_gross, item_price_vat_rate, transaction_type)
+        item_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type)
+        item_price_total_vat: float = TransactionService.get_price_vat(transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type)
 
-        gift_wrap_price_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate)
-        gift_wrap_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate)
-        gift_wrap_price_total_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate)
+        shipment_price_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type)
+        shipment_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type)
+        shipment_price_total_vat: float = TransactionService.get_price_vat(transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type)
 
-        total_value_net: float = TransactionService.get_total_value(item, transaction_input.item_quantity, transaction_type, item_price_total_net, shipment_price_total_net, gift_wrap_price_total_net)
-        total_value_vat: float = TransactionService.get_total_value(item, transaction_input.item_quantity, transaction_type, item_price_total_vat, shipment_price_total_vat, gift_wrap_price_total_vat)
-        total_value_gross: float = TransactionService.get_total_value(item, transaction_input.item_quantity, transaction_type, transaction_input.item_price_total_gross, transaction_input.shipment_price_total_gross, transaction_input.gift_wrap_price_total_gross)
+        gift_wrap_price_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type)
+        gift_wrap_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type)
+        gift_wrap_price_total_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type)
+
+        total_value_net: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_net, shipment_price_total_net, gift_wrap_price_total_net, item_price_total_net)
+        total_value_vat: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_vat, shipment_price_total_vat, gift_wrap_price_total_vat, item_price_total_net)
+        total_value_gross: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, transaction_input.item_price_total_gross, transaction_input.shipment_price_total_gross, transaction_input.gift_wrap_price_total_gross, item_price_total_net)
 
         transaction_currency_code: str = TransactionService.get_transaction_currency(item, transaction_type, transaction_input.currency_code)
 
@@ -239,6 +241,8 @@ class TransactionService:
             'customer_firm_vatin_id': customer_firm_vatin.id if customer_firm_vatin else None,
 
             'tax_jurisdiction_code': tax_jurisdiction.code,
+            'arrival_country_code': arrival_country.code,
+            'departure_country_code': departure_country.code,
 
             'tax_treatment_code': tax_treatment_code,
 
@@ -329,7 +333,11 @@ class TransactionService:
             customer_relationship = transaction_data.get('customer_relationship'),
             customer_firm_id = transaction_data.get('customer_firm_id'),
             customer_firm_vatin_id = transaction_data.get('customer_firm_vatin_id'),
+
             tax_jurisdiction_code = transaction_data.get('tax_jurisdiction_code'),
+            arrival_country_code = transaction_data.get('arrival_country_code'),
+            departure_country_code = transaction_data.get('departure_country_code'),
+
             tax_treatment_code = transaction_data.get('tax_treatment_code'),
             tax_date = transaction_data.get('tax_date'),
             tax_calculation_date = transaction_data.get('tax_calculation_date'),
@@ -455,6 +463,42 @@ class TransactionService:
         return tax_treatment_code
 
 
+    @staticmethod
+    def get_country(transaction_input: TransactionInput, account: Account, bundle: Bundle, transaction_type: TransactionType, country_type: str) -> Country:
+        if transaction_type.code == "REFUND":
+            sale_transaction = TransactionService.get_sale_transaction_by_bundle(account, bundle)
+            print('REFUND corresponding SALE TRANSACTION?: ', sale_transaction, flush=True)
+            if sale_transaction:
+                if country_type == 'arrival':
+                    country = sale_transaction.arrival_country
+                elif country_type == 'departure':
+                    country = sale_transaction.departure_country
+
+                else:
+                    raise
+            else:
+                from ..transaction_input.service import TransactionInputService
+                sale_transaction_input = TransactionInputService.get_sale_transaction_input_by_bundle(bundle)
+                print('REFUND corresponding SALE TRANSACTION INPUT? ', sale_transaction_input, flush=True)
+                if sale_transaction_input:
+                    if country_type == 'arrival':
+                        country_code = sale_transaction_input.sale_arrival_country_code
+                    elif country_type == 'departure':
+                        country_code = sale_transaction_input.sale_departure_country_code
+
+                    else:
+                        raise
+
+                    country = CountryService.get_by_code(country_code)
+
+                else:
+                    raise
+
+
+        else:
+            country = CountryService.get_by_code(transaction_input.arrival_country_code)
+
+        return country
 
 
     @staticmethod
@@ -631,7 +675,6 @@ class TransactionService:
 
 
     @staticmethod
-
     def get_vat_rate_reverse_charge(transaction_input: TransactionInput, arrival_country: Country, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str) -> float:
         if not tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
             vat_rate_reverse_charge=float(0)
@@ -645,24 +688,23 @@ class TransactionService:
 
     @staticmethod
     def get_sale_transaction_by_bundle(account: Account, bundle: Bundle) -> Transaction:
-        if account.platform_code == 'AMZ':
-            sale_transaction_input_type_public_codes = ['SALE', 'COMMINGLING_BUY']
-            sale_transaction_input = TransactionInput.query.filter_by(bundle_id=bundle.id, transaction_type_public_code='SALE').first()
-            if not sale_transaction_input:
-                sale_transaction_input = TransactionInput.query.filter_by(bundle_id=bundle.id, transaction_type_public_code='COMMINGLING_BUY').first()
+        from ..transaction_input.service import TransactionInputService
 
-            if not sale_transaction_input:
-                return None
+        if account.channel.platform_code == 'AMZ':
+            sale_transaction_input = TransactionInputService.get_sale_transaction_input_by_bundle(bundle)
+            if sale_transaction_input:
+                sale_transaction=Transaction.query.filter_by(transaction_input_id=sale_transaction_input.id).first()
 
-            sale_transaction=Transaction.query.filter_by(transaction_input_id=sale_transaction_input.id).first()
+                return sale_transaction
 
-            return sale_transaction
+
+
 
 
 
     # @staticmethod
     # def get_transaction_input_by_bundle_transaction_type(account: Account, bundle: Bundle, transaction_type: TransactionType) -> List[Transaction]:
-    #     if account.platform_code == 'AMZ':
+    #     if account.channel.platform_code == 'AMZ':
     #         transaction_type_code
 
     #     transaction_inputs = TransactionInput.query.filter_by(bundle_id=bundle.id, transaction_type_code=transaction_type.code).all()
@@ -716,24 +758,36 @@ class TransactionService:
 
 
     @staticmethod
-    def get_price_net(price_gross: float, price_tax_rate: Decimal) -> float:
-        price_net = float(price_gross) / float((1 + price_tax_rate))
+    def get_price_net(item: Item, price_gross: float, price_tax_rate: Decimal, transaction_type: TransactionType, price_type: str) -> float:
+        if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
+            if price_type=='item':
+                price_net = float(item.unit_cost_price_net)
+            elif price_type=='shipment' or price_type=='gift_wrap':
+                price_net = float(0)
+
+        else:
+            price_net = float(price_gross) / (1 + float(price_tax_rate))
+
         return price_net
 
 
     @staticmethod
-    def get_price_vat(price_gross: float, price_tax_rate: Decimal) -> float:
-        price_vat = float(price_gross) / (1 + float(price_tax_rate)) * float(price_tax_rate)
+    def get_price_vat(price_gross: float, price_tax_rate: Decimal, transaction_type: TransactionType) -> float:
+        if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
+            price_vat = float(0)
+
+        else:
+            price_vat = float(price_gross) / (1 + float(price_tax_rate)) * float(price_tax_rate)
         return price_vat
 
 
     @staticmethod
-    def get_total_value(item: Item, item_quantity: int, transaction_type: TransactionType, item_price_total: float, shipment_price_total: float, gift_wrap_price_total: float) -> float:
+    def get_total_value(item_quantity: int, transaction_type: TransactionType, item_price_total: float, shipment_price_total: float, gift_wrap_price_total: float, item_price_total_net: float) -> float:
         if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
-            item_price_total = float(item.unit_cost_price_net) * item_quantity
-            shipment_price_total = 0 # könnte man auch weglassen, wenn sie eh 0 sind.
-            gift_wrap_price_total = 0 # könnte man auch weglassen, wenn sie eh 0 sind.
-        return item_price_total + shipment_price_total + gift_wrap_price_total
+            return item_price_total_net * item_quantity
+
+        else:
+            return item_price_total + shipment_price_total + gift_wrap_price_total
 
 
     @staticmethod
