@@ -84,7 +84,7 @@ export default {
     props: {
         // eslint-disable-next-line
         channelCode: {
-            type: [Array],
+            type: String,
             required: false
 
         }

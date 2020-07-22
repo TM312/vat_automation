@@ -17,7 +17,14 @@ from ...utils.service import InputService, NotificationService
 class SellerFirmService:
     @staticmethod
     def get_all() -> List[SellerFirm]:
-        seller_firms = SellerFirm.query.all()
+        try:
+            print('GET ALL SELLERFIRMS', flush=True)
+            seller_firms = SellerFirm.query.all()
+            print('seller_firms: ', seller_firms, flush=True)
+
+
+        except:
+            raise
         return seller_firms
 
     @staticmethod
@@ -279,7 +286,7 @@ class SellerFirmService:
                 'address': InputService.get_str_or_None(df, i, column='address'),
                 'establishment_country_code': InputService.get_str(df, i, column='establishment_country_code'),
                 'accounting_firm_id': kwargs['accounting_firm_id'],
-                'accounting_firm_client_id': InputService.get_str(df, i, column='accounting_firm_client_id'),
+                'accounting_firm_client_id': InputService.get_str_or_None(df, i, column='accounting_firm_client_id'),
             }
 
             try:

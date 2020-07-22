@@ -15,10 +15,14 @@ vatin_validate_dto = vatin_verify_dto.inherit('vatin_validate', {
     'address': fields.String
 })
 
-vatin_sub_dto = vatin_validate_dto.inherit('vatin_sub', {
+vatin_sub_dto = Model('vatin_sub', {
     'public_id': fields.String(readonly=True),
     'created_on': fields.DateTime,
     'modified_at': fields.DateTime,
+    'request_date': fields.Date,
+    'valid': fields.Boolean,
+    'name': fields.String,
+    'address': fields.String,
     'valid_from': fields.Date,
     'valid_to': fields.Date(readonly=True),
     'initial_tax_date': fields.Date,

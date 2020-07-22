@@ -1,7 +1,7 @@
 from app.extensions import db  # noqa
 from ..model_parent import Business
-from ...transaction_input import TransactionInput
-from ...account import Account
+# from ...transaction_input import TransactionInput
+# from ...account import Account
 from sqlalchemy.ext.declarative import declared_attr
 from ...utils.ATs import tax_auditor_seller_firm_AT
 
@@ -37,11 +37,11 @@ class SellerFirm(Business):
 
     @property
     def transaction_ready(self):
-        return (len(self.items) > 0 and len(self.distance_sales) > 0 and len(self.accounts) > 0)
+        return (len(self.items) > 0 and len(self.accounts) > 0)
 
-    @property
-    def transaction_inputs(self):
-        return TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm).filter(Business.id == self.id).all()
+    # @property
+    # def transaction_inputs(self):
+    #     return TransactionInput.query.join(TransactionInput.accounts).join(Account.seller_firm).filter(Business.id == self.id).all()
 
     def __repr__(self):
-        return '<SellerFirm: {} | Address: {}>'.format(self.name, self.name)
+        return '<SellerFirm: {} | Address: {}>'.format(self.name, self.address)

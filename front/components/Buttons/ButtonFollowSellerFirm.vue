@@ -33,7 +33,7 @@
             },
 
             buttonText() {
-                return this.isFollowing ? 'Key Account' : 'Follow'
+                return this.isFollowing ? 'Following' : 'Follow'
             },
 
             buttonVariant() {

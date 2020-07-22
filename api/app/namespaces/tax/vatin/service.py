@@ -468,8 +468,8 @@ class VIESService:
             'request_date': datetime.strptime(request_date.text, "%Y-%m-%d%z").date()
                             if request_date is not None and request_date.text is not None
                             else None,
-            'name': name.text if name is not None else None,
-            'address': address.text if address is not None else None
+            'name': name.text if (name is not None and name.text != '---') else None,
+            'address': address.text if (address is not None and address.text != '---') else None
         }
 
         return vatin_data

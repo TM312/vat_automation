@@ -127,7 +127,7 @@ class TransactionInputService:
         total_number_transaction_inputs = len(df.index)
         input_type = 'transaction' # only used for response objects
 
-        for i in range(total_number_transaction_inputs):
+        for i in range(2):
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
             account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
@@ -233,17 +233,17 @@ class TransactionInputService:
                         'check_item_tax_code_code': InputService.get_str_or_None(df, i, column='PRODUCT_TAX_CODE'),
 
 
-                        'departure_country_code': InputService.get_str(df, i, column='DEPARTURE_COUNTRY'),
+                        'departure_country_code': InputService.get_str_or_None(df, i, column='DEPARTURE_COUNTRY'),
                         'departure_postal_code': InputService.get_single_str_compact(df, i, column='DEPARTURE_POST_CODE'),
-                        'departure_city': InputService.get_str(df, i, column='DEPATURE_CITY'),
+                        'departure_city': InputService.get_str_or_None(df, i, column='DEPATURE_CITY'),
 
-                        'arrival_country_code': InputService.get_str(df, i, column='ARRIVAL_COUNTRY'),
+                        'arrival_country_code': InputService.get_str_or_None(df, i, column='ARRIVAL_COUNTRY'),
                         'arrival_postal_code': InputService.get_single_str_compact(df, i, column='ARRIVAL_POST_CODE'),
-                        'arrival_city': InputService.get_str(df, i, column='ARRIVAL_CITY'),
+                        'arrival_city': InputService.get_str_or_None(df, i, column='ARRIVAL_CITY'),
                         'arrival_address': InputService.get_str_or_None(df, i, column='ARRIVAL_ADDRESS'),
 
-                        'sale_departure_country_code': InputService.get_str(df, i, column='SALE_DEPART_COUNTRY'),
-                        'sale_arrival_country_code': InputService.get_str(df, i, column='SALE_ARRIVAL_COUNTRY'),
+                        'sale_departure_country_code': InputService.get_str_or_None(df, i, column='SALE_DEPART_COUNTRY'),
+                        'sale_arrival_country_code': InputService.get_str_or_None(df, i, column='SALE_ARRIVAL_COUNTRY'),
 
                         'shipment_mode': InputService.get_str_or_None(df, i, column='TRANSPORTATION_MODE'),
                         'shipment_conditions': InputService.get_str_or_None(df, i, column='DELIVERY_CONDITIONS'),
@@ -297,7 +297,7 @@ class TransactionInputService:
                     else:
                         # create new transaction input
                         try:
-                            new_transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
+                            transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
                             print('')
                         except:
                             db.session.rollback()
@@ -305,7 +305,10 @@ class TransactionInputService:
 
                     try:
                         # create transactions
-                        TransactionService.create_transaction_s(transaction_input_data)
+                        boolean = TransactionService.create_transaction_s(transaction_input)
+                        if boolean:
+                            transaction_input.update_processed()
+                            db.session.commit()
 
                     except:
                         db.session.rollback()

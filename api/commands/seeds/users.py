@@ -12,8 +12,8 @@ class AdminSeedService:
     def seed_admin():
         new_admin = Admin(
             name = 'Thomas M.',
-            email = 'thomas.moellers@rwth-aachen.de',
-            password = '21358***',
+            email = 'tm@mail.de',
+            password = '********',
             role = 'the_guy_w_the_secret_key',
         )
         db.session.add(new_admin)
@@ -43,7 +43,7 @@ class TaxAuditorSeedService:
     def seed_tax_auditor():
         new_tax_auditor = TaxAuditor(
             name = 'GVC Main',
-            email = 'thomas.moellers@unisg.ch',
+            email = 'thomas@mail.com',
             password = 'change_once_in_use',
             role = 'admin',
         )

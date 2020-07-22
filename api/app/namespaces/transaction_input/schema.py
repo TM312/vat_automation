@@ -5,36 +5,39 @@ from ..utils import transaction_notification_dto
 
 
 transaction_input_sub_dto = Model('transaction_input_sub', {
+    'public_id': fields.String(readonly=True),
+    'created_on': fields.DateTime,
+    'created_by': fields.Integer,
     'processed': fields.Boolean,
-    'processed_on': fields.DateTime,
     'account_given_id': fields.String,
     'channel_code': fields.String,
     'marketplace': fields.String,
     'transaction_type_public_code': fields.String,
-    'given_id': fields.String,
-    'activity_id': fields.String,
     'shipment_date': fields.Date,
     'arrival_date': fields.Date,
     'complete_date': fields.Date,
     'item_sku': fields.String,
-    'item_name': fields.String,
     'item_quantity': fields.Integer,
     'sale_total_value_gross': fields.Float,
     'currency_code': fields.String,
-    'currency': fields.String(attribute=lambda x: x.currency.name if x.currency != None else None, readonly=True),
     'departure_country_code': fields.String,
-    'arrival_country_code': fields.String
+    'arrival_country_code': fields.String,
 })
 
 
 transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
     'original_filename': fields.String,
     'bundle_id': fields.Integer,
-    'created_on': fields.DateTime,
-    'created_by': fields.Integer,
+    'processed_on': fields.DateTime,
+
+
     'transactions': fields.List(fields.Nested(transaction_dto)),
     'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'public_activity_period': fields.String,
+    'given_id': fields.String,
+    'activity_id': fields.String,
+
+    'item_name': fields.String,
     'item_manufacture_country': fields.String,
     'item_weight_kg': fields.Float,
     'item_weight_kg_total': fields.Float,
