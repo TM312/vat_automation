@@ -27,6 +27,8 @@ from ..country.service import CountryService
 from ..business.customer_firm import CustomerFirm
 from ..business.customer_firm.service import CustomerFirmService
 from ..tax.vatin import VATIN
+from ..tax.vatin.service import VATINService
+from ..tax.vat.service import VatService
 from ..business.seller_firm import SellerFirm
 from ..utils.service import HelperService, NotificationService
 
@@ -84,7 +86,7 @@ class TransactionService:
         print("departure_country:", departure_country, flush=True)
         eu = CountryService.get_eu_by_date(tax_date)
 
-        customer_vat_check_required: bool = TransactionService.vat_check_required(transaction_input, date=tax_date, number=transaction_input.customer_firm_vat_number)
+        customer_vat_check_required: bool = TransactionService.vat_check_required(date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
@@ -105,23 +107,25 @@ class TransactionService:
             print("tax_treatment_code:", tax_treatment_code, flush=True)
 
             new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
+            VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
             # check for special case: non taxable distance sale
             if new_transaction.tax_treatment_code == 'DISTANCE_SALE':
                 print('SPECIAL CASE: NON_TAXABLE_DISTANCE_SALE', flush=True)
                 tax_treatment_code = 'NON_TAXABLE_DISTANCE_SALE'
                 new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
-
+                VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         elif transaction_type.code == 'ACQUISITION':
             tax_treatment_code: str = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service, tax_date)
             new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
-
+            VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         elif transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             tax_treatment_codes = ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']
             for tax_treatment_code in tax_treatment_codes:
                 new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
+                VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         return True
 
@@ -147,7 +151,6 @@ class TransactionService:
 
         from ..tax.vatin.service import VATINService
         from ..tax.vat.service import VatService
-        print("Here we go TransactionService: calculate_transaction_vars", flush=True)
 
         customer_firm: CustomerFirm = CustomerFirmService.get_customer_firm_or_None(customer_firm_vatin, customer_relationship)
 
@@ -168,14 +171,9 @@ class TransactionService:
         gift_wrap_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=shipment_tax_rate_type_code, calculated_vat_rate=gift_wrap_vat_temp.rate)
         shipment_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=gift_wrap_tax_rate_type_code, calculated_vat_rate=shipment_vat_temp.rate)
 
-
-        print('for item_price_net: transaction_input.item_price_gross, item_price_vat_rate: ', transaction_input.item_price_gross, item_price_vat_rate, flush=True)
         item_price_net: float = TransactionService.get_price_net(item, transaction_input.item_price_gross, item_price_vat_rate, transaction_type, price_type='item')
         item_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type, price_type='item')
         item_price_total_net: float = TransactionService.get_price_net(item, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type, price_type='item')
-        print('item_price_discount_net: ', item_price_discount_net, flush=True)
-        print('item_price_total_net: ', item_price_total_net, flush=True)
-
 
         shipment_price_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
         shipment_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
@@ -218,10 +216,6 @@ class TransactionService:
         arrival_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, arrival_country.vat_country_code, transaction_input.check_arrival_seller_vat_number, date=tax_date)
         departure_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, departure_country.vat_country_code, transaction_input.check_departure_seller_vat_number, date=tax_date)
         seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, tax_jurisdiction.vat_country_code, transaction_input.check_seller_vat_number, date=tax_date)
-
-
-        TransactionService.create_notifications(transaction_input, item, customer_firm_vatin, tax_calculation_date, invoice_currency_code)
-
 
 
         transaction_data= {
@@ -309,11 +303,27 @@ class TransactionService:
 
         try:
             new_transaction = TransactionService.create(transaction_data)
-            return new_transaction
-
         except:
             db.session.rollback()
             raise
+
+        try:
+            TransactionService.create_notifications(
+                new_transaction.id,
+                transaction_input,
+                item,
+                customer_firm_vatin,
+                tax_calculation_date,
+                invoice_currency_code,
+                reference_vat_rate=float(item_vat_temp.rate),
+                calculated_vat_rate=float(item_vat_temp.rate)
+            )
+        except:
+            db.session.rollback()
+            raise
+
+        return new_transaction
+
 
 
     @staticmethod
@@ -387,23 +397,39 @@ class TransactionService:
 
 
     @staticmethod
-    def create_notifications(transaction_input: TransactionInput, item: Item, customer_firm_vatin: VATIN, tax_calculation_date: date, invoice_currency_code) -> None:
-        ItemService.compare_calculation_reference(transaction_input, item)
-        CustomerFirmService.compare_calculation_reference(transaction_input, customer_firm_vatin)
-        TransactionService.compare_calculation_reference_tax_calculation_date(transaction_input, tax_calculation_date)
-        TransactionService.compare_calculation_reference_invoice_currency_code(transaction_input, invoice_currency_code)
+    def create_notifications(
+            transaction_id: int,
+            transaction_input: TransactionInput,
+            item: Item,
+            customer_firm_vatin: VATIN,
+            tax_calculation_date: date,
+            invoice_currency_code,
+            reference_vat_rate: float,
+            calculated_vat_rate: float) -> None:
+
+        ItemService.compare_calculation_reference(transaction_id, transaction_input, item)
+        CustomerFirmService.compare_calculation_reference(transaction_id, transaction_input, customer_firm_vatin)
+        TransactionService.compare_calculation_reference_tax_calculation_date(transaction_id, transaction_input, tax_calculation_date)
+        TransactionService.compare_calculation_reference_invoice_currency_code(transaction_id, transaction_input, invoice_currency_code)
+        VatService.compare_reference_calculated_vat_rates(transaction_id, transaction_input, reference_vat_rate=reference_vat_rate, calculated_vat_rate=calculated_vat_rate)
+
+
+
+
+
+
 
 
     @staticmethod
-    def compare_calculation_reference_tax_calculation_date(transaction_input: TransactionInput, tax_calculation_date: date) -> None:
+    def compare_calculation_reference_tax_calculation_date(transaction_id: int, transaction_input: TransactionInput, tax_calculation_date: date) -> None:
         if transaction_input.check_tax_calculation_date and transaction_input.check_tax_calculation_date != tax_calculation_date:
-            notification_data = NotificationService.create_notification_data(main_subject='Tax Calculation Date', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_tax_calculation_date, calculated_value=tax_calculation_date, transaction_input_id=transaction_input.id)
+            notification_data = NotificationService.create_notification_data(main_subject='Tax Calculation Date', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_tax_calculation_date, calculated_value=tax_calculation_date, transaction_id=transaction_id)
             NotificationService.create_transaction_notification(notification_data)
 
     @staticmethod
-    def compare_calculation_reference_invoice_currency_code(transaction_input: TransactionInput, invoice_currency_code: str) -> None:
+    def compare_calculation_reference_invoice_currency_code(transaction_id: int, transaction_input: TransactionInput, invoice_currency_code: str) -> None:
         if transaction_input.check_invoice_currency_code and transaction_input.check_invoice_currency_code != invoice_currency_code:
-            notification_data = NotificationService.create_notification_data(main_subject='Invoice Currency Code', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_invoice_currency_code, calculated_value=invoice_currency_code, transaction_input_id=transaction_input.id)
+            notification_data = NotificationService.create_notification_data(main_subject='Invoice Currency Code', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_invoice_currency_code, calculated_value=invoice_currency_code, transaction_id=transaction_id)
             NotificationService.create_transaction_notification(notification_data)
 
 
@@ -504,46 +530,18 @@ class TransactionService:
 
 
     @staticmethod
-    def vat_check_required(transaction_input: TransactionInput, date: date, number: str) -> bool:
+    def vat_check_required(date: date, number: str) -> bool:
         OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config['OLD_TRANSACTION_TOLERANCE_DAYS']
         if not number:
             return False
         else:
             result: bool = date.today() - timedelta(days=OLD_TRANSACTION_TOLERANCE_DAYS) <= date
-
-            if not result:
-                notification_data = {
-                    'subject': 'Old Transaction',
-                    'original_filename': transaction_input.original_filename,
-                    'status': 'info',
-                    'message': 'Due to the age (>{} days) of the tax date the customer firm VAT Number ({}) it is assumed to be valid without further checks.'.format(OLD_TRANSACTION_TOLERANCE_DAYS, number),
-                    'transaction_input_id': transaction_input.id
-                }
-                try:
-                    NotificationService.create_transaction_notification(notification_data)
-                except:
-                    db.session.rollback()
-                    raise
-
             return result
 
 
 
     @staticmethod
     def get_vat_rate(transaction_input: TransactionInput, tax_jurisdiction: Country, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str, **kwargs) -> float:
-        print("", flush=True)
-        print('Enter get_vat_rate:', flush=True)
-        print('transaction_input:', transaction_input, flush=True)
-        print('tax_jurisdiction:', tax_jurisdiction, flush=True)
-        print('tax_rate_type_code:', tax_rate_type_code, flush=True)
-        print('calculated_vat_rate:', kwargs.get('calculated_vat_rate'), flush=True)
-        print('type calculated_vat_rate:', type(kwargs.get('calculated_vat_rate')), flush=True)
-        print('reference_vat_rate:', kwargs.get('reference_vat_rate'), flush=True)
-        print('type reference_vat_rate:', type(kwargs.get('reference_vat_rate')), flush=True)
-        print("isinstance(kwargs.get('calculated_vat_rate'), (Decimal)): ", isinstance(kwargs.get('calculated_vat_rate'), (Decimal)), flush=True)
-        print("isinstance(kwargs.get('reference_vat_rate'), (Decimal)): ", isinstance(kwargs.get('reference_vat_rate'), (Decimal)), flush=True)
-
-
         if tax_treatment_code == 'EXPORT' or tax_treatment_code == 'INTRA_COMMUNITY_SALE' or tax_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE' or tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
             calculated_vat_rate=float(0)
 
@@ -557,13 +555,6 @@ class TransactionService:
             # print('Check reference_vat_rate float', flush=True)
             reference_vat_rate=kwargs['reference_vat_rate']
             if calculated_vat_rate != reference_vat_rate:
-                notification_data = NotificationService.create_notification_data(main_subject='Tax Rate', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_vat_rate), calculated_value=str(calculated_vat_rate), transaction_input_id=transaction_input.id)
-                try:
-                    NotificationService.create_transaction_notification(notification_data)
-                except:
-                    db.session.rollback()
-                    raise
-
                 vat_rate=reference_vat_rate
 
             else:
@@ -572,7 +563,6 @@ class TransactionService:
         else:
             vat_rate=calculated_vat_rate
 
-        print('vat_rate: ', vat_rate, flush=True)
         return vat_rate
 
 

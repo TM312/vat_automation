@@ -4,16 +4,20 @@ export default ($axios) => ({
         return $axios.get(`${resource}/`)
     },
 
-    get_by_id(transaction_input_id) {
-        return $axios.get(`${resource}/${transaction_input_id}`)
+    get_by_public_id(transaction_input_public_id) {
+        return $axios.get(`${resource}/${transaction_input_public_id}`)
     },
 
-    update(transaction_input_id, payload) {
-        return $axios.put(`${resource}/${transaction_input_id}`, payload)
+    get_by_seller_firm_public_id(seller_firm_public_id) {
+        return $axios.get(`${resource}/seller_firm/${seller_firm_public_id}`)
     },
 
-    delete_by_id(transaction_input_id) {
-        return $axios.delete(`${resource}/${transaction_input_id}`)
+    update_by_public_id(transaction_input_public_id, payload) {
+        return $axios.put(`${resource}/${transaction_input_public_id}`, payload)
+    },
+
+    delete_by_public_id(transaction_input_public_id) {
+        return $axios.delete(`${resource}/${transaction_input_public_id}`)
     },
 
     upload(payload) {

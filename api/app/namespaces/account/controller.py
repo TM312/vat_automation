@@ -35,10 +35,13 @@ class AccountResource(Resource):
 @ns.route("/<string:account_public_id>")
 @ns.param("account_public_id", "Account database ID")
 class AccountIdResource(Resource):
+    @login_required
+    @ns.marshal_with(account_dto, envelope='data')
     def get(self, account_public_id: int) -> Account:
         """Get Single Account"""
         return AccountService.get_by_public_id(account_public_id)
 
+    @login_required
     def delete(self, account_public_id: int) -> Response:
         """Delete Single Account"""
         from flask import jsonify
@@ -46,6 +49,7 @@ class AccountIdResource(Resource):
         id = AccountService.delete_by_public_id(account_public_id)
         return jsonify(dict(status="Success", id=id))
 
+    @login_required
     @ns.expect(account_dto, validate=True)
     @ns.marshal_with(account_dto)
     def put(self, account_public_id: int) -> Account:

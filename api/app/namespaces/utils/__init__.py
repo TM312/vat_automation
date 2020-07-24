@@ -1,5 +1,5 @@
 from .model import Notification, TransactionNotification
-from .schema import notification_dto, transaction_notification_dto
+from .schema import notification_dto, transaction_notification_dto, transaction_notification_admin_dto
 
 BASE_ROUTE = "utils"
 

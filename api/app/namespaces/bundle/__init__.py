@@ -1,5 +1,5 @@
 from .model import Bundle
-from .schema import bundle_dto
+from .schema import bundle_dto, bundle_admin_dto, bundle_sub_dto
 
 BASE_ROUTE = "bundle"
 

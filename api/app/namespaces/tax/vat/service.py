@@ -4,7 +4,7 @@ from werkzeug.exceptions import NotFound
 
 from . import Vat
 from .interface import VatInterface
-
+from ...utils.service import NotificationService
 
 
 
@@ -75,3 +75,21 @@ class VatService:
             return vat
         else:
             raise NotFound('The tax rate for the tax rate type "{}" and the country "{}" could not be found. Please get in contact with one of the admins.'.format(tax_rate_type_code, country.name))
+
+    @staticmethod
+    def compare_reference_calculated_vat_rates(transaction_id: int, transaction_input: 'app.namespaces.transaction_input.TransactionInput', reference_vat_rate: float, calculated_vat_rate: float):
+
+        if reference_vat_rate != calculated_vat_rate:
+            notification_data = NotificationService.create_notification_data(
+                main_subject='Tax Rate',
+                original_filename=transaction_input.original_filename,
+                status='warning',
+                reference_value=str(reference_vat_rate),
+                calculated_value=str(calculated_vat_rate),
+                transaction_id=transaction_id
+            )
+            try:
+                NotificationService.create_transaction_notification(notification_data)
+            except:
+                db.session.rollback()
+                raise

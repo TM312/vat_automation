@@ -34,7 +34,7 @@ class Transaction(db.Model):  # type: ignore
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     tax_records = db.relationship('TaxRecord', secondary=tax_record_transaction_AT, back_populates='transactions')
-
+    notifications = db.relationship('TransactionNotification', backref='transaction', order_by="desc(TransactionNotification.created_on)", lazy=True, cascade='all, delete-orphan')
 
     transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))
     # account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)

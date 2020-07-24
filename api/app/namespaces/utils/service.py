@@ -40,19 +40,21 @@ class NotificationService:
 
 
     @staticmethod
-    def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_input_id: int) -> Dict:
-        if isinstance(reference_value, str) and len(reference_value) > 42:
-            reference_value = reference_value[:19] + ' ... ' + reference_value[-19:]
+    def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_id: int) -> Dict:
+        # if isinstance(reference_value, str) and len(reference_value) > 42:
+        #     reference_value = reference_value[:19] + ' ... ' + reference_value[-19:]
 
-        if isinstance(calculated_value, str) and len(calculated_value) > 42:
-            calculated_value = calculated_value[:19] + ' ... ' + calculated_value[-19:]
+        # if isinstance(calculated_value, str) and len(calculated_value) > 42:
+        #     calculated_value = calculated_value[:19] + ' ... ' + calculated_value[-19:]
 
         notification_data = {
             'subject': '{}s Not Matching'.format(main_subject),
             'original_filename': original_filename,
             'status': status,
-            'message': 'The reference value from the original transaction report ({}) differs from the calculated value ({}). The original reference value has been used for subsequent processing.'.format(str(reference_value), str(calculated_value)),
-            'transaction_input_id': transaction_input_id
+            'reference_value': str(reference_value),
+            'calculated_value': str(calculated_value),
+            'message': 'The reference value from the original transaction report differs from the calculated value. The original value has been used for processing.',
+            'transaction_id': transaction_id
         }
         return notification_data
 
@@ -62,8 +64,10 @@ class NotificationService:
             subject=notification_data.get('subject'),
             original_filename = notification_data.get('original_filename'),
             status = notification_data.get('status'),
+            reference_value = notification_data.get('reference_value'),
+            calculated_value = notification_data.get('calculated_value'),
             message = notification_data.get('message'),
-            transaction_input_id = notification_data.get('transaction_input_id')
+            transaction_id = notification_data.get('transaction_id')
         )
 
         db.session.add(new_notification)

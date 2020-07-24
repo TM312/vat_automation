@@ -1,20 +1,16 @@
 from flask_restx import Model, fields
 
 from ..transaction import transaction_dto
-from ..utils import transaction_notification_dto
 
 
 transaction_input_sub_dto = Model('transaction_input_sub', {
     'public_id': fields.String(readonly=True),
-    'created_on': fields.DateTime,
-    'created_by': fields.Integer,
+    'activity_id': fields.String,
     'processed': fields.Boolean,
-    'account_given_id': fields.String,
     'channel_code': fields.String,
     'marketplace': fields.String,
     'transaction_type_public_code': fields.String,
     'shipment_date': fields.Date,
-    'arrival_date': fields.Date,
     'complete_date': fields.Date,
     'item_sku': fields.String,
     'item_quantity': fields.Integer,
@@ -26,16 +22,19 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
 
 
 transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
+    'created_on': fields.DateTime,
+    'created_by': fields.String(attribute=lambda x: x.uploader.name),
     'original_filename': fields.String,
-    'bundle_id': fields.Integer,
+    'bundle_public_id': fields.String(attribute=lambda x: x.bundle.public_id, readonly=True),
     'processed_on': fields.DateTime,
 
 
     'transactions': fields.List(fields.Nested(transaction_dto)),
-    'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'public_activity_period': fields.String,
     'given_id': fields.String,
-    'activity_id': fields.String,
+    'account_given_id': fields.String,
+
+    'arrival_date': fields.Date,
 
     'item_name': fields.String,
     'item_manufacture_country': fields.String,
@@ -110,5 +109,6 @@ transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
 
 
 transaction_input_admin_dto = transaction_input_dto.inherit('transaction_input_admin', {
-   'id': fields.Integer(readonly=True)
+    'id': fields.Integer(readonly=True),
+    'bundle_id': fields.Integer
 })

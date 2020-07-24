@@ -33,9 +33,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, bundle_id) {
+    async get_by_public_id({ commit }, bundle_public_id) {
 
-        const res = await this.$repositories.bundle.get_by_id(bundle_id)
+        const res = await this.$repositories.bundle.get_by_public_id(bundle_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_BUNDLE', data.data)
@@ -44,8 +44,8 @@ export const actions = {
         }
     },
 
-    async update({ commit }, bundle_id, data_changes) {
-        const res = await this.$repositories.bundle.update(bundle_id, data_changes)
+    async update_by_public_id({ commit }, bundle_public_id, data_changes) {
+        const res = await this.$repositories.bundle.update_by_public_id(bundle_public_id, data_changes)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_BUNDLE', data.data)
@@ -54,8 +54,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, bundle_id) {
-        const res = await this.$repositories.bundle.delete(bundle_id)
+    async delete_by_public_id({ commit }, bundle_public_id) {
+        const res = await this.$repositories.bundle.delete_by_public_id(bundle_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store

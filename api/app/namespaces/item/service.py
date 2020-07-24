@@ -140,19 +140,19 @@ class ItemService:
 
 
     @staticmethod
-    def compare_calculation_reference(transaction_input: TransactionInput, item: Item):
+    def compare_calculation_reference(transaction_id: int, transaction_input: TransactionInput, item: Item):
         notification_data_list = []
         if item.name and transaction_input.item_name and item.name != transaction_input.item_name:
-            notification_data = NotificationService.create_notification_data(main_subject='Item Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_name, calculated_value=item.name, transaction_input_id=transaction_input.id)
+            notification_data = NotificationService.create_notification_data(main_subject='Item Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_name, calculated_value=item.name, transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
         if item.weight_kg and transaction_input.item_weight_kg and item.weight_kg != transaction_input.item_weight_kg:
-            notification_data = NotificationService.create_notification_data(main_subject='Item Weight', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_weight_kg, calculated_value=item.weight_kg, transaction_input_id=transaction_input.id)
+            notification_data = NotificationService.create_notification_data(main_subject='Item Weight', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_weight_kg, calculated_value=item.weight_kg, transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
 
         if item.asin and transaction_input.asin and item.asin != transaction_input.asin:
-            notification_data = NotificationService.create_notification_data(main_subject='ASIN', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.asin, calculated_value=item.asin, transaction_input_id=transaction_input.id)
+            notification_data = NotificationService.create_notification_data(main_subject='ASIN', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.asin, calculated_value=item.asin, transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
         try:

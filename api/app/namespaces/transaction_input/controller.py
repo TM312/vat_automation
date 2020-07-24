@@ -27,27 +27,42 @@ class TransactionInputResource(Resource):
         return TransactionInputService.get_all()
 
 
-@ns.route("/<int:transaction_input_id>")
-@ns.param("transaction_input_id", "TransactionInput database ID")
+@ns.route("/<string:transaction_input_public_id>")
+@ns.param("transaction_input_public_id", "TransactionInput database ID")
 class TransactionInputIdResource(Resource):
-    def get(self, transaction_input_id: int) -> TransactionInput:
+    @login_required
+    @ns.marshal_with(transaction_input_dto, envelope='data')
+    def get(self, transaction_input_public_id: str) -> TransactionInput:
         """Get Single TransactionInput"""
-        return TransactionInputService.get_by_id(transaction_input_id)
+        return TransactionInputService.get_by_public_id(transaction_input_public_id)
 
-    def delete(self, transaction_input_id: int) -> Response:
+    @login_required
+    def delete(self, transaction_input_public_id: str) -> Response:
         """Delete Single TransactionInput"""
         from flask import jsonify
 
-        id = TransactionInputService.delete_by_id(transaction_input_id)
-        return jsonify(dict(status="Success", id=id))
+        public_id = TransactionInputService.delete_by_public_id(transaction_input_public_id)
+        return jsonify(dict(status="Success", id=public_id))
 
+    @login_required
     @ns.expect(transaction_input_dto, validate=True)
-    @ns.marshal_with(transaction_input_dto)
-    def put(self, transaction_input_id: int) -> TransactionInput:
+    @ns.marshal_with(transaction_input_dto, envelope='data')
+    def put(self, transaction_input_public_id: str) -> TransactionInput:
         """Update Single TransactionInput"""
 
         data_changes: TransactionInputInterface = request.parsed_obj
-        return TransactionInputService.update(transaction_input_id, data_changes)
+        return TransactionInputService.update_by_public_id(transaction_input_public_id, data_changes)
+
+
+@ns.route("/seller_firm/<string:seller_firm_public_id>")
+@ns.param("seller_firm_public_id", "TransactionInput database ID")
+class TransactionInputSellerFirmIdResource(Resource):
+    @login_required
+    @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
+    def get(self, seller_firm_public_id: str) -> TransactionInput:
+        """Get Single TransactionInput"""
+        return TransactionInputService.get_by_seller_firm_public_id(seller_firm_public_id)
+
 
 
 @ns.route("/csv")
