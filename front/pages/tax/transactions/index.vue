@@ -1,13 +1,13 @@
 <template>
-  <div>tbd</div>
+    <div>tbd</div>
 </template>
 
 <script>
-export default {
-
-}
+    export default {
+        layout: "tax",
+        middleware: "auth-tax"
+    };
 </script>
 
 <style>
-
 </style>

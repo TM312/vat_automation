@@ -14,7 +14,7 @@ from . import VATIN
 from .interface import VATINInterface
 
 from ...transaction_input import TransactionInput
-from ...utils.service import InputService
+from ...utils.service import InputService, NotificationService
 
 
 
@@ -223,6 +223,29 @@ class VATINService:
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)
 
         return response_objects
+
+    @staticmethod
+    def evaluate_transaction_notification(transaction_id: int, customer_vat_check_required: bool, date: date, number: str) -> None:
+        if number and not customer_vat_check_required:
+            OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config['OLD_TRANSACTION_TOLERANCE_DAYS']
+
+            reference_value = str(OLD_TRANSACTION_TOLERANCE_DAYS)
+            calculated_value = str(date.today() - date).days
+
+            notification_data = {
+                   'subject': 'Old Transaction',
+                    'original_filename': transaction_input.original_filename,
+                    'status': 'info',
+                    'reference_value': reference_value,
+                    'calculated_value': calculated_value,
+                    'message': 'Due to the age of the tax date the customer firm VAT Number ({}) it was assumed to be valid without further checks.'.format(number),
+                    'transaction_id': transaction_input.id
+                   }
+            try:
+                NotificationService.create_transaction_notification(notification_data)
+            except:
+                db.session.rollback()
+                raise
 
 
     @staticmethod

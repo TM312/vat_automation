@@ -1,8 +1,8 @@
 <template>
     <b-tabs content-class="mt-3">
-        <b-tab title="Company Data" active>
+        <b-tab title="Base Data" active>
             <b-card-group deck>
-                <b-card class="mb-5" header="Base Data" title="">
+                <b-card class="mb-5" header="Static Data" title="">
                     <b-card-text>
                         <b>Public ID:</b> <br>
                         <b>Address:</b> <br>
@@ -22,8 +22,15 @@
                     </template>
                     <b-card-text>
                         <div >
-                            <p class="text-right"><small class="text-muted">TOTAL: </small><b-spinner variant="primary" small label="Spinning" /></p>
-                            <div><b-table borderless busy :fields="fieldsAccounts"></b-table></div>
+                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
+                            <div><b-table borderless busy :fields="fieldsAccounts">
+                                <template v-slot:table-busy>
+                                    <div class="text-center text-secondary my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                    </div>
+                                </template>
+                            </b-table></div>
                         </div>
                     </b-card-text>
                 </b-card>
@@ -39,8 +46,15 @@
                     </template>
                     <b-card-text>
                         <div >
-                            <p class="text-right"><small class="text-muted">TOTAL: </small><b-spinner variant="primary" small label="Spinning" /></p>
-                            <div><b-table borderless busy :fields="fieldsVatNumbers"></b-table></div>
+                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
+                            <div><b-table borderless busy :fields="fieldsVatNumbers">
+                                <template v-slot:table-busy>
+                                    <div class="text-center text-secondary my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                    </div>
+                                </template>
+                            </b-table></div>
                         </div>
                     </b-card-text>
                 </b-card>
@@ -56,15 +70,22 @@
                     </template>
                     <b-card-text>
                         <div >
-                            <p class="text-right"><small class="text-muted">TOTAL: </small><b-spinner variant="primary" small label="Spinning" /></p>
-                            <div><b-table borderless busy :fields="fieldsDistanceSales"></b-table></div>
+                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
+                            <div><b-table borderless busy :fields="fieldsDistanceSales">
+                                <template v-slot:table-busy>
+                                    <div class="text-center text-secondary my-2">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>Loading...</strong>
+                                    </div>
+                                </template>
+                            </b-table></div>
                         </div>
                     </b-card-text>
                 </b-card>
             </b-card-group>
         </b-tab>
-        <b-tab title="Items" disabled>
-        </b-tab>
+        <b-tab title="Items" disabled></b-tab>
+        <b-tab title="Transactions" disabled></b-tab>
     </b-tabs>
 </template>
 

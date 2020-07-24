@@ -40,6 +40,10 @@ class Country(db.Model):  # type: ignore
     distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country')
 
+    transaction_inputs_departure_country = db.relationship('TransactionInput', backref='departure_country', foreign_keys='TransactionInput.departure_country_code', lazy=True)
+    transaction_inputs_arrival_country = db.relationship('TransactionInput', backref='arrival_country', foreign_keys='TransactionInput.arrival_country_code', lazy=True)
+
+
     transactions_tax_jurisdiction = db.relationship('Transaction', backref='tax_jurisdiction', foreign_keys='Transaction.tax_jurisdiction_code', lazy=True)
     transactions_departure_country = db.relationship('Transaction', backref='departure_country', foreign_keys='Transaction.departure_country_code', lazy=True)
     transactions_arrival_country = db.relationship('Transaction', backref='arrival_country', foreign_keys='Transaction.arrival_country_code', lazy=True)

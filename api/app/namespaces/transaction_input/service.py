@@ -10,9 +10,8 @@ from app.extensions import db
 from . import TransactionInput
 from .interface import TransactionInputInterface
 
+from ..account import Account
 from ..utils.service import InputService
-
-
 
 
 
@@ -26,6 +25,15 @@ class TransactionInputService:
     @staticmethod
     def get_by_id(transaction_input_id: int) -> TransactionInput:
         return TransactionInput.query.filter(TransactionInput.id == transaction_input_id).first()
+
+    @staticmethod
+    def get_by_public_id(transaction_input_public_id: str) -> TransactionInput:
+        return TransactionInput.query.filter(TransactionInput.public_id == transaction_input_public_id).first()
+
+    @staticmethod
+    def get_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TransactionInput]:
+        transaction_inputs = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).all()
+        return transaction_inputs
 
     @staticmethod
     def get_by_identifiers(account_given_id: str, channel_code: str, given_id: str, activity_id: str, item_sku: str) -> TransactionInput:
@@ -44,9 +52,22 @@ class TransactionInputService:
     @staticmethod
     def update(transaction_input_id: int, data_changes: TransactionInputInterface) -> TransactionInput:
         transaction_input = TransactionInputService.get_by_id(transaction_input_id)
-        transaction_input.update(data_changes)
-        db.session.commit()
-        return transaction_input
+        if transaction_input:
+            transaction_input.update(data_changes)
+            db.session.commit()
+            return transaction_input
+        else:
+            raise NotFound('The indicated transaction input does not exist.')
+
+    @staticmethod
+    def update_by_public_id(transaction_input_public_id: str, data_changes: TransactionInputInterface) -> TransactionInput:
+        transaction_input = TransactionInputService.get_by_public_id(transaction_input_public_id)
+        if transaction_input:
+            transaction_input.update(data_changes)
+            db.session.commit()
+            return transaction_input
+        else:
+            raise NotFound('The indicated transaction input does not exist.')
 
     @staticmethod
     def delete_by_id(transaction_input_id: int):
@@ -62,6 +83,22 @@ class TransactionInputService:
             return response_object
         else:
             raise NotFound('This transaction input does not exist.')
+
+    @staticmethod
+    def delete_by_public_id(transaction_input_public_id: str):
+        transaction_input = TransactionInput.query.filter(TransactionInput.public_id == transaction_input_public_id).first()
+        if transaction_input:
+            db.session.delete(transaction_input)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Transaction input (public_id: {}) has been successfully deleted.'.format(transaction_input_public_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This transaction input does not exist.')
+
 
     @staticmethod
     def get_df_transaction_input_delimiter(file: BinaryIO) -> str:

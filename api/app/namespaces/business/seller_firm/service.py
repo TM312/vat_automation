@@ -17,15 +17,7 @@ from ...utils.service import InputService, NotificationService
 class SellerFirmService:
     @staticmethod
     def get_all() -> List[SellerFirm]:
-        try:
-            print('GET ALL SELLERFIRMS', flush=True)
-            seller_firms = SellerFirm.query.all()
-            print('seller_firms: ', seller_firms, flush=True)
-
-
-        except:
-            raise
-        return seller_firms
+        return SellerFirm.query.all()
 
     @staticmethod
     def get_by_accounting_firm_id(accounting_firm_id) -> List[SellerFirm]:

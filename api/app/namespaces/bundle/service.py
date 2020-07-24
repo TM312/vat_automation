@@ -26,19 +26,42 @@ class BundleService:
         return Bundle.query.get(bundle_id)
 
     @staticmethod
-    def update(bundle: Bundle, data_changes: BundleInterface) -> Bundle:
-        bundle.update(data_changes)
-        db.session.commit()
-        return bundle
+    def get_by_public_id(bundle_public_id: str) -> Bundle:
+        return Bundle.query.filter_by(public_id=bundle_public_id).first()
+
+    @staticmethod
+    def update_by_id(bundle_id: int, data_changes: BundleInterface) -> Bundle:
+        bundle = BundleService.get_by_id(bundle_id)
+        if bundle:
+            bundle.update(data_changes)
+            db.session.commit()
+            return bundle
+
+    @staticmethod
+    def update_by_public_id(bundle_public_id: str, data_changes: BundleInterface) -> Bundle:
+        bundle = BundleService.get_by_public_id(bundle_public_id)
+        if bundle:
+            bundle.update(data_changes)
+            db.session.commit()
+            return bundle
 
     @staticmethod
     def delete_by_id(bundle_id: int) -> List[int]:
-        bundle = Bundle.query.filter(Bundle.bundle_id == bundle_id).first()
+        bundle = BundleService.get_by_id(bundle_id)
         if not bundle:
             return []
         db.session.delete(bundle)
         db.session.commit()
         return [bundle_id]
+
+    @staticmethod
+    def delete_by_public_id(bundle_public_id: str) -> List[int]:
+        bundle = BundleService.get_by_public_id(bundle_public_id)
+        if not bundle:
+            return []
+        db.session.delete(bundle)
+        db.session.commit()
+        return [bundle_public_id]
 
     @staticmethod
     def create() -> Bundle:

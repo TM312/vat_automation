@@ -16,6 +16,8 @@ vatin_validate_dto = vatin_verify_dto.inherit('vatin_validate', {
 })
 
 vatin_sub_dto = Model('vatin_sub', {
+    'country_code': fields.String,
+    'number': fields.String,
     'public_id': fields.String(readonly=True),
     'created_on': fields.DateTime,
     'modified_at': fields.DateTime,

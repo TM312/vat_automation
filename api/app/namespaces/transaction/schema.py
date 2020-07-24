@@ -1,4 +1,6 @@
 from flask_restx import Model, fields
+from ..utils import transaction_notification_dto
+
 
 transaction_type_dto = Model('transaction_type', {
     'code': fields.String,
@@ -17,6 +19,7 @@ transaction_sub_dto = Model('transaction_sub', {
 })
 
 transaction_dto = transaction_sub_dto.inherit('transaction', {
+    'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'created_on': fields.DateTime,
     'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
     # 'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),

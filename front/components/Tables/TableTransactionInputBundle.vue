@@ -1,14 +1,17 @@
 <template>
     <div>
-        <b-card
-            v-if="transaction_inputs.length === 0 && channelCode"
-            sub-title="No transaction have been registered for this channel."
-            class="text-center py-5"
-        ></b-card>
-        <b-table v-else :fields="fields" :items="transaction_inputs" hover>
+        <b-table :fields="fields" :items="transactionInputs" hover :busy="$fetchState.pending && !transactionInputs">
+            <template v-slot:table-busy>
+                <div class="text-center text-secondary my-2">
+                    <b-spinner class="align-middle"></b-spinner>
+                    <strong>Loading...</strong>
+                </div>
+            </template>
 
             <template v-slot:cell(activity_id)="data">
-                <nuxt-link :to="`/tax/transactions/${data.item.public_id}`" >{{ data.value }}</nuxt-link>
+
+                <nuxt-link v-if="data.item.public_id != $route.params.public_id" :to="`/tax/transactions/${data.item.public_id}`" >{{ data.value }}</nuxt-link>
+                <span v-else>{{ data.value }}</span>
             </template>
 
             <template v-slot:cell(processed)="data">
@@ -24,16 +27,13 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'TableTransactionInputsChannel',
+    name: 'TableTransactionInputBundle',
 
     props: {
-        // eslint-disable-next-line
-        channelCode: {
+        bundlePublicId: {
             type: String,
-            required: false
-
+            required: true
         }
-
     },
 
     data() {
@@ -100,14 +100,16 @@ export default {
         }
     },
 
+     async fetch() {
+            const { store } = this.$nuxt.context;
+            console.log('in component: this.bundlePublicId -> ', this.bundlePublicId)
+            await store.dispatch("bundle/get_by_public_id", this.bundlePublicId);
+        },
+
     computed: {
         ...mapState({
-            transaction_inputs_full: state => state.transaction_input.transaction_inputs
-        }),
-
-        transaction_inputs() {
-            return this.channelCode ? this.transaction_inputs_full.filter(transaction_input => transaction_input.channel_code === this.channelCode) : this.transaction_inputs_full
-        }
+            transactionInputs: state => state.bundle.bundle.transaction_inputs
+        })
     }
 }
 </script>

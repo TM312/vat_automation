@@ -43,7 +43,7 @@ class TaxAuditorSeedService:
     def seed_tax_auditor():
         new_tax_auditor = TaxAuditor(
             name = 'GVC Main',
-            email = 'thomas@mail.com',
+            email = 'thomas.moellers@unisg.ch',
             password = 'change_once_in_use',
             role = 'admin',
         )

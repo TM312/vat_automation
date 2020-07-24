@@ -9,8 +9,10 @@
                 <b-form-row><b-col cols="6" cols-lg="5" cols-xl="4"><b>Created On:</b></b-col><b-col cols="6" cols-lg="7" cols-xl="8">{{ business.created_on }}</b-col></b-form-row>
                 <b-form-row><b-col cols="6" cols-lg="5" cols-xl="4"><b>Created By:</b></b-col><b-col cols="6" cols-lg="7" cols-xl="8">{{ business.created_by }}</b-col></b-form-row>
             </b-card-text>
-            <nuxt-link :to="`clients/${business.public_id}`">Details</nuxt-link>
-            <button-follow-seller-firm :sellerFirm="business" />
+            <b-row cols="2">
+                <b-col cols="6" cols-lg="5" cols-xl="4"><nuxt-link :to="`clients/${business.public_id}`">Details</nuxt-link></b-col>
+                <b-col cols="6" cols-lg="7" cols-xl="8"><button-follow-seller-firm :sellerFirm="business" /></b-col>
+            </b-row>
         </b-card>
     </b-col>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <b-tabs content-class="mt-3">
-        <b-tab title="Company Data" active>
+        <b-tab title="Base Data" active>
             <b-card-group deck>
                 <card-client class="mb-5"/>
                 <card-accounts class="mb-5"/>
@@ -12,6 +12,9 @@
         </b-tab>
         <b-tab title="Items">
             <lazy-card-items class="mb-5"/>
+        </b-tab>
+        <b-tab title='Transactions'>
+            <lazy-overview-transaction-inputs />
         </b-tab>
     </b-tabs>
 </template>

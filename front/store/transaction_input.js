@@ -12,6 +12,10 @@ export const mutations = {
     }
 }
 
+// export const getters = {
+//     transactionInputsChannelCode: state => channelCode => state.transaction_input.transaction_inputs.filter(transaction_input => transaction_input.channel_code === channelCode)
+// }
+
 export const actions = {
     async get_all({ commit }) {
         const res = await this.$repositories.transaction_input.get_all()
@@ -23,9 +27,9 @@ export const actions = {
         }
     },
 
-    async get_by_id({ commit }, transaction_input_id) {
+    async get_by_public_id({ commit }, transaction_input_public_id) {
 
-        const res = await this.$repositories.transaction_input.get_by_id(transaction_input_id)
+        const res = await this.$repositories.transaction_input.get_by_public_id(transaction_input_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_TRANSACTION_INPUT', data.data)
@@ -34,8 +38,20 @@ export const actions = {
         }
     },
 
-    async update({ commit }, transaction_input_id, data_changes) {
-        const res = await this.$repositories.transaction_input.update(transaction_input_id, data_changes)
+    async get_by_seller_firm_public_id({ commit }, seller_firm_public_id) {
+
+        const res = await this.$repositories.transaction_input.get_by_seller_firm_public_id(seller_firm_public_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_TRANSACTION_INPUTS', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+
+    async update_by_public_id({ commit }, transaction_input_public_id, data_changes) {
+        const res = await this.$repositories.transaction_input.update_by_public_id(transaction_input_public_id, data_changes)
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_TRANSACTION_INPUT', data.data)
@@ -44,8 +60,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, transaction_input_id) {
-        const res = await this.$repositories.transaction_input.delete(transaction_input_id)
+    async delete_by_public_id({ commit }, transaction_input_public_id) {
+        const res = await this.$repositories.transaction_input.delete_by_public_id(transaction_input_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store
