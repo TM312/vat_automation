@@ -21,11 +21,11 @@ class AccountingFirmService:
         return accounting_firms
 
     @staticmethod
-    def get_by_public_id(public_id: UUID) -> AccountingFirm:
+    def get_by_public_id(public_id: str) -> AccountingFirm:
         return AccountingFirm.query.filter_by(public_id=public_id).first()
 
     @staticmethod
-    def get_by_id(accounting_firm_id: int) -> AccountingFirm:
+    def get_by_id(accounting_firm_id: str) -> AccountingFirm:
         return AccountingFirm.query.filter_by(id=accounting_firm_id).first()
 
     @staticmethod

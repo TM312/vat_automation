@@ -11,7 +11,8 @@ class AccountingFirm(Business):
         "Employees column, if not present already."
         # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
         #also: https://stackoverflow.com/questions/22355890/sqlalchemy-multiple-foreign-keys-in-one-mapped-class-to-the-same-primary-key
-        return Business.__table__.c.get('employees', db.relationship('TaxAuditor', backref='employer', primaryjoin='TaxAuditor.employer_id==Business.id'))
+        # return Business.__table__.c.get('employees', db.relationship('TaxAuditor', backref='employer', primaryjoin='TaxAuditor.employer_id==Business.id'))
+        return Business.__table__.c.get('employees', db.relationship('TaxAuditor', backref='employer', primaryjoin='TaxAuditor.employer_public_id==Business.public_id'))
 
 
     clients = db.relationship('SellerFirm', backref=db.backref('accounting_firm', remote_side=[Business.id]))

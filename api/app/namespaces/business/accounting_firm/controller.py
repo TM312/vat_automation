@@ -7,7 +7,7 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from . import AccountingFirm
-from . import accounting_firm_dto
+from . import accounting_firm_dto, accounting_firm_sub_dto
 from .service import AccountingFirmService
 from .interface import AccountingFirmInterface
 
@@ -15,6 +15,7 @@ from ...utils.decorators import login_required, accepted_u_types, confirmation_r
 
 
 ns = Namespace("AccountingFirm", description="Accounting Firm Related Operations")  # noqa
+ns.add_model(accounting_firm_sub_dto.name, accounting_firm_sub_dto)
 ns.add_model(accounting_firm_dto.name, accounting_firm_dto)
 
 
