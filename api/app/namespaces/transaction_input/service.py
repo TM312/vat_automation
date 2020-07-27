@@ -163,8 +163,9 @@ class TransactionInputService:
         error_counter = 0
         total_number_transaction_inputs = len(df.index)
         input_type = 'transaction' # only used for response objects
+        transaction_inputs = []
 
-        for i in range(2):
+        for i in range(10):
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
             account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
@@ -335,26 +336,35 @@ class TransactionInputService:
                         # create new transaction input
                         try:
                             transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
+                            transaction_inputs.append(transaction_input)
                             print('')
                         except:
                             db.session.rollback()
                             raise
 
-                    try:
-                        # create transactions
-                        boolean = TransactionService.create_transaction_s(transaction_input)
-                        if boolean:
-                            transaction_input.update_processed()
-                            db.session.commit()
 
-                    except:
-                        db.session.rollback()
-                        raise #!!! to be deleted later
 
 
             else:
                 error_counter += 1
 
+
+        # after all transaction inputs have been stored transactions are created
+        for transaction_input in transaction_inputs:
+            if not transaction_input.processed:
+                try:
+                    # create transactions
+                    boolean = TransactionService.create_transaction_s(transaction_input)
+                    if boolean:
+                        transaction_input.update_processed()
+                        db.session.commit()
+
+                except:
+                    db.session.rollback()
+                    raise #!!! to be deleted later
+
+            else:
+                continue
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_transaction_inputs, error_counter, redundancy_counter=0)
 

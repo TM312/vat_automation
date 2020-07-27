@@ -14,6 +14,7 @@ def login_required(f):
             user = TokenService.current_user(request.headers["Authorization"])
             # make user available down the pipeline via flask.g
             g.user = user
+            user.update_last_seen()
             # finally call f. [f() now has access to g.user]
             return f(*args, **kwargs)
         else:

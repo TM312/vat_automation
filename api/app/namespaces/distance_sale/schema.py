@@ -8,15 +8,13 @@ distance_sale_sub_dto = Model('distance_sale_sub', {
     'original_filename': fields.String,
     'valid_from': fields.Date,
     'valid_to': fields.Date,
-    'platform_code': fields.String,
-    'platform': fields.String(attribute=lambda x: x.platform.name, readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'arrival_country_code': fields.String,
     'arrival_country': fields.String(attribute=lambda x: x.country.name, readonly=True),
     'active': fields.Boolean
 })
 
-distance_sale_dto = distance_sale_sub_dto.inherit('distance_sale', {
+distance_sale_dto = distance_sale_sub_dto.clone('distance_sale', {
     'id': fields.Integer,
     'seller_firm_id': fields.Integer,
 })

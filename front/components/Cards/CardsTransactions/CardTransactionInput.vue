@@ -1,9 +1,5 @@
 <template>
     <div>
-        <b-alert>
-            <p v-if="transactionInput.processed">The transaction has been successfully processed on {{ transactionInput.processed_on }} </p>
-            <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: { buttonvalidate} </p>
-        </b-alert>
         <b-card-group deck class="my-5">
             <b-card
                 title="Base Data"
@@ -32,7 +28,7 @@
                 <b>Name</b> {{ transactionInput.item_name }} <br>
                 <b>Quantity:</b> {{ transactionInput.item_quantity }}<br>
                 <b>Manufacture Country:</b> {{ transactionInput.item_manufacture_country }} <br>
-                <b>Weight:</b> {{ transactionInput.item_weight_kg }}kg <i>(Total:{{ transactionInput.item_weight_kg_total }}kg)</i>
+                <b>Weight:</b> {{ transactionInput.item_weight_kg }}kg <i>(Total:{{ transactionInput.item_weight_kg_total }}kg</i>
             </b-card>
 
         </b-card-group>

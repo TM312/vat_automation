@@ -42,8 +42,7 @@ class Item(db.Model):  # type: ignore
     unit_cost_price_net = db.Column(db.Numeric(scale=2))
 
     transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
-    # transactions = db.relationship('Transaction', backref='item', lazy=True)
-
+    transactions = db.relationship('Transaction', backref='item', lazy=True)
 
 
     def __init__(self, **kwargs):

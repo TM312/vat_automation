@@ -221,7 +221,8 @@ class TransactionService:
         transaction_data= {
             # 'account_id': account.id,
             'transaction_input_id': transaction_input.id,
-            # 'item_id': item.id,
+            'seller_firm_id': account.seller_firm_id,
+            'item_id': item.id,
 
             'type_code': transaction_type.code,
             'amazon_vat_calculation_service': amazon_vat_calculation_service,
@@ -330,8 +331,9 @@ class TransactionService:
     def create(transaction_data: TransactionInterface) -> Transaction:
         new_transaction = Transaction(
             transaction_input_id = transaction_data.get('transaction_input_id'),
+            seller_firm_id=transaction_data.get('seller_firm_id'),
             # account_id=transaction_data.get('account_id'),
-            # item_id = transaction_data.get('item_id'),
+            item_id = transaction_data.get('item_id'),
 
             type_code = transaction_data.get('type_code'),
             amazon_vat_calculation_service = transaction_data.get('amazon_vat_calculation_service'),
@@ -470,7 +472,7 @@ class TransactionService:
 
 
             elif customer_relationship == "B2C":
-                if departure_country.code != arrival_country.code and DistanceSaleService.get_status(platform_code=account.channel.platform_code, seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
+                if departure_country.code != arrival_country.code and DistanceSaleService.get_status(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
                     tax_treatment_code = 'DISTANCE_SALE'
 
                 else:

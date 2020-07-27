@@ -13,9 +13,9 @@ from ..utils.decorators import login_required, accepted_u_types, confirmation_re
 
 
 ns = Namespace("User", description="User Related Operations")  # noqa
+ns.add_model(user_sub_dto.name, user_sub_dto)
 ns.add_model(user_dto.name, user_dto)
 ns.add_model(user_dto_admin.name, user_dto_admin)
-ns.add_model(user_sub_dto.name, user_sub_dto)
 ns.add_model(action_dto.name, action_dto)
 
 # https://flask-restx.readthedocs.io/en/latest/api.html#flask_restx.Model

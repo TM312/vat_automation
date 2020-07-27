@@ -161,7 +161,6 @@ class DistanceSaleService:
                 'seller_firm_id': seller_firm_id,
                 'valid_from': valid_from,
                 'valid_to': valid_to,
-                'platform_code': 'AMZ',
                 'arrival_country_code': arrival_country_code,
                 'active': active
             }
@@ -189,7 +188,6 @@ class DistanceSaleService:
             original_filename = distance_sale_data.get('original_filename'),
             valid_from = distance_sale_data.get('valid_from'),
             valid_to = distance_sale_data.get('valid_to'),
-            platform_code = distance_sale_data.get('platform_code'),
             seller_firm_id=distance_sale_data.get('seller_firm_id'),
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
             active = distance_sale_data.get('active')
@@ -224,7 +222,7 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def get_status(platform_code: str, seller_firm_id: int, arrival_country_code: str, tax_date: date) -> bool:
-        distance_sale=DistanceSale.query.filter(DistanceSale.platform_code==platform_code, DistanceSale.seller_firm_id==seller_firm_id, DistanceSale.arrival_country_code==arrival_country_code, DistanceSale.valid_from<=tax_date, DistanceSale.valid_to>=tax_date).first()
+    def get_status(seller_firm_id: int, arrival_country_code: str, tax_date: date) -> bool:
+        distance_sale=DistanceSale.query.filter(DistanceSale.seller_firm_id==seller_firm_id, DistanceSale.arrival_country_code==arrival_country_code, DistanceSale.valid_from<=tax_date, DistanceSale.valid_to>=tax_date).first()
         if distance_sale:
             return distance_sale.active

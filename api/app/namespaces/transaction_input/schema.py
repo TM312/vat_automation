@@ -21,7 +21,7 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
 })
 
 
-transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
+transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
     'created_on': fields.DateTime,
     'created_by': fields.String(attribute=lambda x: x.uploader.name),
     'original_filename': fields.String,
@@ -108,7 +108,7 @@ transaction_input_dto = transaction_input_sub_dto.inherit('transaction_input', {
 })
 
 
-transaction_input_admin_dto = transaction_input_dto.inherit('transaction_input_admin', {
+transaction_input_admin_dto = transaction_input_dto.clone('transaction_input_admin', {
     'id': fields.Integer(readonly=True),
     'bundle_id': fields.Integer
 })

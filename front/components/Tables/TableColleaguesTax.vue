@@ -34,7 +34,12 @@ export default {
                     key: 'last_seen',
                     sortable: true,
                     formatter: (value, key, item) => {
-                        return this.$dateFns.formatDistanceToNow(new Date(item.last_seen))
+                        return this.$dateFns.formatDistanceToNow(new Date(item.last_seen.toString()))
+                        // var last_seen = new Date((`${item.last_seen}Z`))
+
+                        // console.log('last_seen:', last_seen)
+                        // console.log('last_seen.toString():', last_seen.toString())
+                        // return `raw: ${item.last_seen} | to String: ${last_seen.toString()}`
                     }
                 },
                 {

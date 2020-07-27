@@ -60,7 +60,6 @@
                 flashCounter: false,
 
                 fields: [
-                    { key: "platform", sortable: false },
                     { key: "arrival_country", sortable: true },
                     { key: "valid_from", sortable: true },
                     { key: "valid_to", sortable: true },

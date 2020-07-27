@@ -8,7 +8,7 @@ vatin_verify_dto = Model('vatin_verify', {
     'number': fields.String
 })
 
-vatin_validate_dto = vatin_verify_dto.inherit('vatin_validate', {
+vatin_validate_dto = vatin_verify_dto.clone('vatin_validate', {
     'request_date': fields.Date,
     'valid': fields.Boolean,
     'name': fields.String,
@@ -31,10 +31,10 @@ vatin_sub_dto = Model('vatin_sub', {
     'business_name': fields.String(attribute=lambda x: x.business.name)
 })
 
-vatin_dto = vatin_sub_dto.inherit('vatin', {
+vatin_dto = vatin_sub_dto.clone('vatin', {
 })
 
-vatin_admin_dto = vatin_sub_dto.inherit('vatin_admin', {
+vatin_admin_dto = vatin_sub_dto.clone('vatin_admin', {
     'id': fields.Integer,
     'business_id': fields.Integer,
 

@@ -1,9 +1,7 @@
 from app.extensions import db  # noqa
 from ..model_parent import Business
-# from ...transaction_input import TransactionInput
-# from ...account import Account
 from sqlalchemy.ext.declarative import declared_attr
-from ...utils.ATs import tax_auditor_seller_firm_AT
+# from ...utils.ATs import tax_auditor_seller_firm_AT
 
 
 
@@ -30,18 +28,16 @@ class SellerFirm(Business):
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     accounting_firm_client_id = db.Column(db.String(120), default=None)
-    tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
+    # tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
 
 
     tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
+    transactions = db.relationship('Transaction', backref='seller_firm', lazy='joined', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
+
 
     @property
     def transaction_ready(self):
         return (len(self.items) > 0 and len(self.accounts) > 0)
-
-    # @property
-    # def transaction_inputs(self):
-    #     return TransactionInput.query.join(TransactionInput.accounts).join(Account.seller_firm).filter(Business.id == self.id).all()
 
     def __repr__(self):
         return '<SellerFirm: {} | Address: {}>'.format(self.name, self.address)

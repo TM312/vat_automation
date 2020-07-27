@@ -18,7 +18,6 @@ class DistanceSale(db.Model):  # type: ignore
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date)
 
-    platform_code = db.Column(db.String(32), db.ForeignKey('platform.code'), nullable=False)
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     arrival_country_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
     active = db.Column(db.Boolean, nullable=False)

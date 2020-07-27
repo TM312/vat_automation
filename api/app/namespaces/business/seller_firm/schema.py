@@ -10,7 +10,7 @@ from ...tax.vatin import vatin_sub_dto
 
 
 
-seller_firm_sub_dto = business_sub_dto.inherit('seller_firm_sub', {
+seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'claimed': fields.Boolean(readonly=True),
     'establishment_country_code': fields.String,
     'establishment_country': fields.String(attribute=lambda x: x.establishment_country.name),
@@ -23,7 +23,7 @@ seller_firm_sub_dto = business_sub_dto.inherit('seller_firm_sub', {
     # 'len_transaction_inputs': fields.Integer(attribute=lambda x: len(x.transaction_inputs), readonly=True),
 })
 
-seller_firm_dto = business_dto.inherit('seller_firm', {
+seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
     'items': fields.List(fields.Nested(item_sub_dto)),
     'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),
     'accounts': fields.List(fields.Nested(account_sub_dto)),
@@ -32,7 +32,8 @@ seller_firm_dto = business_dto.inherit('seller_firm', {
     # 'tax_records': fields.List(fields.Nested('app.namespaces.tax_record.tax_record_dto')),
 })
 
-seller_firm_admin_dto = business_admin_dto.inherit('seller_firm_admin', {
+seller_firm_admin_dto = seller_firm_dto.clone('seller_firm_admin', {
+    'id': fields.Integer(readonly=True),
     'accounting_firm_id': fields.String,
     'len_employees': fields.Integer(attribute=lambda x: len(x.employees), readonly=True),
 

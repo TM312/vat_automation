@@ -20,7 +20,7 @@ export const getters = {
     countItems: state => state.seller_firm.len_items, //!!! does this work?
     countVatNumbers: state => state.seller_firm.vat_numbers.length,
     //countTransactionInputsSellerFirm: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
-    publicId: state => state.seller_firm.public_id,
+    // publicId: state => state.seller_firm.public_id,
     // transactionInputs: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
     // transactions: state => state.seller_firm.accounts.map(account => account.transactions)
     accountTransactionInputs: state => channelCode => {

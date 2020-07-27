@@ -7,7 +7,6 @@ class DistanceSaleInterface(TypedDict, total=False):
     original_filename: str
     valid_from: date
     valid_to: date
-    platform_code: str
     seller_firm_id: int
     arrival_country_code: str
     status: bool

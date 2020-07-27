@@ -1,9 +1,6 @@
 <template>
-    <div>
-        <b-card border-variant="primary">
-            <h1>{{ greeting }}</h1>
-        </b-card>
-
+    <div class="my-5">
+        <h1>{{ greeting }}</h1>
     </div>
 </template>
 
