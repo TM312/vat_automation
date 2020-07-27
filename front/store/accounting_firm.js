@@ -50,6 +50,17 @@ export const actions = {
         }
     },
 
+    async get_by_id({ commit }, accounting_firm_id) {
+
+        const res = await this.$repositories.accounting_firm.get_by_id(accounting_firm_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_ACCOUNTING_FIRM', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
     async update({ commit }, accounting_firm_id, data_changes) {
         const res = await this.$repositories.accounting_firm.update(accounting_firm_id, data_changes)
         const { status, data } = res

@@ -17,7 +17,8 @@ class SellerFirm(Business):
     def employees(cls):
         'Employees column, if not present already.'
         # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
-        return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
+        # return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
+        return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_public_id==Business.public_id'))
 
     distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy='joined', cascade = 'all, delete-orphan')
     items = db.relationship('Item', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
