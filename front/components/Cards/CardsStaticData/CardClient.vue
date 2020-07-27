@@ -7,7 +7,7 @@
             <br>
             <b>Created On:</b> {{ seller_firm.created_on }} <br>
             <b>Created By:</b> {{ seller_firm.created_by }} <br>
-            <button-follow-seller-firm :sellerFirm="seller_firm" />
+            <!-- <button-follow-seller-firm :sellerFirm="seller_firm" /> -->
         </b-card-text>
     </b-card>
 </template>

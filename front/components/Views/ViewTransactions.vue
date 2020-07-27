@@ -1,16 +1,20 @@
 <template>
     <div>
-        <b-card v-if="transactions.length > 1" no-body>
+        <b-card
+            no-body
+            border-variant="primary"
+            header-bg-variant="primary"
+            header-text-variant="white"
+            >
             <b-tabs card>
                 <b-tab v-for="transaction in transactions" :key="transaction.public_id" :title="transaction.tax_treatment_code" lazy>
-                    <b-card title="tbd">{{ transaction }}
-
-                    </b-card>
+                    <card-transaction :transaction="transaction" />
                     <alert-transaction-input-notification
                         v-for="notification in transaction.notifications"
                         :key="notification.public_id"
                         :notification="notification"
-                        class="my-5"
+                        style="max-width: 50rem;"
+                        class="my-3"
                     />
                 </b-tab>
             </b-tabs>

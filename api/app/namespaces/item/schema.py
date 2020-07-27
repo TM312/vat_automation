@@ -21,7 +21,7 @@ item_sub_dto = Model('item_sub', {
     'unit_cost_price_net': fields.Float
 })
 
-item_dto = item_sub_dto.inherit('item', {
+item_dto = item_sub_dto.clone('item', {
     'id': fields.Integer(readonly=True),
     'seller_firm_id': fields.Integer
 })

@@ -7,6 +7,7 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     import { BIcon } from "bootstrap-vue";
 
     export default {
@@ -25,72 +26,80 @@
             return {
                 progress: 0,
                 progressBarStyle: "success",
-                buttonDisabled: false
+                buttonDisabled: false,
+                // urlEndpointUpload: null
+
             };
         },
         computed: {
-            sellerFirmPublicId() {
-                return this.$store.getters["seller_firm/publicId"];
-            },
+            ...mapState({
+                sellerFirmPublicId: state => state.seller_firm.seller_firm.public_id
+            }),
             urlEndpointUpload() {
                 return `/business/seller_firm/${this.sellerFirmPublicId}/upload`
-
             }
         },
 
         methods: {
             async uploadFiles() {
-                this.buttonDisabled = true
+                if (!this.buttonDisabled && this.urlEndpointUpload !== null) {
+                    this.buttonDisabled = true
 
-                // FormData is a standard JS object
-                const data = new FormData();
-                for (var i = 0; i < this.files.length; i++) {
-                    let file = this.files[i];
-                    data.append("files", file);
+                    // FormData is a standard JS object
+                    const data = new FormData();
+                    for (var i = 0; i < this.files.length; i++) {
+                        let file = this.files[i];
+                        data.append("files", file);
+                    }
+                    // https://github.com/axios/axios/blob/master/examples/upload/index.html
+                    var config = {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        },
+                        onUploadProgress: function(progressEvent) {
+                            this.progress = parseInt(
+                                Math.round(
+                                    (progressEvent.loaded / progressEvent.total) * 100
+                                )
+                            );
+                        }.bind(this)
+                    };
+
+                    await this.$axios
+                        .post(this.urlEndpointUpload, data, config)
+
+                        .then(response => {
+                            let response_object = response.data;
+
+                            if (response_object.status == "success") {
+
+                                this.$toast.success(response_object.message, {
+                                    duration: 5000
+                                });
+
+                                this.$emit('resetFileList')
+
+                            } else {
+                                this.$toast.error(response_object.message, { duration: 5000 });
+                            }
+                        })
+
+                        .catch(err => {
+                            console.log(err);
+                            this.$toast.error(
+                                "An error occured. Please make sure you have tried to submit valid data.",
+                                { duration: 5000 }
+                            );
+                            this.progressBarStyle = "danger";
+                        });
+
+                        this.buttonDisabled = false
+                } else {
+                    this.$toast.error(
+                        "The Seller Firm has not yet been identified.",
+                        { duration: 5000 }
+                    );
                 }
-                // https://github.com/axios/axios/blob/master/examples/upload/index.html
-                var config = {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    },
-                    onUploadProgress: function(progressEvent) {
-                        this.progress = parseInt(
-                            Math.round(
-                                (progressEvent.loaded / progressEvent.total) * 100
-                            )
-                        );
-                    }.bind(this)
-                };
-
-                await this.$axios
-                    .post(this.urlEndpointUpload, data, config)
-
-                    .then(response => {
-                        let response_object = response.data;
-
-                        if (response_object.status == "success") {
-
-                            this.$toast.success(response_object.message, {
-                                duration: 5000
-                            });
-
-                            this.$emit('resetFileList')
-
-                        } else {
-                            this.$toast.error(response_object.message, { duration: 5000 });
-                        }
-                    })
-
-                    .catch(err => {
-                        console.log(err);
-                        this.$toast.error(
-                            "An error occured. Please make sure you have tried to submit valid data.",
-                            { duration: 5000 }
-                        );
-                        this.progressBarStyle = "danger";
-                    });
-
-                    this.buttonDisabled = false
 
             }
         }

@@ -12,11 +12,11 @@ notification_dto = Model('notification', {
     'n_type': fields.String(readonly=True)
 })
 
-transaction_notification_dto = notification_dto.inherit('transaction_notification', {
+transaction_notification_dto = notification_dto.clone('transaction_notification', {
     'transaction_id': fields.Integer(readonly=True),
     'original_filename': fields.String(readonly=True),
 })
 
-transaction_notification_admin_dto = transaction_notification_dto.inherit('transaction_notification', {
+transaction_notification_admin_dto = transaction_notification_dto.clone('transaction_notification', {
     'id': fields.Integer(readonly=True)
 })

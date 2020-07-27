@@ -33,12 +33,12 @@ class TokenService:
     @staticmethod
     def login_user(user_data: UserInterface) -> Dict:
         # fetch the user data
-        user = User.query.filter_by(email=user_data.get('email')).first()
+        user = UserService.get_by_email(user_data.get('email'))
         if user and user.check_password(user_data.get('password')):
             token_lifespan = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
             auth_token = TokenService.encode_auth_token(public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
-                UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
+                # UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
                 response_object = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
@@ -52,7 +52,7 @@ class TokenService:
     def current_user(auth_token: TokenInterface) -> User:
         payload = TokenService.decode_auth_token(auth_token)
         if not isinstance(payload, str):
-            user = User.query.filter_by(public_id = payload['sub']).first()
+            user = UserService.get_by_public_id(payload['sub'])
             if user:
                 return user
             else:
@@ -66,7 +66,7 @@ class TokenService:
 
         user = g.user
 
-        UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
+        # UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
 
         # actual logout
         payload = TokenService.decode_auth_token(auth_token)

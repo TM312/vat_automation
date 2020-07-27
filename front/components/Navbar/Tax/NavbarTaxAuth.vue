@@ -8,8 +8,8 @@
             <b-navbar-nav>
                 <b-nav-item to="/tax/dashboard">Dashboard</b-nav-item>
                 <!-- ^integrate v-if for multiple user roles -->
-                <b-nav-item to="/tax/clients" :disabled="!accounting_firm">Clients</b-nav-item>
-                <b-nav-item to="/tax/tax_records" :disabled="!accounting_firm">Tax Records</b-nav-item>
+                <b-nav-item to="/tax/clients" :disabled="accounting_firm.length === 0">Clients</b-nav-item>
+                <b-nav-item to="/tax/tax_records" :disabled="accounting_firm.length === 0">Tax Records</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->

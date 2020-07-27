@@ -12,8 +12,8 @@ business_sub_dto = Model('business_sub', {
     'len_vat_numbers': fields.String(attribute=lambda x: len(x.vat_numbers), readonly=True),
 })
 
-business_dto = business_sub_dto.inherit('business', {})
+business_dto = business_sub_dto.clone('business', {})
 
-business_admin_dto = business_dto.inherit('business_admin', {
+business_admin_dto = business_dto.clone('business_admin', {
     'id': fields.Integer(readonly=True)
 })

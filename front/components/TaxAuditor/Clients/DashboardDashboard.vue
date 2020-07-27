@@ -2,11 +2,11 @@
     <div>
         <b-row class="mb-3" cols="1" cols-md="2" cols-lg="4">
             <b-col>
-                <b-card
+                <!-- <b-card
                     :title="this.$auth.user.len_key_accounts"
                     sub-title="Total Number of Key Accounts"
                     border-variant="info"
-                ></b-card>
+                ></b-card> -->
             </b-col>
             <b-col>
                 <p>cards</p>

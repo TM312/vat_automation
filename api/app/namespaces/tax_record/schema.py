@@ -11,7 +11,7 @@ tax_record_dto = Model('tax_record', {
     'filename': fields.String
 })
 
-tax_record_dto_admin = tax_record_dto.inherit('tax_record_admin', {
+tax_record_dto_admin = tax_record_dto.clone('tax_record_admin', {
     'id': fields.Integer(readonly=True),
     'active': fields.Boolean(readonly=True)
 })

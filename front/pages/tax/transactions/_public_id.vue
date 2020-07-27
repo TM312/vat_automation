@@ -2,6 +2,10 @@
     <div>
         <container-route-back />
         <b-container fluid>
+             <b-alert :show="!$fetchState.pending && transactionInput.length != 0">
+                <p v-if="transactionInput.processed">The transaction has been successfully processed on {{ transactionInput.processed_on }} </p>
+                <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: { buttonvalidate} </p>
+            </b-alert>
             <card-transaction-input class="mb-5"/>
             <hr>
             <h2>Tax Related Processes</h2>
