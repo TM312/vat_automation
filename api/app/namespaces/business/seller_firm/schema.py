@@ -17,10 +17,10 @@ seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
     'accounting_firm_client_id': fields.String,
     'transaction_ready': fields.Boolean(readonly=True),
-    'len_items': fields.Integer(attribute=lambda x: len(x.items), readonly=True),
-    'len_distance_sales': fields.Integer(attribute=lambda x: len(x.distance_sales), readonly=True),
-    'len_accounts': fields.Integer(attribute=lambda x: len(x.accounts), readonly=True),
-    # 'len_transaction_inputs': fields.Integer(attribute=lambda x: len(x.transaction_inputs), readonly=True),
+    'len_items': fields.Integer,
+    'len_distance_sales': fields.Integer,
+    'len_accounts': fields.Integer,
+    'len_transactions': fields.Integer
 })
 
 seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
@@ -35,6 +35,6 @@ seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
 seller_firm_admin_dto = seller_firm_dto.clone('seller_firm_admin', {
     'id': fields.Integer(readonly=True),
     'accounting_firm_id': fields.String,
-    'len_employees': fields.Integer(attribute=lambda x: len(x.employees), readonly=True),
+    'len_employees': fields.Integer,
 
 })
