@@ -1,7 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
 from hashlib import md5
-from ..business.model_parent import Business
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import UUID

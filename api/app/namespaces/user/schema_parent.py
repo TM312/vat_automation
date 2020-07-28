@@ -12,8 +12,8 @@ user_sub_dto = Model('user_sub', {
     'name': fields.String,
     'initials': fields.String,
     'email': fields.String,
-    'employer_public_id': fields.String(attribute=lambda x: x.employer.public_id),
-    'employer_name': fields.String(attribute=lambda x: x.employer.name),
+    # 'employer_public_id': fields.String(attribute=lambda x: x.employer.public_id),
+    # 'employer_name': fields.String(attribute=lambda x: x.employer.name),
     'avatar_hash': fields.String(readonly=True),
     'location': fields.String(readonly=True),
     'u_type': fields.String(readonly=True)
