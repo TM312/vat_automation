@@ -160,6 +160,12 @@ class TransactionService:
         item_vat_temp = VatService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction, tax_date)
         item_tax_rate_type_code=item_vat_temp.tax_rate_type_code
 
+        print('transaction_input: ', transaction_input, flush=True)
+        print('item: ', item, flush=True)
+        print('account: ', account, flush=True)
+        print('item_tax_code_code:', item_tax_code_code, flush=True)
+        print('item_vat_temp:', item_vat_temp, flush=True)
+
         shipment_tax_rate_type_code = current_app.config['STANDARD_SERVICE_TAX_RATE_TYPE']
         shipment_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction, shipment_tax_rate_type_code, tax_date)
         gift_wrap_tax_rate_type_code = current_app.config['STANDARD_SERVICE_TAX_RATE_TYPE']

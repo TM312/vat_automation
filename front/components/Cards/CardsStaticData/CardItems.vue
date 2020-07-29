@@ -18,7 +18,16 @@
 
 
                 <div v-if="editMode===false">
-                    <b-table borderless :items="items" :fields="fields" hover></b-table>
+                    <b-table borderless :items="items" :fields="fields" hover>
+                        <template v-slot:cell(unit_cost_price_net)="data">
+                            {{ data.value }} {{ data.item.unit_cost_price_currency_code }}
+                        </template>
+
+                        <template v-slot:cell(weight_kg)="data">
+                            {{ data.value }} kg
+                        </template>
+
+                    </b-table>
                 </div>
 
                 <div v-else>
@@ -56,13 +65,23 @@
                     { key: "ean", label:"EAN", sortable: true },
                     { key: "asin", label:"ASIN", sortable: true },
                     { key: "tax_code_code", label:"Tax Code", sortable: true },
-                    { key: "weight_kg", sortable: true },
-                    { key: "unit_cost_price_net", sortable: true },
-                    { key: "unit_cost_price_currency_code", label: "Unit Cost Price Currency", sortable: true },
+                    {
+                        key: "weight_kg",
+                        label: "Weight",
+                        formatter: value => {
+                            return Number.parseFloat(value).toFixed(3)
+                        },
+                        sortable: true
+                    },
+                    {
+                        key: "unit_cost_price_net",
+                        sortable: true,
+                        formatter: value => {
+                            return Number.parseFloat(value).toFixed(2)
+                        },
+                    },
                     { key: "valid_from", sortable: true },
                     { key: "valid_to", sortable: true },
-                    { key: "created_on", sortable: true },
-                    { key: "created_by", sortable: true }
                 ]
             };
         },

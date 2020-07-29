@@ -4,6 +4,8 @@ from hashlib import md5
 
 from flask import current_app
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 from app.extensions import db, bcrypt
 
@@ -50,6 +52,14 @@ class User(db.Model):  # type: ignore
     @property
     def initials(self):
         return ''.join(name[0].upper() for name in self.name.split())
+
+    @hybrid_property
+    def employer_public_id(self):
+        return self.employer.public_id
+
+    @hybrid_property
+    def employer_name(self):
+        return self.employer.name
 
 
     @property

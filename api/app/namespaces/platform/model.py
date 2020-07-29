@@ -11,7 +11,5 @@ class Platform(db.Model):
     name = db.Column(db.String(32), unique=True)
     channels = db.relationship('Channel', backref='platform', lazy=True)
 
-    __mapper_args__ = {'polymorphic_on': code}
-
     def __repr__(self):
         return '<Platform: {} (code : {})>'.format(self.name, self.code)

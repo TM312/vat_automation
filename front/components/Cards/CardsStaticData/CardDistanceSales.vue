@@ -63,9 +63,7 @@
                     { key: "arrival_country", sortable: true },
                     { key: "valid_from", sortable: true },
                     { key: "valid_to", sortable: true },
-                    { key: "active", sortable: true },
-                    { key: "created_on", sortable: true },
-                    { key: "created_by", sortable: true }
+                    { key: "active", sortable: true }
                 ]
             };
         },

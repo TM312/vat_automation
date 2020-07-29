@@ -10,10 +10,14 @@ tax_auditor_sub_dto = user_sub_dto.clone('tax_auditor_sub', {
 
 
 tax_auditor_dto = tax_auditor_sub_dto.clone('tax_auditor', {
-    'password_hash': fields.String(readonly=True),
-    'password': fields.String,
-    # 'key_accounts': fields.List(fields.Nested(seller_firm_sub_dto)),
-    # 'len_key_accounts': fields.String(attribute=lambda x: len(x.key_accounts), readonly=True)
+    'confirmed': fields.Boolean(readonly=True),
+    'confirmed_on': fields.Date(readonly=True),
+    'email': fields.String,
+    'employer_public_id': fields.String,
+    'employer_name': fields.String,
+    'avatar_hash': fields.String(readonly=True),
+    'location': fields.String(readonly=True),
+    'u_type': fields.String(readonly=True)
 })
 
 

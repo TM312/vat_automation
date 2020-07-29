@@ -14,7 +14,6 @@ seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'claimed': fields.Boolean(readonly=True),
     'establishment_country_code': fields.String,
     'establishment_country': fields.String(attribute=lambda x: x.establishment_country.name),
-    'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
     'accounting_firm_client_id': fields.String,
     'transaction_ready': fields.Boolean(readonly=True),
     'len_items': fields.Integer,
@@ -24,6 +23,7 @@ seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
 })
 
 seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
+    'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
     'items': fields.List(fields.Nested(item_sub_dto)),
     'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),
     'accounts': fields.List(fields.Nested(account_sub_dto)),

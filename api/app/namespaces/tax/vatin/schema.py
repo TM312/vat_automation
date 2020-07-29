@@ -28,10 +28,10 @@ vatin_sub_dto = Model('vatin_sub', {
     'valid_from': fields.Date,
     'valid_to': fields.Date(readonly=True),
     'initial_tax_date': fields.Date,
-    'business_name': fields.String(attribute=lambda x: x.business.name)
 })
 
 vatin_dto = vatin_sub_dto.clone('vatin', {
+    'business_name': fields.String(attribute=lambda x: x.business.name)
 })
 
 vatin_admin_dto = vatin_sub_dto.clone('vatin_admin', {

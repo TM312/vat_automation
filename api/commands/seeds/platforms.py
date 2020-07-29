@@ -15,6 +15,7 @@ class PlatformSeedService:
         mfn = Channel.query.filter_by(code='MFN').first()
         afn = Channel.query.filter_by(code='AFN').first()
         amazon = Platform.query.filter_by(code='AMZ').first()
+
         if not isinstance(afn, Channel) or not isinstance(mfn, Channel) or not isinstance(amazon, Platform):
             raise
 
