@@ -30,11 +30,11 @@ class SellerFirm(Business):
         # Pass foreign_keys= as a Python executable string for lazy evaluation (https://stackoverflow.com/questions/54703652/sqlalchemy-multiple-relationships-between-tables)
         return Business.__table__.c.get('employees', db.relationship('Seller', backref='employer', primaryjoin='Seller.employer_id==Business.id'))
 
-    distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy='joined', cascade = 'all, delete-orphan')
-    items = db.relationship('Item', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
+    distance_sales = db.relationship('DistanceSale', backref='seller_firm', lazy='select', cascade = 'all, delete-orphan')
+    items = db.relationship('Item', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
 
     # IDs for supported platforms
-    accounts = db.relationship('Account', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
+    accounts = db.relationship('Account', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
 
     # Columns related to Accounting/Tax Service
     accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
@@ -42,8 +42,8 @@ class SellerFirm(Business):
     # tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
 
 
-    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='joined', cascade='all, delete-orphan')
-    transactions = db.relationship('Transaction', backref='seller_firm', lazy='joined', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
+    tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
+    transactions = db.relationship('Transaction', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
 
 
     # @hybrid_property
