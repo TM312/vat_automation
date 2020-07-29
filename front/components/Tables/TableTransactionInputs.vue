@@ -7,13 +7,18 @@
         ></b-card>
         <b-table v-else :fields="fields" :items="transaction_inputs" hover>
 
-            <template v-slot:cell(activity_id)="data">
-                <nuxt-link :to="`/tax/transactions/${data.item.public_id}`" >{{ data.value }}</nuxt-link>
+            <template v-slot:cell(transaction_type_public_code)="data">
+                <nuxt-link :to="`/tax/transactions/${data.item.public_id}`">{{ data.value }}</nuxt-link>
             </template>
 
             <template v-slot:cell(processed)="data">
                 <b-button size="sm" variant="outline-primary">Validate</b-button><br>
                 {{ data.value }}
+            </template>
+
+            <template v-slot:cell(sale_total_value_gross)="data">
+                <span v-if="data.value === null"></span>
+                <span v-else>{{ data.value }} {{ data.item.currency_code }}</span>
             </template>
 
         </b-table>
@@ -40,14 +45,6 @@ export default {
         return {
             fields: [
                 {
-                    key: 'activity_id',
-                    sortable: true,
-                },
-                {
-                    key: 'marketplace',
-                    sortable: true,
-                },
-                {
                     key: 'transaction_type_public_code',
                     label: 'Public Type',
                     sortable: true,
@@ -58,18 +55,20 @@ export default {
                     sortable: true,
                 },
                 {
+                    key: 'marketplace',
+                    sortable: true,
+                },
+                {
                     key: 'item_quantity',
                     label: 'Quantity',
                     sortable: true,
                 },
-                {
+                 {
                     key: 'sale_total_value_gross',
-                    label: 'Total Value (gross)',
-                    sortable: true,
-                },
-                {
-                    key: 'currency_code',
-                    label: 'Currency',
+                    label: 'Total Value Gross',
+                    formatter: value => {
+                            return value ? Number.parseFloat(value).toFixed(2) : null
+                    },
                     sortable: true,
                 },
                 {

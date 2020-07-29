@@ -25,6 +25,16 @@
                             {{ data.item.country_code }} - {{ data.item.number }}
                         </template>
 
+                        <template v-slot:cell(valid)="data">
+                            <b-icon v-if="data.value === true" icon="check-circle" variant="success"></b-icon>
+                            <span v-else-if="data.value == undefined" icon="check-circle" variant="success">
+                                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
+                                {{ data.value }}
+                            </span>
+                            <b-icon v-else-if="data.value === false" icon="x-circle" variant="danger"></b-icon>
+
+                        </template>
+
                     </b-table>
                 </div>
 

@@ -28,7 +28,9 @@
                 <b>Name</b> {{ transactionInput.item_name }} <br>
                 <b>Quantity:</b> {{ transactionInput.item_quantity }}<br>
                 <b>Manufacture Country:</b> {{ transactionInput.item_manufacture_country }} <br>
-                <b>Weight:</b> {{ transactionInput.item_weight_kg }}kg <i>(Total:{{ transactionInput.item_weight_kg_total }}kg</i>
+                <b>Weight:</b>
+                    {{ Number.parseFloat(transactionInput.item_weight_kg).toFixed(3) }}kg
+                    | Total:{{ Number.parseFloat(transactionInput.item_weight_kg_total).toFixed(3) }} kg
             </b-card>
 
         </b-card-group>
@@ -118,7 +120,7 @@ export default {
                 },
                 {
                     key: 'price_gross',
-                    label: `Price Gross (in ${ this.transactionInput.currency_code})`,
+                    label: `Price Gross (in ${ this.transactionInput.currency_code })`,
                     sortable: false,
                 },
                 {

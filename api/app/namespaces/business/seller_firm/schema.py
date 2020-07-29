@@ -23,6 +23,9 @@ seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
 })
 
 seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
+    'created_by': fields.String(attribute=lambda x: x.creator.name),
+    'created_on': fields.Date(readonly=True),
+
     'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
     'items': fields.List(fields.Nested(item_sub_dto)),
     'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),

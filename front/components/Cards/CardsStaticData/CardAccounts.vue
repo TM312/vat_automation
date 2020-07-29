@@ -54,9 +54,7 @@
 
                 fields: [
                     { key: 'channel_code', sortable: true },
-                    { key: 'given_id', label: "Platform ID", sortable: false },
-                    { key: 'created_on', sortable: true },
-                    { key: 'created_by', sortable: true }
+                    { key: 'given_id', label: "Platform ID", sortable: false }
                 ],
             };
         },

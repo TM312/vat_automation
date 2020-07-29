@@ -5,7 +5,6 @@ from ..transaction import transaction_dto
 
 transaction_input_sub_dto = Model('transaction_input_sub', {
     'public_id': fields.String(readonly=True),
-    'activity_id': fields.String,
     'processed': fields.Boolean,
     'channel_code': fields.String,
     'marketplace': fields.String,
@@ -22,6 +21,7 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
 
 
 transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
+    'activity_id': fields.String,
     'created_on': fields.DateTime,
     'created_by': fields.String(attribute=lambda x: x.uploader.name),
     'original_filename': fields.String,

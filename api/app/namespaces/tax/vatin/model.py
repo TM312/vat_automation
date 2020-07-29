@@ -37,7 +37,7 @@ class VATIN(db.Model):
 
     @hybrid_property
     def valid_to(self):
-        return self.valid_from + timedelta(days=30) #!!! timedelta needs to be updated manually
+        return self.request_date + timedelta(days=30) #!!! timedelta needs to be updated manually
 
 
     def __str__(self):
