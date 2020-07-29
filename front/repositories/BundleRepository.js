@@ -9,7 +9,6 @@ export default ($axios) => ({
     },
 
     get_by_public_id(bundle_public_id) {
-        console.log('in repository: bundle_public_id ->', bundle_public_id)
         return $axios.get(`${resource}/${bundle_public_id}`)
     },
 

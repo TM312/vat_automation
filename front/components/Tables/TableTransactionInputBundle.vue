@@ -8,15 +8,25 @@
                 </div>
             </template>
 
-            <template v-slot:cell(activity_id)="data">
-
-                <nuxt-link v-if="data.item.public_id != $route.params.public_id" :to="`/tax/transactions/${data.item.public_id}`" >{{ data.value }}</nuxt-link>
+            <template v-slot:cell(transaction_type_public_code)="data">
+                <nuxt-link
+                    v-if="data.item.public_id != $route.params.public_id"
+                    :to="`/tax/transactions/${data.item.public_id}`"
+                >{{ data.value }}</nuxt-link>
                 <span v-else>{{ data.value }}</span>
             </template>
 
             <template v-slot:cell(processed)="data">
-                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
-                {{ data.value }}
+                <b-icon v-if="data.value" icon="check-circle" variant="success"></b-icon>
+                <span v-else>
+                    <b-button size="sm" variant="outline-primary">Validate</b-button><br>
+                    {{ data.value }}
+                </span>
+            </template>
+
+            <template v-slot:cell(sale_total_value_gross)="data">
+                <span v-if="data.value === null"></span>
+                <span v-else>{{ data.value }} {{ data.item.currency_code }}</span>
             </template>
 
         </b-table>
@@ -40,14 +50,6 @@ export default {
         return {
             fields: [
                 {
-                    key: 'activity_id',
-                    sortable: true,
-                },
-                {
-                    key: 'marketplace',
-                    sortable: true,
-                },
-                {
                     key: 'transaction_type_public_code',
                     label: 'Public Type',
                     sortable: true,
@@ -58,18 +60,20 @@ export default {
                     sortable: true,
                 },
                 {
+                    key: 'marketplace',
+                    sortable: true,
+                },
+                {
                     key: 'item_quantity',
                     label: 'Quantity',
                     sortable: true,
                 },
                 {
                     key: 'sale_total_value_gross',
-                    label: 'Total Value (gross)',
-                    sortable: true,
-                },
-                {
-                    key: 'currency_code',
-                    label: 'Currency',
+                    label: 'Total Value Gross',
+                    formatter: value => {
+                            return value ? Number.parseFloat(value).toFixed(2) : null
+                    },
                     sortable: true,
                 },
                 {
@@ -102,7 +106,6 @@ export default {
 
      async fetch() {
             const { store } = this.$nuxt.context;
-            console.log('in component: this.bundlePublicId -> ', this.bundlePublicId)
             await store.dispatch("bundle/get_by_public_id", this.bundlePublicId);
         },
 

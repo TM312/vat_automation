@@ -21,12 +21,19 @@
 
                 <div v-if="editMode===false">
                     <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover>
-                         <template v-slot:table-busy>
+                        <template v-slot:table-busy>
                             <div class="text-center text-secondary my-2">
                                 <b-spinner class="align-middle"></b-spinner>
                                 <strong>Loading...</strong>
                             </div>
                         </template>
+
+                        <template v-slot:cell(active)="data">
+                            <b-icon v-if="data.value === true" icon="check-circle" variant="success"></b-icon>
+                            <b-icon v-else icon="x-circle" variant="danger"></b-icon>
+                        </template>
+
+
                     </b-table>
                 </div>
 
