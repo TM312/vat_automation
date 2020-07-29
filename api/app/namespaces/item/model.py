@@ -53,20 +53,20 @@ class Item(db.Model):  # type: ignore
 
     @hybrid_property
     def weight_kg(self):
-        return self.weight_g / 1000
+        return self.weight_g / 1000 if self.weight_g is not None else None
 
     @weight_kg.setter
     def weight_kg(self, value):
-        self.weight_g = int(value * 1000)
+        self.weight_g = int(value * 1000) if value is not None else None
 
 
     @hybrid_property
     def unit_cost_price_net(self):
-        return self._unit_cost_price_net / 100
+        return self._unit_cost_price_net / 100 if self._unit_cost_price_net is not None else None
 
     @unit_cost_price_net.setter
     def unit_cost_price_net(self, value):
-        self._unit_cost_price_net = int(value * 100)
+        self._unit_cost_price_net = int(value * 100) if value is not None else None
 
 
 

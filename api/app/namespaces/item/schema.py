@@ -3,11 +3,8 @@ from flask_restx import Model, fields
 
 item_sub_dto = Model('item_sub', {
     'public_id': fields.String(readonly=True),
-    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
-    'created_on': fields.Date,
     'original_filename': fields.String,
     'sku': fields.String,
-    'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'valid_from': fields.Date,
     'valid_to': fields.Date,
     'brand_name': fields.String,
@@ -22,6 +19,12 @@ item_sub_dto = Model('item_sub', {
 })
 
 item_dto = item_sub_dto.clone('item', {
+    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
+    'created_on': fields.Date,
+    'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
+})
+
+item_admin_dto = item_dto.clone('item_admin', {
     'id': fields.Integer(readonly=True),
     'seller_firm_id': fields.Integer
 })

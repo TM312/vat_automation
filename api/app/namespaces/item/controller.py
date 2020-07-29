@@ -6,14 +6,15 @@ from flask.wrappers import Response
 
 from .service import ItemService
 from . import Item
-from . import item_dto, item_sub_dto
+from . import item_dto, item_sub_dto, item_admin_dto
 
 from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Item", description="Item Related Operations")  # noqa
-ns.add_model(item_dto.name, item_dto)
 ns.add_model(item_sub_dto.name, item_sub_dto)
+ns.add_model(item_dto.name, item_dto)
+ns.add_model(item_admin_dto.name, item_admin_dto)
 
 
 @ns.route("/")

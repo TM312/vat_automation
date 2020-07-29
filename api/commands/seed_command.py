@@ -33,7 +33,6 @@ from .seeds.users import AdminSeedService, TaxAuditorSeedService
 countries = CountrySeedService.seed_countries()
 eu = EUSeedService.seed_eu()
 tax_codes = TaxCodesSeedService.seed_tax_codes()
-tax_rates = VatSeedService.seed_tax_rates()
 
 
 things_list = {
@@ -42,7 +41,6 @@ things_list = {
     'countries': [Country, countries],
     'tax_codes': [TaxCode, tax_codes],
     'tax_rate_types': [TaxRateType, tax_rate_types],
-    'tax_rates': [Vat, tax_rates],
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Platform, platforms],
@@ -112,15 +110,18 @@ class SeedCommand(Command):
             AdminSeedService.append_accounting_firm_to_admin()
 
             print('Appending Channels to Platforms...')
-            print('... mfn, afn to Amazon...')
             PlatformSeedService.append_channels_to_platform()
 
             db.session.commit()
 
-            print('Creating Exchange Rates...')
-            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+            print('Creating Vat Rates...')
+            response_object_vat_rates = VatSeedService.seed_tax_rates()
+            response_objects.append(response_object_vat_rates)
 
-            response_objects.append(response_object_exchange_rates)
+            # print('Creating Exchange Rates...')
+            # response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+
+            # response_objects.append(response_object_exchange_rates)
 
             for response_object in response_objects:
                 print("")

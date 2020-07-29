@@ -4,7 +4,7 @@ from flask import request
 
 from flask_restx import Namespace, Resource
 
-from . import tax_record_dto
+from . import tax_record_dto, tax_record_sub_dto, tax_record_dto_admin
 from . import TaxRecord
 from .service import TaxRecordService
 
@@ -12,6 +12,8 @@ from ..utils.decorators import login_required, employer_required, accepted_u_typ
 
 ns = Namespace("TaxRecord", description="Tax Record Related Operations")  # noqa
 ns.add_model(tax_record_dto.name, tax_record_dto)
+ns.add_model(tax_record_dto_admin.name, tax_record_dto_admin)
+ns.add_model(tax_record_sub_dto.name, tax_record_sub_dto)
 
 
 @ns.route("/")

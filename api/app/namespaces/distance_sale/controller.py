@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import DistanceSale
-from . import distance_sale_dto, distance_sale_sub_dto
+from . import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto
 from .service import DistanceSaleService
 
 
@@ -13,8 +13,9 @@ from ..utils.decorators import login_required, employer_required
 
 
 ns = Namespace("DistanceSale", description="DistanceSale Related Operations")  # noqa
-ns.add_model(distance_sale_dto.name, distance_sale_dto)
 ns.add_model(distance_sale_sub_dto.name, distance_sale_sub_dto)
+ns.add_model(distance_sale_dto.name, distance_sale_dto)
+ns.add_model(distance_sale_admin_dto.name, distance_sale_admin_dto)
 
 
 @ns.route("/")

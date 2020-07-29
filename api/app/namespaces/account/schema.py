@@ -6,15 +6,15 @@ from ..transaction_input import transaction_input_sub_dto
 account_sub_dto = Model('account_sub', {
     'public_id': fields.String(readonly=True),
     'given_id': fields.String,
-    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
-    'created_on': fields.Date(readonly=True),
-    'modified_at': fields.DateTime(readonly=True),
     'channel_code': fields.String,
 
 })
 
 
 account_dto = account_sub_dto.clone('account', {
+    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
+    'created_on': fields.Date(readonly=True),
+    'modified_at': fields.DateTime(readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'transaction_inputs': fields.List(fields.Nested(transaction_input_sub_dto)),
     # 'transactions': fields.List(fields.Nested(transaction_sub_dto))

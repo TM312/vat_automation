@@ -23,7 +23,7 @@
                 </b-row>
             </b-tab>
             <b-tab title="Colleagues">
-                <lazy-view-colleagues />
+                <lazy-table-colleagues-tax />
             </b-tab>
         </b-tabs>
     </b-container>

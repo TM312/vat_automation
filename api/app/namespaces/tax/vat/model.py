@@ -25,11 +25,12 @@ class Vat(db.Model):  # type: ignore
 
     @hybrid_property
     def rate(self):
-        return self._rate / 10_000
+        return self._rate / 10_000 if self._rate is not None else None
 
     @rate.setter
     def rate(self, value):
-        self._rate = int(value * 10_000)
+        print('setting rate with value: ', value, flush=True)
+        self._rate = int(value * 10_000) if value is not None else None
 
     def __repr__(self):
         return '<Vat: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)

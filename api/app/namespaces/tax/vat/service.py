@@ -1,6 +1,9 @@
 from datetime import date
 from typing import List
+
 from werkzeug.exceptions import NotFound
+from app.extensions import db
+
 
 from . import Vat
 from .interface import VatInterface

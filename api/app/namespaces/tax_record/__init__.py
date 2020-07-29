@@ -1,5 +1,5 @@
 from .model import TaxRecord
-from .schema import tax_record_dto, tax_record_dto_admin
+from .schema import tax_record_dto, tax_record_dto_admin, tax_record_sub_dto
 
 BASE_ROUTE = "tax_record"
 

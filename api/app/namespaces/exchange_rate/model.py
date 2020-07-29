@@ -17,11 +17,11 @@ class ExchangeRate(db.Model):
 
     @hybrid_property
     def rate(self):
-        return self._rate / 10_000
+        return self._rate / 10_000 if self._rate is not None else None
 
     @rate.setter
     def rate(self, value):
-        self._rate = int(value * 10_000)
+        self._rate = int(value * 10_000) if value is not None else None
 
 
 
