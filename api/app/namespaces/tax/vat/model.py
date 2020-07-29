@@ -1,6 +1,8 @@
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 from app.extensions import db
 
@@ -19,7 +21,15 @@ class Vat(db.Model):  # type: ignore
     tax_code_code = db.Column(db.String(40), db.ForeignKey('tax_code.code'))
     tax_rate_type_code = db.Column(db.ForeignKey('tax_rate_type.code'), nullable = False)
 
-    rate = db.Column(db.Numeric(scale=4))
+    _rate = db.Column(db.Integer)
+
+    @hybrid_property
+    def rate(self):
+        return self._rate / 10_000
+
+    @rate.setter
+    def rate(self, value):
+        self._rate = int(value * 10_000)
 
     def __repr__(self):
         return '<Vat: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)

@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.extensions import db  # noqa
 
@@ -12,7 +13,15 @@ class ExchangeRate(db.Model):
     base = db.Column(db.String(32), db.ForeignKey('currency.code'), nullable=False)
     target = db.Column(db.String(32),  db.ForeignKey('currency.code'), nullable=False)
 
-    rate = db.Column(db.Numeric(scale=5), nullable=False)
+    _rate = db.Column(db.Integer, nullable=False)
+
+    @hybrid_property
+    def rate(self):
+        return self._rate / 10_000
+
+    @rate.setter
+    def rate(self, value):
+        self._rate = int(value * 10_000)
 
 
 

@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List
 from datetime import datetime, timedelta, date
 import pandas as pd
-from decimal import Decimal
 
 from flask import current_app
 from werkzeug.utils import secure_filename
@@ -547,13 +546,13 @@ class TransactionService:
         if tax_treatment_code == 'EXPORT' or tax_treatment_code == 'INTRA_COMMUNITY_SALE' or tax_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE' or tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
             calculated_vat_rate=float(0)
 
-        elif isinstance(kwargs.get('calculated_vat_rate'), (Decimal, int, float, complex)) and not isinstance(kwargs.get('calculated_vat_rate'), bool):
+        elif isinstance(kwargs.get('calculated_vat_rate'), (int, float, complex)) and not isinstance(kwargs.get('calculated_vat_rate'), bool):
             calculated_vat_rate=kwargs['calculated_vat_rate']
 
         else:
             raise
 
-        if isinstance(kwargs.get('reference_vat_rate'), (Decimal, int, float, complex)) and not isinstance(kwargs.get('reference_vat_rate'), bool):
+        if isinstance(kwargs.get('reference_vat_rate'), (int, float, complex)) and not isinstance(kwargs.get('reference_vat_rate'), bool):
             # print('Check reference_vat_rate float', flush=True)
             reference_vat_rate=kwargs['reference_vat_rate']
             if calculated_vat_rate != reference_vat_rate:
@@ -695,7 +694,7 @@ class TransactionService:
 
 
     @staticmethod
-    def get_invoice_amount(total_value: float, invoice_exchange_rate: Decimal) -> float:
+    def get_invoice_amount(total_value: float, invoice_exchange_rate: float) -> float:
         invoice_amount = float(total_value) * float(invoice_exchange_rate)
         return invoice_amount
 
@@ -741,7 +740,7 @@ class TransactionService:
 
 
     @staticmethod
-    def get_price_net(item: Item, price_gross: float, price_tax_rate: Decimal, transaction_type: TransactionType, price_type: str) -> float:
+    def get_price_net(item: Item, price_gross: float, price_tax_rate: float, transaction_type: TransactionType, price_type: str) -> float:
         if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             if price_type=='item':
                 price_net = float(item.unit_cost_price_net)
@@ -755,7 +754,7 @@ class TransactionService:
 
 
     @staticmethod
-    def get_price_vat(price_gross: float, price_tax_rate: Decimal, transaction_type: TransactionType) -> float:
+    def get_price_vat(price_gross: float, price_tax_rate: float, transaction_type: TransactionType) -> float:
         if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             price_vat = float(0)
 
