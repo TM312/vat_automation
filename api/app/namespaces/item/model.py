@@ -3,6 +3,8 @@ from uuid import uuid4
 
 from app.extensions import db
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 
 class Item(db.Model):  # type: ignore
@@ -28,7 +30,7 @@ class Item(db.Model):  # type: ignore
     # height_mm = db.Column(db.Integer, nullable=False)
     # volume_m3 = db.Column(db.Float(precision=28), nullable=False)
     # volume_f3 = db.Column(db.Float(precision=28), nullable=False)
-    weight_kg = db.Column(db.Numeric(scale=4))
+    weight_g = db.Column(db.Integer)
     # storage_size = db.Column(db.String(32), nullable=False)
     # storage_media_type = db.Column(db.String(32), nullable=False)
     # storage_category = db.Column(db.String(32), nullable=False)
@@ -39,7 +41,7 @@ class Item(db.Model):  # type: ignore
     # item_purchase_price_net = db.Column(db.Float(precision=28))
 
     unit_cost_price_currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
-    unit_cost_price_net = db.Column(db.Numeric(scale=2))
+    _unit_cost_price_net = db.Column(db.Integer)
 
     transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
     transactions = db.relationship('Transaction', backref='item', lazy=True)
@@ -49,7 +51,26 @@ class Item(db.Model):  # type: ignore
         super().__init__(**kwargs)
         #self.item_volume_m3 = (self.item_length_mm * self.item_width_mm * self.item_height_mm) / (1000**3)
 
-    def __repr__(self):
+    @hybrid_property
+    def weight_kg(self):
+        return self.weight_g / 1000
+
+    @weight_kg.setter
+    def weight_kg(self, value):
+        self.weight_g = int(value * 1000)
+
+
+    @hybrid_property
+    def unit_cost_price_net(self):
+        return self._unit_cost_price_net / 100
+
+    @unit_cost_price_net.setter
+    def unit_cost_price_net(self, value):
+        self._unit_cost_price_net = int(value * 100)
+
+
+
+   def __repr__(self):
         return '<Item: Seller_id: {} – SKU: {} – validity: {}-{}>'.format(self.seller_firm_id, self.sku, self.valid_from, self.valid_to)
 
     def update(self, data_changes):

@@ -30,39 +30,39 @@ class TransactionInterface(TypedDict, total=False):
     item_tax_rate_type_code: str
     shipment_tax_rate_type_code = str
     gift_wrap_tax_rate_type_code = str
-    item_price_net: Union[float, int, complex, Decimal]
-    item_price_discount_net: Union[float, int, complex, Decimal]
-    item_price_total_net: Union[float, int, complex, Decimal]
-    shipment_price_net: Union[float, int, complex, Decimal]
-    shipment_price_discount_net: Union[float, int, complex, Decimal]
-    shipment_price_total_net: Union[float, int, complex, Decimal]
-    gift_wrap_price_net: Union[float, int, complex, Decimal]
-    gift_wrap_price_discount_net: Union[float, int, complex, Decimal]
-    gift_wrap_price_total_net: Union[float, int, complex, Decimal]
-    item_price_vat_rate: Union[float, int, complex, Decimal]
-    item_price_vat: Union[float, int, complex, Decimal]
-    item_price_discount_vat: Union[float, int, complex, Decimal]
-    item_price_total_vat: Union[float, int, complex, Decimal]
-    shipment_price_vat_rate: Union[float, int, complex, Decimal]
-    shipment_price_vat: Union[float, int, complex, Decimal]
-    shipment_price_discount_vat: Union[float, int, complex, Decimal]
-    shipment_price_total_vat: Union[float, int, complex, Decimal]
-    gift_wrap_price_vat_rate: Union[float, int, complex, Decimal]
-    gift_wrap_price_vat: Union[float, int, complex, Decimal]
-    gift_wrap_price_discount_vat: Union[float, int, complex, Decimal]
-    gift_wrap_price_total_vat: Union[float, int, complex, Decimal]
-    total_value_net: Union[float, int, complex, Decimal]
-    total_value_vat: Union[float, int, complex, Decimal]
-    total_value_gross: Union[float, int, complex, Decimal]
+    item_price_net: float
+    item_price_discount_net: float
+    item_price_total_net: float
+    shipment_price_net: float
+    shipment_price_discount_net: float
+    shipment_price_total_net: float
+    gift_wrap_price_net: float
+    gift_wrap_price_discount_net: float
+    gift_wrap_price_total_net: float
+    item_price_vat_rate: float
+    item_price_vat: float
+    item_price_discount_vat: float
+    item_price_total_vat: float
+    shipment_price_vat_rate: float
+    shipment_price_vat: float
+    shipment_price_discount_vat: float
+    shipment_price_total_vat: float
+    gift_wrap_price_vat_rate: float
+    gift_wrap_price_vat: float
+    gift_wrap_price_discount_vat: float
+    gift_wrap_price_total_vat: float
+    total_value_net: float
+    total_value_vat: float
+    total_value_gross: float
     transaction_currency_code: str
     invoice_currency_code: str
     invoice_exchange_rate_date: date
-    invoice_exchange_rate: Union[float, int, complex, Decimal]
-    invoice_amount_net: Union[float, int, complex, Decimal]
-    invoice_amount_vat: Union[float, int, complex, Decimal]
-    invoice_amount_gross: Union[float, int, complex, Decimal]
-    vat_rate_reverse_charge: Union[float, int, complex, Decimal]
-    invoice_amount_vat_reverse_charge: Union[float, int, complex, Decimal]
+    invoice_exchange_rate: float
+    invoice_amount_net: float
+    invoice_amount_vat: float
+    invoice_amount_gross: float
+    vat_rate_reverse_charge: float
+    invoice_amount_vat_reverse_charge: float
     arrival_seller_vatin_id: int
     departure_seller_vatin_id: int
     seller_vatin_id: int

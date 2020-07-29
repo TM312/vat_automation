@@ -3,6 +3,8 @@ from uuid import uuid4
 
 from app.extensions import db
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 
 class TransactionInput(db.Model):
@@ -37,19 +39,19 @@ class TransactionInput(db.Model):
     item_name = db.Column(db.String(128))
     item_manufacture_country = db.Column(db.String(128))
     item_quantity = db.Column(db.Integer)
-    item_weight_kg = db.Column(db.Numeric(scale=4))
-    item_weight_kg_total = db.Column(db.Numeric(scale=4))
+    item_weight_g = db.Column(db.Integer)
+    item_weight_g_total = db.Column(db.Integer)
 
-    item_price_discount_gross = db.Column(db.Numeric(scale=2))
-    item_price_gross = db.Column(db.Numeric(scale=2))
-    item_price_total_gross = db.Column(db.Numeric(scale=2))
-    shipment_price_discount_gross = db.Column(db.Numeric(scale=2))
-    shipment_price_gross = db.Column(db.Numeric(scale=2))
-    shipment_price_total_gross = db.Column(db.Numeric(scale=2))
-    sale_total_value_gross = db.Column(db.Numeric(scale=2))
-    gift_wrap_price_discount_gross = db.Column(db.Numeric(scale=2))
-    gift_wrap_price_gross = db.Column(db.Numeric(scale=2))
-    gift_wrap_price_total_gross = db.Column(db.Numeric(scale=2))
+    _item_price_discount_gross = db.Column(db.Integer)
+    _item_price_gross = db.Column(db.Integer)
+    _item_price_total_gross = db.Column(db.Integer)
+    _shipment_price_discount_gross = db.Column(db.Integer)
+    _shipment_price_gross = db.Column(db.Integer)
+    _shipment_price_total_gross = db.Column(db.Integer)
+    _sale_total_value_gross = db.Column(db.Integer)
+    _gift_wrap_price_discount_gross = db.Column(db.Integer)
+    _gift_wrap_price_gross = db.Column(db.Integer)
+    _gift_wrap_price_total_gross = db.Column(db.Integer)
     currency_code = db.Column(db.String(8), db.ForeignKey('currency.code'))
     departure_country_code = db.Column(db.String(8), db.ForeignKey('country.code'))
     departure_postal_code = db.Column(db.String(24))
@@ -73,31 +75,31 @@ class TransactionInput(db.Model):
     supplier_name = db.Column(db.String(128))
 
     check_tax_calculation_date = db.Column(db.Date)
-    check_unit_cost_price_net = db.Column(db.Numeric(scale=2))
+    _check_unit_cost_price_net = db.Column(db.Integer)
 
-    check_item_price_discount_net = db.Column(db.Numeric(scale=2))
-    check_item_price_discount_vat = db.Column(db.Numeric(scale=2))
-    check_item_price_net = db.Column(db.Numeric(scale=2))
-    check_item_price_vat = db.Column(db.Numeric(scale=2))
-    check_item_price_total_net = db.Column(db.Numeric(scale=2))
-    check_item_price_total_vat = db.Column(db.Numeric(scale=2))
-    check_item_price_vat_rate = db.Column(db.Numeric(scale=5))
-    check_shipment_price_discount_net = db.Column(db.Numeric(scale=2))
-    check_shipment_price_discount_vat = db.Column(db.Numeric(scale=2))
-    check_shipment_price_net = db.Column(db.Numeric(scale=2))
-    check_shipment_price_vat = db.Column(db.Numeric(scale=2))
-    check_shipment_price_total_net = db.Column(db.Numeric(scale=2))
-    check_shipment_price_total_vat = db.Column(db.Numeric(scale=2))
-    check_shipment_price_vat_rate = db.Column(db.Numeric(scale=5))
-    check_sale_total_value_net = db.Column(db.Numeric(scale=2))
-    check_sale_total_value_vat = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_discount_net = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_discount_vat = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_net = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_vat = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_total_net = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_total_vat = db.Column(db.Numeric(scale=2))
-    check_gift_wrap_price_tax_rate = db.Column(db.Numeric(scale=5))
+    _check_item_price_discount_net = db.Column(db.Integer)
+    _check_item_price_discount_vat = db.Column(db.Integer)
+    _check_item_price_net = db.Column(db.Integer)
+    _check_item_price_vat = db.Column(db.Integer)
+    _check_item_price_total_net = db.Column(db.Integer)
+    _check_item_price_total_vat = db.Column(db.Integer)
+    _check_item_price_vat_rate = db.Column(db.Integer)
+    _check_shipment_price_discount_net = db.Column(db.Integer)
+    _check_shipment_price_discount_vat = db.Column(db.Integer)
+    _check_shipment_price_net = db.Column(db.Integer)
+    _check_shipment_price_vat = db.Column(db.Integer)
+    _check_shipment_price_total_net = db.Column(db.Integer)
+    _check_shipment_price_total_vat = db.Column(db.Integer)
+    _check_shipment_price_vat_rate = db.Column(db.Integer)
+    _check_sale_total_value_net = db.Column(db.Integer)
+    _check_sale_total_value_vat = db.Column(db.Integer)
+    _check_gift_wrap_price_discount_net = db.Column(db.Integer)
+    _check_gift_wrap_price_discount_vat = db.Column(db.Integer)
+    _check_gift_wrap_price_net = db.Column(db.Integer)
+    _check_gift_wrap_price_vat = db.Column(db.Integer)
+    _check_gift_wrap_price_total_net = db.Column(db.Integer)
+    _check_gift_wrap_price_total_vat = db.Column(db.Integer)
+    _check_gift_wrap_price_tax_rate = db.Column(db.Integer)
     check_item_tax_code_code = db.Column(db.String(8))
     check_departure_seller_vat_country_code = db.Column(db.String(8))
     check_departure_seller_vat_number = db.Column(db.String(24))
@@ -108,11 +110,363 @@ class TransactionInput(db.Model):
     check_tax_calculation_imputation_country = db.Column(db.String(24))
     check_tax_jurisdiction = db.Column(db.String(24))
     check_tax_jurisdiction_level = db.Column(db.String(24))
-    check_invoice_amount_vat = db.Column(db.Numeric(scale=2))
+    _check_invoice_amount_vat = db.Column(db.Integer)
     check_invoice_currency_code = db.Column(db.String(8))
-    check_invoice_exchange_rate = db.Column(db.Numeric(scale=5))
+    _check_invoice_exchange_rate = db.Column(db.Integer)
     check_invoice_exchange_rate_date = db.Column(db.Date)
     check_export = db.Column(db.Boolean)
+
+    #weights
+    @hybrid_property
+    def item_weight_kg(self):
+        return self.item_weight_g / 1000
+
+    @item_weight_kg.setter
+    def item_weight_kg(self, value):
+        self.item_weight_g = int(value * 1000)
+
+    @hybrid_property
+    def item_weight_kg_total(self):
+        return self.item_weight_g_total / 1000
+
+    @item_weight_kg_total.setter
+    def item_weight_kg_total(self, value):
+        self.item_weight_g_total = int(value * 1000)
+
+
+    #cent values
+    @hybrid_property
+    def item_price_discount_gross(self):
+        return self._item_price_discount_gross / 100
+
+    @item_price_discount_gross.setter
+    def item_price_discount_gross(self, value):
+        self._item_price_discount_gross = int(value * 100)
+
+    @hybrid_property
+    def item_price_gross(self):
+        return self._item_price_gross / 100
+
+    @item_price_gross.setter
+    def item_price_gross(self, value):
+        self._item_price_gross = int(value * 100)
+
+    @hybrid_property
+    def item_price_total_gross(self):
+        return self._item_price_total_gross / 100
+
+    @item_price_total_gross.setter
+    def item_price_total_gross(self, value):
+        self._item_price_total_gross = int(value * 100)
+
+    @hybrid_property
+    def shipment_price_discount_gross(self):
+        return self._shipment_price_discount_gross / 100
+
+    @shipment_price_discount_gross.setter
+    def shipment_price_discount_gross(self, value):
+        self._shipment_price_discount_gross = int(value * 100)
+
+    @hybrid_property
+    def shipment_price_gross(self):
+        return self._shipment_price_gross / 100
+
+    @shipment_price_gross.setter
+    def shipment_price_gross(self, value):
+        self._shipment_price_gross = int(value * 100)
+
+    @hybrid_property
+    def shipment_price_total_gross(self):
+        return self._shipment_price_total_gross / 100
+
+    @shipment_price_total_gross.setter
+    def shipment_price_total_gross(self, value):
+        self._shipment_price_total_gross = int(value * 100)
+
+    @hybrid_property
+    def sale_total_value_gross(self):
+        return self._sale_total_value_gross / 100
+
+    @sale_total_value_gross.setter
+    def sale_total_value_gross(self, value):
+        self._sale_total_value_gross = int(value * 100)
+
+    @hybrid_property
+    def gift_wrap_price_discount_gross(self):
+        return self._gift_wrap_price_discount_gross / 100
+
+    @gift_wrap_price_discount_gross.setter
+    def gift_wrap_price_discount_gross(self, value):
+        self._gift_wrap_price_discount_gross = int(value * 100)
+
+    @hybrid_property
+    def gift_wrap_price_gross(self):
+        return self._gift_wrap_price_gross / 100
+
+    @gift_wrap_price_gross.setter
+    def gift_wrap_price_gross(self, value):
+        self._gift_wrap_price_gross = int(value * 100)
+
+    @hybrid_property
+    def gift_wrap_price_total_gross(self):
+        return self._gift_wrap_price_total_gross / 100
+
+    @gift_wrap_price_total_gross.setter
+    def gift_wrap_price_total_gross(self, value):
+        self._gift_wrap_price_total_gross = int(value * 100)
+
+    @hybrid_property
+    def check_unit_cost_price_net(self):
+        return self._check_unit_cost_price_net / 100
+
+    @check_unit_cost_price_net.setter
+    def check_unit_cost_price_net(self, value):
+        self._check_unit_cost_price_net = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_discount_net(self):
+        return self._check_item_price_discount_net / 100
+
+    @check_item_price_discount_net.setter
+    def check_item_price_discount_net(self, value):
+        self._check_item_price_discount_net = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_discount_vat(self):
+        return self._check_item_price_discount_vat / 100
+
+    @check_item_price_discount_vat.setter
+    def check_item_price_discount_vat(self, value):
+        self._check_item_price_discount_vat = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_net(self):
+        return self._check_item_price_net / 100
+
+    @check_item_price_net.setter
+    def check_item_price_net(self, value):
+        self._check_item_price_net = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_vat(self):
+        return self._check_item_price_vat / 100
+
+    @check_item_price_vat.setter
+    def check_item_price_vat(self, value):
+        self._check_item_price_vat = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_total_net(self):
+        return self._check_item_price_total_net / 100
+
+    @check_item_price_total_net.setter
+    def check_item_price_total_net(self, value):
+        self._check_item_price_total_net = int(value * 100)
+
+    @hybrid_property
+    def check_item_price_total_vat(self):
+        return self._check_item_price_total_vat / 100
+
+    @check_item_price_total_vat.setter
+    def check_item_price_total_vat(self, value):
+        self._check_item_price_total_vat = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_discount_net(self):
+        return self._check_shipment_price_discount_net / 100
+
+    @check_shipment_price_discount_net.setter
+    def check_shipment_price_discount_net(self, value):
+        self._check_shipment_price_discount_net = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_discount_vat(self):
+        return self._check_shipment_price_discount_vat / 100
+
+    @check_shipment_price_discount_vat.setter
+    def check_shipment_price_discount_vat(self, value):
+        self._check_shipment_price_discount_vat = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_net(self):
+        return self._check_shipment_price_net / 100
+
+    @check_shipment_price_net.setter
+    def check_shipment_price_net(self, value):
+        self._check_shipment_price_net = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_vat(self):
+        return self._check_shipment_price_vat / 100
+
+    @check_shipment_price_vat.setter
+    def check_shipment_price_vat(self, value):
+        self._check_shipment_price_vat = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_total_net(self):
+        return self._check_shipment_price_total_net / 100
+
+    @check_shipment_price_total_net.setter
+    def check_shipment_price_total_net(self, value):
+        self._check_shipment_price_total_net = int(value * 100)
+
+    @hybrid_property
+    def check_shipment_price_total_vat(self):
+        return self._check_shipment_price_total_vat / 100
+
+    @check_shipment_price_total_vat.setter
+    def check_shipment_price_total_vat(self, value):
+        self._check_shipment_price_total_vat = int(value * 100)
+
+    @hybrid_property
+    def check_sale_total_value_net(self):
+        return self._check_sale_total_value_net / 100
+
+    @check_sale_total_value_net.setter
+    def check_sale_total_value_net(self, value):
+        self._check_sale_total_value_net = int(value * 100)
+
+    @hybrid_property
+    def check_sale_total_value_vat(self):
+        return self._check_sale_total_value_vat / 100
+
+    @check_sale_total_value_vat.setter
+    def check_sale_total_value_vat(self, value):
+        self._check_sale_total_value_vat = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_discount_net(self):
+        return self._check_gift_wrap_price_discount_net / 100
+
+    @check_gift_wrap_price_discount_net.setter
+    def check_gift_wrap_price_discount_net(self, value):
+        self._check_gift_wrap_price_discount_net = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_discount_vat(self):
+        return self._check_gift_wrap_price_discount_vat / 100
+
+    @check_gift_wrap_price_discount_vat.setter
+    def check_gift_wrap_price_discount_vat(self, value):
+        self._check_gift_wrap_price_discount_vat = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_net(self):
+        return self._check_gift_wrap_price_net / 100
+
+    @check_gift_wrap_price_net.setter
+    def check_gift_wrap_price_net(self, value):
+        self._check_gift_wrap_price_net = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_vat(self):
+        return self._check_gift_wrap_price_vat / 100
+
+    @check_gift_wrap_price_vat.setter
+    def check_gift_wrap_price_vat(self, value):
+        self._check_gift_wrap_price_vat = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_total_net(self):
+        return self._check_gift_wrap_price_total_net / 100
+
+    @check_gift_wrap_price_total_net.setter
+    def check_gift_wrap_price_total_net(self, value):
+        self._check_gift_wrap_price_total_net = int(value * 100)
+
+    @hybrid_property
+    def check_gift_wrap_price_total_vat(self):
+        return self._check_gift_wrap_price_total_vat / 100
+
+    @check_gift_wrap_price_total_vat.setter
+    def check_gift_wrap_price_total_vat(self, value):
+        self._check_gift_wrap_price_total_vat = int(value * 100)
+
+    @hybrid_property
+    def check_invoice_amount_vat(self):
+        return self._check_invoice_amount_vat / 100
+
+    @check_invoice_amount_vat.setter
+    def check_invoice_amount_vat(self, value):
+        self._check_invoice_amount_vat = int(value * 100)
+
+    #rate values
+
+    @hybrid_property
+    def check_item_price_vat_rate(self):
+        return self._check_item_price_vat_rate / 10_000
+
+    @check_item_price_vat_rate.setter
+    def check_item_price_vat_rate(self, value):
+        self._check_item_price_vat_rate = int(value * 10_000)
+
+    @hybrid_property
+    def check_shipment_price_vat_rate(self):
+        return self._check_shipment_price_vat_rate / 10_000
+
+    @check_shipment_price_vat_rate.setter
+    def check_shipment_price_vat_rate(self, value):
+        self._check_shipment_price_vat_rate = int(value * 10_000)
+
+    @hybrid_property
+    def check_gift_wrap_price_tax_rate(self):
+        return self._check_gift_wrap_price_tax_rate / 10_000
+
+    @check_gift_wrap_price_tax_rate.setter
+    def check_gift_wrap_price_tax_rate(self, value):
+        self._check_gift_wrap_price_tax_rate = int(value * 10_000)
+
+    @hybrid_property
+    def check_invoice_exchange_rate(self):
+        return self._check_invoice_exchange_rate / 10_000
+
+    @check_invoice_exchange_rate.setter
+    def check_invoice_exchange_rate(self, value):
+        self._check_invoice_exchange_rate = int(value * 10_000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def __repr__(self):
