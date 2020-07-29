@@ -17,8 +17,8 @@ class Account(db.Model):
     modified_at = db.Column(db.DateTime)
     channel_code = db.Column(db.String(8), db.ForeignKey('channel.code'))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    transaction_inputs = db.relationship('TransactionInput', backref='account', lazy='joined', cascade='all, delete-orphan')
-    # transactions = db.relationship('Transaction', backref='account', lazy='joined', cascade='all, delete-orphan')
+    transaction_inputs = db.relationship('TransactionInput', backref='account', lazy='select', cascade='all, delete-orphan')
+    # transactions = db.relationship('Transaction', backref='account', lazy='select', cascade='all, delete-orphan')
 
 
     def update(self, data_changes):

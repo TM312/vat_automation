@@ -1,6 +1,5 @@
 from mypy_extensions import TypedDict
 from typing import Union
-from decimal import Decimal
 from datetime import date
 
 class TransactionTypeInterface(TypedDict, total=False):
