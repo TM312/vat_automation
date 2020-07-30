@@ -29,8 +29,8 @@
                 <b>Quantity:</b> {{ transactionInput.item_quantity }}<br>
                 <b>Manufacture Country:</b> {{ transactionInput.item_manufacture_country }} <br>
                 <b>Weight:</b>
-                    {{ Number.parseFloat(transactionInput.item_weight_kg).toFixed(3) }}kg
-                    | Total:{{ Number.parseFloat(transactionInput.item_weight_kg_total).toFixed(3) }} kg
+                <span v-if="transactionInput.item_weight_kg !== null">{{ Number.parseFloat(transactionInput.item_weight_kg).toFixed(3) }}kg</span>
+                <span v-if="transactionInput.item_weight_kg_total !== null">| Total: {{ Number.parseFloat(transactionInput.item_weight_kg_total).toFixed(3) }}kg</span>
             </b-card>
 
         </b-card-group>
@@ -83,9 +83,6 @@ export default {
             transactionInput: state => state.transaction_input.transaction_input
         }),
 
-        // alertStatus() {
-        //     return this.transactionInput.processed ? 'success' : 'warning'
-        // },
         items() {
             return [
                 {
