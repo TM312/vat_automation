@@ -7,7 +7,7 @@ from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
 from . import SellerFirm
-from . import seller_firm_dto, seller_firm_sub_dto
+from . import seller_firm_dto, seller_firm_sub_dto, seller_firm_admin_dto
 from .service import SellerFirmService
 from .interface import SellerFirmInterface
 
@@ -17,6 +17,7 @@ from ...utils.decorators import login_required, accepted_u_types, confirmation_r
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa
 ns.add_model(seller_firm_dto.name, seller_firm_dto)
 ns.add_model(seller_firm_sub_dto.name, seller_firm_sub_dto)
+ns.add_model(seller_firm_admin_dto.name, seller_firm_admin_dto)
 
 
 

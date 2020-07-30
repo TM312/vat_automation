@@ -4,7 +4,7 @@
             <b-col>
                 <b-card
                     :title="this.$auth.user.len_key_accounts"
-                    sub-title="Total Number of Key Accounts"
+                    sub-title="Key Accounts"
                     border-variant="info"
                 ></b-card>
             </b-col>

@@ -1,9 +1,8 @@
 <template>
-    <div>
+    <div class="cols-2">
         <b-button
-            :variant="buttonVariant"
-            pill
-            size="sm"
+            variant="outline-success"
+            :pressed="isFollowing"
             @click="followSellerFirm"
             :disabled="buttonBusy"
         >{{ buttonText }}</b-button>
@@ -33,19 +32,19 @@
             },
 
             buttonText() {
-                return this.isFollowing ? 'Following' : 'Follow'
+                return this.isFollowing ? 'Following' : '  Follow  '
             },
 
-            buttonVariant() {
-                return this.isFollowing ? 'success' : 'outline-success'
-            }
+            // buttonVariant() {
+            //     return this.isFollowing ? 'success' : 'outline-success'
+            // }
         },
         methods: {
             async followSellerFirm() {
                 this.buttonBusy = true
                 const { store } = this.$nuxt.context
                 await store.dispatch("tax_auditor/follow_unfollow", this.sellerFirm.public_id)
-
+                await store.dispatch("seller_firm/get_by_public_id", this.sellerFirm.public_id)
                 await this.$auth.fetchUser()
                 this.buttonBusy = false
             }

@@ -21,11 +21,29 @@
                 <span v-else>{{ data.value }} {{ data.item.currency_code }}</span>
             </template>
 
+            <template v-slot:head(departure_to_arrival)>
+                <b-row no-gutters class="justify-content-md-center">
+                    <b-col class="text-right">Departure</b-col>
+                    <b-col cols="2" class="text-center"><b-icon icon="arrow-right" /></b-col>
+                    <b-col class="text-left">Arrival</b-col>
+                </b-row>
+            </template>
+
+            <template v-slot:cell(departure_to_arrival)="data">
+                <b-row no-gutters class="justify-content-md-center">
+                    <b-col class="text-right">{{ data.item.departure_country_code }}</b-col>
+                    <b-col v-if="data.item.departure_country_code || data.item.arrival_country_code" cols="2" class="text-center"><b-icon icon="arrow-right" /></b-col>
+                    <b-col class="text-left">{{ data.item.arrival_country_code }}</b-col>
+                </b-row>
+                </template>
+
+
         </b-table>
     </div>
 </template>
 
 <script>
+
 import { mapState } from 'vuex'
 
 export default {
@@ -72,15 +90,15 @@ export default {
                     sortable: true,
                 },
                 {
-                    key: 'departure_country_code',
-                    lable: 'Departure Country',
-                    sortable: true,
+                    key: 'departure_to_arrival',
+                    // label: 'Departure Country',
+                    sortable: false,
                 },
-                {
-                    key: 'arrival_country_code',
-                    lable: 'Arrival Country',
-                    sortable: true,
-                },
+                // {
+                //     key: 'arrival_country_code',
+                //     label: 'Arrival Country',
+                //     sortable: true,
+                // },
                 {
                     key: 'arrival_date',
                     sortable: true,
