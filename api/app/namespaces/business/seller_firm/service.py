@@ -9,7 +9,6 @@ from app.extensions import db
 
 from .model import SellerFirm
 from .interface import SellerFirmInterface
-from .schema import seller_firm_dto
 
 from ...utils.service import InputService, NotificationService
 

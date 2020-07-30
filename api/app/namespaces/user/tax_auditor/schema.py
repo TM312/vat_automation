@@ -1,14 +1,12 @@
 from flask_restx import Model, fields
 from ..schema_parent import user_dto, user_sub_dto, user_dto_admin
-from ...business.seller_firm import seller_firm_sub_dto
-
+import app.namespaces.business.seller_firm.schema as sf
 
 tax_auditor_sub_dto = user_sub_dto.clone('tax_auditor_sub', {
 })
 
-
 tax_auditor_dto = tax_auditor_sub_dto.clone('tax_auditor', {
-    'key_accounts': fields.List(fields.Nested(seller_firm_sub_dto)),
+    'key_accounts': fields.List(fields.Nested(sf.seller_firm_sub_dto)),
     'len_key_accounts': fields.String(attribute=lambda x: len(x.key_accounts), readonly=True),
     'confirmed': fields.Boolean(readonly=True),
     'confirmed_on': fields.Date(readonly=True),

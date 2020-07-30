@@ -35,6 +35,12 @@
 
                         </template>
 
+                        <template v-slot:cell(initial_tax_date)="data">
+                            <span v-if="data.value"> {{ data.value }}</span>
+                            <span v-else><i>Not yet used.</i></span>
+
+                        </template>
+
                     </b-table>
                 </div>
 
