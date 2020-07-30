@@ -42,6 +42,7 @@
                 </b-row>
             </b-card>
         </b-card-group>
+
         <b-card-group>
             <b-card
                 title="Dates"
@@ -62,6 +63,15 @@
             </b-card>
 
         </b-card-group>
+
+        <alert-transaction-input-notification
+            v-for="notification in transaction.notifications"
+            :key="notification.public_id"
+            :notification="notification"
+            style="max-width: 50rem;"
+            class="my-3"
+        />
+
     </div>
 </template>
 

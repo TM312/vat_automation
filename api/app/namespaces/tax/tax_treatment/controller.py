@@ -7,7 +7,7 @@ from . import TaxTreatment
 from . import tax_treatment_dto
 from .service import TaxTreatmentService
 
-from ...utils.decorators import login_required, employer_required
+from ...utils.decorators import login_required, employer_required, accepted_u_types
 
 
 ns = Namespace("TaxTreatment", description="TaxTreatment Related Operations")  # noqa
@@ -17,11 +17,14 @@ ns.add_model(tax_treatment_dto.name, tax_treatment_dto)
 @ns.route("/")
 class TaxTreatmentResource(Resource):
     """TaxTreatments"""
+    @login_required
     @ns.marshal_list_with(tax_treatment_dto, envelope='data')
     def get(self) -> List[TaxTreatment]:
         """Get all TaxTreatments"""
         return TaxTreatmentService.get_all()
 
+    @login_required
+    @accepted_u_types('admin')
     @ns.expect(tax_treatment_dto, validate=True)
     @ns.marshal_with(tax_treatment_dto)
     def post(self) -> TaxTreatment:
@@ -32,10 +35,14 @@ class TaxTreatmentResource(Resource):
 @ns.route("/<string:tax_treatment_code>")
 @ns.param("tax_treatment_code", "TaxTreatment database code")
 class TaxTreatmentIdResource(Resource):
+    @login_required
+    @accepted_u_types('admin')
     def get(self, tax_treatment_code: str) -> TaxTreatment:
         """Get Single TaxTreatment"""
         return TaxTreatmentService.get_by_code(tax_treatment_code)
 
+    @login_required
+    @accepted_u_types('admin')
     def delete(self, tax_treatment_code: str) -> Response:
         """Delete Single TaxTreatment"""
         from flask import jsonify
@@ -43,6 +50,8 @@ class TaxTreatmentIdResource(Resource):
         id = TaxTreatmentService.delete_by_code(tax_treatment_code)
         return jsonify(dict(status="Success", id=id))
 
+    @login_required
+    @accepted_u_types('admin')
     @ns.expect(tax_treatment_dto, validate=True)
     @ns.marshal_with(tax_treatment_dto)
     def put(self, tax_treatment_code: str) -> TaxTreatment:
