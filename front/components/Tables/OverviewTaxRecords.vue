@@ -1,14 +1,12 @@
 <template>
-    <b-tabs content-class="mt-3">
-        <b-tab title="All Tax Records" active>
-            <b-row cols="3" md="4">
-                <card-tax-record v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
-            </b-row>
-        </b-tab>
-        <b-tab title="Generate New Tax Record">
-            <p>tbd</p>
-        </b-tab>
-    </b-tabs>
+    <div>
+        <p>Create New</p>
+            <form-add-seller-firm-tax-record />
+        <hr>
+        <b-row cols="3" md="4">
+            <card-tax-record v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
+        </b-row>
+    </div>
 </template>
 
 <script>

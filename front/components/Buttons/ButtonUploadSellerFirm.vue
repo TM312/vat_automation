@@ -27,7 +27,6 @@
                 progress: 0,
                 progressBarStyle: "success",
                 buttonDisabled: false,
-                // urlEndpointUpload: null
 
             };
         },
