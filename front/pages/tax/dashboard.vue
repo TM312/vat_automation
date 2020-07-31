@@ -37,6 +37,7 @@
 
         async fetch() {
             const { store } = this.$nuxt.context;
+
             await store.dispatch("country/get_all");
             await store.dispatch("currency/get_all");
         },

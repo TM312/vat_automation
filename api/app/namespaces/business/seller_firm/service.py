@@ -27,8 +27,8 @@ class SellerFirmService:
     def get_by_identifiers(seller_firm_name: str,
                            address: str,
                            establishment_country_code: str,
-                           accounting_firm_client_id: str,
-                           ):
+                           accounting_firm_client_id: str
+        ):
         seller_firm = SellerFirm.query.filter_by(name=seller_firm_name).first()
         if not seller_firm:
             seller_firm = SellerFirm.query.filter(
