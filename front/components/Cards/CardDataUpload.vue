@@ -14,8 +14,11 @@
                     @change="onFilesSelected"
                 />
 
-                <button-upload v-if="urlEndpointUpload" :urlEndpointUpload="urlEndpointUpload" :files="files" @resetFileList="files=[]" />
-                <button-upload-seller-firm v-else :files="files" @resetFileList="files=[]" />
+                <!-- for adding clients as file uploads -->
+                <button-upload v-if="urlEndpointUpload" :urlEndpointUpload="urlEndpointUpload" :files="files" @removeFile="removeFile" />
+
+                <!-- for data uploads relating to a specific seller -->
+                <button-upload-seller-firm v-else :files="files" @removeFile="removeFile" />
 
 
                 <b-button id="selectButton" variant="outline-primary" @click="$refs.files.click()">
@@ -31,12 +34,7 @@
                 <b-table striped hover :items="files" :fields="fields">
                     <template v-slot:cell(#)="data">{{ data.index + 1 }}</template>
 
-                    <template v-slot:cell(platform)>
-                        <p>Amazon</p>
-                        <!-- <b-form-select v-model="selected" :options="options"></b-form-select> -->
-                    </template>
-
-                    <template v-slot:cell(keep?)="data">
+                    <template v-slot:cell(button)="data">
                         <b-button
                             size="sm"
                             variant="outline-danger"
@@ -82,7 +80,6 @@
                 fields: [
                     "#",
                     "name",
-                    "platform",
                     {
                         key: "lastModified",
                         label: "Last Modified",
@@ -90,7 +87,10 @@
                             return new Date(item.lastModified).toLocaleString();
                         }
                     },
-                    ""
+                     {
+                        key: "button",
+                        label: ""
+                    },
                 ]
             };
         },
@@ -105,8 +105,8 @@
             },
 
             removeFile(key) {
+                console.log('this.files in card data upload: ', this.files)
                 this.files.splice(key, 1);
-                console.log(this.files);
             }
         }
     };

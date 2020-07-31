@@ -57,9 +57,8 @@
                 label-for="establishment_country_code"
                 label="Establishment Country"
             >
-                <b-form-select v-if="$fetchState.pending" id="establishment_country_code_placeholder" disabled />
+                <!-- <b-form-select v-if="$fetchState.pending" id="establishment_country_code_placeholder" disabled /> -->
                 <b-form-select
-                    v-else
                     id="establishment_country_code"
                     :options="optionsCountryCode"
                     v-model="payload.establishment_country_code"
@@ -95,11 +94,6 @@
                     establishment_country_code: null
                 }
             }
-        },
-
-        async fetch() {
-            const { store } = this.$nuxt.context;
-            await store.dispatch("country/get_all");
         },
 
         computed: {

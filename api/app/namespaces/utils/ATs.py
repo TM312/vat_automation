@@ -34,6 +34,6 @@ tax_record_transaction_AT = db.Table(
 
 tax_auditor_seller_firm_AT = db.Table(
     'tax_auditor_seller_firm_AT',
-    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True)
+    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), primary_key=True),
+    db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id', ondelete="CASCADE"), primary_key=True)
 )

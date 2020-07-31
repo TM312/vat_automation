@@ -23,6 +23,22 @@ class SellerFirmService:
         seller_firms = SellerFirm.query.filter_by(accounting_firm_id=accounting_firm_id).all()
         return seller_firms
 
+    @staticmethod
+    def get_by_identifiers(seller_firm_name: str,
+                           address: str,
+                           establishment_country_code: str,
+                           accounting_firm_client_id: str,
+                           ):
+        seller_firm = SellerFirm.query.filter_by(name=seller_firm_name).first()
+        if not seller_firm:
+            seller_firm = SellerFirm.query.filter(
+                SellerFirm.address == address,
+                SellerFirm.establishment_country_code == establishment_country_code,
+                SellerFirm.accounting_firm_client_id == accounting_firm_client_id
+                ).first()
+
+        return seller_firm
+
 
     @staticmethod
     def get_by_public_id(public_id: str) -> SellerFirm:
@@ -163,68 +179,68 @@ class SellerFirmService:
 
 
     @staticmethod
-    def process_data_upload(seller_firm_public_id, seller_firm_files: List[BinaryIO]):
+    def process_data_upload(seller_firm_public_id, file: BinaryIO):
         DATA_ALLOWED_EXTENSIONS = current_app.config['DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
         user_id = g.user.id
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
-        for file in seller_firm_files:
-            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
+        # for file in seller_firm_files:
+        file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
 
-            df_encoding = 'utf-8'
-            delimiter = ';' if InputService.infer_delimiter(file_path_tbd) != '\t' else '\t'
-            df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
-            file_type = InputService.determine_file_type(df)
-            data_type = InputService.determine_data_type(file_type)
+        df_encoding = 'utf-8'
+        delimiter = ';' if InputService.infer_delimiter(file_path_tbd) != '\t' else '\t'
+        df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
+        file_type = InputService.determine_file_type(df)
+        data_type = InputService.determine_data_type(file_type)
 
-            file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 
-            if data_type == 'static':
-                basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+        if data_type == 'static':
+            basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
-                if file_type == 'account_list':
-                    from ...account.service import AccountService
-                    response_objects = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+            if file_type == 'account_list':
+                from ...account.service import AccountService
+                response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
-                elif file_type == 'distance_sale_list':
-                    from ...distance_sale.service import DistanceSaleService
-                    response_objects = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+            elif file_type == 'distance_sale_list':
+                from ...distance_sale.service import DistanceSaleService
+                response_object = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
-                elif file_type == 'item_list':
-                    from ...item.service import ItemService
-                    response_objects = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+            elif file_type == 'item_list':
+                from ...item.service import ItemService
+                response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
 
-                elif file_type == 'vat_numbers':
-                    from ...tax.vatin.service import VATINService
-                    response_objects = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
+            elif file_type == 'vat_numbers':
+                from ...tax.vatin.service import VATINService
+                response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
 
-            elif data_type == 'recurring':
-                basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+        elif data_type == 'recurring':
+            basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
 
-                if file_type == 'transactions_amazon':
+            if file_type == 'transactions_amazon':
 
-                    from ...transaction_input.service import TransactionInputService
-                    try:
-                        response_objects = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
-                    except:
-                        raise
+                from ...transaction_input.service import TransactionInputService
+                try:
+                    response_object = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
+                except:
+                    raise
 
-            else:
-                raise
+        else:
+            raise
 
-        response_object = {
-            'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_files)))
-        }
+        # response_object = {
+        #     'status': 'success',
+        #     'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_files)))
+        # }
 
         return response_object
 
 
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(seller_firm_information_files: List[BinaryIO], claimed: bool, **kwargs: Dict[str, str]) -> Dict:
+    def process_seller_firm_information_files_upload(file: BinaryIO, claimed: bool, **kwargs: Dict[str, str]) -> Dict:
         BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
         file_type = 'seller_firm'
@@ -235,16 +251,16 @@ class SellerFirmService:
         accounting_firm_id = g.user.employer_id
 
 
-        for file in seller_firm_information_files:
-            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed=claimed, accounting_firm_id=accounting_firm_id, **kwargs)
+        # for file in seller_firm_information_files:
+        file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+        response_objects = SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed=claimed, accounting_firm_id=accounting_firm_id, **kwargs)
 
-        response_object = {
-            'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_information_files)))
-        }
+        # response_object = {
+        #     'status': 'success',
+        #     'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_information_files)))
+        # }
 
-        return response_object
+        return response_objects
 
 
     # celery task !!
@@ -270,24 +286,33 @@ class SellerFirmService:
 
         for i in range(total_number_items):
 
+            seller_firm_name = InputService.get_str_or_None(df, i, column='seller_firm_name')
+            address = InputService.get_str_or_None(df, i, column='address')
+            establishment_country_code = InputService.get_str(df, i, column='establishment_country_code')
+            accounting_firm_client_id = InputService.get_str_or_None(df, i, column='accounting_firm_client_id')
+
             seller_firm_data = {
                 'claimed': kwargs.get('claimed'),
                 'created_by': user_id,
-                'name': InputService.get_str_or_None(df, i, column='seller_firm_name'),
-                'address': InputService.get_str_or_None(df, i, column='address'),
-                'establishment_country_code': InputService.get_str(df, i, column='establishment_country_code'),
+                'name': seller_firm_name,
+                'address': address,
+                'establishment_country_code': establishment_country_code,
                 'accounting_firm_id': kwargs['accounting_firm_id'],
-                'accounting_firm_client_id': InputService.get_str_or_None(df, i, column='accounting_firm_client_id'),
+                'accounting_firm_client_id': accounting_firm_client_id,
             }
 
-            try:
-                SellerFirmService.create(seller_firm_data)
+            seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code, accounting_firm_client_id)
+            if not seller_firm:
+                try:
+                    SellerFirmService.create(seller_firm_data)
 
-            except:
-                db.session.rollback()
+                except:
+                    db.session.rollback()
+                    error_counter += 1
+                    db.session.commit()
+
+            else:
                 error_counter += 1
-
-            db.session.commit()
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter)
 

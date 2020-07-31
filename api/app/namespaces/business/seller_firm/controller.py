@@ -3,8 +3,9 @@ from typing import List
 from flask import request, g
 from flask import current_app
 from flask.wrappers import Response
-
 from flask_restx import Namespace, Resource
+
+from app.extensions import limiter
 
 from . import SellerFirm
 from . import seller_firm_dto, seller_firm_sub_dto, seller_firm_admin_dto
@@ -23,6 +24,7 @@ ns.add_model(seller_firm_admin_dto.name, seller_firm_admin_dto)
 
 @ns.route('/')
 class SellerFirmResource(Resource):
+    # decorators = [limiter.limit("10/second")]
     '''Get all SellerFirm Firms'''
     @login_required
     #@accepted_u_types('admin')
@@ -42,6 +44,7 @@ class SellerFirmResource(Resource):
 @ns.route('/<string:seller_firm_public_id>')
 @ns.param('seller_firm_public_id', 'Seller firm ID')
 class SellerFirmIdResource(Resource):
+    # decorators = [limiter.limit("10/second")]
     @login_required
     #@accepted_u_types('admin')
     @ns.marshal_with(seller_firm_dto, envelope='data')
@@ -58,15 +61,18 @@ class SellerFirmIdResource(Resource):
 
 @ns.route("/<string:seller_firm_public_id>/upload")
 class SellerFirmInformationResource(Resource):
+    # decorators = [limiter.limit("10/second")]
     @login_required
-    def post(self, seller_firm_public_id):
+    def post(self, seller_firm_public_id) -> Response:
         """Upload data for the indicated seller firm"""
-        seller_firm_files: List[BinaryIO] = request.files.getlist("files")
-        return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_files)
+        # seller_firm_files: List[BinaryIO] = request.files.getlist("files")
+        seller_firm_file: BinaryIO = request.files["file"]
+        return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file)
 
 
 @ns.route('/as_client')
 class SellerFirmAsClientResource(Resource):
+    # decorators = [limiter.limit("10/second")]
     @login_required
     #@accepted_u_types('admin')
     @ns.expect(SellerFirmInterface, validate=True)
@@ -81,8 +87,10 @@ class SellerFirmAsClientResource(Resource):
 
 @ns.route("/csv")
 class SellerFirmInformationResource(Resource):
+    # decorators = [limiter.limit("10/second")]
     @login_required
-    def post(self):
+    def post(self) -> Response:
         """Create an unclaimed seller firm as a client"""
-        seller_firm_information_files: List[BinaryIO] = request.files.getlist("files")
-        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_files, claimed=False)
+        seller_firm_information_file: BinaryIO = request.files["file"]
+        print('seller_firm_information_file:', seller_firm_information_file, flush=True)
+        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_file, claimed=False)
