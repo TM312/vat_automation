@@ -4,17 +4,19 @@
             <b-col>
                 <b-card
                     :title="this.$auth.user.len_key_accounts"
-                    sub-title="Key Accounts"
+                    :sub-title="(this.$auth.user.len_key_accounts == 1) ? 'Key Account' : 'Key Accounts'"
                     border-variant="info"
                 ></b-card>
             </b-col>
             <b-col>
-                <p>cards</p>
+                <!-- <p>cards</p> -->
             </b-col>
             <b-col>
-            <p>another card</p>
+            <!-- <p>another card</p> -->
             </b-col>
-            <b-col><p>another card</p></b-col>
+            <b-col>
+                <!-- <p>another card</p> -->
+            </b-col>
         </b-row>
     </div>
 </template>

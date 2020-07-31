@@ -69,7 +69,7 @@ class ExchangeRateService:
         rate_base_eur = ExchangeRate.query.filter_by(date=date, base=base, target='EUR').first().rate
         rate_eur_target = ExchangeRate.query.filter_by(date=date, base='EUR', target=target).first().rate
 
-        rate_base_target = round(rate_base_eur * rate_eur_target, 5)
+        rate_base_target = rate_base_eur * rate_eur_target
 
         exchange_rate_data = {
             'source': 'ECB',
@@ -110,7 +110,7 @@ class ExchangeRateService:
         import more_itertools as mit
 
         for currency_code in supported_currencies:
-            value = round(exchange_rate_dict[currency_code], 5)
+            value = exchange_rate_dict[currency_code]
             exchange_rate_data = {
                 'source': 'ECB',
                 'date': date,
@@ -123,7 +123,7 @@ class ExchangeRateService:
             # creating reverse rates
             exchange_rate_data['base'] = currency_code
             exchange_rate_data['target'] = 'EUR'
-            exchange_rate_data['rate'] = round(1/value, 5)
+            exchange_rate_data['rate'] = 1/value
 
             ExchangeRateService.create(exchange_rate_data)
 

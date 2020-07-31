@@ -33,58 +33,77 @@
             };
         },
         methods: {
+            enableButton() {
+                if (this.files.length == 0) {
+                        this.buttonDisabled = false
+                    }
+            },
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
+
+
             async uploadFiles() {
                 this.buttonDisabled = true
-
-                // FormData is a standard JS object
-                const data = new FormData();
-                for (var i = 0; i < this.files.length; i++) {
-                    let file = this.files[i];
-                    data.append("files", file);
-                }
-                // https://github.com/axios/axios/blob/master/examples/upload/index.html
                 var config = {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },
-                    onUploadProgress: function(progressEvent) {
-                        this.progress = parseInt(
-                            Math.round(
-                                (progressEvent.loaded / progressEvent.total) * 100
-                            )
-                        );
-                    }.bind(this)
+                    // onUploadProgress: function(progressEvent) {
+                    //     this.progress = parseInt(
+                    //         Math.round(
+                    //             (progressEvent.loaded / progressEvent.total) * 100
+                    //         )
+                    //     );
+                    // }.bind(this)
                 };
 
-                await this.$axios
-                    .post(this.urlEndpointUpload, data, config)
+                // FormData is a standard JS object
+                for (var i = 0; i != this.files.length;) {
+                    let file = this.files[i];
+                    const data = new FormData();
+                    data.append('file', file);
 
-                    .then(response => {
-                        let response_object = response.data;
+                    // https://github.com/axios/axios/blob/master/examples/upload/index.html
+                    try {
+                        await this.$axios
+                        .post(this.urlEndpointUpload, data, config)
 
-                        if (response_object.status == "success") {
+                        .then(response => {
+                            let response_objects = response.data;
 
-                            this.$toast.success(response_object.message, {
-                                duration: 5000
-                            });
+                            for (var j = 0; j < response_objects.length; j++) {
+                                let response_object = response_objects[j]
 
-                            this.$emit('resetFileList')
+                                if (response_object.status == "success") {
 
-                        } else {
-                            this.$toast.error(response_object.message, { duration: 5000 });
-                        }
-                    })
+                                    this.$toast.success(response_object.message, {
+                                        duration: 10000
+                                    });
 
-                    .catch(err => {
+
+                                } else {
+                                    this.$toast.error(response_object.message, { duration: 10000 });
+                                }
+                            }
+                            this.$emit('removeFile', i)
+                        })
+
+                    } catch(err) {
                         console.log(err);
                         this.$toast.error(
                             "An error occured. Please make sure you have tried to submit valid data.",
-                            { duration: 5000 }
+                            { duration: 10000 }
                         );
                         this.progressBarStyle = "danger";
-                    });
+                        this.buttonDisabled = false
+                        i = this.files.length
+                    }
 
-                    this.buttonDisabled = false
+                    await this.sleep(1000)
+                    this.enableButton()
+                }
 
             }
         }

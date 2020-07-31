@@ -1,7 +1,8 @@
 # following http://www.patricksoftwareblog.com/structuring-a-flask-project/
-from app.extensions import db, migrate, bcrypt, mail, cors
+from app.extensions import db, migrate, bcrypt, mail, cors, limiter
 #from app.logs.service import LogService
 from flask import Flask, jsonify
+from werkzeug.contrib.fixers import ProxyFix
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -10,6 +11,8 @@ def create_app(env):
     from app.config import app_config
     app = Flask(__name__)
     app.config.from_object(app_config[env])
+    # for example if the request goes through one proxy before hitting your application server
+    app.wsgi_app = ProxyFix(app.wsgi_app, num_proxies=1)
     register_extensions(app)
     register_api(app)
     # !!! LogService.setup_logging(app)
@@ -30,6 +33,8 @@ def register_extensions(app):
     bcrypt.init_app(app)
     cors.init_app(app)
     mail.init_app(app)
+    limiter.init_app(app)
+
     return None
 
 

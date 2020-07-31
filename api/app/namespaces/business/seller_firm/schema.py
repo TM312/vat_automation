@@ -18,7 +18,7 @@ class SellerFirmSchema:
             'created_by': fields.String(attribute=lambda x: x.creator.name),
             'created_on': fields.Date(readonly=True),
             'tax_auditors': fields.List(fields.Nested(tax_auditor_sub_dto)),
-            'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name),
+            'accounting_firm_name': fields.String(attribute=lambda x: x.accounting_firm.name if x.accounting_firm else None),
             'items': fields.List(fields.Nested(item_sub_dto)),
             'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),
             'accounts': fields.List(fields.Nested(account_sub_dto)),
@@ -37,7 +37,7 @@ class SellerFirmSchema:
 seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'claimed': fields.Boolean(readonly=True),
     'establishment_country_code': fields.String,
-    'establishment_country': fields.String(attribute=lambda x: x.establishment_country.name),
+    'establishment_country': fields.String(attribute=lambda x: x.establishment_country.name if x.establishment_country else None),
     'accounting_firm_client_id': fields.String,
     'transaction_ready': fields.Boolean(readonly=True),
     'accounting_firm_client_id': fields.String,

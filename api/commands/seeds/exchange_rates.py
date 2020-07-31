@@ -53,7 +53,7 @@ class ExchangeRatesSeedService:
 
             if date >= SERVICE_START_DATE:
                 for currency_code in SUPPORTED_CURRENCIES:
-                    value = round(df.iloc[row][currency_code], 5)
+                    value = df.iloc[row][currency_code]
                     exchange_rate_data = {
                         'source': 'ECB',
                         'date': date,
@@ -67,7 +67,7 @@ class ExchangeRatesSeedService:
                     # creating reverse rates
                     exchange_rate_data['base'] = currency_code
                     exchange_rate_data['target'] = 'EUR'
-                    exchange_rate_data['rate'] = round(1/value, 5)
+                    exchange_rate_data['rate'] = 1/value
 
                     ExchangeRateService.create(exchange_rate_data)
                     counter += 1

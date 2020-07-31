@@ -1,6 +1,10 @@
 <template>
     <div>
-        <container-route-back />
+        <b-row align-h="start">
+            <b-col cols="auto"><container-route-back /></b-col>
+            <b-col><h3 class="text-muted text-center">{{ seller_firm.name }}</h3></b-col>
+        </b-row>
+        <hr>
         <b-container fluid>
             <b-tabs pills card vertical>
                 <b-tab title='Overview' active>

@@ -166,10 +166,10 @@
             }
         },
 
-        async fetch() {
-            const { store } = this.$nuxt.context;
-            await store.dispatch("country/get_all");
-        },
+        // async fetch() {
+        //     const { store } = this.$nuxt.context;
+        //     await store.dispatch("country/get_all");
+        // },
 
         computed: {
             ...mapState({
