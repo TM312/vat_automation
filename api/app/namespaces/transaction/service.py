@@ -526,14 +526,8 @@ class TransactionService:
 
 
     @staticmethod
-    def get_by_validity_public_id(start_date_str: str, end_date_str: str, seller_firm_public_id: str, tax_jurisdiction_code: str) -> List[Transaction]:
-
-        seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id).first()
-        date_start: date = HelperService.get_date_from_str(start_date_str, '%d-%m-%Y')
-        date_end: date = HelperService.get_date_from_str(end_date_str, '%d-%m-%Y')
-
-        transactions = Transaction.query.filter(Transaction.account.has(seller_firm_id=seller_firm.id), Transaction.date>=date_start, Transaction.date<=date_end, Transaction.tax_jurisdiction_code==tax_jurisdiction_code).all()
-        return transactions
+    def get_by_validity_tax_jurisdiction_seller_firm(start_date: date, end_date: date, seller_firm_id: int, tax_jurisdiction_code: str) -> List[Transaction]:
+        return Transaction.query.filter(Transaction.tax_date.between(start_date, end_date), Transaction.seller_firm_id==seller_firm_id, Transaction.tax_jurisdiction_code==tax_jurisdiction_code).all()
 
 
     @staticmethod

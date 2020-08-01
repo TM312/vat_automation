@@ -6,12 +6,10 @@ from datetime import date, datetime
 class TaxRecordInterface(TypedDict, total=False):
     id: int
     public_id: str
-    active: bool
     created_on: datetime
     created_by: int
     start_date: date
     end_date: date
-    filename: str
     seller_firm_id: int
     tax_jurisdiction_code: str
 

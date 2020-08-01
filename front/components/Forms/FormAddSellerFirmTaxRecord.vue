@@ -31,9 +31,9 @@
                 >
 
                     <b-form-select
-                        id="tax_jurisdiction"
+                        id="tax_jurisdiction_code"
                         :options="optionsCountryCode"
-                        v-model="payload.tax_jurisdiction"
+                        v-model="payload.tax_jurisdiction_code"
                         required
                     ></b-form-select>
 
@@ -124,7 +124,7 @@
         data() {
             return {
                 payload: {
-                    tax_jurisdiction: null,
+                    tax_jurisdiction_code: null,
                     start_date: null,
                     end_date: null
                 }
@@ -276,7 +276,7 @@
 
             reset() {
                 this.payload = {
-                    tax_jurisdiction: null,
+                    tax_jurisdiction_code: null,
                     start_date: null,
                     end_date: null
                 }
@@ -291,7 +291,7 @@
                         this.$route.params.public_id
                     );
                     this.$emit('flash')
-                    await this.$toast.success('New vat number succesfully added.', {
+                    await this.$toast.success('New tax record succesfully added.', {
                         duration: 5000
                     });
                 } catch (error) {
@@ -303,7 +303,7 @@
                 const data_array = [this.$route.params.public_id, this.payload]
 
                 await this.$store.dispatch(
-                    "vatin/create_by_seller_firm_public_id",
+                    "tax_record/create_by_seller_firm_public_id",
                     data_array
                 );
             },
