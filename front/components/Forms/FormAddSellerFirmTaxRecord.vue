@@ -1,101 +1,113 @@
 <template>
-    <b-card bg-variant="white" lg="6" xl="4">
-        <b-form-group
-            label-cols-lg="2"
-            label="New Tax Record"
-            label-size="lg"
-            label-class="font-weight-bold pt-0"
-            class="mb-2"
-        >
-
-            <!-- <b-form-group
-                label-cols-sm="3"
-                label-align-sm="right"
-                label="Name"
-                description="The name helps for better distinction of tax records."
-            >
-                <b-form-input
-                    id="name"
-                    v-model="payload.name"
-                    required
-                ></b-form-input>
-
-            </b-form-group> -->
-
-
+    <b-container>
+        <b-card bg-variant="white" lg="6" xl="4">
             <b-form-group
-                label-cols-sm="3"
-                label-align-sm="right"
-                label="Tax Jurisdiction"
+                label-cols-lg="2"
+                label="New Tax Record"
+                label-size="lg"
+                label-class="font-weight-bold pt-0"
+                class="mb-2"
             >
 
-                <b-form-select
-                    id="tax_jurisdiction"
-                    :options="optionsCountryCode"
-                    v-model="payload.tax_jurisdiction"
-                    required
-                ></b-form-select>
+                <!-- <b-form-group
+                    label-cols-sm="3"
+                    label-align-sm="right"
+                    label="Name"
+                    description="The name helps for better distinction of tax records."
+                >
+                    <b-form-input
+                        id="name"
+                        v-model="payload.name"
+                        required
+                    ></b-form-input>
 
+                </b-form-group> -->
+
+
+                <b-form-group
+                    label-cols-sm="3"
+                    label-align-sm="right"
+                    label="Tax Jurisdiction"
+                >
+
+                    <b-form-select
+                        id="tax_jurisdiction"
+                        :options="optionsCountryCode"
+                        v-model="payload.tax_jurisdiction"
+                        required
+                    ></b-form-select>
+
+                </b-form-group>
+
+
+                <b-form-group
+                    label-cols-sm="3"
+                    label-align-sm="right"
+                    label="Validity"
+                >
+                    <b-row class="my-2">
+                        <b-col><b-button @click="setQ(1)" :disabled="test(1)" :variant="test(1) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block>Q1</b-button></b-col>
+                        <b-col><b-button @click="setQ(2)" :disabled="test(2)" :variant="test(2) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block>Q2</b-button></b-col>
+                        <b-col><b-button @click="setQ(3)" :disabled="test(3)" :variant="test(3) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block>Q3</b-button></b-col>
+                        <b-col><b-button @click="setQ(4)" :disabled="test(4)" :variant="test(4) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block>Q4</b-button></b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col><b-button @click="setPastYear()" variant="outline-primary" :pressed="selected == 'pastYear'" block>{{ pastYearString }}</b-button></b-col>
+                        <b-col><b-button @click="setPastMonth()" variant="outline-primary" :pressed="selected == 'pastMonth'" block>{{ $dateFns.format(pastMonthDate, 'MMMM yyyy') }}</b-button></b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col>
+                            <b-form-group
+                                label-align-sm="right"
+                                label-for="start_date"
+                                description="From"
+                            >
+
+                                <b-form-datepicker
+                                    cols-sm="3"
+                                    id="start_date"
+                                    v-model="payload.start_date"
+                                    :value="dateStringEndLastMonth"
+                                    description="From"
+                                    required
+                                ></b-form-datepicker>
+                            </b-form-group>
+                        </b-col>
+                        <b-col>
+                            <b-form-group
+                                label-align-sm="right"
+                                label-for="end_date"
+                                description="To"
+                            >
+                                <b-form-datepicker
+                                    cols-sm="3"
+                                    id="end_date"
+                                    v-model="payload.end_date"
+                                    :value="dateStringBeginningLastMonth"
+                                    required
+                                ></b-form-datepicker>
+                            </b-form-group>
+
+                        </b-col>
+                    </b-row>
+                </b-form-group>
             </b-form-group>
 
-            <b-row class="my-2">
-                <b-col offset-sm="3"><b-button @click="setQ(1)" variant="outline-primary" block>Q1</b-button></b-col>
-                <b-col><b-button @click="setQ(2)" variant="outline-primary" block>Q2</b-button></b-col>
-                <b-col><b-button @click="setQ(3)" variant="outline-primary" block>Q3</b-button></b-col>
-                <b-col><b-button @click="setQ(4)" variant="outline-primary" block>Q4</b-button></b-col>
-            </b-row>
-            <b-row class="mb-2">
-                <b-col offset-sm="3"><b-button @click="setPastYear()" variant="outline-primary" block>Past Year ({{ yearString }})</b-button></b-col>
-            </b-row>
 
-            <b-form-group
-                label-cols-sm="3"
-                label-align-sm="right"
-                label-for="start_date"
-                label="Validity"
-                description="From"
-            >
-            <b-row>
-                <b-col>
-                    <b-form-datepicker
-                        cols-sm="3"
-                        id="start_date"
-                        v-model="payload.start_date"
-                        description="From"
-                        required
-                    ></b-form-datepicker>
-                </b-col>
-                <b-col>
-                    <b-form-datepicker
-                        cols-sm="3"
-                        id="end_date"
-                        v-model="payload.end_date"
-                        :value="dateLastMonth"
-                        description="To"
-                        required
-                    ></b-form-datepicker>
+            <b-button
+                variant="primary"
+                @click="submitPayload()"
+                block
+            ><b-icon icon="box-arrow-in-up" /> Create New Tax Record</b-button>
 
-                </b-col>
-            </b-row>
-            </b-form-group>
+            <hr><br><hr>
 
+            <br>
+            Payload: {{ payload }}
+            <br>
 
-        </b-form-group>
-
-
-        <b-button
-            variant="primary"
-            @click="submitPayload()"
-            block
-        ><b-icon icon="box-arrow-in-up" /> Create New Tax Record</b-button>
-
-        <hr><br><hr>
-        date.getMonth: {{ new Date().getMonth() }}
-        <br>
-        Payload: {{ payload }}
-        <br>
-
-    </b-card>
+        </b-card>
+    </b-container>
 </template>
 
 <script>
@@ -124,17 +136,31 @@
                 countries: state => state.country.countries
             }),
 
-            dateLastMonth() {
-                var date = new Date()
-                var dateLastMonth = new Date(date.getFullYear(), date.getMonth(), 0 )
-                return this.$dateFns.format(dateLastMonth, 'yyyy-MM-dd')
+            dateStringEndLastMonth() {
+                var d = new Date()
+                var dateEndLastMonth = new Date(d.getFullYear(), d.getMonth(), 0 )
+                return this.$dateFns.format(dateEndLastMonth, 'yyyy-MM-dd')
             },
 
-            yearString() {
-                var d = new Date();
-                var pastYear = d.getFullYear() - 1;
-                d.setFullYear(pastYear);
-                return this.$dateFns.format(d, 'yyyy')
+            dateStringBeginningLastMonth() {
+                var d = new Date()
+                var dateBeginningLastMonth = new Date(d.getFullYear(), d.getMonth(), 1 )
+                return this.$dateFns.format(dateBeginningLastMonth, 'yyyy-MM-dd')
+            },
+
+            pastYearString() {
+                var d = new Date()
+                var pastYear = d.setFullYear(d.getFullYear() - 1);
+                return this.$dateFns.format(pastYear, 'yyyy')
+            },
+
+            currentYearString() {
+                return this.$dateFns.format(new Date(), 'yyyy')
+            },
+
+            pastMonthDate() {
+                var d = new Date()
+                return d.setMonth(d.getMonth() - 1);
             },
 
             optionsCountryCode() {
@@ -149,24 +175,78 @@
 
                     })
                 return options;
-            }
+            },
+
+            selected() {
+                var selected = null
+                var pastMonthString = this.$dateFns.format(this.pastMonthDate, 'yyyy-MM')
+
+                if (
+                    this.payload.start_date == this.currentYearString + '-01-01' &&
+                    this.payload.end_date == this.currentYearString + '-03-31'
+                    ) {
+                        selected = 'Q1'
+                } else if (
+                    this.payload.start_date == this.currentYearString + '-04-01' &&
+                    this.payload.end_date == this.currentYearString + '-06-30'
+                    ) {
+                        selected = 'Q2'
+                } else if (
+                        this.payload.start_date == this.currentYearString + '-07-01' &&
+                        this.payload.end_date == this.currentYearString + '-09-30'
+                    ) {
+                        selected = 'Q3'
+                } else if (
+                        this.payload.start_date == this.currentYearString + '-10-01' &&
+                        this.payload.end_date == this.currentYearString + '-12-31'
+                    ) {
+                        selected = 'Q4'
+                } else if(
+                    this.payload.start_date == this.pastYearString + '-01-01' &&
+                    this.payload.end_date == this.pastYearString + '-12-31'
+                ) {
+                    selected = 'pastYear'
+
+                } else if (
+                    this.payload.start_date == pastMonthString + '-01' &&
+                    this.payload.end_date == pastMonthString + '-31'
+                ) {
+                    selected = 'pastMonth'
+                }
+
+                return selected
+
+            },
         },
 
         methods: {
 
-            // setFirstOfMonth() {
-            //     var date = new Date()
-            //     var dateLastMonth = new Date(date.getFullYear(), date.getMonth() + 1, 1)
-            //     this.payload.start_date = this.$dateFns.format(dateLastMonth, 'yyyy-MM-dd')
-            // },
+            test(quarter) {
+                if (quarter === 1) {
+                    return new Date() < new Date(this.currentYearString, 2, 31)
+                } else if (quarter === 2) {
+                    return new Date() < new Date(this.currentYearString, 5, 30)
+                } else if (quarter === 3) {
+                    return new Date() < new Date(this.currentYearString, 8, 30)
+                } else if (quarter === 4) {
+                    return new Date() < new Date(this.currentYearString, 11, 31)
+                }
+
+            },
 
             setPastYear() {
-                this.payload.start_date = this.yearString + '-01-01'
-                this.payload.end_date = this.yearString + '-12-31'
+                this.payload.start_date = this.pastYearString + '-01-01'
+                this.payload.end_date = this.pastYearString + '-12-31'
+            },
+
+            setPastMonth() {
+                var pastMonthString = this.$dateFns.format(this.pastMonthDate, 'yyyy-MM')
+
+                this.payload.start_date = pastMonthString + '-01'
+                this.payload.end_date = pastMonthString + '-31'
             },
 
             setQ(quarter) {
-                var yearString = this.$dateFns.format(new Date(), 'yyyy')
                 // https://en.wikipedia.org/wiki/Calendar_year
                 // First quarter, Q1: 1 January – 31 March (90 days or 91 days in leap years)
                 // Second quarter, Q2: 1 April – 30 June (91 days)
@@ -175,33 +255,24 @@
 
                 switch (quarter) {
                     case 1:
-                        this.payload.start_date = yearString + '-01-01'
-                        this.payload.end_date = yearString + '-03-31'
+                        this.payload.start_date = this.currentYearString + '-01-01'
+                        this.payload.end_date = this.currentYearString + '-03-31'
                         break;
                     case 2:
-                        this.payload.start_date = yearString + '-04-01'
-                        this.payload.end_date = yearString + '-06-30'
+                        this.payload.start_date = this.currentYearString + '-04-01'
+                        this.payload.end_date = this.currentYearString + '-06-30'
                         break;
                     case 3:
-                        this.payload.start_date = yearString + '-07-01'
-                        this.payload.end_date = yearString + '-09-30'
+                        this.payload.start_date = this.currentYearString + '-07-01'
+                        this.payload.end_date = this.currentYearString + '-09-30'
                         break;
                     case 4:
-                        this.payload.start_date = yearString + '-10-01'
-                        this.payload.end_date = yearString + '-12-31'
+                        this.payload.start_date = this.currentYearString + '-10-01'
+                        this.payload.end_date = this.currentYearString + '-12-31'
                         break;
                 }
 
             },
-
-
-            // setToday() {
-            //     this.payload.end_date = this.$dateFns.format(new Date(), 'yyyy-MM-dd')
-            // },
-
-            // setLastMonth() {
-            //     this.payload.end_date = this.dateLastMonth
-            // },
 
             reset() {
                 this.payload = {
