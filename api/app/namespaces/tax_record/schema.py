@@ -1,20 +1,32 @@
 from flask_restx import Model, fields
 
+from ..transaction import transaction_sub_dto
+
 tax_record_sub_dto = Model('tax_record_sub', {
     'public_id': fields.String(readonly=True),
-    'tax_jurisdiction': fields.String(attribute=lambda x: x.tax_jurisdiction.name, readonly=True),
+    'tax_jurisdiction_code': fields.String(readonly=True),
     'start_date': fields.Date(readonly=True),
     'end_date': fields.Date(readonly=True),
+    'seller_firm_public_id': fields.String(attribute=lambda x: x.seller_firm.public_id, readonly=True),
 })
 
-tax_record_dto = Model('tax_record', {
+tax_record_dto = tax_record_sub_dto.clone('tax_record', {
     'created_on': fields.DateTime(readonly=True),
     'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
-    'filename': fields.String
+    'total_local_sale': fields.Integer(readonly=True),
+    'total_local_sale_reverse_charge': fields.Integer(readonly=True),
+    'total_distance_sale': fields.Integer(readonly=True),
+    'total_intra_community_sale': fields.Integer(readonly=True),
+    'total_export': fields.Integer(readonly=True),
+    'total_local_acquisition': fields.Integer(readonly=True),
+    'total_intra_community_acquisition': fields.Integer(readonly=True),
+    'total_import': fields.Integer(readonly=True),
+    'transactions':fields.List(fields.Nested(transaction_sub_dto))
 })
 
 tax_record_dto_admin = tax_record_dto.clone('tax_record_admin', {
     'id': fields.Integer(readonly=True),
-    'active': fields.Boolean(readonly=True)
+    'seller_firm_id': fields.String(readonly=True)
+
 })

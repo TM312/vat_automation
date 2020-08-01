@@ -4,9 +4,9 @@ export default ($axios) => ({
         return $axios.get(`${resource}/`)
     },
 
-    generate(payload) {
-        return $axios.post(`${resource}/`, payload)
-    },
+    // generate(payload) {
+    //     return $axios.post(`${resource}/`, payload)
+    // },
 
     download_by_id(tax_record_public_id) {
         return $axios.get(`${resource}/${tax_record_public_id}`)
@@ -18,6 +18,10 @@ export default ($axios) => ({
 
     get_all_by_seller_firm_public_id(seller_firm_public_id) {
         return $axios.get(`${resource}/seller_firm/${seller_firm_public_id}`)
+    },
+
+    create_by_seller_firm_public_id(seller_firm_public_id, payload) {
+        return $axios.post(`${resource}/seller_firm/${seller_firm_public_id}`, payload)
     }
 
 })

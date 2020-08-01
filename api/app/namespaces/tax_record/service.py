@@ -4,9 +4,11 @@ from flask import g, current_app, send_from_directory
 from typing import List, BinaryIO, Dict, Union
 from uuid import UUID
 
+from app.extensions import db
+
 from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauthorized, NotFound
 
-from .interface import TaxRecordDictInterface
+from .interface import TaxRecordDictInterface, TaxRecordInterface
 from . import TaxRecord
 
 from ..utils.service import HelperService, NotificationService, InputService
@@ -70,6 +72,132 @@ class TaxRecordService:
 
 
     @staticmethod
+    def create_by_seller_firm_public_id(seller_firm_public_id: str, tax_record_data_raw: TaxRecordInterface):
+        from ..business.seller_firm.service import SellerFirmService
+        from ..transaction.service import TransactionService
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if seller_firm:
+
+            start_date = HelperService.get_date_from_str(tax_record_data_raw.get('start_date'), '%Y-%m-%d')
+            end_date = HelperService.get_date_from_str(tax_record_data_raw.get('end_date'), '%Y-%m-%d')
+            tax_jurisdiction_code = tax_record_data_raw.get('tax_jurisdiction_code')
+            transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm.id, tax_jurisdiction_code)
+
+            print('start_date:', start_date, flush=True)
+            print('end_date:', end_date, flush=True)
+            print('tax_jurisdiction_code:', tax_jurisdiction_code, flush=True)
+            print('transactions original:', transactions, len(transactions), flush=True)
+
+
+
+
+
+
+
+
+
+
+            if not transactions:
+                raise UnprocessableEntity('There are no transactions by this seller for this period and tax jurisdiction.')
+
+            else:
+
+                tax_record_data = {
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'created_by': g.user.id,
+                    'seller_firm_id': seller_firm.id,
+                    'tax_jurisdiction_code': tax_jurisdiction_code,
+                    'total_local_sale': TaxRecordService.get_total_local_sale(transactions),
+                    'total_local_sale_reverse_charge': TaxRecordService.get_total_local_sale_reverse_charge(transactions),
+                    'total_distance_sale': TaxRecordService.get_total_distance_sale(transactions),
+                    'total_intra_community_sale': TaxRecordService.get_total_intra_community_sale(transactions),
+                    'total_export': TaxRecordService.get_total_export(transactions),
+                    'total_local_acquisition': TaxRecordService.get_total_local_acquisition(transactions),
+                    'total_intra_community_acquisition': TaxRecordService.get_total_intra_community_acquisition(transactions),
+                    'total_import': TaxRecordService.get_total_import(transactions)
+                }
+                try:
+                    tax_record = TaxRecordService.create(tax_record_data)
+                    tax_record = TaxRecordService.extend_transactions(tax_record, transactions)
+                except:
+                    db.session.rollback()
+                    raise
+
+                return tax_record
+
+        else:
+            raise NotFound('A seller firm with the id "{}" does not exist.'.format(seller_firm_public_id))
+
+
+
+
+    @staticmethod
+    def get_total_local_sale(transactions: List[Transaction]):
+        local_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE']
+        total_local_sale = sum([local_sale.total_value_vat for local_sale in local_sales])
+        return total_local_sale
+
+    @staticmethod
+    def get_total_local_sale_reverse_charge(transactions: List[Transaction]):
+        local_sale_reverse_charges = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE']
+        total_local_sale_reverse_charge = sum([local_sale.total_value_vat for local_sale in local_sale_reverse_charges])
+        return total_local_sale_reverse_charge
+
+    @staticmethod
+    def get_total_distance_sale(transactions: List[Transaction]):
+        distance_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'DISTANCE_SALE']
+        total_distance_sale = sum([local_sale.total_value_vat for local_sale in distance_sales])
+        return total_distance_sale
+
+    @staticmethod
+    def get_total_intra_community_sale(transactions: List[Transaction]):
+        intra_community_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_SALE']
+        total_intra_community_sale = sum([local_sale.total_value_vat for local_sale in intra_community_sales])
+        return total_intra_community_sale
+
+    @staticmethod
+    def get_total_export(transactions: List[Transaction]):
+        exports = [transaction for transaction in transactions if transaction.tax_treatment_code == 'EXPORT']
+        total_export = sum([local_sale.total_value_vat for local_sale in exports])
+        return total_export
+
+    @staticmethod
+    def get_total_local_acquisition(transactions: List[Transaction]):
+        local_acquisitions = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_ACQUISITION']
+        total_local_acquisition = sum([local_sale.total_value_vat for local_sale in local_acquisitions])
+        return total_local_acquisition
+
+    @staticmethod
+    def get_total_intra_community_acquisition(transactions: List[Transaction]):
+        intra_community_acquisitions = [transaction for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION']
+        total_intra_community_acquisition = sum([local_sale.total_value_vat for local_sale in intra_community_acquisitions])
+        return total_intra_community_acquisition
+
+    @staticmethod
+    def get_total_import(transactions: List[Transaction]):
+        imports = [transaction for transaction in transactions if transaction.tax_treatment_code == 'IMPORT']
+        total_import = sum([local_sale.total_value_vat for local_sale in imports])
+        return total_import
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @staticmethod
     def get_df_list(tax_record_dict: TaxRecordDictInterface) -> List[Union[pd.DataFrame, str]]:
         tab_names = ['LOCAL_SALES', 'LOCAL_SALES_REVERSE_CHARGE', 'DISTANCE_SALES', 'NON_TAXABLE_DISTANCE_SALES', 'INTRA_COMMUNITY_SALES', 'EXPORTS', 'DOMESTIC_ACQUISITIONS', 'INTRA_COMMUNITY_ACQUISITIONS']
         #'SUMMARY',
@@ -100,30 +228,33 @@ class TaxRecordService:
 
 
     @staticmethod
-    def create_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, filename: str, user_id: int):
-        seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id).first()
-        if seller_firm:
-            start_date: date = HelperService.get_date_from_str(start_date_str, '%d-%m-%Y')
-            end_date: date = HelperService.get_date_from_str(end_date_str, '%d-%m-%Y')
+    def create(tax_record_data: TaxRecordInterface) -> TaxRecord:
 
-            try:
-                new_tax_record_object = TaxRecord(
-                    created_by = user_id,
-                    seller_firm_id = seller_firm.id,
-                    filename = filename,
-                    start_date = start_date,
-                    end_date = end_date
-                )
 
-                db.session.add(new_tax_record_object)
-                db.commit()
+        new_tax_record = TaxRecord(
+            created_by = tax_record_data.get('user_id'),
+            seller_firm_id = tax_record_data.get('seller_firm_id'),
+            start_date = tax_record_data.get('start_date'),
+            end_date = tax_record_data.get('end_date'),
+            total_local_sale = tax_record_data.get('total_local_sale'),
+            total_local_sale_reverse_charge = tax_record_data.get('total_local_sale_reverse_charge'),
+            total_distance_sale = tax_record_data.get('total_distance_sale'),
+            total_intra_community_sale = tax_record_data.get('total_intra_community_sale'),
+            total_export = tax_record_data.get('total_export'),
+            total_local_acquisition = tax_record_data.get('total_local_acquisition'),
+            total_intra_community_acquisition = tax_record_data.get('total_intra_community_acquisition'),
+            total_import = tax_record_data.get('total_import')
+        )
 
-            except:
-                raise InternalServerError('Can not create Tax Record object.')
+        db.session.add(new_tax_record)
+        db.session.commit()
 
-        else:
-            raise NotFound('Seller Firm can not be identified. Invalid ID: {}'.format(seller_firm_public_id))
 
+    @staticmethod
+    def extend_transactions(tax_record: TaxRecord, transactions: List[Transaction]):
+        tax_record.transactions.extend(transactions)
+        db.session.commit()
+        return tax_record
 
 
     # celery task on this level
@@ -146,7 +277,7 @@ class TaxRecordService:
         tax_record_file= TaxRecordService.write_dfs_to_xlsx(dfs, sheets, file_path)
 
 
-        TaxRecordService.create_tax_record(start_date_str, end_date_str, seller_firm_public_id, filename, user_id)
+        TaxRecordService.create(start_date_str, end_date_str, seller_firm_public_id, filename, user_id)
 
 
 

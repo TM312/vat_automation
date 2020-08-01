@@ -37,6 +37,8 @@ class Config(object):
     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/home/data/seller_firm_data/transaction'
     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/home/data/seller_firm_data/tax_record'
 
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+
     # Media
     # PROFILE_IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
