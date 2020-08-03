@@ -28,8 +28,8 @@ tax_treatment_transaction_type_AT = db.Table(
 
 tax_record_transaction_AT = db.Table(
     'tax_record_transaction_AT',
-    db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id'), primary_key=True),
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
+    db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id', ondelete="CASCADE")),
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id', ondelete="CASCADE"))
 )
 
 tax_auditor_seller_firm_AT = db.Table(

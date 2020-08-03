@@ -27,6 +27,7 @@ class TaxRecord(db.Model):
     _total_local_sale = db.Column(db.Integer, default=0)
     _total_local_sale_reverse_charge = db.Column(db.Integer, default=0)
     _total_distance_sale = db.Column(db.Integer, default=0)
+    _total_non_taxable_distance_sale = db.Column(db.Integer, default=0)
     _total_intra_community_sale = db.Column(db.Integer, default=0)
     _total_export = db.Column(db.Integer, default=0)
     _total_local_acquisition = db.Column(db.Integer, default=0)
@@ -48,7 +49,6 @@ class TaxRecord(db.Model):
     def total_local_sale(self, value):
         self._total_local_sale = int(value * 100) if value is not None else None
 
-    #cent values
     @hybrid_property
     def total_local_sale_reverse_charge(self):
         return self._total_local_sale_reverse_charge / 100
@@ -57,7 +57,6 @@ class TaxRecord(db.Model):
     def total_local_sale_reverse_charge(self, value):
         self._total_local_sale_reverse_charge = int(value * 100) if value is not None else None
 
-    #cent values
     @hybrid_property
     def total_distance_sale(self):
         return self._total_distance_sale / 100
@@ -66,7 +65,14 @@ class TaxRecord(db.Model):
     def total_distance_sale(self, value):
         self._total_distance_sale = int(value * 100) if value is not None else None
 
-    #cent values
+    @hybrid_property
+    def total_non_taxable_distance_sale(self):
+        return self._total_non_taxable_distance_sale / 100
+
+    @total_non_taxable_distance_sale.setter
+    def total_non_taxable_distance_sale(self, value):
+        self._total_non_taxable_distance_sale = int(value * 100) if value is not None else None
+
     @hybrid_property
     def total_intra_community_sale(self):
         return self._total_intra_community_sale / 100
@@ -75,7 +81,6 @@ class TaxRecord(db.Model):
     def total_intra_community_sale(self, value):
         self._total_intra_community_sale = int(value * 100) if value is not None else None
 
-    #cent values
     @hybrid_property
     def total_export(self):
         return self._total_export / 100

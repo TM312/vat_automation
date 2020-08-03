@@ -17,7 +17,7 @@
                     <b-col cols="auto" class="mr-auto">{{ business.address  }}</b-col>
                 </b-form-row>
             </b-card-text>
-            <b-row cols="2">
+            <b-row>
                 <b-col cols="auto" class="mr-auto"><nuxt-link :to="`clients/${business.public_id}`">Details</nuxt-link></b-col>
             </b-row>
         </b-card>

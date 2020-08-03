@@ -165,7 +165,7 @@ class TransactionInputService:
         input_type = 'transaction' # only used for response objects
         transaction_inputs = []
 
-        for i in range(10):
+        for i in range(total_number_transaction_inputs):
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
             account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)

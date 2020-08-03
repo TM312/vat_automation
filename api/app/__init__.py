@@ -22,6 +22,14 @@ def create_app(env):
     def ping():
         return jsonify("pong_3f5ca2711e72a507")
 
+
+    @app.teardown_request
+    def teardown_request(exception):
+        if exception:
+            db.session.rollback()
+        db.session.remove()
+        print('RUN ON TEARDOWN', flush=True)
+
     return app
 
 

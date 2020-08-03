@@ -133,7 +133,6 @@ export default {
       } catch (err) {
         const status = err.response.status
         if (status === 409) {
-          console.log('status check')
 
           this.$toast.error(
             'A user with this email adress already exists. Try logging in instead.',

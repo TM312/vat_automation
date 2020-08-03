@@ -15,10 +15,10 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - certbot:/data/certbot
-            - letsencrypt:/data/letsencrypt
-            # - /home/thomas/data/certbot/conf:/etc/letsencrypt
-            # - /home/thomas/data/certbot/www:/var/www/certbot
+            # - certbot:/data/certbot
+            # - letsencrypt:/data/letsencrypt
+            - /Users/tm/Projects/NTAMAZON/webapp/certificates/letsencrypt:/etc/letsencrypt
+            - /Users/tm/Projects/NTAMAZON/webapp/certificates/certbot:/var/www/certbot
         networks:
             - web
         depends_on:
@@ -32,10 +32,10 @@ services:
         image: certbot/certbot
         restart: unless-stopped
         volumes:
-            - certbot:/data/certbot
-            - letsencrypt:/data/letsencrypt
-            # - /home/thomas/data/certbot/conf:/etc/letsencrypt
-            # - /home/thomas/data/certbot/www:/var/www/certbot
+            # - certbot:/data/certbot
+            # - letsencrypt:/data/letsencrypt
+            - /Users/tm/Projects/NTAMAZON/webapp/certificates/letsencrypt:/etc/letsencrypt
+            - /Users/tm/Projects/NTAMAZON/webapp/certificates/certbot:/var/www/certbot
         networks:
             - web
         entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"

@@ -1,11 +1,11 @@
 <template>
     <div>
-        <p>Create New</p>
-            <form-add-seller-firm-tax-record />
+        <b-button v-b-toggle.collapse-tax-record-form variant="outline-primary">Create New</b-button>
+            <b-collapse id="collapse-tax-record-form" class="mt-2">
+                <form-add-seller-firm-tax-record />
+            </b-collapse>
         <hr>
-        <b-row cols="3" md="4">
-            <card-tax-record v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
-        </b-row>
+        <card-tax-record-short v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
     </div>
 </template>
 
@@ -14,6 +14,12 @@
 
     export default {
         name:'OverviewTaxRecords',
+
+        // data() {
+        //     return {
+        //         buttonPressed: false
+        //     }
+        // },
 
         props: {
             business: {

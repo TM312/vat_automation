@@ -100,12 +100,6 @@
                 block
             ><b-icon icon="box-arrow-in-up" /> Create New Tax Record</b-button>
 
-            <hr><br><hr>
-
-            <br>
-            Payload: {{ payload }}
-            <br>
-
         </b-card>
     </b-container>
 </template>

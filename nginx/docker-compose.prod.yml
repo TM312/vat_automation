@@ -13,8 +13,8 @@
 #       - 443:443
 #     volumes:
 #       - ./prod:/etc/nginx/conf.d
-#       - ./prod/certbot/conf:/etc/letsencrypt
-#       - ./prod/certbot/www:/var/www/certbot
+        # - /Users/tm/Projects/NTAMAZON/webapp/certificates/letsencrypt:/etc/letsencrypt
+        # - /Users/tm/Projects/NTAMAZON/webapp/certificates/certbot:/var/www/certbot
 #     networks:
 #       - web
 #     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
@@ -24,8 +24,8 @@
 #     image: certbot/certbot
 #     restart: always
 #     volumes:
-#       - ./prod/certbot/conf:/etc/letsencrypt
-#       - ./prod/certbot/www:/var/www/certbot
+#       - /Users/tm/Projects/NTAMAZON/webapp/certificates/letsencrypt:/etc/letsencrypt
+        # - /Users/tm/Projects/NTAMAZON/webapp/certificates/certbot:/var/www/certbot
 #     networks:
 #       - web
 #     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
