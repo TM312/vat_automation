@@ -97,7 +97,6 @@
         methods: {
             onFilesSelected() {
                 let selectedFiles = this.$refs.files.files;
-                console.log(selectedFiles);
 
                 for (var i = 0; i < selectedFiles.length; i++) {
                     this.files.push(selectedFiles[i]);
@@ -105,7 +104,6 @@
             },
 
             removeFile(key) {
-                console.log('this.files in card data upload: ', this.files)
                 this.files.splice(key, 1);
             }
         }

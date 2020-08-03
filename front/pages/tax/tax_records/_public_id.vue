@@ -1,5 +1,7 @@
 <template>
-    <div>tbd
+    <div>Tax Record Public ID
+
+
 
     </div>
 

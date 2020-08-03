@@ -22,23 +22,7 @@ def login_required(f):
 
     return wrap
 
-# acccepted_roles accepts arguments (more info here: https://blog.miguelgrinberg.com/post/the-ultimate-guide-to-python-decorators-part-iii-decorators-with-arguments)
-def accepted_roles(*roles):
-    def accepted_roles_inner_decorator(f):
-        @wraps(f)
-        def wrap(*args, **kwargs):
-            # user is available from @login_required
-            for role in roles:
-                if g.user.role == role:
-                    return f(*args, **kwargs)
-            raise Forbidden('You do not possess the rights to access the requested resource.')
-
-        return wrap
-    return accepted_roles_inner_decorator
-
-
-
-
+# accepted_u_types accepts arguments (more info here: https://blog.miguelgrinberg.com/post/the-ultimate-guide-to-python-decorators-part-iii-decorators-with-arguments)
 def accepted_u_types(*u_types):
     def accepted_u_types_inner_decorator(f):
         @wraps(f)
@@ -66,7 +50,6 @@ def confirmation_required(f):
     return wrap
 
 
-#provides access to the resource only if the user's (mail) confirmation status is True
 #to be used only in combination with login_required
 def employer_required(f):
     @wraps(f)

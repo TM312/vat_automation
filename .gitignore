@@ -1,6 +1,9 @@
 # Created by https://www.gitignore.io/api/nuxt,venv,macos,flask,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=nuxt,venv,macos,flask,visualstudiocode
 
+### Jupyter lab ####
+*.ipynb
+
 ### Flask ###
 instance/*
 !instance/.gitignore

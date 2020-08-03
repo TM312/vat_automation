@@ -44,10 +44,7 @@ things_list = {
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Platform, platforms],
-    'channels': [Channel, channels],
-#    'admins': [Admin, admins],
-    #'accounting_firms': [AccountingFirm, accounting_firms],
-    #'tax_auditors': [TaxAuditor, tax_auditors],
+    'channels': [Channel, channels]
 
 }
 
@@ -118,10 +115,10 @@ class SeedCommand(Command):
             response_object_vat_rates = VatSeedService.seed_tax_rates()
             response_objects.append(response_object_vat_rates)
 
-            # print('Creating Exchange Rates...')
-            # response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+            print('Creating Exchange Rates...')
+            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
 
-            # response_objects.append(response_object_exchange_rates)
+            response_objects.append(response_object_exchange_rates)
 
             for response_object in response_objects:
                 print("")

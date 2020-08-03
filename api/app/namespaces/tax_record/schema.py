@@ -17,6 +17,7 @@ tax_record_dto = tax_record_sub_dto.clone('tax_record', {
     'total_local_sale': fields.Integer(readonly=True),
     'total_local_sale_reverse_charge': fields.Integer(readonly=True),
     'total_distance_sale': fields.Integer(readonly=True),
+    'total_non_taxable_distance_sale': fields.Integer(readonly=True),
     'total_intra_community_sale': fields.Integer(readonly=True),
     'total_export': fields.Integer(readonly=True),
     'total_local_acquisition': fields.Integer(readonly=True),

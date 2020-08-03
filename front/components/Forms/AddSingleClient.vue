@@ -73,7 +73,6 @@
                         let response_objects = response.data;
                         response_objects.map(data => {
                             if (data.status == "success") {
-                                console.log(data);
                                 this.$toast.success(data.message, {
                                     duration: 5000
                                 });

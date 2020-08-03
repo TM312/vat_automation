@@ -71,34 +71,21 @@ class TransactionService:
         if transaction_type.code == 'RETURN':
             return True
 
-        print("define foundational vars", flush=True)
         # define foundational vars
         tax_date = TransactionService.get_tax_date(transaction_type, transaction_input)
-        print("tax_date:", tax_date, flush=True)
         item = ItemService.get_by_sku_account_date(transaction_input.item_sku, account, tax_date)
-        print("item:", item, flush=True)
         bundle = BundleService.get_by_id(transaction_input.bundle_id)
-        print("bundle:", bundle, flush=True)
         arrival_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='arrival')
-        print("arrival_country:", arrival_country, flush=True)
         departure_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='departure')
-        print("departure_country:", departure_country, flush=True)
         eu = CountryService.get_eu_by_date(tax_date)
 
         customer_vat_check_required: bool = TransactionService.vat_check_required(date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
-        print('transaction_input.customer_firm_vat_number_country_code: ', transaction_input.customer_firm_vat_number_country_code, flush=True)
-        print('transaction_input.customer_firm_vat_number: ', transaction_input.customer_firm_vat_number, flush=True)
-
         customer_firm_vatin: VATIN = CustomerFirmService.get_vatin_or_None(customer_vat_check_required, country_code_temp=transaction_input.customer_firm_vat_number_country_code, number_temp=transaction_input.customer_firm_vat_number, date=tax_date)
         customer_relationship, customer_relationship_checked = CustomerFirmService.get_customer_relationship(customer_firm_vatin, check_required=customer_vat_check_required)
 
-
-        print("Transaction Type Code", transaction_type.code, flush=True)
-        print('customer_firm_vatin: ', customer_firm_vatin, flush=True)
-        print('customer_relationship: ', customer_relationship, flush=True)
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             print('CASE: ', transaction_type.code, flush=True)
@@ -110,7 +97,6 @@ class TransactionService:
 
             # check for special case: non taxable distance sale
             if new_transaction.tax_treatment_code == 'DISTANCE_SALE':
-                print('SPECIAL CASE: NON_TAXABLE_DISTANCE_SALE', flush=True)
                 tax_treatment_code = 'NON_TAXABLE_DISTANCE_SALE'
                 new_non_taxable_distance_sale = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
                 VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
@@ -160,11 +146,11 @@ class TransactionService:
         item_vat_temp = VatService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction, tax_date)
         item_tax_rate_type_code=item_vat_temp.tax_rate_type_code
 
-        print('transaction_input: ', transaction_input, flush=True)
-        print('item: ', item, flush=True)
-        print('account: ', account, flush=True)
-        print('item_tax_code_code:', item_tax_code_code, flush=True)
-        print('item_vat_temp:', item_vat_temp, flush=True)
+        # print('transaction_input: ', transaction_input, flush=True)
+        # print('item: ', item, flush=True)
+        # print('account: ', account, flush=True)
+        # print('item_tax_code_code:', item_tax_code_code, flush=True)
+        # print('item_vat_temp:', item_vat_temp, flush=True)
 
         shipment_tax_rate_type_code = current_app.config['STANDARD_SERVICE_TAX_RATE_TYPE']
         shipment_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction, shipment_tax_rate_type_code, tax_date)

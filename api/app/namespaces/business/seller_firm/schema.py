@@ -14,6 +14,7 @@ class SellerFirmSchema:
 
     def get_seller_firm_dto():
         from ...user.tax_auditor import tax_auditor_sub_dto
+        from ...tax_record import tax_record_sub_dto
         return seller_firm_sub_dto.clone('seller_firm', {
             'created_by': fields.String(attribute=lambda x: x.creator.name),
             'created_on': fields.Date(readonly=True),
@@ -27,10 +28,8 @@ class SellerFirmSchema:
             'len_distance_sales': fields.Integer,
             'len_accounts': fields.Integer,
             'len_transactions': fields.Integer,
-            # 'len_items': fields.Integer,
-            # 'len_transactions': fields.Integer,
             # 'transaction_inputs': fields.List(fields.Nested(transaction_input_sub_dto)),
-            # 'tax_records': fields.List(fields.Nested('app.namespaces.tax_record.tax_record_dto')),
+            'tax_records': fields.List(fields.Nested(tax_record_sub_dto)),
         })
 
 

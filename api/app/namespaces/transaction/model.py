@@ -34,8 +34,8 @@ class Transaction(db.Model):  # type: ignore
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    tax_records = db.relationship('TaxRecord', secondary=tax_record_transaction_AT, back_populates='transactions')
-    notifications = db.relationship('TransactionNotification', backref='transaction', order_by="desc(TransactionNotification.created_on)", lazy=True, cascade='all, delete-orphan')
+    tax_records = db.relationship('TaxRecord', secondary=tax_record_transaction_AT, back_populates='transactions', cascade="all, delete")
+    notifications = db.relationship('TransactionNotification', backref='transaction', lazy=True, cascade='all, delete-orphan')
 
     transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
