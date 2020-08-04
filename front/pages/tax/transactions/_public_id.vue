@@ -10,8 +10,10 @@
             <hr>
             <h2>Tax Related Processes</h2>
 
-            <view-transactions v-if="!$fetchState.pending && transactionInput.length != 0" class="my-5 cols-6 cols-md-12" />
+            <view-transactions v-if="!$fetchState.pending && transactionInput.length != 0" class="my-5 cols-6 cols-md-12" :transactions="transactionInput.transactions" />
             <hr>
+            <h2>Transaction Bundle</h2>
+            <p class="text-muted">Below you find a list of all related transactions.</p>
             <table-transaction-input-bundle v-if="!$fetchState.pending && transactionInput.length != 0" :bundlePublicId="transactionInput.bundle_public_id"/>
 
         </b-container>
@@ -33,7 +35,7 @@
 
         computed: {
             ...mapState({
-                transactionInput: state => state.transaction_input.transaction_input
+                transactionInput: state => state.transaction_input.transaction_input,
             })
         }
     };

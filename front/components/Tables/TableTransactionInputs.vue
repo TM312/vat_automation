@@ -35,7 +35,7 @@
                     <b-col v-if="data.item.departure_country_code || data.item.arrival_country_code" cols="2" class="text-center"><b-icon icon="arrow-right" /></b-col>
                     <b-col class="text-left">{{ data.item.arrival_country_code }}</b-col>
                 </b-row>
-                </template>
+            </template>
 
 
         </b-table>
@@ -119,13 +119,22 @@ export default {
 
     computed: {
         ...mapState({
-            transaction_inputs_full: state => state.transaction_input.transaction_inputs
+            transaction_inputs_full: state => state.transaction_input.transaction_inputs,
+            countries: state => state.country.countries
         }),
 
         transaction_inputs() {
             return this.channelCode ? this.transaction_inputs_full.filter(transaction_input => transaction_input.channel_code === this.channelCode) : this.transaction_inputs_full
-        }
-    }
+        },
+
+    },
+    // methods: {
+    //     codeToName(countryCode) {
+    //         return this.countries.find(country => country.code == countryCode).name
+    //     },
+
+    // },
+
 }
 </script>
 

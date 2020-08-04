@@ -58,9 +58,6 @@
                         <b>Arrival:</b> {{ transactionInput.arrival_date }} <br>
                         <b>Complete:</b> {{ transactionInput.complete_date }} <br>
 
-
-
-
                     </b-col>
                 </b-row>
             </b-card>

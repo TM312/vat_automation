@@ -1,7 +1,6 @@
 <template>
     <div>
         <b-card
-            v-if="!$fetchState.pending"
             no-body
             border-variant="primary"
             header-bg-variant="primary"
@@ -43,24 +42,18 @@ import { mapState } from 'vuex'
 export default {
     name: "ViewTransactions",
 
-    async fetch() {
-            if (this.taxTreatments.length === 0) {
-                const { store } = this.$nuxt.context;
-                await store.dispatch("tax_treatment/get_all");
-            }
-        },
+    props: {
+        transactions: {
+            type: [Array, Object],
+            required: true
+        }
+    },
 
 
     computed: {
         ...mapState({
-            transactions: state => state.transaction_input.transaction_input.transactions,
             taxTreatments: state => state.tax_treatment.tax_treatments
         }),
-
-        // fullNames: function() {
-        // return this.items.map(function(item) {
-        //     return item.firstname + ' ' + item.lastname;
-        // });
 
         filteredTransactions: function() {
             var transactions = this.transactions

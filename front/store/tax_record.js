@@ -27,15 +27,16 @@ export const actions = {
         }
     },
 
-    // async generate({ commit }, tax_record_data) {
-    //     const res = await this.$repositories.tax_record.generate(tax_record_data)
-    //     const { status, data } = res
-    //     if (status === 200 && data.data) {
-    //         commit('SET_TAX_RECORD', data.data)
-    //     } else {
-    //         // Handle error here
-    //     }
-    // },
+    async get_by_public_id({ commit }, tax_record_public_id) {
+
+        const res = await this.$repositories.tax_record.get_by_public_id(tax_record_public_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_TAX_RECORD', data.data)
+        } else {
+            // Handle error here
+        }
+    },
 
     async download_by_id({ commit }, tax_record_public_id) {
 

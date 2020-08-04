@@ -4,11 +4,7 @@ export default ($axios) => ({
         return $axios.get(`${resource}/`)
     },
 
-    // generate(payload) {
-    //     return $axios.post(`${resource}/`, payload)
-    // },
-
-    download_by_id(tax_record_public_id) {
+    get_by_public_id(tax_record_public_id) {
         return $axios.get(`${resource}/${tax_record_public_id}`)
     },
 
