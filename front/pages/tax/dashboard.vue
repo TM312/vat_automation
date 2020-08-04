@@ -40,6 +40,7 @@
 
             await store.dispatch("country/get_all");
             await store.dispatch("currency/get_all");
+            await store.dispatch("tax_treatment/get_all");
         },
 
 

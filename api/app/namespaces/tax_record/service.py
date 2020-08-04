@@ -25,6 +25,10 @@ class TaxRecordService:
         return tax_records
 
     @staticmethod
+    def get_by_public_id(tax_record_public_id: str) -> TaxRecord:
+        return TaxRecord.query.filter_by(public_id=tax_record_public_id).first()
+
+    @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
         tax_records = TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
         return tax_records
@@ -97,15 +101,15 @@ class TaxRecordService:
                     'end_date': end_date,
                     'tax_jurisdiction_code': tax_jurisdiction_code,
 
-                    'total_local_sale': TaxRecordService.get_total_local_sale(transactions),
-                    'total_local_sale_reverse_charge': TaxRecordService.get_total_local_sale_reverse_charge(transactions),
-                    'total_distance_sale': TaxRecordService.get_total_distance_sale(transactions),
-                    'total_non_taxable_distance_sale': TaxRecordService.get_total_non_taxable_distance_sale(transactions),
-                    'total_intra_community_sale': TaxRecordService.get_total_intra_community_sale(transactions),
-                    'total_export': TaxRecordService.get_total_export(transactions),
-                    'total_local_acquisition': TaxRecordService.get_total_local_acquisition(transactions),
-                    'total_intra_community_acquisition': TaxRecordService.get_total_intra_community_acquisition(transactions),
-                    'total_import': TaxRecordService.get_total_import(transactions)
+                    'total_local_sale': TaxRecordService.get_total(transactions, 'LOCAL_SALE'),
+                    'total_local_sale_reverse_charge': TaxRecordService.get_total(transactions, 'LOCAL_SALE_REVERSE_CHARGE'),
+                    'total_distance_sale': TaxRecordService.get_total(transactions, 'DISTANCE_SALE'),
+                    'total_non_taxable_distance_sale': TaxRecordService.get_total(transactions, 'NON_TAXABLE_DISTANCE_SALE'),
+                    'total_intra_community_sale': TaxRecordService.get_total(transactions, 'INTRA_COMMUNITY_SALE'),
+                    'total_export': TaxRecordService.get_total(transactions, 'EXPORT'),
+                    'total_local_acquisition': TaxRecordService.get_total(transactions, 'LOCAL_ACQUISITION'),
+                    'total_intra_community_acquisition': TaxRecordService.get_total(transactions, 'INTRA_COMMUNITY_ACQUISITION'),
+                    'total_import': TaxRecordService.get_total(transactions, 'IMPORT')
                 }
 
                 try:
@@ -124,6 +128,11 @@ class TaxRecordService:
 
         else:
             raise NotFound('A seller firm with the id "{}" does not exist.'.format(seller_firm_public_id))
+
+
+    @staticmethod
+    def get_total(transactions: List[Transaction], tax_treatment_code: str):
+        return sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
 
 
     @staticmethod
@@ -159,53 +168,6 @@ class TaxRecordService:
         tax_record.transactions.extend(transactions)
         db.session.commit()
 
-
-    @staticmethod
-    def get_total_local_sale(transactions: List[Transaction]):
-        total_local_sale = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE'])
-        return total_local_sale
-
-    @staticmethod
-    def get_total_local_sale_reverse_charge(transactions: List[Transaction]):
-        total_local_sale_reverse_charge = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE'])
-        return total_local_sale_reverse_charge
-
-    @staticmethod
-    def get_total_distance_sale(transactions: List[Transaction]):
-        total_distance_sale = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'DISTANCE_SALE'])
-        return total_distance_sale
-
-    @staticmethod
-    def get_total_non_taxable_distance_sale(transactions: List[Transaction]):
-        total_non_taxable_distance_sale = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'NON_TAXABLE_DISTANCE_SALE'])
-        return total_non_taxable_distance_sale
-
-        get_total_non_taxable_distance_sale
-
-    @staticmethod
-    def get_total_intra_community_sale(transactions: List[Transaction]):
-        total_intra_community_sale = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_SALE'])
-        return total_intra_community_sale
-
-    @staticmethod
-    def get_total_export(transactions: List[Transaction]):
-        total_export = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'EXPORT'])
-        return total_export
-
-    @staticmethod
-    def get_total_local_acquisition(transactions: List[Transaction]):
-        total_local_acquisition = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_ACQUISITION'])
-        return total_local_acquisition
-
-    @staticmethod
-    def get_total_intra_community_acquisition(transactions: List[Transaction]):
-        total_intra_community_acquisition = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION'])
-        return total_intra_community_acquisition
-
-    @staticmethod
-    def get_total_import(transactions: List[Transaction]):
-        total_import = sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == 'IMPORT'])
-        return total_import
 
 
 

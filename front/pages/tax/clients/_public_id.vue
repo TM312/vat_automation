@@ -8,14 +8,14 @@
         <b-container fluid>
             <b-tabs pills card vertical>
                 <b-tab title='Overview' active>
-                    <overview-base-data-loading v-if="$fetchState.pending && seller_firm.length === 0" />
+                    <overview-base-data-loading v-if="$fetchState.pending && (seller_firm.public_id != $route.params.public_id || seller_firm.length === 0)" />
                     <overview-base-data v-else />
                 </b-tab>
 
                 <b-tab title='Tax Records'>
                     <lazy-overview-tax-records :business="seller_firm" />
                 </b-tab>
-                <b-tab title='Upload Files' :disabled="$fetchState.pending && seller_firm.length === 0">
+                <b-tab title='Upload Files' :disabled="$fetchState.pending && seller_firm.public_id != $route.params.public_id || seller_firm.length === 0">
                     <lazy-add-data-files :seller_firm_public_id="seller_firm.public_id" />
                 </b-tab>
 
@@ -32,7 +32,9 @@
 
         async fetch() {
             const { store } = this.$nuxt.context
-            await store.dispatch('seller_firm/get_by_public_id', this.$route.params.public_id);
+            if (this.seller_firm.length == 0 || this.seller_firm.public_id !== this.$route.params.public_id) {
+                await store.dispatch('seller_firm/get_by_public_id', this.$route.params.public_id)
+            }
         },
 
         computed: {

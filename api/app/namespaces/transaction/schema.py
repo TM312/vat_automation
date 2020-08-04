@@ -17,12 +17,12 @@ transaction_sub_dto = Model('transaction_sub', {
     'tax_date': fields.Date,
     'tax_calculation_date': fields.Date,
     'transaction_currency': fields.String(attribute=lambda x: x.transaction_currency.name, readonly=True),
+    'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
 })
 
 transaction_dto = transaction_sub_dto.clone('transaction', {
     'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'created_on': fields.DateTime,
-    'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     # 'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),
     # 'item_public_id': fields.String(attribute=lambda x: x.item.public_id, readonly=True),

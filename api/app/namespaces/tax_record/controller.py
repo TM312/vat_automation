@@ -38,20 +38,21 @@ class TaxRecordResource(Resource):
     #     return generate_tax_record(start_date_str, end_date_str, seller_firm_public_id, tax_jurisdiction_code)
 
 
-@ns.route("/<string:public_id>")
+@ns.route("/<string:tax_record_public_id>")
 class TaxRecordResource(Resource):
     @login_required
     @employer_required
-    def get(self, public_id):
-        return TaxRecordService.download_tax_record(public_id)
+    @ns.marshal_with(tax_record_dto, envelope='data')
+    def get(self, tax_record_public_id):
+        return TaxRecordService.get_by_public_id(tax_record_public_id)
 
 
 @ns.route("/seller_firm/<string:seller_firm_public_id>")
 class TaxRecordSellerFirmResource(Resource):
     @login_required
-    @ns.marshal_list_with(tax_record_dto, envelope='data')
+    @ns.marshal_list_with(tax_record_sub_dto, envelope='data')
     def get(self) -> List[TaxRecord]:
-        """Get own Tax Records """
+        """Get Tax Records of Seller Firm """
         return TaxRecordService.get_all_by_seller_firm_public_id(seller_firm_public_id)
 
     @login_required
