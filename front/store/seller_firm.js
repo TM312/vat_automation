@@ -80,8 +80,8 @@ export const actions = {
         }
     },
 
-    async delete_by_id({ commit }, seller_firm_id) {
-        const res = await this.$repositories.seller_firm.delete(seller_firm_id)
+    async delete_by_public_id({ commit }, seller_firm_public_id) {
+        const res = await this.$repositories.seller_firm.delete_by_public_id(seller_firm_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store

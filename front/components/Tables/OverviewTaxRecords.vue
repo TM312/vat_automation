@@ -5,7 +5,7 @@
                 <form-add-seller-firm-tax-record />
             </b-collapse>
         <hr>
-        <card-tax-record-short v-for="(tax_record, i) in tax_records" :key="i" :tax_record="tax_record" />
+        <card-tax-record-short v-for="(taxRecord, i) in taxRecords" :key="i" :taxRecord="taxRecord" />
     </div>
 </template>
 
@@ -14,12 +14,6 @@
 
     export default {
         name:'OverviewTaxRecords',
-
-        // data() {
-        //     return {
-        //         buttonPressed: false
-        //     }
-        // },
 
         props: {
             business: {
@@ -30,7 +24,7 @@
 
         computed: {
             ...mapState({
-                tax_records: state => state.seller_firm.seller_firm.tax_records
+                taxRecords: state => state.seller_firm.seller_firm.taxRecords
             }),
         }
     }
