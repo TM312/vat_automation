@@ -1,5 +1,6 @@
 <template>
     <div>
+        <b-button variant="outline-danger" :disabled="buttonDisabled" @click="removeAll">Delete</b-button>
         <b-tabs pills content-class="mt-3">
             <b-tab title="Total" active>
                 <b-card
@@ -24,6 +25,12 @@
     export default {
         name:'OverviewTransactionInputs',
 
+        data() {
+            return {
+                buttonDisabled: false
+            }
+        },
+
         async fetch() {
             const { store } = this.$nuxt.context;
             await store.dispatch("transaction_input/get_by_seller_firm_public_id", this.$route.params.public_id);
@@ -34,7 +41,22 @@
                 seller_firm: state => state.seller_firm.seller_firm,
                 transaction_inputs: state => state.transaction_input.transaction_inputs
             }),
-        }
+        },
+
+        methods: {
+            async removeAll() {
+                this.buttonDisabled = true;
+                try {
+                    await this.$store.dispatch("transaction_input/delete_all");
+                    await this.$store.dispatch("seller_firm/get_by_public_id", this.$route.params.public_id);
+                    this.buttonDisabled = false;
+                } catch (error) {
+                    this.$toast.error(error, { duration: 5000 });
+                    this.buttonDisabled = false;
+                    return [];
+                }
+            },
+        },
     }
 </script>
 

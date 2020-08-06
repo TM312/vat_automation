@@ -1,6 +1,5 @@
 <template>
     <b-col cols="4" md="3">
-        <p>"Test"</p>
         <b-card :title="tax_record.seller_firm" border-variant="success">
             <b-card-text>
                 <b>Period: </b>{{ $dateFns.format(tax_record.start_date, 'MMMM dd, yyyy') }} – {{ $dateFns.format(tax_record.end_date, 'MMMM dd, yyyy') }} <br>

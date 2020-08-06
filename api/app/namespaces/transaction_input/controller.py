@@ -21,10 +21,19 @@ ns.add_model(transaction_input_sub_dto.name, transaction_input_sub_dto)
 @ns.route("/")
 class TransactionInputResource(Resource):
     """TransactionInputs"""
+    @login_required
     @ns.marshal_list_with(transaction_input_dto, envelope='data')
     def get(self) -> List[TransactionInput]:
         """Get all TransactionInputs"""
         return TransactionInputService.get_all()
+
+    # !!!! DELETE ALL NEEDS TOO BE REMOVED ASAP !!!!!
+    @login_required
+    def delete(self) -> Response:
+        """Delete Single TransactionInput"""
+        from flask import jsonify
+
+        return TransactionInputService.delete_all()
 
 
 @ns.route("/<string:transaction_input_public_id>")

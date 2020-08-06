@@ -33,6 +33,10 @@ class VATINService:
         return VATIN.query.filter_by(public_id = vatin_public_id).first()
 
     @staticmethod
+    def get_by_country_code_seller_firm(country_code: str, seller_firm: 'app.namespaces.business.seller_firm.SellerFirm') -> VATIN:
+        return VATIN.query.join(seller_firm.vat_numbers).filter_by(country_code).first()
+
+    @staticmethod
     def update(vatin_id: int, data_changes: VATINInterface) -> VATIN:
         vatin = VATINService.get_by_id(vatin_id)
         vatin.update(data_changes)
@@ -188,7 +192,6 @@ class VATINService:
         for i in range(total_number_vatins):
             country_code, number = VATINService.get_vat_from_df(df, i)
             if (country_code is None or number is None):
-                print("IS NONE CONDITION", flush=True)
                 continue
 
             vatin = VATIN.query.filter(VATIN.country_code==country_code, VATIN.number==number, VATIN.valid_to >= date.today()).first()

@@ -16,14 +16,7 @@ class CountryService:
 
     @staticmethod
     def get_by_code(country_code: str) -> Country:
-        country = Country.query.filter_by(code=country_code).first()
-        print('country_code:', country_code, flush=True)
-        print('country:', country, flush=True)
-
-        if country:
-            return country
-        else:
-            raise
+        return Country.query.filter_by(code=country_code).first()
 
     @staticmethod
     def get_eu_by_date(date: date) -> EU:

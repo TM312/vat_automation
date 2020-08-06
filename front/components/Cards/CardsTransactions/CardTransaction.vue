@@ -34,8 +34,8 @@
                     <b-col>
                         <b>Invoice</b>
                         <p>Exchange Rate: {{ transaction.invoice_exchange_rate }}  <i>({{ transaction.invoice_exchange_rate_date }})</i></p>
-                        <p>Net: {{ transaction.invoice_amount_net }} {{ transaction.transaction_currency }}</p>
-                        <p>Vat: {{ transaction.invoice_amount_vat }} {{ transaction.transaction_currency }}</p>
+                        <p>Net: {{ transaction.invoice_amount_net }} {{ transaction.invoice_currency }}</p>
+                        <p>Vat: {{ transaction.invoice_amount_vat }} {{ transaction.invoice_currency }}</p>
                         <p>Gross: {{ transaction.invoice_amount_gross }} {{ transaction.invoice_currency }}</p>
                         <p>Amount Reverse Charge: {{ transaction.invoice_amount_vat_reverse_charge}} {{ transaction.invoice_currency }}</p>
                     </b-col>

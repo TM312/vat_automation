@@ -153,8 +153,6 @@ class SellerFirmService:
 
     @staticmethod
     def get_seller_firm_id(**kwargs) -> int:
-        print("kwargs.get('seller_firm_public_id'):", kwargs.get('seller_firm_public_id'), flush=True)
-        print("type: kwargs.get('seller_firm_public_id'):", type(kwargs.get('seller_firm_public_id')), flush=True)
 
         """
         Function may take either:
@@ -194,6 +192,9 @@ class SellerFirmService:
         df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
         file_type = InputService.determine_file_type(df)
         data_type = InputService.determine_data_type(file_type)
+
+        print('file_type:', file_type, flush=True)
+        print('data_type:', data_type, flush=True)
 
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 

@@ -50,13 +50,14 @@ class TransactionService:
         return Transaction.query.filter_by(public_id = transaction_public_id).first()
 
 
+
     @staticmethod
     def create_transaction_s(transaction_input: TransactionInputInterface) -> Transaction:
         from ..account.service import AccountService
         from ..transaction_input.service import TransactionInputService
 
-        print("", flush=True)
-        print("function start: create_transaction_s", flush=True)
+        # print("", flush=True)
+        # print("function start: create_transaction_s", flush=True)
 
 
         account_given_id = transaction_input.account_given_id
@@ -88,9 +89,9 @@ class TransactionService:
 
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
-            print('CASE: ', transaction_type.code, flush=True)
+            # print('CASE: ', transaction_type.code, flush=True)
             tax_treatment_code = TransactionService.get_tax_treatment_code(transaction_type, account, transaction_input, eu, customer_relationship, departure_country, arrival_country, amazon_vat_calculation_service, tax_date)
-            print("tax_treatment_code:", tax_treatment_code, flush=True)
+            # print("tax_treatment_code:", tax_treatment_code, flush=True)
 
             new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service)
             VATINService.evaluate_transaction_notification(transaction_id=new_transaction.id, customer_vat_check_required=customer_vat_check_required, date=tax_date, number=transaction_input.customer_firm_vat_number)
@@ -162,17 +163,17 @@ class TransactionService:
         gift_wrap_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=shipment_tax_rate_type_code, calculated_vat_rate=gift_wrap_vat_temp.rate)
         shipment_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=gift_wrap_tax_rate_type_code, calculated_vat_rate=shipment_vat_temp.rate)
 
-        item_price_net: float = TransactionService.get_price_net(item, transaction_input.item_price_gross, item_price_vat_rate, transaction_type, price_type='item')
-        item_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type, price_type='item')
-        item_price_total_net: float = TransactionService.get_price_net(item, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type, price_type='item')
+        item_price_net: float = TransactionService.get_price_net(item, transaction_input.item_price_gross, item_price_vat_rate, transaction_type, price_type='item', discount=False)
+        item_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type, price_type='item', discount=True)
+        item_price_total_net: float = TransactionService.get_price_net(item, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type, price_type='item', discount=False)
 
-        shipment_price_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
-        shipment_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
-        shipment_price_total_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type, price_type='shipment')
+        shipment_price_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type, price_type='shipment', discount=False)
+        shipment_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type, price_type='shipment', discount=True)
+        shipment_price_total_net: float = TransactionService.get_price_net(item, transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type, price_type='shipment', discount=False)
 
-        gift_wrap_price_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
-        gift_wrap_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
-        gift_wrap_price_total_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap')
+        gift_wrap_price_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap', discount=False)
+        gift_wrap_price_discount_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap', discount=True)
+        gift_wrap_price_total_net: float = TransactionService.get_price_net(item, transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type, price_type='gift_wrap', discount=False)
 
         item_price_vat: float = TransactionService.get_price_vat(transaction_input.item_price_gross, item_price_vat_rate, transaction_type)
         item_price_discount_vat: float = TransactionService.get_price_vat(transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type)
@@ -187,7 +188,7 @@ class TransactionService:
         gift_wrap_price_total_vat: float = TransactionService.get_price_vat(transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type)
 
         total_value_net: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_net, shipment_price_total_net, gift_wrap_price_total_net, item_price_total_net)
-        total_value_vat: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_vat, shipment_price_total_vat, gift_wrap_price_total_vat, item_price_total_net)
+        total_value_vat: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_vat, shipment_price_total_vat, gift_wrap_price_total_vat, item_price_total_vat)
         total_value_gross: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, transaction_input.item_price_total_gross, transaction_input.shipment_price_total_gross, transaction_input.gift_wrap_price_total_gross, item_price_total_net)
 
         transaction_currency_code: str = TransactionService.get_transaction_currency(item, transaction_type, transaction_input.currency_code)
@@ -200,7 +201,7 @@ class TransactionService:
         invoice_amount_vat: float = TransactionService.get_invoice_amount(total_value_vat, invoice_exchange_rate)
         invoice_amount_gross: float = TransactionService.get_invoice_amount(total_value_gross, invoice_exchange_rate)
 
-        vat_rate_reverse_charge: float = TransactionService.get_vat_rate_reverse_charge(transaction_input, arrival_country, tax_treatment_code, tax_date, tax_rate_type_code=item_tax_rate_type_code)
+        vat_rate_reverse_charge: float = TransactionService.get_vat_rate_reverse_charge(transaction_input, arrival_country, tax_treatment_code, tax_date, item_tax_rate_type_code, item)
         invoice_amount_vat_reverse_charge: float = TransactionService.get_invoice_amount_vat_reverse_charge(invoice_amount_net, vat_rate_reverse_charge)
 
 
@@ -287,11 +288,6 @@ class TransactionService:
             'seller_vatin_id': seller_vatin.id if seller_vatin else None
 
         }
-
-        print("", flush=True)
-        print("transaction_data:", transaction_data, flush=True)
-        print("", flush=True)
-
 
         try:
             new_transaction = TransactionService.create(transaction_data)
@@ -463,7 +459,14 @@ class TransactionService:
 
 
             elif customer_relationship == "B2C":
-                if departure_country.code != arrival_country.code and DistanceSaleService.get_status(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
+                print("", flush=True)
+                if departure_country.code != arrival_country.code:
+                    print('departure_country.code:', departure_country.code, 'arrival_country.code:', arrival_country.code, flush=True)
+                    print('account.seller_firm_id:', account.seller_firm_id)
+                    print('Tax Date:', tax_date, flush=True)
+                    print('DistanceSaleService.get_status():', DistanceSaleService.get_active(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date), flush=True)
+                    print("", flush=True)
+                if departure_country.code != arrival_country.code and DistanceSaleService.get_active(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date):
                     tax_treatment_code = 'DISTANCE_SALE'
 
                 else:
@@ -475,7 +478,6 @@ class TransactionService:
         elif transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             tax_treatment_code = kwargs.get('tax_treatment_code')
 
-        print('Tax Treatment Code: ', tax_treatment_code, flush=True)
         return tax_treatment_code
 
 
@@ -483,7 +485,6 @@ class TransactionService:
     def get_country(transaction_input: TransactionInput, account: Account, bundle: Bundle, transaction_type: TransactionType, country_type: str) -> Country:
         if transaction_type.code == 'REFUND':
             sale_transaction = TransactionService.get_sale_transaction_by_bundle(account, bundle)
-            print('REFUND corresponding SALE TRANSACTION?: ', sale_transaction, flush=True)
             if sale_transaction:
                 if country_type == 'arrival':
                     country = sale_transaction.arrival_country
@@ -506,7 +507,10 @@ class TransactionService:
 
 
         else:
-            country = CountryService.get_by_code(transaction_input.arrival_country_code)
+            if country_type == 'arrival':
+                country = CountryService.get_by_code(transaction_input.arrival_country_code)
+            else:
+                country = CountryService.get_by_code(transaction_input.departure_country_code)
 
         return country
 
@@ -558,7 +562,6 @@ class TransactionService:
     @staticmethod
     def get_tax_date(transaction_type: TransactionType, transaction_input: TransactionInput) -> date:
         print('transaction_type: ', transaction_type, flush=True)
-        print('transaction_input: ', transaction_input, flush=True)
         if transaction_type.code == 'SALE':
             tax_date = transaction_input.shipment_date
 
@@ -643,15 +646,14 @@ class TransactionService:
 
 
     @staticmethod
-    def get_vat_rate_reverse_charge(transaction_input: TransactionInput, arrival_country: Country, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str) -> float:
-        if not tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
+    def get_vat_rate_reverse_charge(transaction_input: TransactionInput, arrival_country: Country, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str, item: Item) -> float:
+        if tax_treatment_code != 'INTRA_COMMUNITY_ACQUISITION':
             vat_rate_reverse_charge=float(0)
         else:
             # tax jurisdiction is arrival country
-            vat_rate_reverse_charge = TransactionService.get_vat_rate(transaction_input, arrival_country, tax_treatment_code, tax_date, tax_rate_type_code)
+            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(item.tax_code_code, arrival_country, tax_date).rate
+
         return vat_rate_reverse_charge
-
-
 
 
     @staticmethod
@@ -692,7 +694,6 @@ class TransactionService:
 
             if transaction_type.code == "REFUND":
                 sale_transaction = TransactionService.get_sale_transaction_by_bundle(account, bundle)
-                print('REFUND corresponding SALE TRANSACTION?: ', sale_transaction, type(sale_transaction), flush=True)
 
                 if sale_transaction:
                     exchange_rate_date = sale_transaction.invoice_exchange_rate_date
@@ -725,13 +726,21 @@ class TransactionService:
         return transaction_currency_code != invoice_currency_code
 
 
+
+
+
     @staticmethod
-    def get_price_net(item: Item, price_gross: float, price_tax_rate: float, transaction_type: TransactionType, price_type: str) -> float:
+    def get_price_net(item: Item, price_gross: float, price_tax_rate: float, transaction_type: TransactionType, price_type: str, discount: bool) -> float:
         if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
-            if price_type=='item':
-                price_net = float(item.unit_cost_price_net)
-            elif price_type=='shipment' or price_type=='gift_wrap':
+            if discount:
                 price_net = float(0)
+
+            else:
+                if price_type=='item':
+                    price_net = float(item.unit_cost_price_net)
+
+                elif price_type=='shipment' or price_type=='gift_wrap':
+                    price_net = float(0)
 
         else:
             price_net = float(price_gross) / (1 + float(price_tax_rate))
@@ -749,10 +758,11 @@ class TransactionService:
         return price_vat
 
 
+
     @staticmethod
-    def get_total_value(item_quantity: int, transaction_type: TransactionType, item_price_total: float, shipment_price_total: float, gift_wrap_price_total: float, item_price_total_net: float) -> float:
+    def get_total_value(item_quantity: int, transaction_type: TransactionType, item_price_total: float, shipment_price_total: float, gift_wrap_price_total: float, item_unit_cost_price: float) -> float:
         if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
-            return item_price_total_net * item_quantity
+            return item_unit_cost_price * item_quantity
 
         else:
             return item_price_total + shipment_price_total + gift_wrap_price_total
@@ -786,7 +796,6 @@ class TransactionService:
 
     @staticmethod
     def get_item_tax_code_code(transaction_input: TransactionInput, item: Item, account: Account, **kwargs) -> str:
-        print('account.channel.platform_code: ', account.channel.platform_code, flush=True)
         if account.channel.platform_code == 'AMZ':
             calculated_item_tax_code_code = item.tax_code_code if item.tax_code_code else 'A_GEN_STANDARD'
 
@@ -795,9 +804,6 @@ class TransactionService:
 
         if 'reference_tax_code' in kwargs and kwargs['reference_tax_code'] != None:
             reference_tax_code = kwargs['reference_tax_code']
-            print('calculated_item_tax_code_code: ', calculated_item_tax_code_code, flush=True)
-            print('reference_tax_code: ', reference_tax_code, flush=True)
-
 
             if calculated_item_tax_code_code != reference_tax_code:
                 notification_data=NotificationService.create_notification_data(main_subject='Item Tax Code', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_tax_code), calculated_value=str(calculated_item_tax_code_code), transaction_input_id=transaction_input.id)

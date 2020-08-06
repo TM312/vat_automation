@@ -30,6 +30,7 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
 
     export default {
         layout: "tax",
@@ -37,12 +38,12 @@
 
         async fetch() {
             const { store } = this.$nuxt.context;
-
-            await store.dispatch("country/get_all");
-            await store.dispatch("currency/get_all");
-            await store.dispatch("tax_treatment/get_all");
+            if (this.countries.length == 0 || this.currencies.length == 0 || this.taxTreatments.length == 0) {
+                await store.dispatch("country/get_all");
+                await store.dispatch("currency/get_all");
+                await store.dispatch("tax_treatment/get_all");
+            }
         },
-
 
         data() {
             return {
@@ -50,20 +51,14 @@
             }
         },
 
+         computed: {
+            ...mapState({
+                countries: state => state.country.countries,
+                currencies: state => state.currency.currencies,
+                taxTreatments: state => state.tax_treatment.tax_treatments
 
-        // computed: {
-        //     ...mapState({
-        //         accounting_firm: state => state.accounting_firm.accounting_firm
-        //     }),
-
-        //     // getCountEmployees() {
-        //     //     return this.$store.getters['accounting_firm/countEmployees']
-        //     //     // this.countEmployees = counter
-        //     // },
-        //     countEmployees() {
-        //         return this.$store.getters['accounting_firm/countEmployees']
-        //     },
-        // },
+            })
+         }
 
     };
 </script>

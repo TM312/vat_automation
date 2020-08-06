@@ -29,7 +29,6 @@ class Vat(db.Model):  # type: ignore
 
     @rate.setter
     def rate(self, value):
-        print('setting rate with value: ', value, flush=True)
         self._rate = int(value * 10_000) if value is not None else None
 
     def __repr__(self):

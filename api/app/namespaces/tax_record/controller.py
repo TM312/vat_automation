@@ -3,6 +3,7 @@ from typing import List, BinaryIO
 from flask import request
 
 from flask_restx import Namespace, Resource
+from flask.wrappers import Response
 
 from . import tax_record_dto, tax_record_sub_dto, tax_record_dto_admin
 from . import TaxRecord
@@ -45,6 +46,15 @@ class TaxRecordResource(Resource):
     @ns.marshal_with(tax_record_dto, envelope='data')
     def get(self, tax_record_public_id):
         return TaxRecordService.get_by_public_id(tax_record_public_id)
+
+
+    @login_required
+    def delete(self, tax_record_public_id: str) -> Response:
+        """Delete Single TransactionInput"""
+        from flask import jsonify
+
+        public_id = TaxRecordService.delete_by_public_id(tax_record_public_id)
+        return jsonify(dict(status="Success", id=public_id))
 
 
 @ns.route("/seller_firm/<string:seller_firm_public_id>")

@@ -8,7 +8,7 @@ export default ($axios) => ({
         return $axios.get(`${resource}/${tax_record_public_id}`)
     },
 
-    delete_by_id(tax_record_public_id) {
+    delete_by_public_id(tax_record_public_id) {
         return $axios.delete(`${resource}/${tax_record_public_id}`)
     },
 

@@ -222,7 +222,11 @@ class DistanceSaleService:
 
 
     @staticmethod
-    def get_status(seller_firm_id: int, arrival_country_code: str, tax_date: date) -> bool:
-        distance_sale=DistanceSale.query.filter(DistanceSale.seller_firm_id==seller_firm_id, DistanceSale.arrival_country_code==arrival_country_code, DistanceSale.valid_from<=tax_date, DistanceSale.valid_to>=tax_date).first()
+    def get_active(seller_firm_id: int, arrival_country_code: str, tax_date: date) -> bool:
+        distance_sale=DistanceSale.query.filter(
+            DistanceSale.seller_firm_id==seller_firm_id,
+            DistanceSale.arrival_country_code==arrival_country_code,
+            DistanceSale.valid_from<=tax_date, DistanceSale.valid_to>=tax_date
+        ).first()
         if distance_sale:
             return distance_sale.active
