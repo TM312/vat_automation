@@ -101,6 +101,22 @@ class TransactionInputService:
 
 
     @staticmethod
+    def delete_all() -> Dict:
+        transaction_inputs = TransactionInput.query.all()
+        if transaction_inputs:
+            for transaction_input in transaction_inputs:
+                db.session.delete(transaction_input)
+
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'All transaction inputs have been successfully deleted.'
+            }
+            return response_object
+
+
+    @staticmethod
     def get_df_transaction_input_delimiter(file: BinaryIO) -> str:
         if file.lower().endswith('.txt'):
             delimiter='\t'
@@ -186,7 +202,6 @@ class TransactionInputService:
 
                 transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
                 if transaction_input and transaction_input.processed:
-                    print('Skip Transaction Input: ', transaction_input, flush=True)
                     continue #skipping duplicates
 
                 else:
@@ -324,7 +339,6 @@ class TransactionInputService:
                         data_changes = {k:v for k,v in transaction_input_data.items() if v is not None}
                         if data_changes != {}:
                             try:
-                                print('Update unprocessed transaction inputs: data_changes:', data_changes, flush=True)
                                 transaction_input.update(data_changes)
                                 transaction_input.transactions = []
                                 db.session.commit()

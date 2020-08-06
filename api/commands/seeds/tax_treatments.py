@@ -67,7 +67,6 @@ class TaxTreatmentSeedService:
         try:
             for key, val in transaction_type_tax_treatment_dict.items():
                 transaction_type = TransactionType.query.filter_by(code=key).first()
-                print(transaction_type.code) #--> 'SALE'
                 for tax_treatment_code in val: #--> 'LOCAL_SALE'
                     tax_treatment = TaxTreatment.query.filter_by(code=tax_treatment_code).first()
                     transaction_type.tax_treatments.append(tax_treatment)

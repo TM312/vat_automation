@@ -33,6 +33,21 @@ class TaxRecordService:
         tax_records = TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
         return tax_records
 
+    @staticmethod
+    def delete_by_public_id(seller_firm_public_id: str):
+        tax_record = TaxRecord.query.filter(TaxRecord.public_id == seller_firm_public_id).first()
+        if tax_record:
+            db.session.delete(tax_record)
+            db.session.commit()
+
+            response_object = {
+                'status': 'success',
+                'message': 'Transaction input (public_id: {}) has been successfully deleted.'.format(seller_firm_public_id)
+            }
+            return response_object
+        else:
+            raise NotFound('This transaction input does not exist.')
+
 
     def download_tax_record(public_id: str):
         from ..business.seller_firm import SellerFirm
@@ -79,6 +94,7 @@ class TaxRecordService:
     def create_by_seller_firm_public_id(seller_firm_public_id: str, tax_record_data_raw: TaxRecordInterface):
         from ..business.seller_firm.service import SellerFirmService
         from ..transaction.service import TransactionService
+        from ..tax.vatin.service import VATINService
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
@@ -86,12 +102,56 @@ class TaxRecordService:
             start_date = HelperService.get_date_from_str(tax_record_data_raw.get('start_date'), '%Y-%m-%d')
             end_date = HelperService.get_date_from_str(tax_record_data_raw.get('end_date'), '%Y-%m-%d')
             tax_jurisdiction_code = tax_record_data_raw.get('tax_jurisdiction_code')
+
+            vatin = VATINService.get_by_country_code_seller_firm_id(tax_jurisdiction_code, seller_firm.id)
+
+            if not vatin:
+                raise NotFound('A VATIN for the indicated tax jurisdiction does not exist for this seller firm.')
+
             transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm.id, tax_jurisdiction_code)
 
             if not transactions:
                 raise UnprocessableEntity('There are no transactions by this seller for this period and tax jurisdiction.')
 
             else:
+
+                sales = [transaction for transaction in transactions if transaction.type_code == 'SALE']
+                refunds = [transaction for transaction in transactions if transaction.type_code == 'REFUND']
+                acquisitions = [transaction for transaction in transactions if transaction.type_code == 'ACQUISITION']
+
+
+                total_local_sale_net = TaxRecordService.get_net(transactions, 'LOCAL_SALE')
+                total_local_sale_reverse_charge_net = TaxRecordService.get_net(transactions, 'LOCAL_SALE_REVERSE_CHARGE')
+                total_distance_sale_net = TaxRecordService.get_net(transactions, 'DISTANCE_SALE')
+                total_non_taxable_distance_sale_net = TaxRecordService.get_net(transactions, 'NON_TAXABLE_DISTANCE_SALE')
+                total_intra_community_sale_net = TaxRecordService.get_net(transactions, 'INTRA_COMMUNITY_SALE')
+                total_export_net = TaxRecordService.get_net(transactions, 'EXPORT')
+                total_local_acquisition_net = TaxRecordService.get_net(transactions, 'LOCAL_ACQUISITION')
+                total_intra_community_acquisition_net = TaxRecordService.get_net(transactions, 'INTRA_COMMUNITY_ACQUISITION')
+                total_import_net = TaxRecordService.get_net(transactions, 'IMPORT')
+
+                total_local_sale_vat = TaxRecordService.get_vat(transactions, 'LOCAL_SALE')
+                total_local_sale_reverse_charge_vat = TaxRecordService.get_vat(transactions, 'LOCAL_SALE_REVERSE_CHARGE')
+                total_distance_sale_vat = TaxRecordService.get_vat(transactions, 'DISTANCE_SALE')
+                total_non_taxable_distance_sale_vat = TaxRecordService.get_vat(transactions, 'NON_TAXABLE_DISTANCE_SALE')
+                total_intra_community_sale_vat = TaxRecordService.get_vat(transactions, 'INTRA_COMMUNITY_SALE')
+                total_export_vat = TaxRecordService.get_vat(transactions, 'EXPORT')
+                total_local_acquisition_vat = TaxRecordService.get_vat(transactions, 'LOCAL_ACQUISITION')
+                total_intra_community_acquisition_vat = TaxRecordService.get_vat(transactions, 'INTRA_COMMUNITY_ACQUISITION')
+                total_import_vat = TaxRecordService.get_vat(transactions, 'IMPORT')
+
+                total_local_sale_gross= TaxRecordService.get_gross(transactions, 'LOCAL_SALE')
+                total_local_sale_reverse_charge_gross= TaxRecordService.get_gross(transactions, 'LOCAL_SALE_REVERSE_CHARGE')
+                total_distance_sale_gross= TaxRecordService.get_gross(transactions, 'DISTANCE_SALE')
+                total_non_taxable_distance_sale_gross= TaxRecordService.get_gross(transactions, 'NON_TAXABLE_DISTANCE_SALE')
+                total_intra_community_sale_gross= TaxRecordService.get_gross(transactions, 'INTRA_COMMUNITY_SALE')
+                total_export_gross= TaxRecordService.get_gross(transactions, 'EXPORT')
+                total_local_acquisition_gross= TaxRecordService.get_gross(transactions, 'LOCAL_ACQUISITION')
+                total_intra_community_acquisition_gross= TaxRecordService.get_gross(transactions, 'INTRA_COMMUNITY_ACQUISITION')
+                total_import_gross= TaxRecordService.get_gross(transactions, 'IMPORT')
+
+                taxable_turnover_amount = TaxRecordService.get_taxable_turnover_amount()
+                payable_vat_amount = TaxRecordService.get_payable_vat_amount()
 
                 tax_record_data = {
                     'created_by': g.user.id,
@@ -101,15 +161,20 @@ class TaxRecordService:
                     'end_date': end_date,
                     'tax_jurisdiction_code': tax_jurisdiction_code,
 
-                    'total_local_sale': TaxRecordService.get_total(transactions, 'LOCAL_SALE'),
-                    'total_local_sale_reverse_charge': TaxRecordService.get_total(transactions, 'LOCAL_SALE_REVERSE_CHARGE'),
-                    'total_distance_sale': TaxRecordService.get_total(transactions, 'DISTANCE_SALE'),
-                    'total_non_taxable_distance_sale': TaxRecordService.get_total(transactions, 'NON_TAXABLE_DISTANCE_SALE'),
-                    'total_intra_community_sale': TaxRecordService.get_total(transactions, 'INTRA_COMMUNITY_SALE'),
-                    'total_export': TaxRecordService.get_total(transactions, 'EXPORT'),
-                    'total_local_acquisition': TaxRecordService.get_total(transactions, 'LOCAL_ACQUISITION'),
-                    'total_intra_community_acquisition': TaxRecordService.get_total(transactions, 'INTRA_COMMUNITY_ACQUISITION'),
-                    'total_import': TaxRecordService.get_total(transactions, 'IMPORT')
+                    'vatin_id': vatin.id,
+
+                    'taxable_turnover_amount': taxable_turnover_amount,
+                    'payable_vat_amount': payable_vat_amount,
+
+                    'total_local_sale_vat': total_local_sale_vat,
+                    'total_local_sale_reverse_charge_vat': total_local_sale_reverse_charge_vat,
+                    'total_distance_sale_vat': total_distance_sale_vat,
+                    'total_non_taxable_distance_sale_vat': total_non_taxable_distance_sale_vat,
+                    'total_intra_community_sale_vat': total_intra_community_sale_vat,
+                    'total_export_vat': total_export_vat,
+                    'total_local_acquisition_vat': total_local_acquisition_vat,
+                    'total_intra_community_acquisition_vat': total_intra_community_acquisition_vat,
+                    'total_import_vat': total_import_vat,
                 }
 
                 try:
@@ -130,9 +195,36 @@ class TaxRecordService:
             raise NotFound('A seller firm with the id "{}" does not exist.'.format(seller_firm_public_id))
 
 
+
     @staticmethod
-    def get_total(transactions: List[Transaction], tax_treatment_code: str):
-        return sum([transaction.total_value_vat for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+    def get_net(transactions: List[Transaction], tax_treatment_code: str):
+        return sum([transaction.invoice_amount_net for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+
+    @staticmethod
+    def get_vat(transactions: List[Transaction], tax_treatment_code: str):
+        return sum([transaction.invoice_amount_vat for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+
+    @staticmethod
+    def get_gross(transactions: List[Transaction], tax_treatment_code: str):
+        return sum([transaction.invoice_amount_gross for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+
+    @staticmethod
+    def get_reverse_charge(transactions: List[Transaction], tax_treatment_code: str):
+        return sum([transaction.invoice_amount_vat_reverse_charge for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+
+    @staticmethod
+    def get_total(*amounts):
+        return sum(amounts)
+
+    @staticmethod
+    def get_taxable_turnover_amount()
+
+    @staticmethod
+    def get_payable_vat_amount()
+
+
+
+
 
 
     @staticmethod

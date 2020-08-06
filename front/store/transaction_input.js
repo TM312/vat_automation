@@ -27,6 +27,18 @@ export const actions = {
         }
     },
 
+
+    async delete_all({ commit }) {
+        const res = await this.$repositories.transaction_input.delete_all()
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            // Remove from store
+            commit('SET_TRANSACTION_INPUTS', [])
+        } else {
+            // Handle error here
+        }
+    },
+
     async get_by_public_id({ commit }, transaction_input_public_id) {
 
         const res = await this.$repositories.transaction_input.get_by_public_id(transaction_input_public_id)

@@ -23,7 +23,7 @@ class VATIN(db.Model):
 
     initial_tax_date = db.Column(db.Date)
 
-    country_code = db.Column(db.String(4), nullable=False)
+    country_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
     number = db.Column(db.String(16), nullable=False)
     valid = db.Column(db.Boolean)
     name = db.Column(db.String(128))
@@ -34,6 +34,8 @@ class VATIN(db.Model):
     transactions_arrival_seller = db.relationship('Transaction', backref='arrival_seller_vatin', foreign_keys='Transaction.arrival_seller_vatin_id', lazy=True)
     transactions_departure_seller = db.relationship('Transaction', backref='departure_seller_vatin', foreign_keys='Transaction.departure_seller_vatin_id', lazy=True)
     transactions_seller = db.relationship('Transaction', backref='seller_vatin', foreign_keys='Transaction.seller_vatin_id', lazy=True)
+
+    tax_records = db.relationship('TaxRecord', backref='vatin', lazy=True)
 
     @hybrid_property
     def valid_to(self):

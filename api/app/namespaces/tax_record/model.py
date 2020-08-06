@@ -24,6 +24,12 @@ class TaxRecord(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     tax_jurisdiction_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
+
+    vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'), nullable=False)
+
+    _taxable_turnover_amount = db.Column(db.Integer, default=0)
+    _payable_vat_amount = db.Column(db.Integer, default=0)
+
     _total_local_sale = db.Column(db.Integer, default=0)
     _total_local_sale_reverse_charge = db.Column(db.Integer, default=0)
     _total_distance_sale = db.Column(db.Integer, default=0)
@@ -41,6 +47,29 @@ class TaxRecord(db.Model):
         return '<SellerFirm: {} | validity: {}-{}>'.format(self.seller_firm.name, str(self.start_date), str(self.end_date))
 
     #cent values
+
+    @hybrid_property
+    def taxable_turnover_amount(self):
+        return self._taxable_turnover_amount / 100
+
+    @taxable_turnover_amount.setter
+    def taxable_turnover_amount(self, value):
+        self._taxable_turnover_amount = int(value * 100) if value is not None else None
+
+    @hybrid_property
+    def payable_vat_amount(self):
+        return self._payable_vat_amount / 100
+
+    @payable_vat_amount.setter
+    def payable_vat_amount(self, value):
+        self._payable_vat_amount = int(value * 100) if value is not None else None
+
+
+
+
+
+
+
     @hybrid_property
     def total_local_sale(self):
         return self._total_local_sale / 100

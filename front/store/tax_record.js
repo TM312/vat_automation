@@ -13,6 +13,10 @@ export const mutations = {
     },
     SET_TAX_RECORD(state, tax_record) {
         state.tax_record = tax_record
+    },
+    // !!!! NOT SURE IF WORKING maybe position of tax_record in array required
+    SPLICE_TAX_RECORDS(state, tax_record) {
+        state.tax_records.splice(tax_record, 1)
     }
 }
 
@@ -50,12 +54,12 @@ export const actions = {
     },
 
 
-    async delete_by_id({ commit }, tax_record_public_id) {
-        const res = await this.$repositories.tax_record.delete(tax_record_public_id)
+    async delete_by_public_id({ commit }, tax_record_public_id) {
+        const res = await this.$repositories.tax_record.delete_by_public_id(tax_record_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
             // Remove from store
-            commit('SET_TAX_RECORD', [])
+            commit('SPLICE_TAX_RECORDS', data.data)
         } else {
             // Handle error here
         }

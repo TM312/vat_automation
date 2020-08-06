@@ -13,7 +13,13 @@ tax_record_sub_dto = Model('tax_record_sub', {
 tax_record_dto = tax_record_sub_dto.clone('tax_record', {
     'created_on': fields.DateTime(readonly=True),
     'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
+    'vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.vatin.country_code, x.vatin.number)),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
+
+    'taxable_turnover_amount': fields.Float(readonly=True),
+    'payable_vat_amount': fields.Float(readonly=True),
+
+
     'total_local_sale': fields.Float(readonly=True),
     'total_local_sale_reverse_charge': fields.Float(readonly=True),
     'total_distance_sale': fields.Float(readonly=True),

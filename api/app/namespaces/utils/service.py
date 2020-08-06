@@ -92,7 +92,6 @@ class InputService:
                     try:
                         date = datetime.strptime(df.iloc[i][column], '%d.%m.%y').date()
                     except:
-                        print('get_date_or_None', date, flush=True)
                         raise UnsupportedMediaType('Can not read date format.')
         return date
 
@@ -123,7 +122,6 @@ class InputService:
             try:
                 string = str(df.iloc[i][column])
             except:
-                print('get_str_or_None', str(df.iloc[i][column]), flush=True)
                 raise UnsupportedMediaType('Can not read date format.')
 
         return string
@@ -149,7 +147,6 @@ class InputService:
                     flt = float(string_trimmed)
 
                 except:
-                    print('get_float: ', df.head(), 'column: ', column, flush=True)
                     raise UnsupportedMediaType('Can not read float format.')
 
         return flt
@@ -325,8 +322,6 @@ class InputService:
         elif data_type == 'recurring':
             basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
 
-        print('basepath:', basepath, flush=True)
-
         basepath_tbd = os.path.join(BASE_PATH_DATA_SELLER_FIRM, 'tbd')
         basepath_file_type = os.path.join(basepath, file_type, 'in')
         os.makedirs(basepath_file_type, exist_ok=True)
@@ -358,7 +353,6 @@ class InputService:
     def read_file_path_into_df(file_path: str, df_encoding: str, delimiter: str) -> pd.DataFrame:
         if os.path.isfile(file_path):
             file_name = os.path.basename(file_path)
-            print('file_name: ', file_name, flush=True)
             try:
                 if file_name.lower().endswith('.csv') or file_name.lower().endswith('.txt'):
                     df_raw = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
@@ -366,14 +360,12 @@ class InputService:
                     df = InputService.clean_df(df_raw)
                     # """ below: delete later !!! """
                     # pd.set_option('display.max_columns', None)
-                    print('df.head()', df.head(), flush=True)
+                    # print('df.head()', df.head(), flush=True)
                 else:
-                    print('Case "Read File Path: File extension invalid"', flush=True)
                     raise UnsupportedMediaType(
                         'File extension invalid (file: {}).'.format(file_name))
                 return df
             except:
-                print('Case "Read File Path: Cannot read file"', flush=True)
                 raise UnsupportedMediaType('Cannot read file {}.'.format(file_name))
 
         else:

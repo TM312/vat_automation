@@ -175,8 +175,6 @@ class AccountService:
 
             try:
                 new_account = AccountService.create(account_data)
-                print('new_account:', new_account, flush=True)
-                print('account_data:', account_data, flush=True)
 
             except:
                 db.session.rollback()

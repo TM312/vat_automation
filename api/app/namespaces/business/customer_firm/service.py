@@ -94,7 +94,6 @@ class CustomerFirmService:
 
     @staticmethod
     def get_vatin_or_None(customer_vat_check_required: bool, country_code_temp: str, number_temp: str, date: date) -> VATIN:
-        print('customer_vat_check_required: ', customer_vat_check_required, flush=True)
         if not customer_vat_check_required:
             return None
         else:
