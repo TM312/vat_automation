@@ -12,6 +12,7 @@ class Currency(db.Model):  # type: ignore
     transactions_inputs_currency = db.relationship('TransactionInput', backref='currency', lazy=True)
     transactions_transaction_currency = db.relationship('Transaction', backref='transaction_currency', foreign_keys='Transaction.transaction_currency_code', lazy=True)
     transactions_invoice_currency = db.relationship('Transaction', backref='invoice_currency', foreign_keys='Transaction.invoice_currency_code', lazy=True)
+    tax_records = db.relationship('TaxRecord', backref='currency', lazy=True)
 
 
     bases = db.relationship('ExchangeRate', primaryjoin='Currency.code==ExchangeRate.base', lazy=True)

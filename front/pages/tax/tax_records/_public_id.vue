@@ -9,9 +9,10 @@
         <card-tax-record-loading v-if="$fetchState.pending && (taxRecord.public_id != $route.params.public_id || taxRecord.length == 0)" />
         <card-tax-record v-else />
 
+        <container-tax-record-tables />
+
         <b-card v-if="$fetchState.pending && (taxRecord.public_id != $route.params.public_id || taxRecord.length == 0)" ></b-card>
         <table-transactions v-else class="my-5 cols-6 cols-md-12" :transactions="taxRecord.transactions"/>
-
 
 
     </div>

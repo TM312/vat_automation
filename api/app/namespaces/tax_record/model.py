@@ -24,21 +24,79 @@ class TaxRecord(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     tax_jurisdiction_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
+    currency_code = db.Column(db.String(8), db.ForeignKey('currency.code'), nullable=False)
 
     vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'), nullable=False)
+
+
+    _local_sales_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sales_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sales_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sales_sales_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sales_refunds_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sales_total_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sales_sales_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_sales_refunds_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_sales_total_invoice_amount_gross = db.Column(db.Integer, default=0)
+
+    _local_sale_reverse_charges_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_sales_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_refunds_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_total_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_sales_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_refunds_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_sale_reverse_charges_total_invoice_amount_gross = db.Column(db.Integer, default=0)
+
+    _distance_sales_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _distance_sales_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _distance_sales_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _distance_sales_sales_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _distance_sales_refunds_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _distance_sales_total_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _distance_sales_sales_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _distance_sales_refunds_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _distance_sales_total_invoice_amount_gross = db.Column(db.Integer, default=0)
+
+    _non_taxable_distance_sales_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_sales_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_refunds_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_total_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_sales_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_refunds_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _non_taxable_distance_sales_total_invoice_amount_gross = db.Column(db.Integer, default=0)
+
+    _intra_community_sales_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _intra_community_sales_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _intra_community_sales_total_invoice_amount_net = db.Column(db.Integer, default=0)
+
+    _exports_sales_invoice_amount_net = db.Column(db.Integer, default=0)
+    _exports_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _exports_total_invoice_amount_net = db.Column(db.Integer, default=0)
+
+    _intra_community_acquisitions_acquisitions_invoice_amount_net = db.Column(db.Integer, default=0)
+    _intra_community_acquisitions_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _intra_community_acquisitions_total_invoice_amount_net = db.Column(db.Integer, default=0)
+
+    _intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _local_acquisitions_acquisitions_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_acquisitions_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_acquisitions_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _local_acquisitions_acquisitions_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_acquisitions_refunds_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_acquisitions_total_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _local_acquisitions_acquisitions_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_acquisitions_refunds_invoice_amount_gross = db.Column(db.Integer, default=0)
+    _local_acquisitions_total_invoice_amount_gross = db.Column(db.Integer, default=0)
 
     _taxable_turnover_amount = db.Column(db.Integer, default=0)
     _payable_vat_amount = db.Column(db.Integer, default=0)
 
-    _total_local_sale = db.Column(db.Integer, default=0)
-    _total_local_sale_reverse_charge = db.Column(db.Integer, default=0)
-    _total_distance_sale = db.Column(db.Integer, default=0)
-    _total_non_taxable_distance_sale = db.Column(db.Integer, default=0)
-    _total_intra_community_sale = db.Column(db.Integer, default=0)
-    _total_export = db.Column(db.Integer, default=0)
-    _total_local_acquisition = db.Column(db.Integer, default=0)
-    _total_intra_community_acquisition = db.Column(db.Integer, default=0)
-    _total_import = db.Column(db.Integer, default=0)
 
     transactions = db.relationship('Transaction', secondary=tax_record_transaction_AT, back_populates='tax_records')
 
@@ -46,7 +104,520 @@ class TaxRecord(db.Model):
     def __repr__(self):
         return '<SellerFirm: {} | validity: {}-{}>'.format(self.seller_firm.name, str(self.start_date), str(self.end_date))
 
+
     #cent values
+    @hybrid_property
+    def local_sales_sales_invoice_amount_net(self):
+        return self._local_sales_sales_invoice_amount_net / 100
+
+    @local_sales_sales_invoice_amount_net.setter
+    def local_sales_sales_invoice_amount_net(self, value):
+        self._local_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_refunds_invoice_amount_net(self):
+        return self._local_sales_refunds_invoice_amount_net / 100
+
+    @local_sales_refunds_invoice_amount_net.setter
+    def local_sales_refunds_invoice_amount_net(self, value):
+        self._local_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_total_invoice_amount_net(self):
+        return self._local_sales_total_invoice_amount_net / 100
+
+    @local_sales_total_invoice_amount_net.setter
+    def local_sales_total_invoice_amount_net(self, value):
+        self._local_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_sales_invoice_amount_vat(self):
+        return self._local_sales_sales_invoice_amount_vat / 100
+
+    @local_sales_sales_invoice_amount_vat.setter
+    def local_sales_sales_invoice_amount_vat(self, value):
+        self._local_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_refunds_invoice_amount_vat(self):
+        return self._local_sales_refunds_invoice_amount_vat / 100
+
+    @local_sales_refunds_invoice_amount_vat.setter
+    def local_sales_refunds_invoice_amount_vat(self, value):
+        self._local_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_total_invoice_amount_vat(self):
+        return self._local_sales_total_invoice_amount_vat / 100
+
+    @local_sales_total_invoice_amount_vat.setter
+    def local_sales_total_invoice_amount_vat(self, value):
+        self._local_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_sales_invoice_amount_gross(self):
+        return self._local_sales_sales_invoice_amount_gross / 100
+
+    @local_sales_sales_invoice_amount_gross.setter
+    def local_sales_sales_invoice_amount_gross(self, value):
+        self._local_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_refunds_invoice_amount_gross(self):
+        return self._local_sales_refunds_invoice_amount_gross / 100
+
+    @local_sales_refunds_invoice_amount_gross.setter
+    def local_sales_refunds_invoice_amount_gross(self, value):
+        self._local_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sales_total_invoice_amount_gross(self):
+        return self._local_sales_total_invoice_amount_gross / 100
+
+    @local_sales_total_invoice_amount_gross.setter
+    def local_sales_total_invoice_amount_gross(self, value):
+        self._local_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_sales_invoice_amount_net(self):
+        return self._local_sale_reverse_charges_sales_invoice_amount_net / 100
+
+    @local_sale_reverse_charges_sales_invoice_amount_net.setter
+    def local_sale_reverse_charges_sales_invoice_amount_net(self, value):
+        self._local_sale_reverse_charges_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_refunds_invoice_amount_net(self):
+        return self._local_sale_reverse_charges_refunds_invoice_amount_net / 100
+
+    @local_sale_reverse_charges_refunds_invoice_amount_net.setter
+    def local_sale_reverse_charges_refunds_invoice_amount_net(self, value):
+        self._local_sale_reverse_charges_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_total_invoice_amount_net(self):
+        return self._local_sale_reverse_charges_total_invoice_amount_net / 100
+
+    @local_sale_reverse_charges_total_invoice_amount_net.setter
+    def local_sale_reverse_charges_total_invoice_amount_net(self, value):
+        self._local_sale_reverse_charges_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_sales_invoice_amount_vat(self):
+        return self._local_sale_reverse_charges_sales_invoice_amount_vat / 100
+
+    @local_sale_reverse_charges_sales_invoice_amount_vat.setter
+    def local_sale_reverse_charges_sales_invoice_amount_vat(self, value):
+        self._local_sale_reverse_charges_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_refunds_invoice_amount_vat(self):
+        return self._local_sale_reverse_charges_refunds_invoice_amount_vat / 100
+
+    @local_sale_reverse_charges_refunds_invoice_amount_vat.setter
+    def local_sale_reverse_charges_refunds_invoice_amount_vat(self, value):
+        self._local_sale_reverse_charges_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_total_invoice_amount_vat(self):
+        return self._local_sale_reverse_charges_total_invoice_amount_vat / 100
+
+    @local_sale_reverse_charges_total_invoice_amount_vat.setter
+    def local_sale_reverse_charges_total_invoice_amount_vat(self, value):
+        self._local_sale_reverse_charges_total_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_sales_invoice_amount_gross(self):
+        return self._local_sale_reverse_charges_sales_invoice_amount_gross / 100
+
+    @local_sale_reverse_charges_sales_invoice_amount_gross.setter
+    def local_sale_reverse_charges_sales_invoice_amount_gross(self, value):
+        self._local_sale_reverse_charges_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_refunds_invoice_amount_gross(self):
+        return self._local_sale_reverse_charges_refunds_invoice_amount_gross / 100
+
+    @local_sale_reverse_charges_refunds_invoice_amount_gross.setter
+    def local_sale_reverse_charges_refunds_invoice_amount_gross(self, value):
+        self._local_sale_reverse_charges_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_sale_reverse_charges_total_invoice_amount_gross(self):
+        return self._local_sale_reverse_charges_total_invoice_amount_gross / 100
+
+    @local_sale_reverse_charges_total_invoice_amount_gross.setter
+    def local_sale_reverse_charges_total_invoice_amount_gross(self, value):
+        self._local_sale_reverse_charges_total_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_sales_invoice_amount_net(self):
+        return self._distance_sales_sales_invoice_amount_net / 100
+
+    @distance_sales_sales_invoice_amount_net.setter
+    def distance_sales_sales_invoice_amount_net(self, value):
+        self._distance_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_refunds_invoice_amount_net(self):
+        return self._distance_sales_refunds_invoice_amount_net / 100
+
+    @distance_sales_refunds_invoice_amount_net.setter
+    def distance_sales_refunds_invoice_amount_net(self, value):
+        self._distance_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_total_invoice_amount_net(self):
+        return self._distance_sales_total_invoice_amount_net / 100
+
+    @distance_sales_total_invoice_amount_net.setter
+    def distance_sales_total_invoice_amount_net(self, value):
+        self._distance_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_sales_invoice_amount_vat(self):
+        return self._distance_sales_sales_invoice_amount_vat / 100
+
+    @distance_sales_sales_invoice_amount_vat.setter
+    def distance_sales_sales_invoice_amount_vat(self, value):
+        self._distance_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_refunds_invoice_amount_vat(self):
+        return self._distance_sales_refunds_invoice_amount_vat / 100
+
+    @distance_sales_refunds_invoice_amount_vat.setter
+    def distance_sales_refunds_invoice_amount_vat(self, value):
+        self._distance_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_total_invoice_amount_vat(self):
+        return self._distance_sales_total_invoice_amount_vat / 100
+
+    @distance_sales_total_invoice_amount_vat.setter
+    def distance_sales_total_invoice_amount_vat(self, value):
+        self._distance_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_sales_invoice_amount_gross(self):
+        return self._distance_sales_sales_invoice_amount_gross / 100
+
+    @distance_sales_sales_invoice_amount_gross.setter
+    def distance_sales_sales_invoice_amount_gross(self, value):
+        self._distance_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_refunds_invoice_amount_gross(self):
+        return self._distance_sales_refunds_invoice_amount_gross / 100
+
+    @distance_sales_refunds_invoice_amount_gross.setter
+    def distance_sales_refunds_invoice_amount_gross(self, value):
+        self._distance_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def distance_sales_total_invoice_amount_gross(self):
+        return self._distance_sales_total_invoice_amount_gross / 100
+
+    @distance_sales_total_invoice_amount_gross.setter
+    def distance_sales_total_invoice_amount_gross(self, value):
+        self._distance_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_sales_invoice_amount_net(self):
+        return self._non_taxable_distance_sales_sales_invoice_amount_net / 100
+
+    @non_taxable_distance_sales_sales_invoice_amount_net.setter
+    def non_taxable_distance_sales_sales_invoice_amount_net(self, value):
+        self._non_taxable_distance_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_refunds_invoice_amount_net(self):
+        return self._non_taxable_distance_sales_refunds_invoice_amount_net / 100
+
+    @non_taxable_distance_sales_refunds_invoice_amount_net.setter
+    def non_taxable_distance_sales_refunds_invoice_amount_net(self, value):
+        self._non_taxable_distance_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_total_invoice_amount_net(self):
+        return self._non_taxable_distance_sales_total_invoice_amount_net / 100
+
+    @non_taxable_distance_sales_total_invoice_amount_net.setter
+    def non_taxable_distance_sales_total_invoice_amount_net(self, value):
+        self._non_taxable_distance_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_sales_invoice_amount_vat(self):
+        return self._non_taxable_distance_sales_sales_invoice_amount_vat / 100
+
+    @non_taxable_distance_sales_sales_invoice_amount_vat.setter
+    def non_taxable_distance_sales_sales_invoice_amount_vat(self, value):
+        self._non_taxable_distance_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_refunds_invoice_amount_vat(self):
+        return self._non_taxable_distance_sales_refunds_invoice_amount_vat / 100
+
+    @non_taxable_distance_sales_refunds_invoice_amount_vat.setter
+    def non_taxable_distance_sales_refunds_invoice_amount_vat(self, value):
+        self._non_taxable_distance_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_total_invoice_amount_vat(self):
+        return self._non_taxable_distance_sales_total_invoice_amount_vat / 100
+
+    @non_taxable_distance_sales_total_invoice_amount_vat.setter
+    def non_taxable_distance_sales_total_invoice_amount_vat(self, value):
+        self._non_taxable_distance_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_sales_invoice_amount_gross(self):
+        return self._non_taxable_distance_sales_sales_invoice_amount_gross / 100
+
+    @non_taxable_distance_sales_sales_invoice_amount_gross.setter
+    def non_taxable_distance_sales_sales_invoice_amount_gross(self, value):
+        self._non_taxable_distance_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_refunds_invoice_amount_gross(self):
+        return self._non_taxable_distance_sales_refunds_invoice_amount_gross / 100
+
+    @non_taxable_distance_sales_refunds_invoice_amount_gross.setter
+    def non_taxable_distance_sales_refunds_invoice_amount_gross(self, value):
+        self._non_taxable_distance_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def non_taxable_distance_sales_total_invoice_amount_gross(self):
+        return self._non_taxable_distance_sales_total_invoice_amount_gross / 100
+
+    @non_taxable_distance_sales_total_invoice_amount_gross.setter
+    def non_taxable_distance_sales_total_invoice_amount_gross(self, value):
+        self._non_taxable_distance_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_sales_sales_invoice_amount_net(self):
+        return self._intra_community_sales_sales_invoice_amount_net / 100
+
+    @intra_community_sales_sales_invoice_amount_net.setter
+    def intra_community_sales_sales_invoice_amount_net(self, value):
+        self._intra_community_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_sales_refunds_invoice_amount_net(self):
+        return self._intra_community_sales_refunds_invoice_amount_net / 100
+
+    @intra_community_sales_refunds_invoice_amount_net.setter
+    def intra_community_sales_refunds_invoice_amount_net(self, value):
+        self._intra_community_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_sales_total_invoice_amount_net(self):
+        return self._intra_community_sales_total_invoice_amount_net / 100
+
+    @intra_community_sales_total_invoice_amount_net.setter
+    def intra_community_sales_total_invoice_amount_net(self, value):
+        self._intra_community_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def exports_sales_invoice_amount_net(self):
+        return self._exports_sales_invoice_amount_net / 100
+
+    @exports_sales_invoice_amount_net.setter
+    def exports_sales_invoice_amount_net(self, value):
+        self._exports_sales_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def exports_refunds_invoice_amount_net(self):
+        return self._exports_refunds_invoice_amount_net / 100
+
+    @exports_refunds_invoice_amount_net.setter
+    def exports_refunds_invoice_amount_net(self, value):
+        self._exports_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def exports_total_invoice_amount_net(self):
+        return self._exports_total_invoice_amount_net / 100
+
+    @exports_total_invoice_amount_net.setter
+    def exports_total_invoice_amount_net(self, value):
+        self._exports_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_acquisitions_invoice_amount_net(self):
+        return self._intra_community_acquisitions_acquisitions_invoice_amount_net / 100
+
+    @intra_community_acquisitions_acquisitions_invoice_amount_net.setter
+    def intra_community_acquisitions_acquisitions_invoice_amount_net(self, value):
+        self._intra_community_acquisitions_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_refunds_invoice_amount_net(self):
+        return self._intra_community_acquisitions_refunds_invoice_amount_net / 100
+
+    @intra_community_acquisitions_refunds_invoice_amount_net.setter
+    def intra_community_acquisitions_refunds_invoice_amount_net(self, value):
+        self._intra_community_acquisitions_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_total_invoice_amount_net(self):
+        return self._intra_community_acquisitions_total_invoice_amount_net / 100
+
+    @intra_community_acquisitions_total_invoice_amount_net.setter
+    def intra_community_acquisitions_total_invoice_amount_net(self, value):
+        self._intra_community_acquisitions_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge(self):
+        return self._intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge / 100
+
+    @intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge.setter
+    def intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge(self, value):
+        self._intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge(self):
+        return self._intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge / 100
+
+    @intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge.setter
+    def intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge(self, value):
+        self._intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def intra_community_acquisitions_total_invoice_amount_vat_reverse_charge(self):
+        return self._intra_community_acquisitions_total_invoice_amount_vat_reverse_charge / 100
+
+    @intra_community_acquisitions_total_invoice_amount_vat_reverse_charge.setter
+    def intra_community_acquisitions_total_invoice_amount_vat_reverse_charge(self, value):
+        self._intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_acquisitions_invoice_amount_net(self):
+        return self._local_acquisitions_acquisitions_invoice_amount_net / 100
+
+    @local_acquisitions_acquisitions_invoice_amount_net.setter
+    def local_acquisitions_acquisitions_invoice_amount_net(self, value):
+        self._local_acquisitions_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_refunds_invoice_amount_net(self):
+        return self._local_acquisitions_refunds_invoice_amount_net / 100
+
+    @local_acquisitions_refunds_invoice_amount_net.setter
+    def local_acquisitions_refunds_invoice_amount_net(self, value):
+        self._local_acquisitions_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_total_invoice_amount_net(self):
+        return self._local_acquisitions_total_invoice_amount_net / 100
+
+    @local_acquisitions_total_invoice_amount_net.setter
+    def local_acquisitions_total_invoice_amount_net(self, value):
+        self._local_acquisitions_total_invoice_amount_net = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_acquisitions_invoice_amount_vat(self):
+        return self._local_acquisitions_acquisitions_invoice_amount_vat / 100
+
+    @local_acquisitions_acquisitions_invoice_amount_vat.setter
+    def local_acquisitions_acquisitions_invoice_amount_vat(self, value):
+        self._local_acquisitions_acquisitions_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_refunds_invoice_amount_vat(self):
+        return self._local_acquisitions_refunds_invoice_amount_vat / 100
+
+    @local_acquisitions_refunds_invoice_amount_vat.setter
+    def local_acquisitions_refunds_invoice_amount_vat(self, value):
+        self._local_acquisitions_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_total_invoice_amount_vat(self):
+        return self._local_acquisitions_total_invoice_amount_vat / 100
+
+    @local_acquisitions_total_invoice_amount_vat.setter
+    def local_acquisitions_total_invoice_amount_vat(self, value):
+        self._local_acquisitions_total_invoice_amount_vat = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_acquisitions_invoice_amount_gross(self):
+        return self._local_acquisitions_acquisitions_invoice_amount_gross / 100
+
+    @local_acquisitions_acquisitions_invoice_amount_gross.setter
+    def local_acquisitions_acquisitions_invoice_amount_gross(self, value):
+        self._local_acquisitions_acquisitions_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_refunds_invoice_amount_gross(self):
+        return self._local_acquisitions_refunds_invoice_amount_gross / 100
+
+    @local_acquisitions_refunds_invoice_amount_gross.setter
+    def local_acquisitions_refunds_invoice_amount_gross(self, value):
+        self._local_acquisitions_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def local_acquisitions_total_invoice_amount_gross(self):
+        return self._local_acquisitions_total_invoice_amount_gross / 100
+
+    @local_acquisitions_total_invoice_amount_gross.setter
+    def local_acquisitions_total_invoice_amount_gross(self, value):
+        self._local_acquisitions_total_invoice_amount_gross = int(value * 100) if value is not None else None
+
 
     @hybrid_property
     def taxable_turnover_amount(self):
@@ -56,6 +627,7 @@ class TaxRecord(db.Model):
     def taxable_turnover_amount(self, value):
         self._taxable_turnover_amount = int(value * 100) if value is not None else None
 
+
     @hybrid_property
     def payable_vat_amount(self):
         return self._payable_vat_amount / 100
@@ -63,84 +635,3 @@ class TaxRecord(db.Model):
     @payable_vat_amount.setter
     def payable_vat_amount(self, value):
         self._payable_vat_amount = int(value * 100) if value is not None else None
-
-
-
-
-
-
-
-    @hybrid_property
-    def total_local_sale(self):
-        return self._total_local_sale / 100
-
-    @total_local_sale.setter
-    def total_local_sale(self, value):
-        self._total_local_sale = int(value * 100) if value is not None else None
-
-    @hybrid_property
-    def total_local_sale_reverse_charge(self):
-        return self._total_local_sale_reverse_charge / 100
-
-    @total_local_sale_reverse_charge.setter
-    def total_local_sale_reverse_charge(self, value):
-        self._total_local_sale_reverse_charge = int(value * 100) if value is not None else None
-
-    @hybrid_property
-    def total_distance_sale(self):
-        return self._total_distance_sale / 100
-
-    @total_distance_sale.setter
-    def total_distance_sale(self, value):
-        self._total_distance_sale = int(value * 100) if value is not None else None
-
-    @hybrid_property
-    def total_non_taxable_distance_sale(self):
-        return self._total_non_taxable_distance_sale / 100
-
-    @total_non_taxable_distance_sale.setter
-    def total_non_taxable_distance_sale(self, value):
-        self._total_non_taxable_distance_sale = int(value * 100) if value is not None else None
-
-    @hybrid_property
-    def total_intra_community_sale(self):
-        return self._total_intra_community_sale / 100
-
-    @total_intra_community_sale.setter
-    def total_intra_community_sale(self, value):
-        self._total_intra_community_sale = int(value * 100) if value is not None else None
-
-    @hybrid_property
-    def total_export(self):
-        return self._total_export / 100
-
-    @total_export.setter
-    def total_export(self, value):
-        self._total_export = int(value * 100) if value is not None else None
-
-    #cent values
-    @hybrid_property
-    def total_local_acquisition(self):
-        return self._total_local_acquisition / 100
-
-    @total_local_acquisition.setter
-    def total_local_acquisition(self, value):
-        self._total_local_acquisition = int(value * 100) if value is not None else None
-
-    #cent values
-    @hybrid_property
-    def total_intra_community_acquisition(self):
-        return self._total_intra_community_acquisition / 100
-
-    @total_intra_community_acquisition.setter
-    def total_intra_community_acquisition(self, value):
-        self._total_intra_community_acquisition = int(value * 100) if value is not None else None
-
-    #cent values
-    @hybrid_property
-    def total_import(self):
-        return self._total_import / 100
-
-    @total_import.setter
-    def total_import(self, value):
-        self._total_import = int(value * 100) if value is not None else None

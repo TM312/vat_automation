@@ -21,8 +21,8 @@ export default ($axios) => ({
         return $axios.put(`${resource}/${seller_firm_id}`, payload)
     },
 
-    delete_by_id(seller_firm_id) {
-        return $axios.delete(`${resource}/${seller_firm_id}`)
+    delete_by_public_id(seller_firm_public_id) {
+        return $axios.delete(`${resource}/${seller_firm_public_id}`)
     },
 
     // upload_create(payload) {
