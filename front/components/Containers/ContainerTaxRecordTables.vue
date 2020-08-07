@@ -1,44 +1,52 @@
 <template>
     <b-container fluid class="my-3">
-        <div>
-            <h3>Local Sales</h3><br>
-            <b-table :items="itemsLocalSales" :fields="fieldsNetVatGross" borderless />
-        </div>
+        <b-row class="my-5 px-3" cols="1" cols-xl="2">
+            <b-col class="mb-2 pr-5">
+                <h3>Local Sales</h3><br>
+                <b-table :items="itemsLocalSales" :fields="fieldsNetVatGross" hover/>
+            </b-col>
 
-        <div>
-            <h3>Local Sales Reverse Charge</h3><br>
-            <b-table :items="itemsLocalSaleReverseCharges" :fields="fieldsNetVatGross" borderless />
-        </div>
+            <b-col class="mb-2 pr-5">
+                <h3>Local Sales Reverse Charge</h3><br>
+                <b-table :items="itemsLocalSaleReverseCharges" :fields="fieldsNetVatGross" hover/>
+            </b-col>
+        </b-row>
 
-        <div>
-            <h3>Distance Sales</h3><br>
-            <b-table :items="itemsDistanceSales" :fields="fieldsNetVatGross" borderless />
-        </div>
+        <b-row class="my-5" cols="1" cols-xl="2">
+            <b-col class="mb-2 pr-5">
+                <h3>Distance Sales</h3><br>
+                <b-table :items="itemsDistanceSales" :fields="fieldsNetVatGross" hover/>
+            </b-col>
 
-        <div>
-            <h3>Non-taxable Distance Sales</h3><br>
-            <b-table :items="itemsNonTaxableDistanceSales" :fields="fieldsNetVatGross" borderless />
-        </div>
+            <b-col class="mb-2 pr-5">
+                <h3>Non-taxable Distance Sales</h3><br>
+                <b-table :items="itemsNonTaxableDistanceSales" :fields="fieldsNetVatGross" hover/>
+            </b-col>
+        </b-row>
 
-        <div>
-            <h3>Intra-Community Sales</h3><br>
-            <b-table :items="itemsIntraCommunitySales" :fields="fieldsNet" borderless />
-        </div>
+        <b-row class="my-5" cols="1" cols-xl="2">
+            <b-col class="mb-2 pr-5">
+                <h3>Intra-Community Sales</h3><br>
+                <b-table :items="itemsIntraCommunitySales" :fields="fieldsNet" hover/>
+            </b-col>
 
-            <div>
-            <h3>Exports</h3><br>
-            <b-table :items="itemsExports" :fields="fieldsNet" borderless />
-        </div>
+            <b-col class="mb-2 pr-5">
+                <h3>Exports</h3><br>
+                <b-table :items="itemsExports" :fields="fieldsNet" hover/>
+            </b-col>
+        </b-row>
 
-        <div>
-            <h3>Intra-Community Acquisitions</h3><br>
-            <b-table :items="itemsIntraCommunityAcquisitions" :fields="fieldsNetReverseCharge" borderless />
-        </div>
+        <b-row class="my-5" cols="1" cols-xl="2">
+            <b-col class="mb-2 pr-5">
+                <h3>Intra-Community Acquisitions</h3><br>
+                <b-table :items="itemsIntraCommunityAcquisitions" :fields="fieldsNetReverseCharge" hover/>
+            </b-col>
 
-        <div>
-            <h3>Local Acquisitions</h3><br>
-            <b-table :items="itemsLocalAcquisitions" :fields="fieldsNetVatGross" borderless />
-        </div>
+            <b-col class="mb-2 pr-5">
+                <h3>Local Acquisitions</h3><br>
+                <b-table :items="itemsLocalAcquisitions" :fields="fieldsNetVatGross" hover/>
+            </b-col>
+        </b-row>
 
     </b-container>
 </template>
@@ -55,11 +63,14 @@ export default {
                 {
                     key: 'itemName',
                     label: '',
-                    sortable: false,
+                    sortable: false
                 },
                 {
                     key: 'netInvoiceAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 }
             ],
 
@@ -67,15 +78,21 @@ export default {
                 {
                     key: 'itemName',
                     label: '',
-                    sortable: false,
+                    sortable: false
                 },
                 {
                     key: 'netInvoiceAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 },
                 {
                     key: 'reverseChargeAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 }
             ],
 
@@ -89,14 +106,23 @@ export default {
                 {
                     key: 'netInvoiceAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 },
                 {
                     key: 'vatInvoiceAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 },
                 {
                     key: 'grossInvoiceAmount',
                     sortable: false,
+                    formatter: value => {
+                        return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
+                    }
                 }
             ]
         }

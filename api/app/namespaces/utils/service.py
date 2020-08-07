@@ -31,6 +31,11 @@ class HelperService:
         return date
 
 
+class CalcService:
+    @staticmethod
+    def get_sum(*amounts):
+        return sum(amounts)
+
 
 class NotificationService:
 

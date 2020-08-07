@@ -1,7 +1,7 @@
 <template>
     <b-container fluid>
         <dashboard-dashboard />
-        <card-greeting-dashboard />
+        <card-greeting-dashboard class="mx-3" />
         <br>
         <b-row>
             <b-col cols="3">
@@ -16,9 +16,9 @@
             </b-col>
         </b-row>
 
-        <b-tabs content-class="mt-3">
+        <b-tabs content-class="mx-3">
             <b-tab title="Key Accounts" active>
-                <b-row class="mb-3" cols="1" cols-md="1" cols-lg="3" cols-xl="4">
+                <b-row class="my-3" cols="1" cols-md="1" cols-lg="3" cols-xl="4">
                     <card-client-short v-for="(client, i) in $auth.user.key_accounts" :key="i" :business="client" class="mb-2" />
                 </b-row>
             </b-tab>

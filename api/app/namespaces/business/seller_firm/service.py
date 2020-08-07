@@ -193,9 +193,6 @@ class SellerFirmService:
         file_type = InputService.determine_file_type(df)
         data_type = InputService.determine_data_type(file_type)
 
-        print('file_type:', file_type, flush=True)
-        print('data_type:', data_type, flush=True)
-
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 
         if data_type == 'static':

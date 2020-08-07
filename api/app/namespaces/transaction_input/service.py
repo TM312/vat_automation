@@ -364,11 +364,13 @@ class TransactionInputService:
 
 
         # after all transaction inputs have been stored transactions are created
+        print('all transaction inputs have been stored', flush=True)
         for transaction_input in transaction_inputs:
             if not transaction_input.processed:
                 try:
                     # create transactions
                     boolean = TransactionService.create_transaction_s(transaction_input)
+                    print('boolean: {},  transaction_input: {}'.format(boolean, transaction_input), flush=True )
                     if boolean:
                         transaction_input.update_processed()
                         db.session.commit()

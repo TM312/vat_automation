@@ -4,7 +4,7 @@
             <b-row>
                 <b-col cols="auto" class="mr-auto mb-1"><span>{{ sellerFirm.name }}</span></b-col>
                 <b-col cols="auto"><button-follow-seller-firm :sellerFirm="sellerFirm" /></b-col>
-                <b-col cols="auto ml-auto"><b-button variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">Delete</b-button></b-col>
+                <b-col cols="auto"><b-button variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">Delete</b-button></b-col>
             </b-row>
 
         </b-card-title>
@@ -70,12 +70,20 @@
 
     export default {
         name: 'CardClient',
+
+        data() {
+            return {
+                buttonDisabled: false
+            }
+        },
+
         computed: {
             ...mapState({
                 sellerFirm: state => state.seller_firm.seller_firm
             }),
             // calcVariant: index => (index % 2 == 0) ? 'success' : 'info'
         },
+
         methods: {
             get_role(role) {
                 return role.replace('_', ' ').replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
@@ -84,25 +92,16 @@
             async remove(sellerFirmPublicId) {
                 this.buttonDisabled = true;
                 try {
-                    await this.deleteFile(sellerFirmPublicId);
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    );
-                    this.buttonDisabled = false;
+                    await this.$store.dispatch("seller_firm/delete_by_public_id", sellerFirmPublicId);
+                    await this.$store.dispatch("accounting_firm/get_by_public_id", this.$auth.user.employer_public_id)
+
+                    this.$router.push('/tax/clients');
                 } catch (error) {
                     this.$toast.error(error, { duration: 5000 });
                     this.buttonDisabled = false;
                     return [];
                 }
             },
-
-            async deleteFile(sellerFirmPublicId) {
-                await this.$store.dispatch(
-                    "seller_firm/delete_by_public_id",
-                    sellerFirmPublicId
-                );
-            }
         }
 
 

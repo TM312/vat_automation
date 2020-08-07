@@ -8,8 +8,10 @@
         </b-card>
         <b-tabs v-else content-class="mt-3">
             <b-tab title="Card View" active>
-                <b-row class="mb-3" sm lg="6" xl="4">
-                    <card-client-short v-for="(client, i) in clients" :key="i" :business="client" class="mb-2" />
+                <b-row class="mb-3" cols="1" cols-md="2" cols-lg="3" cols-xl="4">
+                    <b-col class="mb-2" v-for="(client, i) in clients" :key="i">
+                        <card-client-short :business="client" />
+                    </b-col>
                 </b-row>
             </b-tab>
             <b-tab title="Table View">
