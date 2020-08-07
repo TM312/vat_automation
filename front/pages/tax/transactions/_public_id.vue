@@ -4,7 +4,7 @@
         <b-container fluid>
              <b-alert :show="!$fetchState.pending && transactionInput.length != 0">
                 <p v-if="transactionInput.processed">The transaction has been successfully processed on {{ new Date(transactionInput.processed_on).toLocaleString() }} </p>
-                <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: { buttonvalidate} </p>
+                <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: { _in_future: buttonvalidate} </p>
             </b-alert>
             <card-transaction-input class="mb-5"/>
             <hr>

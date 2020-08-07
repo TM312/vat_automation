@@ -5,7 +5,11 @@
                 <form-add-seller-firm-tax-record />
             </b-collapse>
         <hr>
-        <card-tax-record-short v-for="(taxRecord, i) in taxRecords" :key="i" :taxRecord="taxRecord" />
+        <b-row class="mb-3" cols="1" cols-md="2" cols-xl="4">
+            <b-col v-for="(taxRecord, i) in taxRecords" :key="i" class="mb-2">
+                <card-tax-record-short :taxRecord="taxRecord" />
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -24,7 +28,7 @@
 
         computed: {
             ...mapState({
-                taxRecords: state => state.seller_firm.seller_firm.taxRecords
+                taxRecords: state => state.seller_firm.seller_firm.tax_records
             }),
         }
     }

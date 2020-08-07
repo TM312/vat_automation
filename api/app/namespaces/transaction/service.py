@@ -517,7 +517,11 @@ class TransactionService:
 
     @staticmethod
     def get_by_validity_tax_jurisdiction_seller_firm(start_date: date, end_date: date, seller_firm_id: int, tax_jurisdiction_code: str) -> List[Transaction]:
-        return Transaction.query.filter(Transaction.tax_date.between(start_date, end_date), Transaction.seller_firm_id==seller_firm_id, Transaction.tax_jurisdiction_code==tax_jurisdiction_code).all()
+        return Transaction.query.filter(
+            Transaction.tax_date.between(start_date, end_date),
+            Transaction.seller_firm_id==seller_firm_id,
+            Transaction.tax_jurisdiction_code==tax_jurisdiction_code
+            ).all()
 
 
     @staticmethod

@@ -23,11 +23,9 @@ export default {
     data() {
         return {
             fields: [
-                { key: 'name', sortable: true },
-                { key: 'address', sortable: false },
-                { key: 'len_vat_numbers', label: '# Vat Numbers', sortable: false },
-                { key: 'created_on', sortable: true },
-                { key: 'created_by', sortable: true },
+                { key: 'name', sortable: false },
+                { key: 'accounting_firm_client_id', label: 'Client ID', sortable: false },
+                { key: 'address', sortable: false }
             ],
         }
     }

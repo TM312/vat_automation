@@ -11,7 +11,7 @@ from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauth
 from .interface import TaxRecordDictInterface, TaxRecordInterface
 from . import TaxRecord
 
-from ..utils.service import HelperService, NotificationService, InputService
+from ..utils.service import HelperService, NotificationService, InputService, CalcService
 from ..utils import TransactionNotification
 from ..transaction import Transaction
 from ..transaction_input import TransactionInput
@@ -95,6 +95,7 @@ class TaxRecordService:
         from ..business.seller_firm.service import SellerFirmService
         from ..transaction.service import TransactionService
         from ..tax.vatin.service import VATINService
+        from ..tax.vatin import VATIN
         from ..country.service import CountryService
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
@@ -110,114 +111,117 @@ class TaxRecordService:
 
             vatin = VATINService.get_by_country_code_seller_firm_id(tax_jurisdiction_code, seller_firm.id)
 
-            if not vatin:
+            if not isinstance(vatin, VATIN):
                 raise NotFound('A VATIN for the indicated tax jurisdiction does not exist for this seller firm.')
+
 
             transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm.id, tax_jurisdiction_code)
 
-            if not transactions:
+            if not isinstance(transactions, list) or len(transactions) == 0:
                 raise UnprocessableEntity('There are no transactions by this seller for this period and tax jurisdiction.')
 
             else:
+
 
                 sales = [transaction for transaction in transactions if transaction.type_code == 'SALE']
                 refunds = [transaction for transaction in transactions if transaction.type_code == 'REFUND']
                 acquisitions = [transaction for transaction in transactions if transaction.type_code == 'ACQUISITION']
 
+
                 # LOCAL SALES
                 local_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'LOCAL_SALE')
                 local_sales_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'LOCAL_SALE')
-                local_sales_total_invoice_amount_net = TaxRecordService.get_sum(local_sales_sales_invoice_amount_net, local_sales_refunds_invoice_amount_net)
+                local_sales_total_invoice_amount_net = CalcService.get_sum(local_sales_sales_invoice_amount_net, local_sales_refunds_invoice_amount_net)
 
                 local_sales_sales_invoice_amount_vat = TaxRecordService.get_invoice_vat(sales, 'LOCAL_SALE')
                 local_sales_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'LOCAL_SALE')
-                local_sales_total_invoice_amount_vat = TaxRecordService.get_sum(local_sales_sales_invoice_amount_vat, local_sales_refunds_invoice_amount_vat)
+                local_sales_total_invoice_amount_vat = CalcService.get_sum(local_sales_sales_invoice_amount_vat, local_sales_refunds_invoice_amount_vat)
 
                 local_sales_sales_invoice_amount_gross = TaxRecordService.get_invoice_gross(sales, 'LOCAL_SALE')
                 local_sales_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'LOCAL_SALE')
-                local_sales_total_invoice_amount_gross = TaxRecordService.get_invoice_gross(local_sales_sales_invoice_amount_gross, local_sales_refunds_invoice_amount_gross)
+                local_sales_total_invoice_amount_gross = CalcService.get_sum(local_sales_sales_invoice_amount_gross, local_sales_refunds_invoice_amount_gross)
 
 
                 # LOCAL SALES REVERSE CHARGE
                 local_sale_reverse_charges_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'LOCAL_SALE_REVERSE_CHARGE')
                 local_sale_reverse_charges_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'LOCAL_SALE_REVERSE_CHARGE')
-                local_sale_reverse_charges_total_invoice_amount_net = TaxRecordService.get_sum(local_sales_sales_invoice_amount_net, local_sales_refunds_invoice_amount_net)
+                local_sale_reverse_charges_total_invoice_amount_net = CalcService.get_sum(local_sale_reverse_charges_sales_invoice_amount_net, local_sale_reverse_charges_refunds_invoice_amount_net)
 
                 local_sale_reverse_charges_sales_invoice_amount_vat = TaxRecordService.get_invoice_vat(sales, 'LOCAL_SALE_REVERSE_CHARGE')
                 local_sale_reverse_charges_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'LOCAL_SALE_REVERSE_CHARGE')
-                local_sale_reverse_charges_total_invoice_amount_vat = TaxRecordService.get_sum(local_sale_reverse_charges_sales_invoice_amount_vat, local_sale_reverse_charges_refunds_invoice_amount_vat)
+                local_sale_reverse_charges_total_invoice_amount_vat = CalcService.get_sum(local_sale_reverse_charges_sales_invoice_amount_vat, local_sale_reverse_charges_refunds_invoice_amount_vat)
 
                 local_sale_reverse_charges_sales_invoice_amount_gross = TaxRecordService.get_invoice_gross(sales, 'LOCAL_SALE_REVERSE_CHARGE')
                 local_sale_reverse_charges_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'LOCAL_SALE_REVERSE_CHARGE')
-                local_sale_reverse_charges_total_invoice_amount_gross = TaxRecordService.get_invoice_gross(local_sale_reverse_charges_sales_invoice_amount_gross, local_sale_reverse_charges_refunds_invoice_amount_gross)
+                local_sale_reverse_charges_total_invoice_amount_gross = CalcService.get_sum(local_sale_reverse_charges_sales_invoice_amount_gross, local_sale_reverse_charges_refunds_invoice_amount_gross)
 
 
                 # DISTANCE SALES
                 distance_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'DISTANCE_SALE')
                 distance_sales_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'DISTANCE_SALE')
-                distance_sales_total_invoice_amount_net = TaxRecordService.get_sum(distance_sales_sales_invoice_amount_net, distance_sales_refunds_invoice_amount_net)
+                distance_sales_total_invoice_amount_net = CalcService.get_sum(distance_sales_sales_invoice_amount_net, distance_sales_refunds_invoice_amount_net)
 
                 distance_sales_sales_invoice_amount_vat = TaxRecordService.get_invoice_vat(sales, 'DISTANCE_SALE')
                 distance_sales_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'DISTANCE_SALE')
-                distance_sales_total_invoice_amount_vat = TaxRecordService.get_sum(distance_sales_sales_invoice_amount_vat, distance_sales_refunds_invoice_amount_vat)
+                distance_sales_total_invoice_amount_vat = CalcService.get_sum(distance_sales_sales_invoice_amount_vat, distance_sales_refunds_invoice_amount_vat)
 
                 distance_sales_sales_invoice_amount_gross = TaxRecordService.get_invoice_gross(sales, 'DISTANCE_SALE')
                 distance_sales_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'DISTANCE_SALE')
-                distance_sales_total_invoice_amount_gross = TaxRecordService.get_invoice_gross(distance_sales_sales_invoice_amount_gross, distance_sales_refunds_invoice_amount_gross)
+                distance_sales_total_invoice_amount_gross = CalcService.get_sum(distance_sales_sales_invoice_amount_gross, distance_sales_refunds_invoice_amount_gross)
 
 
                 # NON TAXABLE DISTANCE SALES
                 non_taxable_distance_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'NON_TAXABLE_DISTANCE_SALE')
                 non_taxable_distance_sales_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'NON_TAXABLE_DISTANCE_SALE')
-                non_taxable_distance_sales_total_invoice_amount_net = TaxRecordService.get_sum(non_taxable_distance_sales_sales_invoice_amount_net, non_taxable_distance_sales_refunds_invoice_amount_net)
+                non_taxable_distance_sales_total_invoice_amount_net = CalcService.get_sum(non_taxable_distance_sales_sales_invoice_amount_net, non_taxable_distance_sales_refunds_invoice_amount_net)
 
                 non_taxable_distance_sales_sales_invoice_amount_vat = TaxRecordService.get_invoice_vat(sales, 'NON_TAXABLE_DISTANCE_SALE')
                 non_taxable_distance_sales_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'NON_TAXABLE_DISTANCE_SALE')
-                non_taxable_distance_sales_total_invoice_amount_vat = TaxRecordService.get_sum(non_taxable_distance_sales_sales_invoice_amount_vat, non_taxable_distance_sales_refunds_invoice_amount_vat)
+                non_taxable_distance_sales_total_invoice_amount_vat = CalcService.get_sum(non_taxable_distance_sales_sales_invoice_amount_vat, non_taxable_distance_sales_refunds_invoice_amount_vat)
 
                 non_taxable_distance_sales_sales_invoice_amount_gross = TaxRecordService.get_invoice_gross(sales, 'NON_TAXABLE_DISTANCE_SALE')
                 non_taxable_distance_sales_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'NON_TAXABLE_DISTANCE_SALE')
-                non_taxable_distance_sales_total_invoice_amount_gross = TaxRecordService.get_invoice_gross(non_taxable_distance_sales_sales_invoice_amount_gross, non_taxable_distance_sales_refunds_invoice_amount_gross)
+                non_taxable_distance_sales_total_invoice_amount_gross = CalcService.get_sum(non_taxable_distance_sales_sales_invoice_amount_gross, non_taxable_distance_sales_refunds_invoice_amount_gross)
 
 
                 # INTRA COMMUNITY SALES
                 intra_community_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'INTRA_COMMUNITY_SALE')
                 intra_community_sales_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'INTRA_COMMUNITY_SALE')
-                intra_community_sales_total_invoice_amount_net = TaxRecordService.get_sum(intra_community_sales_sales_invoice_amount_net, intra_community_sales_refunds_invoice_amount_net)
+                intra_community_sales_total_invoice_amount_net = CalcService.get_sum(intra_community_sales_sales_invoice_amount_net, intra_community_sales_refunds_invoice_amount_net)
 
 
                 # EXPORTS
                 exports_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'EXPORT')
                 exports_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'EXPORT')
-                exports_total_invoice_amount_net = TaxRecordService.get_sum(exports_sales_invoice_amount_net, exports_refunds_invoice_amount_net)
+                exports_total_invoice_amount_net = CalcService.get_sum(exports_sales_invoice_amount_net, exports_refunds_invoice_amount_net)
 
 
                 # INTRA COMMUNITY ACQUISITIONS
                 intra_community_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'INTRA_COMMUNITY_ACQUISITION')
                 intra_community_acquisitions_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_total_invoice_amount_net = TaxRecordService.get_sum(local_acquisitions_acquisitions_invoice_amount_net, intra_community_acquisitions_refunds_invoice_amount_net)
+                intra_community_acquisitions_total_invoice_amount_net = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_net, intra_community_acquisitions_refunds_invoice_amount_net)
 
                 intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(acquisitions, 'INTRA_COMMUNITY_ACQUISITION')
                 intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(refunds, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = TaxRecordService.get_sum(local_acquisitions_acquisitions_invoice_amount_vat_reverse_charge, intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge)
+                intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge, intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge)
 
 
                 # LOCAL ACQUISITIONS
-                local_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'MOVEMENT')
-                local_acquisitions_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'MOVEMENT')
-                local_acquisitions_total_invoice_amount_net = TaxRecordService.get_sum(local_acquisitions_acquisitions_invoice_amount_net, local_acquisitions_refunds_invoice_amount_net)
+                local_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_total_invoice_amount_net = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_net, local_acquisitions_refunds_invoice_amount_net)
 
-                local_acquisitions_acquisitions_invoice_amount_vat = TaxRecordService.get_invoice_vat(acquisitions, 'MOVEMENT')
-                local_acquisitions_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'MOVEMENT')
-                local_acquisitions_total_invoice_amount_vat = TaxRecordService.get_sum(local_acquisitions_acquisitions_invoice_amount_vat, local_acquisitions_refunds_invoice_amount_vat)
+                local_acquisitions_acquisitions_invoice_amount_vat = TaxRecordService.get_invoice_vat(acquisitions, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_total_invoice_amount_vat = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_vat, local_acquisitions_refunds_invoice_amount_vat)
 
-                local_acquisitions_acquisitions_invoice_amount_gross = TaxRecordService.get_invoice_gross(acquisitions, 'MOVEMENT')
-                local_acquisitions_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'MOVEMENT')
-                local_acquisitions_total_invoice_amount_gross = TaxRecordService.get_invoice_gross(local_acquisitions_acquisitions_invoice_amount_gross, local_acquisitions_refunds_invoice_amount_gross)
+                local_acquisitions_acquisitions_invoice_amount_gross = TaxRecordService.get_invoice_gross(acquisitions, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_total_invoice_amount_gross = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_gross, local_acquisitions_refunds_invoice_amount_gross)
 
                 # SUMMARY
-                taxable_turnover_amount = TaxRecordService.get_sum(local_sales_total_invoice_amount_net, local_sale_reverse_charges_total_invoice_amount_net, distance_sales_total_invoice_amount_net, intra_community_sales_total_invoice_amount_net)
-                payable_vat_amount = TaxRecordService.get_sum(local_sales_total_invoice_amount_vat, distance_sales_total_invoice_amount_vat, local_acquisitions_total_invoice_amount_vat)
+                taxable_turnover_amount = CalcService.get_sum(local_sales_total_invoice_amount_net, local_sale_reverse_charges_total_invoice_amount_net, distance_sales_total_invoice_amount_net, intra_community_sales_total_invoice_amount_net)
+                payable_vat_amount = CalcService.get_sum(local_sales_total_invoice_amount_vat, distance_sales_total_invoice_amount_vat, local_acquisitions_total_invoice_amount_vat)
 
                 tax_record_data = {
                     'created_by': g.user.id,
@@ -320,23 +324,20 @@ class TaxRecordService:
 
     @staticmethod
     def get_invoice_net(transactions: List[Transaction], tax_treatment_code: str):
-        return sum([transaction.invoice_amount_net for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+        return sum([transaction.invoice_amount_net for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code]) if not len(transactions) == 0 else 0
 
     @staticmethod
     def get_invoice_vat(transactions: List[Transaction], tax_treatment_code: str):
-        return sum([transaction.invoice_amount_vat for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+        return sum([transaction.invoice_amount_vat for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code]) if not len(transactions) == 0 else 0
 
     @staticmethod
     def get_invoice_gross(transactions: List[Transaction], tax_treatment_code: str):
-        return sum([transaction.invoice_amount_gross for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+        return sum([transaction.invoice_amount_gross for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code]) if not len(transactions) == 0 else 0
 
     @staticmethod
     def get_vat_reverse_charge(transactions: List[Transaction], tax_treatment_code: str):
-        return sum([transaction.invoice_amount_vat_reverse_charge for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code])
+        return sum([transaction.invoice_amount_vat_reverse_charge for transaction in transactions if transaction.tax_treatment_code == tax_treatment_code]) if not len(transactions) == 0 else 0
 
-    @staticmethod
-    def get_sum(*amounts):
-        return sum(amounts)
 
 
 
@@ -355,6 +356,8 @@ class TaxRecordService:
             end_date = tax_record_data.get('end_date'),
             tax_jurisdiction_code = tax_record_data.get('tax_jurisdiction_code'),
             currency_code=tax_record_data.get('currency_code'),
+
+            vatin_id=tax_record_data.get('vatin_id'),
 
             local_sales_sales_invoice_amount_net = tax_record_data.get('local_sales_sales_invoice_amount_net'),
             local_sales_refunds_invoice_amount_net = tax_record_data.get('local_sales_refunds_invoice_amount_net'),

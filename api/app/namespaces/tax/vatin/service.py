@@ -37,6 +37,10 @@ class VATINService:
         return VATIN.query.join(seller_firm.vat_numbers).filter_by(country_code).first()
 
     @staticmethod
+    def get_by_country_code_seller_firm_id(country_code, business_id) -> VATIN:
+        return VATIN.query.filter(VATIN.country_code == country_code, VATIN.business_id == business_id).first()
+
+    @staticmethod
     def update(vatin_id: int, data_changes: VATINInterface) -> VATIN:
         vatin = VATINService.get_by_id(vatin_id)
         vatin.update(data_changes)

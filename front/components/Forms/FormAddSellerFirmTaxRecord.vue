@@ -98,7 +98,7 @@
                 variant="primary"
                 @click="submitPayload()"
                 block
-            ><b-icon icon="box-arrow-in-up" /> Create New Tax Record</b-button>
+            ><b-icon icon="box-arrow-in-up" /> Generate New Tax Record</b-button>
 
         </b-card>
     </b-container>

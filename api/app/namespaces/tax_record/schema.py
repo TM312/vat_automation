@@ -10,6 +10,7 @@ tax_record_sub_dto = Model('tax_record_sub', {
     'seller_firm_public_id': fields.String(attribute=lambda x: x.seller_firm.public_id, readonly=True),
     'taxable_turnover_amount': fields.Float(readonly=True),
     'payable_vat_amount': fields.Float(readonly=True),
+    'currency_code': fields.String(readonly=True)
 })
 
 tax_record_dto = tax_record_sub_dto.clone('tax_record', {
