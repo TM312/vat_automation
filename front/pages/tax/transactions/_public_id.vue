@@ -2,9 +2,9 @@
     <div>
         <container-route-back />
         <b-container fluid>
-             <b-alert :show="!$fetchState.pending && transactionInput.length != 0">
+             <b-alert :show="!$fetchState.pending && transactionInput.length != 0" :variant="transactionInput.processed ? 'info' : 'danger'">
                 <p v-if="transactionInput.processed">The transaction has been successfully processed on {{ new Date(transactionInput.processed_on).toLocaleString() }} </p>
-                <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: { _in_future: buttonvalidate} </p>
+                <p v-else>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transactionInputPublicId="transactionInput.public_id"/> </p>
             </b-alert>
             <card-transaction-input class="mb-5"/>
             <hr>

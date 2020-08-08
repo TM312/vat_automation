@@ -18,10 +18,7 @@
 
             <template v-slot:cell(processed)="data">
                 <b-icon v-if="data.value" icon="check-circle" variant="success"></b-icon>
-                <span v-else>
-                    <b-button size="sm" variant="outline-primary">Validate</b-button><br>
-                    {{ data.value }}
-                </span>
+                <span v-else><button-validate-transaction-input :transactionInputPublicId="data.item.public_id"/></span>
             </template>
 
             <template v-slot:cell(sale_total_value_gross)="data">
@@ -49,6 +46,10 @@ export default {
     data() {
         return {
             fields: [
+                 {
+                    key: 'complete_date',
+                    sortable: true,
+                },
                 {
                     key: 'transaction_type_public_code',
                     label: 'Public Type',
@@ -86,14 +87,10 @@ export default {
                     lable: 'Arrival Country',
                     sortable: true,
                 },
-                {
-                    key: 'arrival_date',
-                    sortable: true,
-                },
-                {
-                    key: 'complete_date',
-                    sortable: true,
-                },
+                // {
+                //     key: 'arrival_date',
+                //     sortable: true,
+                // },
 
                 {
                     key: 'processed',

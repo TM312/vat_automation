@@ -12,7 +12,7 @@ from . import seller_firm_dto, seller_firm_sub_dto, seller_firm_admin_dto
 from .service import SellerFirmService
 from .interface import SellerFirmInterface
 
-from ...utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required
+from ...utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required, accepted_roles
 
 
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa
@@ -53,7 +53,7 @@ class SellerFirmIdResource(Resource):
         return SellerFirmService.get_by_public_id(seller_firm_public_id)
 
     @login_required
-        # @accepted_u_types('admin')
+    @accepted_roles('admin')
     def delete(self, seller_firm_public_id: str) -> Response:
         '''Delete A Single SellerFirm'''
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)

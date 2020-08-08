@@ -1,39 +1,32 @@
 <template>
-    <b-card header="Base Data">
+    <b-card border-variant="primary">
         <b-card-title>
-            <b-row>
-                <b-col cols="auto" class="mr-auto mb-1"><span>{{ sellerFirm.name }}</span></b-col>
-                <b-col cols="auto"><button-follow-seller-firm :sellerFirm="sellerFirm" /></b-col>
-                <b-col cols="auto"><b-button variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">Delete</b-button></b-col>
-            </b-row>
-
-        </b-card-title>
-        <b-card-text>
             <b-row>
                 <b-col cols="auto"><b>Client ID:</b></b-col>
                 <b-col cols="auto" class="mr-auto">
                     <span v-if="sellerFirm.accounting_firm_client_id">{{ sellerFirm.accounting_firm_client_id }} </span>
-                    <span v-else><i>No ID assigned to this client.</i></span>
+                    <span v-else class="text-muted"><i>No ID assigned to this client.</i></span>
+                </b-col>
+                <b-col cols="auto">
+                    <button-follow-seller-firm :sellerFirm="sellerFirm" />
+                    <b-button v-if="$auth.user.role === 'admin'" size="sm" variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">Delete</b-button>
                 </b-col>
             </b-row>
-            <br>
-            <b-row>
-                <b-col cols="auto"><b>Address:</b></b-col>
-                <b-col cols="auto" class="mr-auto">{{ sellerFirm.address }} </b-col>
-            </b-row>
-            <b-row>
-                <b-col cols="auto"><b>Establishment Country:</b></b-col>
-                <b-col cols="auto" class="mr-auto">{{ sellerFirm.establishment_country }} </b-col>
-            </b-row>
-            <br>
+
+        </b-card-title>
+        <b-card-sub-title class="mb-3">
+            {{ sellerFirm.address }} | Establishment: {{ sellerFirm.establishment_country }}
+        </b-card-sub-title>
+
+        <b-card-text>
             <b-row>
                 <b-col cols="auto"><b>Tax Auditors: </b></b-col>
                 <b-col cols="auto" class="mr-auto">
                     <b-avatar
-                        v-for="(taxAuditor, index) in sellerFirm.tax_auditors"
+                        v-for="taxAuditor in sellerFirm.tax_auditors"
                         :key="taxAuditor.public_id"
                         :id="`popover-target-${taxAuditor.public_id}`"
-                        :variant="(index % 2 == 0) ? 'success' : 'info'"
+                        :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
                         :text="taxAuditor.initials"
                         class="mr-1"
                         >

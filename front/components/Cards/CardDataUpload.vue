@@ -1,8 +1,16 @@
 
 <template>
-    <b-card header="Upload" no-body>
-        <b-card-body>
-            <b-progress v-show="progress>0" striped :value="progress" :variant="progressBarStyle" />
+    <b-card>
+        <b-card-title>Upload</b-card-title>
+        <b-card-sub-title class="my-2">
+            {{ files.length }}
+            <span v-show="files.length==1">files </span>
+            <span v-show="files.length>1">file </span>
+            selected
+        </b-card-sub-title>
+
+        <b-card-text>
+            <!-- <b-progress v-show="progress>0" striped :value="progress" :variant="progressBarStyle" /> -->
 
             <div class="my-3">
                 <input
@@ -14,20 +22,20 @@
                     @change="onFilesSelected"
                 />
 
-                <!-- for adding clients as file uploads -->
-                <button-upload v-if="urlEndpointUpload" :urlEndpointUpload="urlEndpointUpload" :files="files" @removeFile="removeFile" />
-
-                <!-- for data uploads relating to a specific seller -->
-                <button-upload-seller-firm v-else :files="files" @removeFile="removeFile" />
-
-
                 <b-button id="selectButton" variant="outline-primary" @click="$refs.files.click()">
                     <b-icon icon="file-plus" /> Files
                 </b-button>
 
-                <b-button variant="outline-secondary" @click="files = []">
+                <b-button v-show="files.length>0" variant="outline-secondary" @click="files = []">
                     <b-icon icon="arrow-counterclockwise" /> Reset
                 </b-button>
+
+                 <!-- for adding clients as file uploads -->
+                <button-upload v-if="urlEndpointUpload" v-show="files.length>0" :urlEndpointUpload="urlEndpointUpload" :files="files" @removeFile="removeFile" />
+
+                <!-- for data uploads relating to a specific seller -->
+                <button-upload-seller-firm v-else v-show="files.length>0" :files="files" @removeFile="removeFile" />
+
             </div>
 
             <div v-show="files.length>0" class="mt-3">
@@ -46,7 +54,7 @@
                     </template>
                 </b-table>
             </div>
-        </b-card-body>
+        </b-card-text>
     </b-card>
 </template>
 
@@ -94,6 +102,7 @@
                 ]
             };
         },
+
         methods: {
             onFilesSelected() {
                 let selectedFiles = this.$refs.files.files;

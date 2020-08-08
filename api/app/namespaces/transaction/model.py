@@ -349,21 +349,6 @@ class Transaction(db.Model):  # type: ignore
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def __repr__(self):
         return '<ID: {} - {}>'.format(self.id, self.tax_jurisdiction_code)
         #return '<Transaction {}: Tax Jurisdiction: {} | Type: {} | Tax Treatment: {}>'.format(self.id, self.tax_jurisdiction_code, self.type_code, self.tax_treatment_code)

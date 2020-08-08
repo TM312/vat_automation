@@ -1,12 +1,11 @@
 <template>
-    <div class="cols-2">
-        <b-button
-            variant="outline-success"
-            :pressed="isFollowing"
-            @click="followSellerFirm"
-            :disabled="buttonBusy"
-        >{{ buttonText }}</b-button>
-    </div>
+    <b-button
+        variant="outline-success"
+        :pressed="isFollowing"
+        @click="followSellerFirm"
+        :disabled="buttonBusy"
+        size="sm"
+    >{{ buttonText }}</b-button>
 </template>
 
 <script>

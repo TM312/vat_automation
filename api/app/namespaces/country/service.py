@@ -25,6 +25,7 @@ class CountryService:
         if eu:
             return eu
         else:
+            print("Function: CountryService -> get_eu_by_date", flush=True)
             raise NotFound('A constellation of EU countries has not been defined for the requested date ({})'.format(str(date)))
 
 

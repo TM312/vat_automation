@@ -23,8 +23,8 @@ ns.add_model(business_admin_dto.name, business_admin_dto)
 @ns.route('/')
 class AdminBusinessListResource(Resource):
     '''Get all Business Firms'''
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(business_dto, envelope='data')
     def get(self) -> List[Business]:
         '''List Of Registered Business Firms'''
@@ -34,15 +34,15 @@ class AdminBusinessListResource(Resource):
 @ns.route('/<string:public_id>')
 @ns.param('public_id', 'Public accounting business ID')
 class AdminBusinessIdResource(Resource):
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_with(business_dto)
     def get(self, public_id: str) -> Business:
         '''Get One Business'''
         return BusinessService.get_by_id(UUID(public_id))
 
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
         '''Delete A Single Business'''
         return BusinessService.delete_by_id(UUID(public_id))

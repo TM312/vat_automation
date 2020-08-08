@@ -126,6 +126,7 @@ class TaxRecordService:
                 sales = [transaction for transaction in transactions if transaction.type_code == 'SALE']
                 refunds = [transaction for transaction in transactions if transaction.type_code == 'REFUND']
                 acquisitions = [transaction for transaction in transactions if transaction.type_code == 'ACQUISITION']
+                movements = [transaction for transaction in transactions if transaction.type_code == 'MOVEMENT']
 
 
                 # LOCAL SALES
@@ -186,7 +187,7 @@ class TaxRecordService:
 
                 # INTRA COMMUNITY SALES
                 intra_community_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'INTRA_COMMUNITY_SALE')
-                intra_community_sales_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'INTRA_COMMUNITY_SALE')
+                intra_community_sales_refunds_invoice_amount_net = 0
                 intra_community_sales_total_invoice_amount_net = CalcService.get_sum(intra_community_sales_sales_invoice_amount_net, intra_community_sales_refunds_invoice_amount_net)
 
 
@@ -197,31 +198,35 @@ class TaxRecordService:
 
 
                 # INTRA COMMUNITY ACQUISITIONS
-                intra_community_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'INTRA_COMMUNITY_ACQUISITION')
+                intra_community_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(movements, 'INTRA_COMMUNITY_ACQUISITION')
+                intra_community_acquisitions_refunds_invoice_amount_net = 0
                 intra_community_acquisitions_total_invoice_amount_net = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_net, intra_community_acquisitions_refunds_invoice_amount_net)
 
-                intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(acquisitions, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(refunds, 'INTRA_COMMUNITY_ACQUISITION')
+                intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(movements, 'INTRA_COMMUNITY_ACQUISITION')
+                intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = 0
                 intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge, intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge)
 
 
                 # LOCAL ACQUISITIONS
-                local_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'DOMESTIC_ACQUISITION')
-                local_acquisitions_refunds_invoice_amount_net = TaxRecordService.get_invoice_net(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(acquisitions, 'LOCAL_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_net = 0
                 local_acquisitions_total_invoice_amount_net = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_net, local_acquisitions_refunds_invoice_amount_net)
 
-                local_acquisitions_acquisitions_invoice_amount_vat = TaxRecordService.get_invoice_vat(acquisitions, 'DOMESTIC_ACQUISITION')
-                local_acquisitions_refunds_invoice_amount_vat = TaxRecordService.get_invoice_vat(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_acquisitions_invoice_amount_vat = TaxRecordService.get_invoice_vat(acquisitions, 'LOCAL_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_vat = 0
                 local_acquisitions_total_invoice_amount_vat = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_vat, local_acquisitions_refunds_invoice_amount_vat)
 
-                local_acquisitions_acquisitions_invoice_amount_gross = TaxRecordService.get_invoice_gross(acquisitions, 'DOMESTIC_ACQUISITION')
-                local_acquisitions_refunds_invoice_amount_gross = TaxRecordService.get_invoice_gross(refunds, 'DOMESTIC_ACQUISITION')
+                local_acquisitions_acquisitions_invoice_amount_gross = TaxRecordService.get_invoice_gross(acquisitions, 'LOCAL_ACQUISITION')
+                local_acquisitions_refunds_invoice_amount_gross = 0
                 local_acquisitions_total_invoice_amount_gross = CalcService.get_sum(local_acquisitions_acquisitions_invoice_amount_gross, local_acquisitions_refunds_invoice_amount_gross)
 
                 # SUMMARY
                 taxable_turnover_amount = CalcService.get_sum(local_sales_total_invoice_amount_net, local_sale_reverse_charges_total_invoice_amount_net, distance_sales_total_invoice_amount_net, intra_community_sales_total_invoice_amount_net)
-                payable_vat_amount = CalcService.get_sum(local_sales_total_invoice_amount_vat, distance_sales_total_invoice_amount_vat, local_acquisitions_total_invoice_amount_vat)
+                payable_vat_amount = (
+                    local_sales_total_invoice_amount_vat
+                    + distance_sales_total_invoice_amount_vat
+                    - local_acquisitions_total_invoice_amount_vat
+                    )
 
                 tax_record_data = {
                     'created_by': g.user.id,
@@ -450,7 +455,7 @@ class TaxRecordService:
 
     # @staticmethod
     # def get_df_list(tax_record_dict: TaxRecordDictInterface) -> List[Union[pd.DataFrame, str]]:
-    #     tab_names = ['LOCAL_SALES', 'LOCAL_SALES_REVERSE_CHARGE', 'DISTANCE_SALES', 'NON_TAXABLE_DISTANCE_SALES', 'INTRA_COMMUNITY_SALES', 'EXPORTS', 'DOMESTIC_ACQUISITIONS', 'INTRA_COMMUNITY_ACQUISITIONS']
+    #     tab_names = ['LOCAL_SALES', 'LOCAL_SALES_REVERSE_CHARGE', 'DISTANCE_SALES', 'NON_TAXABLE_DISTANCE_SALES', 'INTRA_COMMUNITY_SALES', 'EXPORTS', 'LOCAL_ACQUISITIONS', 'INTRA_COMMUNITY_ACQUISITIONS']
     #     #'SUMMARY',
     #     df_local_sales = pd.Dataframe(tax_record_dict.get('LOCAL_SALES'))
     #     df_local_sales_reverse_charge = pd.Dataframe(tax_record_dict.get('LOCAL_SALES_REVERSE_CHARGE'))
@@ -458,7 +463,7 @@ class TaxRecordService:
     #     df_non_taxable_distance_sales = pd.Dataframe(tax_record_dict.get('NON_TAXABLE_DISTANCE_SALES'))
     #     df_intra_community_sales = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_SALES'))
     #     df_exports = pd.Dataframe(tax_record_dict.get('EXPORTS'))
-    #     df_domestic_acquisitions = pd.Dataframe(tax_record_dict.get('DOMESTIC_ACQUISITIONS'))
+    #     df_domestic_acquisitions = pd.Dataframe(tax_record_dict.get('LOCAL_ACQUISITIONS'))
     #     df_intra_community_acquisitions = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS'))
     #     #df_summary = TaxRecordService.calculate_front_page(df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_intra_community_acquisitions)
 
@@ -558,8 +563,8 @@ class TaxRecordService:
     #     elif t_treatment_code == 'EXPORT':
     #         t_treatment_list: List[Dict] = tax_record_dict.get('EXPORTS')
 
-    #     elif t_treatment_code == 'DOMESTIC_ACQUISITION':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('DOMESTIC_ACQUISITIONS')
+    #     elif t_treatment_code == 'LOCAL_ACQUISITION':
+    #         t_treatment_list: List[Dict] = tax_record_dict.get('LOCAL_ACQUISITIONS')
 
     #     elif t_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
     #         t_treatment_list: List[Dict] = tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS')
@@ -598,7 +603,7 @@ class TaxRecordService:
     #     elif t_treatment_code == 'EXPORT':
     #         t_type_dict = tax_record_base_dict
 
-    #     elif t_treatment_code == 'DOMESTIC_ACQUISITION':
+    #     elif t_treatment_code == 'LOCAL_ACQUISITION':
     #         t_type_dict = tax_record_base_dict
 
     #     elif t_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
@@ -631,7 +636,7 @@ class TaxRecordService:
     #         'NON_TAXABLE_DISTANCE_SALES': non_taxable_distance_sales,
     #         'INTRA_COMMUNITY_SALES': intra_community_sales,
     #         'EXPORTS': exports,
-    #         'DOMESTIC_ACQUISITIONS': domestic_acquisitions,
+    #         'LOCAL_ACQUISITIONS': domestic_acquisitions,
     #         'INTRA_COMMUNITY_ACQUISITIONS': intra_community_acquisitions
     #     }
 

@@ -36,6 +36,21 @@ def accepted_u_types(*u_types):
         return wrap
     return accepted_u_types_inner_decorator
 
+
+def accepted_roles(*roles):
+    def accepted_roles_inner_decorator(f):
+        @wraps(f)
+        def wrap(*args, **kwargs):
+            # user is available from @login_required
+            for role in roles:
+                if g.user.role == role or g.user.u_type == 'admin':
+                    return f(*args, **kwargs)
+            raise Forbidden(
+                'You do not possess the rights to access the requested resource.')
+
+        return wrap
+    return accepted_roles_inner_decorator
+
 #provides access to the resource only if the user's (mail) confirmation status is True
 #to be used only in combination with login_required
 def confirmation_required(f):

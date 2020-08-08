@@ -1,19 +1,17 @@
 <template>
     <b-card :border-variant="cardBorder">
-        <template v-slot:header>
+        <b-card-title>
             <b-row>
-                <b-col cols="auto" class="mr-auto">
-                    <h6 class="mb-0">Items</h6>
-                </b-col>
-                <b-col cols="auto"><b-form-checkbox v-model="editMode" name="check-button" switch>Edit Mode</b-form-checkbox></b-col>
+                <b-col cols="auto" class="mr-auto"></b-col>
+                <b-col cols="auto"><b-form-checkbox v-model="editMode" name="check-button" switch /></b-col>
             </b-row>
-        </template>
+        </b-card-title>
         <b-card-text>
-            <h5 v-if="seller_firm.len_items === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
+            <h5 v-if="items.length === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
                 <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ seller_firm.len_items }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ seller_firm.len_items }}</span></small>
+                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ items.length }}</small>
+                    <small v-else>TOTAL: <span class="text-primary">{{ items.length }}</span></small>
                 </p>
 
 
@@ -37,7 +35,7 @@
 
                         </b-tab>
 
-                        <b-tab title="Delete" :disabled="seller_firm.len_items === 0">
+                        <b-tab title="Delete" :disabled="items.length === 0">
                             <lazy-table-delete-seller-firm-item :fields="fieldsEditable" @flash="flashCount"/>
                         </b-tab>
                     </b-tabs>
@@ -59,29 +57,25 @@
                 flashCounter: false,
 
                 fields: [
-                    { key: "brand_name", sortable: true },
-                    { key: "name", sortable: true },
-                    { key: "sku", label:"SKU", sortable: true },
-                    { key: "ean", label:"EAN", sortable: true },
-                    { key: "asin", label:"ASIN", sortable: true },
-                    { key: "tax_code_code", label:"Tax Code", sortable: true },
+                    { key: "brand_name", sortable: false },
+                    { key: "sku", label:"SKU", sortable: false },
+                    { key: "name", sortable: false },
+                    { key: "tax_code_code", label:"Tax Code", sortable: false },
                     {
                         key: "weight_kg",
                         label: "Weight",
                         formatter: value => {
                             return Number.parseFloat(value).toFixed(3)
                         },
-                        sortable: true
+                        sortable: false
                     },
                     {
                         key: "unit_cost_price_net",
-                        sortable: true,
+                        sortable: false,
                         formatter: value => {
                             return Number.parseFloat(value).toFixed(2)
                         },
-                    },
-                    { key: "valid_from", sortable: true },
-                    { key: "valid_to", sortable: true },
+                    }
                 ]
             };
         },

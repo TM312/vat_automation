@@ -11,9 +11,9 @@
                 <nuxt-link :to="`/tax/transactions/${data.item.public_id}`">{{ data.value }}</nuxt-link>
             </template>
 
-            <template v-slot:cell(processed)="data">
-                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
-                {{ data.value }}
+            <template v-slot:cell(processed)="data" class="align-center">
+                <b-icon v-if="data.value" icon="check-circle" variant="success"></b-icon>
+                <span v-else><button-validate-transaction-input :transactionInputPublicId="data.item.public_id"/></span>
             </template>
 
             <template v-slot:cell(sale_total_value_gross)="data">
@@ -62,24 +62,28 @@ export default {
     data() {
         return {
             fields: [
+                 {
+                    key: 'complete_date',
+                    sortable: false,
+                },
                 {
                     key: 'transaction_type_public_code',
                     label: 'Public Type',
-                    sortable: true,
+                    sortable: false,
                 },
                 {
                     key: 'item_sku',
                     label: 'SKU',
-                    sortable: true,
+                    sortable: false,
                 },
                 {
                     key: 'marketplace',
-                    sortable: true,
+                    sortable: false,
                 },
                 {
                     key: 'item_quantity',
                     label: 'Quantity',
-                    sortable: true,
+                    sortable: false,
                 },
                  {
                     key: 'sale_total_value_gross',
@@ -87,7 +91,7 @@ export default {
                     formatter: value => {
                             return value ? Number.parseFloat(value).toFixed(2) : null
                     },
-                    sortable: true,
+                    sortable: false,
                 },
                 {
                     key: 'departure_to_arrival',
@@ -99,14 +103,10 @@ export default {
                 //     label: 'Arrival Country',
                 //     sortable: true,
                 // },
-                {
-                    key: 'arrival_date',
-                    sortable: true,
-                },
-                {
-                    key: 'complete_date',
-                    sortable: true,
-                },
+                // {
+                //     key: 'arrival_date',
+                //     sortable: true,
+                // },
 
                 {
                     key: 'processed',

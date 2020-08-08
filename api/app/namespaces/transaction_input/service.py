@@ -31,8 +31,15 @@ class TransactionInputService:
         return TransactionInput.query.filter(TransactionInput.public_id == transaction_input_public_id).first()
 
     @staticmethod
-    def get_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TransactionInput]:
-        transaction_inputs = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).all()
+    def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
+        base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
+        if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
+            per_page = current_app.config['TRANSACTIONS_PER_QUERY']
+            page = kwargs.get('page')
+            transaction_inputs = base_query.paginate(page, per_page, False).items
+
+        else:
+            transaction_inputs = base_query.all()
         return transaction_inputs
 
     @staticmethod

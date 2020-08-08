@@ -12,8 +12,9 @@
                     <overview-base-data v-else />
                 </b-tab>
 
-                <b-tab title='Tax Records'>
-                    <lazy-overview-tax-records :business="seller_firm" />
+                <b-tab title='Tax Records' :disabled="$fetchState.pending && seller_firm.public_id != $route.params.public_id || seller_firm.length === 0">
+                    <span v-if="$fetchState.pending && (seller_firm.public_id != $route.params.public_id || seller_firm.length === 0)"></span>
+                    <lazy-overview-tax-records v-else :business="seller_firm" />
                 </b-tab>
                 <b-tab title='Upload Files' :disabled="$fetchState.pending && seller_firm.public_id != $route.params.public_id || seller_firm.length === 0">
                     <lazy-add-data-files :seller_firm_public_id="seller_firm.public_id" />

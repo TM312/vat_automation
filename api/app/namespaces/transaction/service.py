@@ -473,7 +473,7 @@ class TransactionService:
                     tax_treatment_code = 'LOCAL_SALE'
 
         elif transaction_type.code == 'ACQUISITION':
-            tax_treatment_code = 'DOMESTIC_ACQUISITION'
+            tax_treatment_code = 'LOCAL_ACQUISITION'
 
         elif transaction_type.code == 'MOVEMENT' or transaction_type.code == 'INBOUND':
             tax_treatment_code = kwargs.get('tax_treatment_code')
@@ -611,10 +611,12 @@ class TransactionService:
                 transaction_type = TransactionType.query.filter_by(code="INBOUND").first()
 
             else:
+                print("Function: TransactionService -> get_transaction_type_by_public_code_account", flush=True)
                 raise NotFound('The indicated transaction type "{}" is not supported. Please get in touch with one of the administrators.'.format(transaction_type_code))
                 current_app.logger.warning('Unrecognized public transaction type code: {} for account id: {}'.format(transaction_type_code, account.id))
 
         else:
+            print("Function: TransactionService -> get_transaction_type_by_public_code_account -> platform not found", flush=True)
             raise NotFound('The platform for the transaction account "{}" is currently not supported. Please get in touch with one of the administrators.'.format(account.given_id))
 
         return transaction_type
@@ -655,7 +657,7 @@ class TransactionService:
             vat_rate_reverse_charge=float(0)
         else:
             # tax jurisdiction is arrival country
-            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(item.tax_code_code, arrival_country, tax_date).rate
+            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(item.tax_code_code, arrival_country, tax_date)
 
         return vat_rate_reverse_charge
 
@@ -717,7 +719,7 @@ class TransactionService:
 
         if invoice_exchange_rate_date:
             from ..exchange_rate.service import ExchangeRateService
-            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date).rate
+            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date)
 
         else:
             invoice_exchange_rate = float(1)
@@ -787,7 +789,7 @@ class TransactionService:
             tax_treatment_code == 'DISTANCE_SALE'
             or tax_treatment_code == 'NON_TAXABLE_DISTANCE_SALE'
             or tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION'
-            or tax_treatment_code == 'DOMESTIC_ACQUISITION'
+            or tax_treatment_code == 'LOCAL_ACQUISITION'
             ):
             tax_jurisdiction_code = arrival_country.code
         else:

@@ -3,18 +3,6 @@
         <dashboard-dashboard />
         <card-greeting-dashboard class="mx-3" />
         <br>
-        <b-row>
-            <b-col cols="3">
-            </b-col>
-            <b-col cols="3">
-            </b-col>
-            <b-col cols="3">
-                <!-- <card-total-count :counterNumber="0" subTitle="Total Number of Something Else" /> -->
-            </b-col>
-            <b-col cols="3">
-                <!-- <card-total-count :counterNumber="0" subTitle="Total Number of Something Else  4th" /> -->
-            </b-col>
-        </b-row>
 
         <b-tabs content-class="mx-3">
             <b-tab title="Key Accounts" active>
