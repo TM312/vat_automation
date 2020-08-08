@@ -30,6 +30,7 @@ class AccountService:
         if account:
             return account
         else:
+            print("Function: AccountService -> get_by_given_id_channel_code", flush=True)
             raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
 
 

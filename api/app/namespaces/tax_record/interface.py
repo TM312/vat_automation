@@ -20,7 +20,7 @@ class TaxRecordDictInterface(TypedDict, total=True):
     NON_TAXABLE_DISTANCE_SALES: List[Dict]
     INTRA_COMMUNITY_SALES: List[Dict]
     EXPORTS: List[Dict]
-    DOMESTIC_ACQUISITIONS: List[Dict]
+    LOCAL_ACQUISITIONS: List[Dict]
     INTRA_COMMUNITY_ACQUISITIONS: List[Dict]
 
 
@@ -171,7 +171,7 @@ class EXPORTS_DictInterface(TaxRecordBaseDictInterface):
     pass
 
 
-class DOMESTIC_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
+class LOCAL_ACQUISITIONS_DictInterface(TaxRecordBaseDictInterface):
     pass
 
 

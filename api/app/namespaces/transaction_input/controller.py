@@ -1,9 +1,8 @@
 from typing import List, BinaryIO
 from flask import request
 
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, reqparse
 from flask.wrappers import Response
-
 
 from . import transaction_input_dto, transaction_input_sub_dto, transaction_input_admin_dto
 from . import TransactionInput
@@ -16,6 +15,10 @@ ns = Namespace("TransactionInput", description="Transaction Input Related Operat
 ns.add_model(transaction_input_dto.name, transaction_input_dto)
 ns.add_model(transaction_input_admin_dto.name, transaction_input_admin_dto)
 ns.add_model(transaction_input_sub_dto.name, transaction_input_sub_dto)
+
+parser = reqparse.RequestParser()
+parser.add_argument('seller_firm_public_id', type=str)
+parser.add_argument('page', type=int)
 
 
 @ns.route("/")
@@ -63,14 +66,16 @@ class TransactionInputIdResource(Resource):
         return TransactionInputService.update_by_public_id(transaction_input_public_id, data_changes)
 
 
-@ns.route("/seller_firm/<string:seller_firm_public_id>")
+@ns.route("/seller_firm/") #<string:seller_firm_public_id><int:page>")
 @ns.param("seller_firm_public_id", "TransactionInput database ID")
 class TransactionInputSellerFirmIdResource(Resource):
+
     @login_required
     @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
-    def get(self, seller_firm_public_id: str) -> TransactionInput:
+    def get(self) -> TransactionInput:
         """Get Single TransactionInput"""
-        return TransactionInputService.get_by_seller_firm_public_id(seller_firm_public_id)
+        args = parser.parse_args()
+        return TransactionInputService.get_by_seller_firm_public_id(args.get('seller_firm_public_id'), paginate=True, page=args.get('page'))
 
 
 

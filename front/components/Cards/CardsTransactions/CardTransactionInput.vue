@@ -18,8 +18,18 @@
                     </b-col>
                 </b-row>
 
-                <b>Created On:</b> {{ transactionInput.created_on }} <br>
-                <b>Uploaded By:</b> {{ transactionInput.created_by }} <br>
+                <b-row>
+                    <b-col cols="auto">
+                         <b>Created On:</b><br>
+                         <b>Uploaded By:</b>
+                    </b-col>
+                    <b-col>
+                        {{ new Date(transactionInput.created_on).toLocaleString() }} <br>
+                        {{ transactionInput.created_by }}
+                    </b-col>
+                </b-row>
+
+
             </b-card>
             <b-card
                 title="Item"
@@ -53,10 +63,20 @@
                         <b>Conditions:</b> {{ transactionInput.shipment_conditions }} <br>
                     </b-col>
                     <b-col>
-                        <b>Dates</b><br>
-                        <b>Shipment:</b> {{ transactionInput.shipment_date }} <br>
-                        <b>Arrival:</b> {{ transactionInput.arrival_date }} <br>
-                        <b>Complete:</b> {{ transactionInput.complete_date }} <br>
+                        <b-row><b-col><b>Dates</b></b-col></b-row>
+                        <b-row>
+                            <b-col cols="auto">
+                                <b>Shipment:</b><br>
+                                <b>Arrival:</b><br>
+                                <b>Complete:</b>
+                            </b-col>
+                            <b-col>
+                                {{ transactionInput.shipment_date }} <br>
+                                {{ transactionInput.arrival_date }} <br>
+                                {{ transactionInput.complete_date }}
+                            </b-col>
+                        </b-row>
+
 
                     </b-col>
                 </b-row>

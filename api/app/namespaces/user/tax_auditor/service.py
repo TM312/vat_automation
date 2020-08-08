@@ -72,8 +72,7 @@ class TaxAuditorService:
     @staticmethod
     def delete_by_id(public_id: str):
         #check if tax_auditor exists in db
-        tax_auditor = TaxAuditor.query.filter(
-            TaxAuditor.public_id == public_id).first()
+        tax_auditor = TaxAuditor.query.filter(TaxAuditor.public_id == public_id).first()
         if tax_auditor:
             db.session.delete(tax_auditor)
             db.session.commit()

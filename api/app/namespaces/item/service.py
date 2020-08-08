@@ -37,6 +37,7 @@ class ItemService:
             if item:
                 return item
             else:
+                print("Function: ItemService -> get_by_sku_account_date", flush=True)
                 raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
 
 

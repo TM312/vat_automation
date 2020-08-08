@@ -34,7 +34,7 @@ tax_treatments = [
         'description': 'Sale of good(s) leaving the Single European Economic Area. Limited to Transaction Types SALE (and REFUND).'
     },
     {
-        'code': 'DOMESTIC_ACQUISITION',
+        'code': 'LOCAL_ACQUISITION',
         'name': 'Domestic Acquisition',
         'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
     },
@@ -60,7 +60,7 @@ class TaxTreatmentSeedService:
         transaction_type_tax_treatment_dict = [
             {'SALE': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
             {'REFUND': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
-            {'ACQUISITION': ['DOMESTIC_ACQUISITION']},
+            {'ACQUISITION': ['LOCAL_ACQUISITION']},
             {'MOVEMENT': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']}
         ]
 

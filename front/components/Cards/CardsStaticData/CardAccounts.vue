@@ -1,6 +1,15 @@
 <template>
     <b-card :border-variant="cardBorder">
-        <template v-slot:header>
+        <b-card-title>
+            <b-row>
+                <b-col cols="auto" class="mr-auto">Accounts</b-col>
+                <b-col cols="auto">
+                    <b-form-checkbox v-model="editMode" name="check-button" switch />
+                </b-col>
+            </b-row>
+
+        </b-card-title>
+        <!-- <template v-slot:title>
             <b-row>
                 <b-col cols="auto" class="mr-auto">
                     <h6 class="mb-0">Accounts</h6>
@@ -9,13 +18,13 @@
                     <b-form-checkbox v-model="editMode" name="check-button" switch>Edit Mode</b-form-checkbox>
                 </b-col>
             </b-row>
-        </template>
+        </template> -->
         <b-card-text>
-            <h5 v-if="seller_firm.len_accounts === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
+            <h5 v-if="accounts.length === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
                 <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ seller_firm.len_accounts }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ seller_firm.len_accounts }}</span></small>
+                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ accounts.length }}</small>
+                    <small v-else>TOTAL: <span class="text-primary">{{ accounts.length }}</span></small>
                 </p>
 
 
@@ -30,7 +39,7 @@
 
                         </b-tab>
 
-                        <b-tab title="Delete" :disabled="seller_firm.len_accounts === 0">
+                        <b-tab title="Delete" :disabled="accounts.length === 0">
                             <lazy-table-delete-seller-firm-account :fields="fieldsEditable" @flash="flashCount"/>
                         </b-tab>
                     </b-tabs>
@@ -53,7 +62,7 @@
                 flashCounter: false,
 
                 fields: [
-                    { key: 'channel_code', sortable: true },
+                    { key: 'channel_code', sortable: false },
                     { key: 'given_id', label: "Platform ID", sortable: false }
                 ],
             };

@@ -7,18 +7,6 @@
             label-class="font-weight-bold pt-0"
             class="mb-2"
         >
-            <b-form-group
-                label-cols-sm="3"
-                label-align-sm="right"
-                label-for="platform"
-                label="Platform"
-            >
-                <b-form-select
-                    id="platform"
-                    :options="optionsPlatform"
-                    v-model="payload.platform_code"
-                ></b-form-select>
-            </b-form-group>
 
             <b-form-group
                 label-cols-sm="3"
@@ -100,13 +88,11 @@
         data() {
             return {
                 payload: {
-                        platform_code: null,
                         arrival_country_code: null,
                         valid_from: null,
                         valid_to: null,
                         active: false
-                    },
-                optionsPlatform: [{ value: "AMZ", text: "Amazon" }]
+                    }
             }
         },
 
@@ -145,7 +131,6 @@
 
             validation_submit() {
                 if (
-                    this.payload.platform_code !== null &&
                     this.payload.arrival_country_code !== null &&
                     this.payload.valid_from !== null &&
                     this.validation_valid_to !== false

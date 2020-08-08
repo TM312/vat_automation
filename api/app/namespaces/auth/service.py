@@ -23,11 +23,7 @@ class TokenService:
 
     @staticmethod
     def get_by_id(auth_token: TokenInterface) -> Token:
-        auth_token = Token.query.filter(Token.auth_token == auth_token).first()
-        if auth_token:
-            return auth_token, 200
-        else:
-            raise NotFound('Token does not exist.')
+        return Token.query.filter(Token.auth_token == auth_token).first()
 
 
     @staticmethod

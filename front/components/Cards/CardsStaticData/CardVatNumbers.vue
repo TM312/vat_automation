@@ -1,21 +1,20 @@
 <template>
     <b-card :border-variant="cardBorder">
-        <template v-slot:header>
+       <b-card-title>
             <b-row>
-                <b-col cols="auto" class="mr-auto">
-                    <h6 class="mb-0">Vat Numbers</h6>
-                </b-col>
+                <b-col cols="auto" class="mr-auto">Vat Numbers</b-col>
                 <b-col cols="auto">
-                    <b-form-checkbox v-model="editMode" @click="evaluateRefresh" name="check-button" switch>Edit Mode</b-form-checkbox>
+                    <b-form-checkbox v-model="editMode" name="check-button" switch />
                 </b-col>
             </b-row>
-        </template>
+        </b-card-title>
+
         <b-card-text>
-            <h5 v-if="countVatNumbers === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
+            <h5 v-if="vatNumbers.length === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
                 <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ countVatNumbers }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ countVatNumbers }}</span></small>
+                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ vatNumbers.length }}</small>
+                    <small v-else>TOTAL: <span class="text-primary">{{ vatNumbers.length }}</span></small>
                 </p>
 
 
@@ -51,7 +50,7 @@
 
                         </b-tab>
 
-                        <b-tab title="Delete" :disabled="countVatNumbers === 0">
+                        <b-tab title="Delete" :disabled="vatNumbers.length === 0">
                             <lazy-table-delete-seller-firm-vat-number :fields="fieldsEditable" @flash="flashCount"/>
                         </b-tab>
                     </b-tabs>
@@ -88,10 +87,6 @@
             ...mapState({
                 vatNumbers: state => state.seller_firm.seller_firm.vat_numbers,
             }),
-
-            countVatNumbers() {
-                return this.$store.getters["seller_firm/countVatNumbers"];
-            },
 
             cardBorder() {
                 return this.editMode ? "info" : "";

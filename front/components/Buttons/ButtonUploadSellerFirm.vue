@@ -1,6 +1,6 @@
 <template>
     <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
-        <b-icon v-if="!buttonDisabled" icon="box-arrow-in-right" />
+        <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
         <b-spinner v-else small label="Spinning"></b-spinner>
          Upload
     </b-button>
@@ -22,20 +22,29 @@
                 required: true
             }
         },
-        data() {
+         data() {
             return {
                 progress: 0,
                 progressBarStyle: "success",
-                buttonDisabled: false,
-
+                uploadInProgress: false
             };
         },
+
         computed: {
             ...mapState({
                 sellerFirmPublicId: state => state.seller_firm.seller_firm.public_id
             }),
+
             urlEndpointUpload() {
                 return `/business/seller_firm/${this.sellerFirmPublicId}/upload`
+            },
+
+            buttonDisabled() {
+                if (this.files.length == 0 || this.uploadInProgress) {
+                    return true
+                } else {
+                    return false
+                }
             }
         },
         methods: {
@@ -50,7 +59,7 @@
             },
 
             async uploadFiles() {
-                this.buttonDisabled = true
+                this.uploadInProgress = true
                 var config = {
                     headers: {
                         "Content-Type": "multipart/form-data"
@@ -76,20 +85,20 @@
                         .post(this.urlEndpointUpload, data, config)
 
                         .then(response => {
-                            let response_objects = response.data;
+                            let responseObjects = response.data;
 
-                            for (var j = 0; j < response_objects.length; j++) {
-                                let response_object = response_objects[j]
+                            for (var j = 0; j < responseObjects.length; j++) {
+                                let responseObject = responseObjects[j]
 
-                                if (response_object.status == "success") {
+                                if (responseObject.status == "success") {
 
-                                    this.$toast.success(response_object.message, {
+                                    this.$toast.success(responseObject.message, {
                                         duration: 10000
                                     });
 
 
                                 } else {
-                                    this.$toast.error(response_object.message, { duration: 10000 });
+                                    this.$toast.error(responseObject.message, { duration: 10000 });
                                 }
                             }
                             this.$emit('removeFile', i)
@@ -102,13 +111,13 @@
                             { duration: 10000 }
                         );
                         this.progressBarStyle = "danger";
-                        this.buttonDisabled = false
+                        this.uploadInProgress = false
                         i = this.files.length
                     }
 
                     await this.sleep(1000)
-                    this.enableButton()
                 }
+                this.uploadInProgress = false
 
             }
         }
