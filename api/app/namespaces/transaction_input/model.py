@@ -17,6 +17,7 @@ class TransactionInput(db.Model):
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
+    seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
 
     processed = db.Column(db.Boolean, default=False)
     processed_on = db.Column(db.DateTime)

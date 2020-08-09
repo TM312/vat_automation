@@ -17,6 +17,8 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
     'currency_code': fields.String,
     'departure_country_code': fields.String,
     'arrival_country_code': fields.String,
+    'seller_firm_public_id': fields.String(attribute=lambda x: x.seller_firm.public_id, readonly=True),
+
 })
 
 

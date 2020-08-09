@@ -43,7 +43,9 @@ class SellerFirm(Business):
 
 
     tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
+    transaction_inputs = db.relationship('TransactionInput', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='TransactionInput.seller_firm_id==Business.id')
     transactions = db.relationship('Transaction', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
+
 
 
     # @hybrid_property
