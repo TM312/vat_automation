@@ -3,7 +3,7 @@ from os import path
 import pandas as pd
 import more_itertools as mit
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from app.extensions import db
 from app.namespaces.exchange_rate.service import ExchangeRateService
 from app.namespaces.exchange_rate import ExchangeRate
@@ -35,51 +35,69 @@ class ExchangeRatesSeedService:
         file = 'hist_exchange_rates.csv'
         SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN', 'HUF', 'DKK', 'SEK']
         SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
+        timespan_as_days = (date.today()-SERVICE_START_DATE).days
+
 
         from . import BASE_PATH_SEEDS
-
 
         dirpath = path.join(BASE_PATH_SEEDS, file)
         df = pd.read_csv(dirpath)
         counter = 0
-        for row in range(len(df.index)):
-            date = ExchangeRatesSeedService.get_date_or_None_incl_format(df, i=row, column='Date', dstr_format='%Y-%m-%d', alternative_dstr_format='%Y.%m.%d')
-            if not date:
-                response_object = {
-                    'status': 'error',
-                    'message': 'The corresponding exchange rate collection can not be found.'
+
+
+        for i in range(timespan_as_days):
+            exchange_rate_date = SERVICE_START_DATE + timedelta(days=i)
+            calc_exchange_rate_date = exchange_rate_date
+            date_string = exchange_rate_date.strftime('%Y-%m-%d')
+
+            #below you find the worst code ever
+            while not date_string in df['Date'].values:
+                calc_exchange_rate_date -=  timedelta(days=1)
+                date_string = calc_exchange_rate_date.strftime('%Y-%m-%d')
+                print('in loop', flush=True)
+
+
+            row = df.loc[df['Date'] == date_string]
+
+
+            for currency_code in SUPPORTED_CURRENCIES:
+                value = row[currency_code].values[0]
+
+                exchange_rate_data = {
+                    'source': 'ECB',
+                    'date': exchange_rate_date,
+                    'base': 'EUR',
+                    'target': currency_code,
+                    'rate': value
                 }
-                raise InternalServerError(response_object)
+                print('exchange_rate_data: source: {} | date: {} | calc_date {} | base: {} | target: {} | rate: {}'.format(
+                    exchange_rate_data['source'],
+                    exchange_rate_data['date'],
+                    calc_exchange_rate_date,
+                    exchange_rate_data['base'],
+                    exchange_rate_data['target'],
+                    exchange_rate_data['rate']
+                    ), flush=True)
+                print("", flush=True)
 
-            if date >= SERVICE_START_DATE:
-                for currency_code in SUPPORTED_CURRENCIES:
-                    value = df.iloc[row][currency_code]
-                    exchange_rate_data = {
-                        'source': 'ECB',
-                        'date': date,
-                        'base': 'EUR',
-                        'target': currency_code,
-                        'rate': value
-                    }
-                    ExchangeRateService.create(exchange_rate_data)
-                    counter +=1
+                ExchangeRateService.create(exchange_rate_data)
+                counter += 1
 
-                    # creating reverse rates
-                    exchange_rate_data['base'] = currency_code
-                    exchange_rate_data['target'] = 'EUR'
-                    exchange_rate_data['rate'] = 1/value
+                # creating reverse rates
+                exchange_rate_data['base'] = currency_code
+                exchange_rate_data['target'] = 'EUR'
+                exchange_rate_data['rate'] = 1/value
 
-                    ExchangeRateService.create(exchange_rate_data)
-                    counter += 1
+                ExchangeRateService.create(exchange_rate_data)
+                counter += 1
 
+            currency_tuples = list(mit.distinct_combinations(SUPPORTED_CURRENCIES, 2))
 
-                currency_tuples = list(mit.distinct_combinations(SUPPORTED_CURRENCIES, 2))
-                for currency_tuple in currency_tuples:
-                    ExchangeRateService.create_between_rate(date, base=currency_tuple[0], target=currency_tuple[1])
-                    counter += 1
-            else:
-                break
+            for currency_tuple in currency_tuples:
+                ExchangeRateService.create_between_rate(exchange_rate_date, base=currency_tuple[0], target=currency_tuple[1])
+                counter += 1
 
+            exchange_rate_date += timedelta(days=1)
 
         response_object = {
             'status': 'success',

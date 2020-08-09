@@ -23,6 +23,7 @@ export const mutations = {
 //     transactionInputsChannelCode: state => channelCode => state.transaction_input.transaction_inputs.filter(transaction_input => transaction_input.channel_code === channelCode)
 // }
 
+
 export const actions = {
     async get_all({ commit }) {
         const res = await this.$repositories.transaction_input.get_all()
@@ -57,7 +58,7 @@ export const actions = {
         }
     },
 
-    async get_by_seller_firm_public_id({ commit }, params) {
+    async get_by_seller_firm_public_id({ commit, state }, params) {
 
         const res = await this.$repositories.transaction_input.get_by_seller_firm_public_id(params)
         const { status, data } = res

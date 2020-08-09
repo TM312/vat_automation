@@ -7,7 +7,6 @@ tax_auditor_sub_dto = user_sub_dto.clone('tax_auditor_sub', {
 
 tax_auditor_dto = tax_auditor_sub_dto.clone('tax_auditor', {
     'key_accounts': fields.List(fields.Nested(sf.seller_firm_sub_dto)),
-    'len_key_accounts': fields.String(attribute=lambda x: len(x.key_accounts), readonly=True),
     'confirmed': fields.Boolean(readonly=True),
     'confirmed_on': fields.Date(readonly=True),
     'email': fields.String,

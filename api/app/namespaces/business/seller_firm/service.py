@@ -157,7 +157,7 @@ class SellerFirmService:
         """
         Function may take either:
             - a pd.Dataframe kwargs['df'] and an integer kwargs['i'] as the row index
-        or  - a UUID kwargs['seller_firm_public_id']
+        or  - a str kwargs['seller_firm_public_id']
         If both, the later one is prioritized.
         """
         if isinstance(kwargs.get('seller_firm_public_id'), str):

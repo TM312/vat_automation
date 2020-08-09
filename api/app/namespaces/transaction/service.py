@@ -657,7 +657,7 @@ class TransactionService:
             vat_rate_reverse_charge=float(0)
         else:
             # tax jurisdiction is arrival country
-            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(item.tax_code_code, arrival_country, tax_date)
+            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(item.tax_code_code, arrival_country, tax_date).rate
 
         return vat_rate_reverse_charge
 
@@ -719,7 +719,7 @@ class TransactionService:
 
         if invoice_exchange_rate_date:
             from ..exchange_rate.service import ExchangeRateService
-            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date)
+            invoice_exchange_rate = ExchangeRateService.get_rate_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date).rate
 
         else:
             invoice_exchange_rate = float(1)

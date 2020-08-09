@@ -16,7 +16,7 @@
                 </b-button>
 
             </b-tab>
-            <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code" lazy>
+            <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code">
                 <lazy-table-transaction-inputs :channelCode="account.channel_code" />
                 <!-- {{ account.channel_code }} -->
             </b-tab>

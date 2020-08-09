@@ -1,5 +1,6 @@
 <template>
     <b-container>
+        Seller Firm Transactions: length {{ sellerFirm.transactions.length }} {{ typeof(sellerFirm.transactions.length) }} <br><br>
         <b-card bg-variant="white" lg="6" xl="4">
             <b-form-group
                 label-cols-lg="2"
@@ -96,9 +97,9 @@
                 variant="primary"
                 @click="submitPayload()"
                 block
-                :disabled="sellerFirm.transactions.length == 0"
+                :disabled="sellerFirm.transactions.length === 0"
             ><b-icon icon="box-arrow-in-up" />
-            <span v-if="sellerFirm.transactions.length == 0">There are no processed transactions available for this seller firm</span>
+            <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span>
             <span v-else>Generate New Tax Record</span>
             </b-button>
 
