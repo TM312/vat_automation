@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="align-right" :disabled="buttonDisabled" @click="removeAll">Delete All</b-button>
+        <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="align-right" :disabled="buttonRemoveDisabled" @click="removeAll">Delete All</b-button>
         <b-tabs pills content-class="mt-3">
             <b-tab title="Total" active>
                 <b-card
@@ -9,6 +9,11 @@
                     class="text-center py-5"
                 ></b-card>
                 <table-transaction-inputs v-else />
+                <b-button v-if="page>0" variant="outline-primary" :disabled="buttonFetchDisabled" @click="$fetch" block>
+                    <b-spinner v-if="buttonFetchDisabled" small />
+                    <b-icon v-else icon="chevron-down" />
+                    Show More
+                </b-button>
 
             </b-tab>
             <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code" lazy>
@@ -27,13 +32,19 @@
 
         data() {
             return {
-                buttonDisabled: false
+                buttonRemoveDisabled: false,
+                page: 0
             }
         },
 
         async fetch() {
+            this.page ++
             const { store } = this.$nuxt.context;
-            await store.dispatch("transaction_input/get_by_seller_firm_public_id", this.$route.params.public_id);
+            const params = {
+                seller_firm_public_id: this.$route.params.public_id,
+                page: this.page
+            }
+            await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
         },
 
         computed: {
@@ -41,11 +52,15 @@
                 sellerFirm: state => state.seller_firm.seller_firm,
                 transactionInputs: state => state.transaction_input.transaction_inputs
             }),
+
+            buttonFetchDisabled() {
+                return this.$fetchState.pending ? true : false
+            }
         },
 
         methods: {
             async removeAll() {
-                this.buttonDisabled = true;
+                this.buttonRemoveDisabled = true;
                 if (this.transactionInputs.length > 0) {
                     try {
 
@@ -55,7 +70,7 @@
 
                     } catch (error) {
                         this.$toast.error(error, { duration: 5000 });
-                        this.buttonDisabled = false;
+                        this.buttonRemoveDisabled = false;
                         return [];
                     }
                 }

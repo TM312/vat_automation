@@ -75,6 +75,7 @@ class TransactionInputSellerFirmIdResource(Resource):
     def get(self) -> TransactionInput:
         """Get Single TransactionInput"""
         args = parser.parse_args()
+        print('args:', args, flush=True)
         return TransactionInputService.get_by_seller_firm_public_id(args.get('seller_firm_public_id'), paginate=True, page=args.get('page'))
 
 

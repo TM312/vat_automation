@@ -12,6 +12,7 @@
 
     export default {
         name: "ButtonFollowSellerFirm",
+
         props: {
             sellerFirm: {
                 type: [Array, Object],

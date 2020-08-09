@@ -44,7 +44,8 @@
                         <b-col class="mb-2"><b-button @click="setM(9)" :disabled="test(9)" :variant="test(9) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Oct'" block>Oct</b-button></b-col>
                         <b-col class="mb-2"><b-button @click="setM(10)" :disabled="test(10)" :variant="test(10) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Nov'" block>Nov</b-button></b-col>
                         <b-col class="mb-2"><b-button @click="setM(11)" :disabled="test(11)" :variant="test(11) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Dec'" block>Dec</b-button></b-col>
-
+                    </b-row>
+                    <b-row cols="1" cols-md="2" cols-lg="4">
                         <b-col class="mb-2"><b-button @click="setQ(1)" :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block>Q1</b-button></b-col>
                         <b-col class="mb-2"><b-button @click="setQ(2)" :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block>Q2</b-button></b-col>
                         <b-col class="mb-2"><b-button @click="setQ(3)" :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block>Q3</b-button></b-col>

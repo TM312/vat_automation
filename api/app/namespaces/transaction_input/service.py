@@ -32,11 +32,15 @@ class TransactionInputService:
 
     @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
-        base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
+        #base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
+        base_query = TransactionInput.query.filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
         if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
             per_page = current_app.config['TRANSACTIONS_PER_QUERY']
             page = kwargs.get('page')
             transaction_inputs = base_query.paginate(page, per_page, False).items
+            print('TransactionInputService -> get_by_seller_firm -> per_page:', per_page, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> per_page:', page, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> per_page:', transaction_inputs, flush=True)
 
         else:
             transaction_inputs = base_query.all()
@@ -216,6 +220,8 @@ class TransactionInputService:
                         'created_by': user_id,
                         'bundle_id': bundle.id,
                         'original_filename': os.path.basename(file_path_in),
+
+                        'seller_firm_id': account.seller_firm_id,
 
                         'account_id': account.id,
                         'account_given_id': account_given_id,
@@ -401,6 +407,7 @@ class TransactionInputService:
             created_by = transaction_input_data.get('created_by'),
             bundle_id = transaction_input_data.get('bundle_id'),
             original_filename = transaction_input_data.get('original_filename'),
+            seller_firm_id=transaction_input_data.get('seller_firm_id'),
             account_id = transaction_input_data.get('account_id'),
             account_given_id = transaction_input_data.get('account_given_id'),
             public_activity_period = transaction_input_data.get('public_activity_period'),

@@ -12,8 +12,8 @@ export default ($axios) => ({
         return $axios.delete(`${resource}/`)
     },
 
-    get_by_seller_firm_public_id(seller_firm_public_id) {
-        return $axios.get(`${resource}/seller_firm/${seller_firm_public_id}`)
+    get_by_seller_firm_public_id(params) {
+        return $axios.get(`${resource}/seller_firm/`, {params})
     },
 
     update_by_public_id(transaction_input_public_id, payload) {
