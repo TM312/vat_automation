@@ -412,13 +412,13 @@ class TransactionService:
     @staticmethod
     def compare_calculation_reference_tax_calculation_date(transaction_id: int, transaction_input: TransactionInput, tax_calculation_date: date) -> None:
         if transaction_input.check_tax_calculation_date and transaction_input.check_tax_calculation_date != tax_calculation_date:
-            notification_data = NotificationService.create_notification_data(main_subject='Tax Calculation Date', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_tax_calculation_date, calculated_value=tax_calculation_date, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(main_subject='Tax Calculation Date', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_tax_calculation_date, calculated_value=tax_calculation_date, transaction_id=transaction_id)
             NotificationService.create_transaction_notification(notification_data)
 
     @staticmethod
     def compare_calculation_reference_invoice_currency_code(transaction_id: int, transaction_input: TransactionInput, invoice_currency_code: str) -> None:
         if transaction_input.check_invoice_currency_code and transaction_input.check_invoice_currency_code != invoice_currency_code:
-            notification_data = NotificationService.create_notification_data(main_subject='Invoice Currency Code', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_invoice_currency_code, calculated_value=invoice_currency_code, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(main_subject='Invoice Currency Code', original_filename=transaction_input.original_filename, status='warning', reference_value=transaction_input.check_invoice_currency_code, calculated_value=invoice_currency_code, transaction_id=transaction_id)
             NotificationService.create_transaction_notification(notification_data)
 
 
@@ -812,7 +812,7 @@ class TransactionService:
             reference_tax_code = kwargs['reference_tax_code']
 
             if calculated_item_tax_code_code != reference_tax_code:
-                notification_data=NotificationService.create_notification_data(main_subject='Item Tax Code', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_tax_code), calculated_value=str(calculated_item_tax_code_code), transaction_input_id=transaction_input.id)
+                notification_data=NotificationService.create_transaction_notification_data(main_subject='Item Tax Code', original_filename=transaction_input.original_filename, status='warning', reference_value=str(reference_tax_code), calculated_value=str(calculated_item_tax_code_code), transaction_input_id=transaction_input.id)
                 try:
                     NotificationService.create_transaction_notification(notification_data)
                     item_tax_code_code = reference_tax_code

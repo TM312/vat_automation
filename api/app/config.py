@@ -55,7 +55,7 @@ class Config(object):
 
     SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN'] #besides 'EUR'
 
-    TRANSACTIONS_PER_QUERY = 25
+    TRANSACTIONS_PER_QUERY = NOTIFICATIONS_PER_QUERY = 25
 
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']

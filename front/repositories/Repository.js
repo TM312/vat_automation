@@ -22,8 +22,7 @@ import UserRepository from './UserRepository'
 import AdminRepository from './AdminRepository'
 import SellerRepository from './SellerRepository'
 import TaxAuditorRepository from './TaxAuditorRepository'
-// import TemplateRepository from './TemplateRepository'
-
+import UtilsRepository from './UtilsRepository'
 
 export default ($axios) => ({
     account: AccountRepository($axios),
@@ -50,5 +49,5 @@ export default ($axios) => ({
     admin: AdminRepository($axios),
     seller: SellerRepository($axios),
     tax_auditor: TaxAuditorRepository($axios),
-    // template: TemplateRepository($axios),
+    utils: UtilsRepository($axios)
 })

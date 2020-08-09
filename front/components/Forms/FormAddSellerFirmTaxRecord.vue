@@ -1,6 +1,5 @@
 <template>
     <b-container>
-        Seller Firm Transactions: length {{ sellerFirm.transactions.length }} {{ typeof(sellerFirm.transactions.length) }} <br><br>
         <b-card bg-variant="white" lg="6" xl="4">
             <b-form-group
                 label-cols-lg="2"

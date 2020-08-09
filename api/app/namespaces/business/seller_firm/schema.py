@@ -26,7 +26,7 @@ class SellerFirmSchema:
             'distance_sales': fields.List(fields.Nested(distance_sale_sub_dto)),
             'accounts': fields.List(fields.Nested(account_sub_dto)),
             'vat_numbers': fields.List(fields.Nested(vatin_sub_dto)),
-            'transactions': fields.List(fields.Nested(transaction_sub_dto)),
+            # 'transactions': fields.List(fields.Nested(transaction_sub_dto)),
             # 'transaction_inputs': fields.List(fields.Nested(transaction_input_sub_dto)),
             'tax_records': fields.List(fields.Nested(tax_record_sub_dto)),
         })

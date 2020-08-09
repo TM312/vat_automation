@@ -42,6 +42,9 @@ class User(db.Model):  # type: ignore
     created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by='desc(DistanceSale.created_on)', lazy=True)
     created_tax_records = db.relationship('TaxRecord', backref='creator', order_by='desc(TaxRecord.created_on)', lazy=True)
 
+    notifications = db.relationship('SellerFirmNotification', backref='user', lazy='select', cascade='all, delete-orphan', primaryjoin='SellerFirmNotification.user_id==User.id')
+
+
     # downloaded_tax_records = db.relationship('TaxRecord', secondary=tax_record_user_AT, back_populates="downloaded_by_users")
 
     actions = db.relationship('Action', backref='user', order_by='desc(Action.timestamp)', lazy=True)

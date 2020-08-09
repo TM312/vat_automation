@@ -195,24 +195,36 @@ class SellerFirmService:
 
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 
+        #Prepare SellerFirmNotification
+        seller_firm_notification_data = {
+            'subject': 'Data Upload',
+            'status': 'success',
+            'seller_firm_id': seller_firm.id,
+            'created_by': user_id
+        }
+
         if data_type == 'static':
             basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
             if file_type == 'account_list':
                 from ...account.service import AccountService
                 response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+                seller_firm_notification_data['message'] = 'Account Information'
 
             elif file_type == 'distance_sale_list':
                 from ...distance_sale.service import DistanceSaleService
                 response_object = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+                seller_firm_notification_data['message'] = 'Distance Sale Information'
 
             elif file_type == 'item_list':
                 from ...item.service import ItemService
                 response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+                seller_firm_notification_data['message'] = 'Items'
 
             elif file_type == 'vat_numbers':
                 from ...tax.vatin.service import VATINService
                 response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
+                seller_firm_notification_data['message'] = 'Vat Numbers'
 
         elif data_type == 'recurring':
             basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
@@ -222,16 +234,14 @@ class SellerFirmService:
                 from ...transaction_input.service import TransactionInputService
                 try:
                     response_object = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
+                    seller_firm_notification_data['message'] = 'Transactions'
                 except:
                     raise
 
         else:
             raise
 
-        # response_object = {
-        #     'status': 'success',
-        #     'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_files)))
-        # }
+        NotificationService.create_seller_firm_notification(seller_firm_notification_data)
 
         return response_object
 

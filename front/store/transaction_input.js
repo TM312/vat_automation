@@ -7,6 +7,7 @@ export const mutations = {
     SET_TRANSACTION_INPUTS(state, transaction_inputs) {
         state.transaction_inputs = transaction_inputs
     },
+
     SET_TRANSACTION_INPUT(state, transaction_input) {
         state.transaction_input = transaction_input
     },
@@ -64,8 +65,12 @@ export const actions = {
         const { status, data } = res
         if (status === 200 && data.data) {
             if (
-                state.transaction_inputs.length>0 &&
-                params['seller_firm_public_id'] !== state.transaction_inputs[0].seller_firm_public_id ) {
+                state.transaction_inputs.length===0 ||
+                (
+                    state.transaction_inputs.length>0 &&
+                    params['seller_firm_public_id'] !== state.transaction_inputs[0].seller_firm_public_id
+                )
+                ) {
                 console.log('state.transaction_inputs[0].seller_firm_public_id:', state.transaction_inputs[0].seller_firm_public_id)
                 commit('SET_TRANSACTION_INPUTS', data.data)
             } else {
