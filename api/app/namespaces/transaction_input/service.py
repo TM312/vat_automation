@@ -32,15 +32,17 @@ class TransactionInputService:
 
     @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
+        from ..business.seller_firm.service import SellerFirmService
+        seller_firm_id = SellerFirmService.get_by_public_id(seller_firm_public_id).id
         #base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
-        base_query = TransactionInput.query.filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
+        base_query = TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).order_by(TransactionInput.complete_date.desc())
         if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
             per_page = current_app.config['TRANSACTIONS_PER_QUERY']
             page = kwargs.get('page')
             transaction_inputs = base_query.paginate(page, per_page, False).items
             print('TransactionInputService -> get_by_seller_firm -> per_page:', per_page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> per_page:', page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> per_page:', transaction_inputs, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> page:', page, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> transaction_inputs:', transaction_inputs, flush=True)
 
         else:
             transaction_inputs = base_query.all()

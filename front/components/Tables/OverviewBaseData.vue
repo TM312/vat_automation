@@ -7,7 +7,7 @@
             <b-nav-item to="#items" :active="$route.hash === '#items'">
                 Items
             </b-nav-item>
-            <b-nav-item to="#transactions" :active="$route.hash === '#transactions'">
+            <b-nav-item to="#transactions" :active="$route.hash === '#transactions'" lazy>
                 Transactions
             </b-nav-item>
         </b-nav>

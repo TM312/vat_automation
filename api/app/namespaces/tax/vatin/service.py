@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import date, datetime, timedelta
 import time
 import re
+from random import randint
+
 
 from flask import current_app
 from werkzeug.exceptions import HTTPException, FailedDependency, UnprocessableEntity, NotFound
@@ -205,8 +207,8 @@ class VATINService:
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
-                sleep(3)
-                print("SLEEP(3) in create_vatins", flush=True)
+                sleep(randint(4, 6))
+                print("SLEEP in create_vatins", flush=True)
                 vatin_data = VIESService.send_request(country_code, number)
 
                 if seller_firm_id:
@@ -440,7 +442,7 @@ class VIESService:
             try:
                 # VIES DB is unreliable therefore reducing requests per second
                 from time import sleep
-                sleep(3)
+                sleep(randint(4,6))
                 vatin_data = VIESService.send_request_via_zeep(country_code, number)
 
             except:

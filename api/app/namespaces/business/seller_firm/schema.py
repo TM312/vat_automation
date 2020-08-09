@@ -12,6 +12,7 @@ from ...tax.vatin import vatin_sub_dto
 
 class SellerFirmSchema:
 
+    @staticmethod
     def get_seller_firm_dto():
         from ...user.tax_auditor import tax_auditor_sub_dto
         from ...tax_record import tax_record_sub_dto
