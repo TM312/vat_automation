@@ -4,9 +4,8 @@
         <b-card-title>Upload</b-card-title>
         <b-card-sub-title class="my-2">
             {{ files.length }}
-            <span v-show="files.length==1">files </span>
-            <span v-show="files.length>1">file </span>
-            selected
+            <span v-show="files.length!=1">files </span>
+            <span v-show="files.length==1">file </span>
         </b-card-sub-title>
 
         <b-card-text>

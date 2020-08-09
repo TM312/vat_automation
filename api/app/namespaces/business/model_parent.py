@@ -30,27 +30,6 @@ class Business(db.Model):  # type: ignore
     b_type = db.Column(db.String(50))
     __mapper_args__ = {'polymorphic_on': b_type}
 
-    # @hybrid_property
-    # def len_vat_numbers(self):
-    #     return len(self.vat_numbers)
-
-    len_vat_numbers = column_property(
-        select([func.count(VATIN.id)])
-        .where(VATIN.business_id == id)
-        .correlate_except(VATIN)
-    )
-
-    len_transactions = column_property(
-        select([func.count(Transaction.id)])
-        .where(Transaction.seller_firm_id == id)
-        .correlate_except(Transaction)
-    )
-
-    len_employees = column_property(
-        select([func.count(User.id)])
-        .where(User.employer_id == id)
-        .correlate_except(User)
-    )
 
 
     def update(self, data_changes):

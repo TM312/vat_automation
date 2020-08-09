@@ -3,7 +3,7 @@
         <b>Subject:</b> {{ notification.subject }} <br>
         <p>Calculated Value: {{ notification.calculated_value }}</p>
         <p>Reference Value: {{ notification.reference_value }}</p>
-        <p>{{ notification.message }}</p>
+        <p v-if="notification.message">{{ notification.message }}</p>
         <hr>
         <p class="mb-0 text-muted text-right"><small>{{ createdOnDistance }}</small></p>
     </b-alert>

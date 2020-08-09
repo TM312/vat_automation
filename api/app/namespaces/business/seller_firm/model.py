@@ -46,6 +46,8 @@ class SellerFirm(Business):
     transaction_inputs = db.relationship('TransactionInput', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='TransactionInput.seller_firm_id==Business.id')
     transactions = db.relationship('Transaction', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
 
+    notifications = db.relationship('SellerFirmNotification', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='SellerFirmNotification.seller_firm_id==Business.id')
+
 
 
     # @hybrid_property

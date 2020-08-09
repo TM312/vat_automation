@@ -152,5 +152,5 @@ class CustomerFirmService:
     @staticmethod
     def compare_calculation_reference(transaction_id: int, transaction_input: 'app.namespaces.transaction_input.TransactionInput', customer_firm_vatin: VATIN):
         if transaction_input.customer_firm_name and customer_firm_vatin.name and transaction_input.customer_firm_name != customer_firm_vatin.name:
-            notification_data = NotificationService.create_notification_data(main_subject='Customer Firm Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.customer_firm_name, calculated_value=customer_firm_vatin.name, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(main_subject='Customer Firm Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.customer_firm_name, calculated_value=customer_firm_vatin.name, transaction_id=transaction_id)
             NotificationService.create_transaction_notification(notification_data)

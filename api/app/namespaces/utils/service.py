@@ -5,7 +5,8 @@ import pandas as pd
 from datetime import datetime, date
 
 from flask import g, current_app, send_from_directory
-from . import TransactionNotification
+from . import TransactionNotification, SellerFirmNotification
+from .interface import SellerFirmNotificationInterface
 
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
@@ -40,17 +41,65 @@ class CalcService:
 class NotificationService:
 
     @staticmethod
+    def get_all_key_account_notifications(**kwargs) -> List[SellerFirmNotification]:
+        """
+        **kwargs['paginate']: bool --> if True, paginate base query
+        **kwargs['page']: int --> indicate page
+        """
+        from ..user.tax_auditor import TaxAuditor
+        from ..business.seller_firm import SellerFirm
+
+
+        base_query = db.session.
+            query(TaxAuditor).
+            filter_by(id=g.user.id).
+            options(
+                joinedload(User.key_accounts).
+                subqueryload(SellerFirm.notifications)
+            ).
+            order_by(SellerFirmNotification.created_on.desc())
+
+
+
+        if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
+            per_page = current_app.config['NOTIFICATIONS_PER_QUERY']
+            page = kwargs.get('page')
+            seller_firm_notifications = base_query.paginate(page, per_page, False).items
+            print('TransactionInputService -> get_by_seller_firm -> per_page:', per_page, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> page:', page, flush=True)
+            print('TransactionInputService -> get_by_seller_firm -> seller_firm_notifications:', seller_firm_notifications, flush=True)
+
+        else:
+            seller_firm_notifications = base_query.all()
+
+        return seller_firm_notifications
+
+
+
+    @staticmethod
+    def create_seller_firm_notification(seller_firm_notification_data: SellerFirmNotificationInterface) -> SellerFirmNotification:
+
+        new_notification = SellerFirmNotification(
+            subject=notification_data.get('subject'),
+            status=notification_data.get('status'),
+            message=notification_data.get('message'),
+            seller_firm_id=notification_data.get('seller_firm_id'),
+            created_by=notification_data.get('created_by')
+        )
+
+        db.session.add(new_notification)
+        db.session.commit()
+
+
+
+
+    @staticmethod
     def get_by_transaction_input_id_status(transaction_input_id: int, status: str) -> List[TransactionNotification]:
         return TransactionNotification.query.filter_by(transaction_input_id=transaction_input_id).all()
 
 
     @staticmethod
-    def create_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_id: int) -> Dict:
-        # if isinstance(reference_value, str) and len(reference_value) > 42:
-        #     reference_value = reference_value[:19] + ' ... ' + reference_value[-19:]
-
-        # if isinstance(calculated_value, str) and len(calculated_value) > 42:
-        #     calculated_value = calculated_value[:19] + ' ... ' + calculated_value[-19:]
+    def create_transaction_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_id: int) -> Dict:
 
         notification_data = {
             'subject': '{}s Not Matching'.format(main_subject),
@@ -58,7 +107,6 @@ class NotificationService:
             'status': status,
             'reference_value': str(reference_value),
             'calculated_value': str(calculated_value),
-            'message': 'The reference value from the original transaction report differs from the calculated value. The original value has been used for processing.',
             'transaction_id': transaction_id
         }
         return notification_data
