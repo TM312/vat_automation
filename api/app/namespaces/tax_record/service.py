@@ -72,7 +72,7 @@ class TaxRecordService:
         BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config['BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM']
 
         seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
-        if g.user.employer_id == seller_firm.accounting_firm_id:
+        if g.user.employer in seller_firm.accounting_firms:
             user_id = g.user.id
 
             #!!! call as async celery task
@@ -186,7 +186,10 @@ class TaxRecordService:
 
 
                 # INTRA COMMUNITY SALES
-                intra_community_sales_sales_invoice_amount_net = TaxRecordService.get_invoice_net(sales, 'INTRA_COMMUNITY_SALE')
+                intra_community_sales_sales_invoice_amount_net_case_a = TaxRecordService.get_invoice_net(sales, 'INTRA_COMMUNITY_SALE')
+                intra_community_sales_sales_invoice_amount_net_case_b = TaxRecordService.get_invoice_net(movements, 'INTRA_COMMUNITY_SALE')
+
+                intra_community_sales_sales_invoice_amount_net = CalcService.get_sum(intra_community_sales_sales_invoice_amount_net_case_a, intra_community_sales_sales_invoice_amount_net_case_b)
                 intra_community_sales_refunds_invoice_amount_net = 0
                 intra_community_sales_total_invoice_amount_net = CalcService.get_sum(intra_community_sales_sales_invoice_amount_net, intra_community_sales_refunds_invoice_amount_net)
 
@@ -198,13 +201,13 @@ class TaxRecordService:
 
 
                 # INTRA COMMUNITY ACQUISITIONS
-                intra_community_acquisitions_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(movements, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_refunds_invoice_amount_net = 0
-                intra_community_acquisitions_total_invoice_amount_net = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_net, intra_community_acquisitions_refunds_invoice_amount_net)
+                ica_acquisitions_invoice_amount_net = TaxRecordService.get_invoice_net(movements, 'INTRA_COMMUNITY_ACQUISITION')
+                ica_refunds_invoice_amount_net = 0
+                ica_total_invoice_amount_net = CalcService.get_sum(ica_acquisitions_invoice_amount_net, ica_refunds_invoice_amount_net)
 
-                intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(movements, 'INTRA_COMMUNITY_ACQUISITION')
-                intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = 0
-                intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = CalcService.get_sum(intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge, intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge)
+                ica_acquisitions_invoice_amount_vat_reverse_charge = TaxRecordService.get_vat_reverse_charge(movements, 'INTRA_COMMUNITY_ACQUISITION')
+                ica_refunds_invoice_amount_vat_reverse_charge = 0
+                ica_total_invoice_amount_vat_reverse_charge = CalcService.get_sum(ica_acquisitions_invoice_amount_vat_reverse_charge, ica_refunds_invoice_amount_vat_reverse_charge)
 
 
                 # LOCAL ACQUISITIONS
@@ -287,12 +290,12 @@ class TaxRecordService:
                     'exports_refunds_invoice_amount_net': exports_refunds_invoice_amount_net,
                     'exports_total_invoice_amount_net': exports_total_invoice_amount_net,
 
-                    'intra_community_acquisitions_acquisitions_invoice_amount_net': intra_community_acquisitions_acquisitions_invoice_amount_net,
-                    'intra_community_acquisitions_refunds_invoice_amount_net': intra_community_acquisitions_refunds_invoice_amount_net,
-                    'intra_community_acquisitions_total_invoice_amount_net': intra_community_acquisitions_total_invoice_amount_net,
-                    'intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge': intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge,
-                    'intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge': intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge,
-                    'intra_community_acquisitions_total_invoice_amount_vat_reverse_charge': intra_community_acquisitions_total_invoice_amount_vat_reverse_charge,
+                    'ica_acquisitions_invoice_amount_net': ica_acquisitions_invoice_amount_net,
+                    'ica_refunds_invoice_amount_net': ica_refunds_invoice_amount_net,
+                    'ica_total_invoice_amount_net': ica_total_invoice_amount_net,
+                    'ica_acquisitions_invoice_amount_vat_reverse_charge': ica_acquisitions_invoice_amount_vat_reverse_charge,
+                    'ica_refunds_invoice_amount_vat_reverse_charge': ica_refunds_invoice_amount_vat_reverse_charge,
+                    'ica_total_invoice_amount_vat_reverse_charge': ica_total_invoice_amount_vat_reverse_charge,
 
                     'local_acquisitions_acquisitions_invoice_amount_net': local_acquisitions_acquisitions_invoice_amount_net,
                     'local_acquisitions_refunds_invoice_amount_net': local_acquisitions_refunds_invoice_amount_net,
@@ -412,12 +415,12 @@ class TaxRecordService:
             exports_refunds_invoice_amount_net = tax_record_data.get('exports_refunds_invoice_amount_net'),
             exports_total_invoice_amount_net = tax_record_data.get('exports_total_invoice_amount_net'),
 
-            intra_community_acquisitions_acquisitions_invoice_amount_net = tax_record_data.get('intra_community_acquisitions_acquisitions_invoice_amount_net'),
-            intra_community_acquisitions_refunds_invoice_amount_net = tax_record_data.get('intra_community_acquisitions_refunds_invoice_amount_net'),
-            intra_community_acquisitions_total_invoice_amount_net = tax_record_data.get('intra_community_acquisitions_total_invoice_amount_net'),
-            intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = tax_record_data.get('intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge'),
-            intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = tax_record_data.get('intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge'),
-            intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = tax_record_data.get('intra_community_acquisitions_total_invoice_amount_vat_reverse_charge'),
+            ica_acquisitions_invoice_amount_net = tax_record_data.get('ica_acquisitions_invoice_amount_net'),
+            ica_refunds_invoice_amount_net = tax_record_data.get('ica_refunds_invoice_amount_net'),
+            ica_total_invoice_amount_net = tax_record_data.get('ica_total_invoice_amount_net'),
+            ica_acquisitions_invoice_amount_vat_reverse_charge = tax_record_data.get('ica_acquisitions_invoice_amount_vat_reverse_charge'),
+            ica_refunds_invoice_amount_vat_reverse_charge = tax_record_data.get('ica_refunds_invoice_amount_vat_reverse_charge'),
+            ica_total_invoice_amount_vat_reverse_charge = tax_record_data.get('ica_total_invoice_amount_vat_reverse_charge'),
 
             local_acquisitions_acquisitions_invoice_amount_net = tax_record_data.get('local_acquisitions_acquisitions_invoice_amount_net'),
             local_acquisitions_refunds_invoice_amount_net = tax_record_data.get('local_acquisitions_refunds_invoice_amount_net'),
@@ -464,10 +467,10 @@ class TaxRecordService:
     #     df_intra_community_sales = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_SALES'))
     #     df_exports = pd.Dataframe(tax_record_dict.get('EXPORTS'))
     #     df_domestic_acquisitions = pd.Dataframe(tax_record_dict.get('LOCAL_ACQUISITIONS'))
-    #     df_intra_community_acquisitions = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS'))
-    #     #df_summary = TaxRecordService.calculate_front_page(df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_intra_community_acquisitions)
+    #     df_ica = pd.Dataframe(tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS'))
+    #     #df_summary = TaxRecordService.calculate_front_page(df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_ica)
 
-    #     df_list = [df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_intra_community_acquisitions]
+    #     df_list = [df_local_sales, df_local_sales_reverse_charge, df_distance_sales, df_non_taxable_distance_sales, df_intra_community_sales, df_exports, df_domestic_acquisitions, df_ica]
     #     #df_summary,
 
     #     # !!! evtl. dies für summary :
@@ -510,7 +513,7 @@ class TaxRecordService:
 
 
     #     # @staticmethod
-    #     # !!! def calculate_front_page(df_local_sales: pd.DataFrame, df_local_sales_reverse_charge: pd.DataFrame, df_distance_sales: pd.DataFrame, df_non_taxable_distance_sales: pd.DataFrame, df_intra_community_sales: pd.DataFrame, df_exports: pd.DataFrame, df_domestic_acquisitions: pd.DataFrame, df_intra_community_acquisitions: pd.DataFrame) -> pd.DataFrame:
+    #     # !!! def calculate_front_page(df_local_sales: pd.DataFrame, df_local_sales_reverse_charge: pd.DataFrame, df_distance_sales: pd.DataFrame, df_non_taxable_distance_sales: pd.DataFrame, df_intra_community_sales: pd.DataFrame, df_exports: pd.DataFrame, df_domestic_acquisitions: pd.DataFrame, df_ica: pd.DataFrame) -> pd.DataFrame:
 
     #     #     ### something happens here
 
@@ -626,7 +629,7 @@ class TaxRecordService:
 
 
 
-    #     local_sales = local_sales_reverse_charge = distance_sales = non_taxable_distance_sales = intra_community_sales = exports = domestic_acquisitions = intra_community_acquisitions = []
+    #     local_sales = local_sales_reverse_charge = distance_sales = non_taxable_distance_sales = intra_community_sales = exports = domestic_acquisitions = ica = []
     #     t_treatment_list=[]
 
     #     tax_record_dict = {
@@ -637,7 +640,7 @@ class TaxRecordService:
     #         'INTRA_COMMUNITY_SALES': intra_community_sales,
     #         'EXPORTS': exports,
     #         'LOCAL_ACQUISITIONS': domestic_acquisitions,
-    #         'INTRA_COMMUNITY_ACQUISITIONS': intra_community_acquisitions
+    #         'INTRA_COMMUNITY_ACQUISITIONS': ica
     #     }
 
 

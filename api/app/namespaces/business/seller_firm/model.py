@@ -37,9 +37,10 @@ class SellerFirm(Business):
     accounts = db.relationship('Account', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
 
     # Columns related to Accounting/Tax Service
-    accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    accounting_firm_client_id = db.Column(db.String(120), default=None)
-    tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts', cascade="all, delete")
+    # accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
+    # accounting_firm_client_id = db.Column(db.String(120), default=None)
+
+    tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
 
 
     tax_records = db.relationship('TaxRecord', backref='seller_firm', lazy='select', cascade='all, delete-orphan')

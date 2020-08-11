@@ -14,6 +14,7 @@ from app.namespaces.tax.tax_treatment import TaxTreatment
 from app.namespaces.tax.vat import Vat, TaxRateType
 from app.namespaces.platform import Platform
 from app.namespaces.channel import Channel
+from app.namespaces.tag import Tag
 
 
 from .seeds.currencies import currencies
@@ -29,6 +30,7 @@ from .seeds.platforms import platforms, PlatformSeedService
 from .seeds.channels import channels
 from .seeds.accounting_firms import AccountingFirmSeedService
 from .seeds.users import AdminSeedService, TaxAuditorSeedService
+from .seeds.tags import tags
 
 countries = CountrySeedService.seed_countries()
 eu = EUSeedService.seed_eu()
@@ -44,7 +46,8 @@ things_list = {
     'transaction_types': [TransactionType, transaction_types],
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Platform, platforms],
-    'channels': [Channel, channels]
+    'channels': [Channel, channels],
+    'tags': [Tag, tags]
 
 }
 

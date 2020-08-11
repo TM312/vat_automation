@@ -5,7 +5,6 @@ from uuid import UUID
 
 from app.extensions import db
 from .model import AccountingFirm
-from .schema import accounting_firm_dto
 
 from typing import Dict
 

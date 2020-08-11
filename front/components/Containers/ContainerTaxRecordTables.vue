@@ -262,18 +262,18 @@ export default {
             return [
                 {
                     'itemName': 'Acquisitions',
-                    'netInvoiceAmount': this.taxRecord.intra_community_acquisitions_acquisitions_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge
+                    'netInvoiceAmount': this.taxRecord.ica_acquisitions_invoice_amount_net,
+                    'reverseChargeAmount': this.taxRecord.ica_acquisitions_invoice_amount_vat_reverse_charge
                 },
                 {
                     'itemName': 'Refunds',
-                    'netInvoiceAmount': this.taxRecord.intra_community_acquisitions_refunds_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge
+                    'netInvoiceAmount': this.taxRecord.ica_refunds_invoice_amount_net,
+                    'reverseChargeAmount': this.taxRecord.ica_refunds_invoice_amount_vat_reverse_charge
                 },
                 {
                     'itemName': 'Total',
-                    'netInvoiceAmount': this.taxRecord.intra_community_acquisitions_total_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.intra_community_acquisitions_total_invoice_amount_vat_reverse_charge
+                    'netInvoiceAmount': this.taxRecord.ica_total_invoice_amount_net,
+                    'reverseChargeAmount': this.taxRecord.ica_total_invoice_amount_vat_reverse_charge
                 }
             ]
         },

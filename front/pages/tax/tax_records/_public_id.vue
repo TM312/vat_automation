@@ -17,16 +17,10 @@
 
                 <b-tab title='Transactions' lazy>
                     <b-card v-if="$fetchState.pending && (taxRecord.public_id != $route.params.public_id || taxRecord.length == 0)" lazy></b-card>
-                    <lazy-table-transactions v-else class="my-5 cols-6 cols-md-12" :transactions="taxRecord.transactions"/>
+                    <overview-transactions />
                 </b-tab>
             </b-tabs>
         </b-container>
-
-
-
-
-
-
 
 
     </div>

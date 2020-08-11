@@ -2,7 +2,7 @@ import os
 import shutil
 from typing import List, BinaryIO, Dict, Union
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from flask import g, current_app, send_from_directory
 from . import TransactionNotification, SellerFirmNotification
@@ -41,36 +41,28 @@ class CalcService:
 class NotificationService:
 
     @staticmethod
-    def get_all_key_account_notifications(**kwargs) -> List[SellerFirmNotification]:
-        """
-        **kwargs['paginate']: bool --> if True, paginate base query
-        **kwargs['page']: int --> indicate page
-        """
+    def get_seller_firm_shared(seller_firm_id: int, user_id: int, time: datetime, subject: str) -> SellerFirmNotification:
+        timespan_in_min = current_app.config['TIMESPAN_SIMILARITY']
+        seller_firm_notification = SellerFirmNotification.query.filter(
+            SellerFirmNotification.seller_firm_id == seller_firm_id,
+            SellerFirmNotification.created_by == user_id,
+            SellerFirmNotification.created_on.between(time - timedelta(minutes=timespan_in_min), time),
+            SellerFirmNotification.subject == subject
+        ).first()
+
+        return seller_firm_notification
+
+    @staticmethod
+    def get_all_key_account_notifications() -> List[SellerFirmNotification]:
+
         from ..user.tax_auditor import TaxAuditor
         from ..business.seller_firm import SellerFirm
 
-
-        base_query = db.session.
-            query(TaxAuditor).
-            filter_by(id=g.user.id).
-            options(
-                joinedload(User.key_accounts).
-                subqueryload(SellerFirm.notifications)
-            ).
-            order_by(SellerFirmNotification.created_on.desc())
-
-
-
-        if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
-            per_page = current_app.config['NOTIFICATIONS_PER_QUERY']
-            page = kwargs.get('page')
-            seller_firm_notifications = base_query.paginate(page, per_page, False).items
-            print('TransactionInputService -> get_by_seller_firm -> per_page:', per_page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> page:', page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> seller_firm_notifications:', seller_firm_notifications, flush=True)
-
-        else:
-            seller_firm_notifications = base_query.all()
+        seller_firm_notifications = SellerFirmNotification.query.join(
+            SellerFirm.notifications
+            ).join(
+                SellerFirm.tax_auditors, aliased=True
+            ).filter_by(id=g.user.id).order_by(SellerFirmNotification.created_on.desc()).limit(30).all()
 
         return seller_firm_notifications
 
@@ -80,15 +72,17 @@ class NotificationService:
     def create_seller_firm_notification(seller_firm_notification_data: SellerFirmNotificationInterface) -> SellerFirmNotification:
 
         new_notification = SellerFirmNotification(
-            subject=notification_data.get('subject'),
-            status=notification_data.get('status'),
-            message=notification_data.get('message'),
-            seller_firm_id=notification_data.get('seller_firm_id'),
-            created_by=notification_data.get('created_by')
+            subject=seller_firm_notification_data.get('subject'),
+            status=seller_firm_notification_data.get('status'),
+            message=seller_firm_notification_data.get('message'),
+            seller_firm_id=seller_firm_notification_data.get('seller_firm_id'),
+            created_by=seller_firm_notification_data.get('created_by')
         )
 
         db.session.add(new_notification)
         db.session.commit()
+
+        return new_notification
 
 
 
@@ -125,6 +119,9 @@ class NotificationService:
 
         db.session.add(new_notification)
         db.session.commit()
+
+
+        return new_notification
 
 
 

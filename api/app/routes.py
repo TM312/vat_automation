@@ -11,6 +11,7 @@ def register_routes(api, app):
     from app.namespaces.exchange_rate import attach_exchange_rate
     from app.namespaces.item import attach_item
     from app.namespaces.platform import attach_platform
+    from app.namespaces.tag import attach_tag
     from app.namespaces.tax import attach_tax
     from app.namespaces.tax_record import attach_tax_record
     from app.namespaces.transaction import attach_transaction
@@ -33,6 +34,7 @@ def register_routes(api, app):
     attach_exchange_rate(api, app)
     attach_item(api, app)
     attach_platform(api, app)
+    attach_tag(api, app)
     attach_tax(api, app)
     attach_tax_record(api, app)
     attach_transaction(api, app)

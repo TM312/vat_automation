@@ -7,6 +7,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
 
 from ..transaction import Transaction
+from ..utils.ATs import seller_firm_accounting_firm_AT
 
 from app.extensions import db  # noqa
 
@@ -28,6 +29,16 @@ class Business(db.Model):  # type: ignore
     # logo_image_name = db.Column(db.String(120), default=None)
     vat_numbers = db.relationship('VATIN', backref='business', lazy=True)
     b_type = db.Column(db.String(50))
+
+    accounting_firms = db.relationship(
+        'Business',
+        secondary=seller_firm_accounting_firm_AT,
+        primaryjoin="seller_firm_accounting_firm_AT.c.seller_firm_id == Business.id",
+        secondaryjoin="seller_firm_accounting_firm_AT.c.accounting_firm_id == Business.id",
+        backref='clients'
+        )
+
+
     __mapper_args__ = {'polymorphic_on': b_type}
 
 

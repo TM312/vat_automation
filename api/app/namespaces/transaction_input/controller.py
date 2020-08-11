@@ -4,11 +4,14 @@ from flask import request
 from flask_restx import Namespace, Resource, reqparse
 from flask.wrappers import Response
 
+from app.extensions import limiter
+
 from . import transaction_input_dto, transaction_input_sub_dto, transaction_input_admin_dto
 from . import TransactionInput
 from .service import TransactionInputService
 
 from ..utils.decorators import login_required, employer_required
+
 
 
 ns = Namespace("TransactionInput", description="Transaction Input Related Operations")  # noqa
@@ -69,10 +72,10 @@ class TransactionInputIdResource(Resource):
 @ns.route("/seller_firm/") #<string:seller_firm_public_id><int:page>")
 @ns.param("seller_firm_public_id", "TransactionInput database ID")
 class TransactionInputSellerFirmIdResource(Resource):
-
+    decorators = [limiter.limit("5/second")]
     @login_required
     @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
-    def get(self) -> TransactionInput:
+    def get(self) -> List[TransactionInput]:
         """Get Single TransactionInput"""
         args = parser.parse_args()
         print('args:', args, flush=True)

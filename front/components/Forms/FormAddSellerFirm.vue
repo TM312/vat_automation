@@ -7,20 +7,6 @@
             label-class="font-weight-bold pt-0"
             class="mb-2"
         >
-            <b-form-group
-                label-cols-sm="3"
-                label-align-sm="right"
-                label-for="givenId"
-                label="Internal ID"
-                description="The ID you have assigned internally to this client."
-            >
-                <b-form-input
-                    id="givenId"
-                    v-model="payload.accounting_firm_client_id"
-                    type="text"
-                    class="mt-1"
-                />
-            </b-form-group>
 
             <b-form-group
                 label-cols-sm="3"
@@ -88,7 +74,6 @@
         data() {
             return {
                 payload: {
-                    accounting_firm_client_id: null,
                     name: null,
                     address: null,
                     establishment_country_code: null
@@ -130,7 +115,6 @@
                     await this.create_as_client();
 
                     this.payload.establishment_country_code = null;
-                    this.payload.accounting_firm_client_id = null;
 
 
                     this.$emit('flash')

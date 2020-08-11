@@ -96,10 +96,9 @@
                 variant="primary"
                 @click="submitPayload()"
                 block
-                :disabled="sellerFirm.transactions.length === 0"
             ><b-icon icon="box-arrow-in-up" />
-            <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span>
-            <span v-else>Generate New Tax Record</span>
+            <!-- <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span> -->
+            <span>Generate New Tax Record</span>
             </b-button>
 
         </b-card>

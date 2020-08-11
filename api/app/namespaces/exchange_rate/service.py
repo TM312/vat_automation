@@ -133,12 +133,7 @@ class ExchangeRateService:
         exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first()
 
         if not isinstance(exchange_rate, ExchangeRate):
-            print('get_rate_by_base_taget_date: base: {} | target: {} | date: {} | exchange_rate: {}'.format(
-                    base,
-                    target,
-                    date,
-                    exchange_rate,
-                    ), flush=True)
+            print('get_rate_by_base_taget_date: base: {} | target: {} | date: {} | exchange_rate: {}'.format( base, target, date, exchange_rate), flush=True)
             print("", flush=True)
             raise NotFound('The currency pair {}-{} for {} is not available'.format(base, target, date))
 

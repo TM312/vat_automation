@@ -14,7 +14,7 @@ export const mutations = {
 
     PUSH_TRANSACTION_INPUTS(state, transaction_inputs) {
         for (let i = 0; i < transaction_inputs.length; i++)
-            state.transaction_inputs.push(transaction_inputs[i])
+            if (state.transaction_inputs.includes(transaction_inputs[i]) === false) state.transaction_inputs.push(transaction_inputs[i])
     }
 
 
@@ -59,19 +59,12 @@ export const actions = {
         }
     },
 
-    async get_by_seller_firm_public_id({ commit, state }, params) {
+    async get_by_seller_firm_public_id({ commit }, params) {
 
         const res = await this.$repositories.transaction_input.get_by_seller_firm_public_id(params)
         const { status, data } = res
         if (status === 200 && data.data) {
-            if (
-                state.transaction_inputs.length===0 ||
-                (
-                    state.transaction_inputs.length>0 &&
-                    params['seller_firm_public_id'] !== state.transaction_inputs[0].seller_firm_public_id
-                )
-                ) {
-                console.log('state.transaction_inputs[0].seller_firm_public_id:', state.transaction_inputs[0].seller_firm_public_id)
+            if (params['page'] === 1) {
                 commit('SET_TRANSACTION_INPUTS', data.data)
             } else {
                 commit('PUSH_TRANSACTION_INPUTS', data.data)

@@ -28,12 +28,25 @@ tax_treatment_transaction_type_AT = db.Table(
 
 tax_record_transaction_AT = db.Table(
     'tax_record_transaction_AT',
-    db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id', ondelete="CASCADE")),
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id', ondelete="CASCADE"))
+    db.Column('tax_record_id', db.Integer, db.ForeignKey('tax_record.id')),
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'))
 )
 
 tax_auditor_seller_firm_AT = db.Table(
     'tax_auditor_seller_firm_AT',
-    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), primary_key=True),
-    db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id', ondelete="CASCADE"), primary_key=True)
+    db.Column('tax_auditor_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True)
+)
+
+
+tag_notification_AT = db.Table(
+    'tag_notification_AT',
+    db.Column('tag_code', db.String(24), db.ForeignKey('tag.code'), primary_key=True),
+    db.Column('notification_id', db.Integer, db.ForeignKey('notification.id'), primary_key=True)
+)
+
+seller_firm_accounting_firm_AT = db.Table(
+    'seller_firm_accounting_firm_AT',
+     db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True),
+     db.Column('accounting_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True)
 )

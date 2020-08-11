@@ -1,6 +1,7 @@
 from flask_restx import Model, fields
 
 
+
 user_sub_dto = Model('user_sub', {
     'public_id': fields.String(readonly=True),
     'registered_on': fields.Date(readonly=True),
@@ -26,10 +27,13 @@ user_dto = user_sub_dto.clone('user', {
     # 'password': fields.String,
 })
 
+
+
 user_dto_admin = user_dto.clone('user_admin', {
     'id': fields.Integer(readonly=True),
     'employer_id': fields.Integer,
 })
+
 
 
 

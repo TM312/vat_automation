@@ -37,7 +37,7 @@ class TransactionInput(db.Model):
 
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     item_sku = db.Column(db.String(128))
-    item_name = db.Column(db.String(128))
+    item_name = db.Column(db.String(256))
     item_manufacture_country = db.Column(db.String(128))
     item_quantity = db.Column(db.Integer)
     item_weight_g = db.Column(db.Integer)
@@ -101,7 +101,7 @@ class TransactionInput(db.Model):
     _check_gift_wrap_price_total_net = db.Column(db.Integer)
     _check_gift_wrap_price_total_vat = db.Column(db.Integer)
     _check_gift_wrap_price_tax_rate = db.Column(db.Integer)
-    check_item_tax_code_code = db.Column(db.String(8))
+    check_item_tax_code_code = db.Column(db.String(40))
     check_departure_seller_vat_country_code = db.Column(db.String(8))
     check_departure_seller_vat_number = db.Column(db.String(24))
     check_arrival_seller_vat_country_code = db.Column(db.String(8))

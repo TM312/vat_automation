@@ -7,8 +7,14 @@ export const mutations = {
     SET_TRANSACTIONS(state, transactions) {
         state.transactions = transactions
     },
+
     SET_TRANSACTION(state, transaction) {
         state.transaction = transaction
+    },
+
+    PUSH_TRANSACTIONS(state, transactions) {
+        for (let i = 0; i < transactions.length; i++)
+            if (state.transactions.includes(transactions[i]) === false) state.transactions.push(transactions[i])
     }
 }
 
@@ -32,5 +38,20 @@ export const actions = {
         } else {
             // Handle error here
         }
-    }
+    },
+
+    async get_by_tax_record_public_id({ commit }, params) {
+
+        const res = await this.$repositories.transaction.get_by_tax_record_public_id(params)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            if (params['page'] === 1) {
+                commit('SET_TRANSACTIONS', data.data)
+            } else {
+                commit('PUSH_TRANSACTIONS', data.data)
+            }
+        } else {
+            // Handle error here
+        }
+    },
 }

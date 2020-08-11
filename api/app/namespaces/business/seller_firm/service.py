@@ -2,6 +2,7 @@ import os
 
 from typing import List, BinaryIO, Dict
 import pandas as pd
+from datetime import datetime
 
 from werkzeug.exceptions import Conflict, NotFound, Unauthorized, UnsupportedMediaType
 from flask import g, current_app
@@ -11,6 +12,8 @@ from .model import SellerFirm
 from .interface import SellerFirmInterface
 
 from ...utils.service import InputService, NotificationService
+from ...utils import SellerFirmNotification
+from ...tag.service import TagService
 
 
 class SellerFirmService:
@@ -18,23 +21,17 @@ class SellerFirmService:
     def get_all() -> List[SellerFirm]:
         return SellerFirm.query.all()
 
-    @staticmethod
-    def get_by_accounting_firm_id(accounting_firm_id) -> List[SellerFirm]:
-        seller_firms = SellerFirm.query.filter_by(accounting_firm_id=accounting_firm_id).all()
-        return seller_firms
 
     @staticmethod
     def get_by_identifiers(seller_firm_name: str,
                            address: str,
-                           establishment_country_code: str,
-                           accounting_firm_client_id: str
+                           establishment_country_code: str
         ):
         seller_firm = SellerFirm.query.filter_by(name=seller_firm_name).first()
         if not seller_firm:
             seller_firm = SellerFirm.query.filter(
                 SellerFirm.address == address,
                 SellerFirm.establishment_country_code == establishment_country_code,
-                SellerFirm.accounting_firm_client_id == accounting_firm_client_id
                 ).first()
 
         return seller_firm
@@ -52,8 +49,9 @@ class SellerFirmService:
     @staticmethod
     def update(seller_firm_id: int, data_changes: SellerFirmInterface) -> SellerFirm:
         seller_firm = SellerFirmService.get_by_id(seller_firm_id)
-        seller_firm.update(data_changes)
-        db.session.commit()
+        if isinstance(seller_firm, SellerFirm):
+            seller_firm.update(data_changes)
+            db.session.commit()
         return seller_firm
 
     @staticmethod
@@ -93,12 +91,8 @@ class SellerFirmService:
 
         name = seller_firm_data_as_client.get('name')
         establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
-        accounting_firm_client_id = seller_firm_data_as_client.get('accounting_firm_client_id')
 
-        if (accounting_firm_client_id != None and name != None and establishment_country_code != None):
-            seller_firm = SellerFirm.query.filter_by(name=name, establishment_country_code=establishment_country_code, accounting_firm_client_id=accounting_firm_client_id).first()
-
-        elif (name != None and establishment_country_code != None):
+        if (name != None and establishment_country_code != None):
             seller_firm = SellerFirm.query.filter_by(name=name, establishment_country_code=establishment_country_code).first()
 
         if seller_firm:
@@ -117,12 +111,12 @@ class SellerFirmService:
                 'name': name,
                 'address': seller_firm_data_as_client.get('address'),
                 'establishment_country_code': establishment_country_code,
-                'accounting_firm_id': g.user.employer_id,
-                'accounting_firm_client_id': accounting_firm_client_id
             }
 
             try:
                 new_seller_firm = SellerFirmService.create(seller_firm_data)
+                new_seller_firm.accounting_firms.append(g.user.employer)
+                db.session.commit()
                 return new_seller_firm
 
             except:
@@ -139,9 +133,7 @@ class SellerFirmService:
             created_by = seller_firm_data.get('created_by'),
             name = seller_firm_data.get('name'),
             address = seller_firm_data.get('address'),
-            establishment_country_code = seller_firm_data.get('establishment_country_code'),
-            accounting_firm_id = seller_firm_data.get('accounting_firm_id'),
-            accounting_firm_client_id = seller_firm_data.get('accounting_firm_client_id')
+            establishment_country_code = seller_firm_data.get('establishment_country_code')
         )
 
         #add seller firm to db
@@ -209,22 +201,22 @@ class SellerFirmService:
             if file_type == 'account_list':
                 from ...account.service import AccountService
                 response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                seller_firm_notification_data['message'] = 'Account Information'
+                tag = TagService.get_by_code('ACCOUNT')
 
             elif file_type == 'distance_sale_list':
                 from ...distance_sale.service import DistanceSaleService
                 response_object = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                seller_firm_notification_data['message'] = 'Distance Sale Information'
+                tag = TagService.get_by_code('DISTANCE_SALE')
 
             elif file_type == 'item_list':
                 from ...item.service import ItemService
                 response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                seller_firm_notification_data['message'] = 'Items'
+                tag = TagService.get_by_code('ITEM')
 
             elif file_type == 'vat_numbers':
                 from ...tax.vatin.service import VATINService
                 response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
-                seller_firm_notification_data['message'] = 'Vat Numbers'
+                tag = TagService.get_by_code('VAT_NUMBER')
 
         elif data_type == 'recurring':
             basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
@@ -234,14 +226,34 @@ class SellerFirmService:
                 from ...transaction_input.service import TransactionInputService
                 try:
                     response_object = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
-                    seller_firm_notification_data['message'] = 'Transactions'
                 except:
+                    db.session.rollback()
                     raise
+                tag = TagService.get_by_code('TRANSACTION')
+
 
         else:
             raise
 
-        NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+        seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm.id, g.user.id, datetime.utcnow(), subject='Data Upload')
+        if isinstance(seller_firm_notification, SellerFirmNotification):
+            if not tag in seller_firm_notification.tags:
+                seller_firm_notification.tags.append(tag)
+                seller_firm_notification.modify()
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    raise
+        else:
+            seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+            seller_firm_notification.tags.append(tag)
+            seller_firm_notification.modify()
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
 
         return response_object
 
@@ -256,12 +268,11 @@ class SellerFirmService:
         delimiter = ';'
         basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
         user_id = g.user.id
-        accounting_firm_id = g.user.employer_id
 
 
         # for file in seller_firm_information_files:
         file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-        response_objects = SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed=claimed, accounting_firm_id=accounting_firm_id, **kwargs)
+        response_objects = SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed=claimed, **kwargs)
 
         # response_object = {
         #     'status': 'success',
@@ -297,22 +308,21 @@ class SellerFirmService:
             seller_firm_name = InputService.get_str_or_None(df, i, column='seller_firm_name')
             address = InputService.get_str_or_None(df, i, column='address')
             establishment_country_code = InputService.get_str(df, i, column='establishment_country_code')
-            accounting_firm_client_id = InputService.get_str_or_None(df, i, column='accounting_firm_client_id')
 
             seller_firm_data = {
                 'claimed': kwargs.get('claimed'),
                 'created_by': user_id,
                 'name': seller_firm_name,
                 'address': address,
-                'establishment_country_code': establishment_country_code,
-                'accounting_firm_id': kwargs['accounting_firm_id'],
-                'accounting_firm_client_id': accounting_firm_client_id,
+                'establishment_country_code': establishment_country_code
             }
 
-            seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code, accounting_firm_client_id)
+            seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code)
             if not seller_firm:
                 try:
-                    SellerFirmService.create(seller_firm_data)
+                    new_seller_firm = SellerFirmService.create(seller_firm_data)
+                    new_seller_firm.accounting_firms.append(g.user.employer)
+                    db.session.commit()
 
                 except:
                     db.session.rollback()
