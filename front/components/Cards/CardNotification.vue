@@ -1,28 +1,52 @@
 <template>
-  <b-card>
-      <b-card-title>{{ notification.subject }}</b-card-title>
-      <b-card-text>
-        <p v-if="notification.subject === 'Data Upload'" ><b>{{ notification.user}}</b> added {{ notification.message }} for one of your key accounts.</p>
-        <nuxt-link :to="`/tax/clients/${notification.seller_firm_public_id}`" class="mt-2">Go to seller firm</nuxt-link>
+    <b-card>
+        <b-card-title>{{ notification.subject }}</b-card-title>
+        <b-card-text>
+            <p v-if="notification.subject === 'Data Upload'">
+                <b>{{ notification.created_by }}</b> added new data for
+                <nuxt-link
+                    :to="`/tax/clients/${notification.seller_firm_public_id}`"
+                    class="mt-2">{{ notification.seller_firm }}
+                </nuxt-link>
+            </p>
 
-      </b-card-text>
-      <b-card-text class="small text-muted">{{ $dateFns.formatDistanceToNow(new Date(notification.created_on)) }}</b-card-text>
+            <b-row v-if="notification.tags && notification.tags.length !== 0" class="mb-2">
+                <b-col>
+                    <b-badge v-for="tag in notification.tags" :key="tag.code" :variant="tag.code === 'TRANSACTION' ? 'success' : 'primary'" class="mr-1">{{ get_code(tag.code) }}</b-badge>
+                </b-col>
+
+            </b-row>
+        </b-card-text>
+        <b-card-text class="small text-muted">
+            <span v-if="notification.modified_at"> updated {{ $dateFns.formatDistanceToNow(new Date(notification.modified_at)) }} ago</span>
+            <span v-else> {{ $dateFns.formatDistanceToNow(new Date(notification.created_on)) }} ago</span>
+        </b-card-text>
     </b-card>
 </template>
 
 <script>
-export default {
-    name: 'CardNotification',
-    props: {
-        notification: {
-            type: [Array, Object],
-            required: true
-        }
-    }
+    export default {
+        name: "CardNotification",
+        props: {
+            notification: {
+                type: [Array, Object],
+                required: true,
+            },
+        },
 
-}
+
+        methods: {
+            get_code(code) {
+                return code
+                    .toLowerCase()
+                    .replace("_", " ")
+                    .replace(/(^\w{1})|(\s{1}\w{1})/g, (match) =>
+                        match.toUpperCase()
+                    );
+            },
+        },
+    };
 </script>
 
 <style>
-
 </style>

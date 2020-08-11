@@ -49,6 +49,25 @@ class TransactionService:
     def get_by_public_id(transaction_public_id: str) -> Transaction:
         return Transaction.query.filter_by(public_id = transaction_public_id).first()
 
+    @staticmethod
+    def get_by_tax_record_public_id(tax_record_public_id: str, **kwargs) -> List[Transaction]:
+        # from ..tax_record.service import TaxRecordService
+        from ..tax_record import TaxRecord
+        # tax_record_id = TaxRecordService.get_by_public_id(tax_record_public_id).id
+        #base_query = Transaction.query.join(Transaction.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(Transaction.complete_date.desc())
+        base_query = Transaction.query.join(TaxRecord.transactions).filter(TaxRecord.public_id == tax_record_public_id).order_by(Transaction.tax_date.desc())
+        if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
+            per_page = current_app.config['TRANSACTIONS_PER_QUERY']
+            page = kwargs.get('page')
+            transactions = base_query.paginate(page, per_page, False).items
+            print('TransactionService -> get_by_seller_firm -> per_page:', per_page, flush=True)
+            print('TransactionService -> get_by_seller_firm -> page:', page, flush=True)
+            print('TransactionService -> get_by_seller_firm -> transactions:', transactions, flush=True)
+
+        else:
+            transactions = base_query.all()
+        return transactions
+
 
 
     @staticmethod

@@ -9,7 +9,7 @@
                     class="text-center py-5"
                 ></b-card>
                 <table-transaction-inputs v-else />
-                <b-button v-if="page>0" variant="outline-primary" :disabled="buttonFetchDisabled" @click="$fetch" block>
+                <b-button variant="outline-primary" :disabled="buttonFetchDisabled" @click="refresh" block>
                     <b-spinner v-if="buttonFetchDisabled" small />
                     <b-icon v-else icon="chevron-down" />
                     Show More
@@ -33,18 +33,21 @@
         data() {
             return {
                 buttonRemoveDisabled: false,
-                page: 0
             }
         },
 
         async fetch() {
-            this.page ++
-            const { store } = this.$nuxt.context;
-            const params = {
-                seller_firm_public_id: this.$route.params.public_id,
-                page: this.page
+            if (
+                this.transactionInputs.length === 0 || this.transaction_inputs[0]['seller_firm_public_id'] !== this.$route.params.public_id
+            ) {
+
+                const { store } = this.$nuxt.context;
+                const params = {
+                    seller_firm_public_id: this.$route.params.public_id,
+                    page: 1
+                }
+                await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
             }
-            await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
         },
 
         computed: {
@@ -55,10 +58,22 @@
 
             buttonFetchDisabled() {
                 return this.$fetchState.pending ? true : false
+            },
+            currentPage() {
+               return Math.trunc(this.transactionInputs.length / 25)
             }
         },
 
         methods: {
+            async refresh() {
+                const { store } = this.$nuxt.context;
+                const params = {
+                    seller_firm_public_id: this.$route.params.public_id,
+                    page: this.currentPage + 1
+                }
+                await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
+            },
+
             async removeAll() {
                 this.buttonRemoveDisabled = true;
                 if (this.transactionInputs.length > 0) {

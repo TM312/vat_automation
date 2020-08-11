@@ -71,7 +71,7 @@ export default {
 
     axios: {
         // proxy: true,
-        baseURL: 'http://127.0.0.1:5000',
+        baseURL: 'http://api.tax-automation.com',
         /* "94.237.95.140:5000", */
         /* "http://api.tax-automation.com", */
         /*  "http://127.0.0.1:5000"  */
@@ -84,27 +84,27 @@ export default {
     },
     auth: {
         strategies: {
-            local_seller: {
-                _scheme: 'local',
-                endpoints: {
-                    login: {
-                        url: '/auth/login',
-                        method: 'post',
-                        propertyName: 'token',
-                    },
-                    logout: {
-                        url: '/auth/logout',
-                        method: 'post',
-                    },
-                    user: {
-                        url: 'user/seller/self',
-                        method: 'get',
-                        propertyName: 'data',
-                    },
-                },
-                tokenRequired: true,
-                tokenType: '',
-            },
+            // local_seller: {
+            //     _scheme: 'local',
+            //     endpoints: {
+            //         login: {
+            //             url: '/auth/login',
+            //             method: 'post',
+            //             propertyName: 'token',
+            //         },
+            //         logout: {
+            //             url: '/auth/logout',
+            //             method: 'post',
+            //         },
+            //         user: {
+            //             url: 'user/seller/self',
+            //             method: 'get',
+            //             propertyName: 'data',
+            //         },
+            //     },
+            //     tokenRequired: true,
+            //     tokenType: '',
+            // },
             local_tax_auditor: {
                 _scheme: 'local',
                 endpoints: {

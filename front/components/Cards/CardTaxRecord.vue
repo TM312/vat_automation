@@ -21,7 +21,7 @@
                     <b-col>
                         {{ Number.parseFloat(taxRecord.taxable_turnover_amount).toFixed(2) }} {{ taxRecord.currency_code }}
                         <br>
-                        {{ Number.parseFloat(taxRecord.taxable_turnover_amount).toFixed(2) }} {{ taxRecord.currency_code }}
+                        {{ Number.parseFloat(taxRecord.payable_vat_amount).toFixed(2) }} {{ taxRecord.currency_code }}
                     </b-col>
                 </b-row>
 

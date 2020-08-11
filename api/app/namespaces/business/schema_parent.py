@@ -1,6 +1,7 @@
 from flask_restx import Model, fields
 
 
+
 business_sub_dto = Model('business_sub', {
     'public_id': fields.String(readonly=True),
     'modified_at': fields.DateTime(readonly=True),
@@ -9,10 +10,13 @@ business_sub_dto = Model('business_sub', {
     'b_type': fields.String(readonly=True),
 })
 
+
 business_dto = business_sub_dto.clone('business', {
     'created_by': fields.String(attribute=lambda x: x.creator.name),
     'created_on': fields.Date(readonly=True),
 })
+
+
 
 business_admin_dto = business_dto.clone('business_admin', {
     'id': fields.Integer(readonly=True)

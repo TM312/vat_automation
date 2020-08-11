@@ -24,7 +24,6 @@ export default {
         return {
             fields: [
                 { key: 'name', sortable: false },
-                { key: 'accounting_firm_client_id', label: 'Client ID', sortable: false },
                 { key: 'address', sortable: false }
             ],
         }

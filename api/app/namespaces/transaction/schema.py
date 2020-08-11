@@ -18,6 +18,8 @@ transaction_sub_dto = Model('transaction_sub', {
     'tax_calculation_date': fields.Date,
     'transaction_currency': fields.String(attribute=lambda x: x.transaction_currency.name, readonly=True),
     'transaction_input_public_id': fields.String(attribute=lambda x: x.transaction_input.public_id, readonly=True),
+    'transaction_input_given_id': fields.String(attribute=lambda x: x.transaction_input.given_id, readonly=True),
+    'transaction_input_activity_id': fields.String(attribute=lambda x: x.transaction_input.activity_id, readonly=True),
 })
 
 transaction_dto = transaction_sub_dto.clone('transaction', {

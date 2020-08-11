@@ -1,7 +1,11 @@
+from typing import List
+
 from flask_restx import Namespace, Resource, reqparse
 
-from .service import TemplateService, NotificationService
+from . import Notification, SellerFirmNotification
 from . import transaction_notification_dto, notification_dto, transaction_notification_admin_dto, seller_firm_notification_dto
+from .service import TemplateService, NotificationService
+
 from .decorators import login_required
 
 parser = reqparse.RequestParser()
@@ -32,7 +36,6 @@ class TemplateResource(Resource):
 class SellerFirmNotificationResource(Resource):
     @login_required
     @ns.marshal_list_with(seller_firm_notification_dto, envelope='data')
-    def get(self) -> TransactionInput:
+    def get(self) -> List[SellerFirmNotification]:
         """Get Single TransactionInput"""
-        args = parser.parse_args()
-        return NotificationService.get_all_key_account_notifications(paginate=True, page=args.get('page'))
+        return NotificationService.get_all_key_account_notifications()

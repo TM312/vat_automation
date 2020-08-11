@@ -67,12 +67,12 @@ tax_record_dto = tax_record_sub_dto.clone('tax_record', {
     'exports_refunds_invoice_amount_net': fields.Float(readonly=True),
     'exports_total_invoice_amount_net': fields.Float(readonly=True),
 
-    'intra_community_acquisitions_acquisitions_invoice_amount_net': fields.Float(readonly=True),
-    'intra_community_acquisitions_refunds_invoice_amount_net': fields.Float(readonly=True),
-    'intra_community_acquisitions_total_invoice_amount_net': fields.Float(readonly=True),
-    'intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
-    'intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
-    'intra_community_acquisitions_total_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
+    'ica_acquisitions_invoice_amount_net': fields.Float(readonly=True),
+    'ica_refunds_invoice_amount_net': fields.Float(readonly=True),
+    'ica_total_invoice_amount_net': fields.Float(readonly=True),
+    'ica_acquisitions_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
+    'ica_refunds_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
+    'ica_total_invoice_amount_vat_reverse_charge': fields.Float(readonly=True),
 
     'local_acquisitions_acquisitions_invoice_amount_net': fields.Float(readonly=True),
     'local_acquisitions_refunds_invoice_amount_net': fields.Float(readonly=True),

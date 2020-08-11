@@ -77,13 +77,14 @@ class TaxRecord(db.Model):
     _exports_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
     _exports_total_invoice_amount_net = db.Column(db.Integer, default=0)
 
-    _intra_community_acquisitions_acquisitions_invoice_amount_net = db.Column(db.Integer, default=0)
-    _intra_community_acquisitions_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
-    _intra_community_acquisitions_total_invoice_amount_net = db.Column(db.Integer, default=0)
+    _ica_acquisitions_invoice_amount_net = db.Column(db.Integer, default=0)
+    _ica_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
+    _ica_total_invoice_amount_net = db.Column(db.Integer, default=0)
 
-    _intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
-    _intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
-    _intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _ica_acquisitions_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _ica_refunds_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+    _ica_total_invoice_amount_vat_reverse_charge = db.Column(db.Integer, default=0)
+
     _local_acquisitions_acquisitions_invoice_amount_net = db.Column(db.Integer, default=0)
     _local_acquisitions_refunds_invoice_amount_net = db.Column(db.Integer, default=0)
     _local_acquisitions_total_invoice_amount_net = db.Column(db.Integer, default=0)
@@ -485,57 +486,57 @@ class TaxRecord(db.Model):
 
 
     @hybrid_property
-    def intra_community_acquisitions_acquisitions_invoice_amount_net(self):
-        return self._intra_community_acquisitions_acquisitions_invoice_amount_net / 100
+    def ica_acquisitions_invoice_amount_net(self):
+        return self._ica_acquisitions_invoice_amount_net / 100
 
-    @intra_community_acquisitions_acquisitions_invoice_amount_net.setter
-    def intra_community_acquisitions_acquisitions_invoice_amount_net(self, value):
-        self._intra_community_acquisitions_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
-
-
-    @hybrid_property
-    def intra_community_acquisitions_refunds_invoice_amount_net(self):
-        return self._intra_community_acquisitions_refunds_invoice_amount_net / 100
-
-    @intra_community_acquisitions_refunds_invoice_amount_net.setter
-    def intra_community_acquisitions_refunds_invoice_amount_net(self, value):
-        self._intra_community_acquisitions_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+    @ica_acquisitions_invoice_amount_net.setter
+    def ica_acquisitions_invoice_amount_net(self, value):
+        self._ica_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
 
 
     @hybrid_property
-    def intra_community_acquisitions_total_invoice_amount_net(self):
-        return self._intra_community_acquisitions_total_invoice_amount_net / 100
+    def ica_refunds_invoice_amount_net(self):
+        return self._ica_refunds_invoice_amount_net / 100
 
-    @intra_community_acquisitions_total_invoice_amount_net.setter
-    def intra_community_acquisitions_total_invoice_amount_net(self, value):
-        self._intra_community_acquisitions_total_invoice_amount_net = int(value * 100) if value is not None else None
-
-
-    @hybrid_property
-    def intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge(self):
-        return self._intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge / 100
-
-    @intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge.setter
-    def intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge(self, value):
-        self._intra_community_acquisitions_acquisitions_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+    @ica_refunds_invoice_amount_net.setter
+    def ica_refunds_invoice_amount_net(self, value):
+        self._ica_refunds_invoice_amount_net = int(value * 100) if value is not None else None
 
 
     @hybrid_property
-    def intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge(self):
-        return self._intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge / 100
+    def ica_total_invoice_amount_net(self):
+        return self._ica_total_invoice_amount_net / 100
 
-    @intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge.setter
-    def intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge(self, value):
-        self._intra_community_acquisitions_refunds_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+    @ica_total_invoice_amount_net.setter
+    def ica_total_invoice_amount_net(self, value):
+        self._ica_total_invoice_amount_net = int(value * 100) if value is not None else None
 
 
     @hybrid_property
-    def intra_community_acquisitions_total_invoice_amount_vat_reverse_charge(self):
-        return self._intra_community_acquisitions_total_invoice_amount_vat_reverse_charge / 100
+    def ica_acquisitions_invoice_amount_vat_reverse_charge(self):
+        return self._ica_acquisitions_invoice_amount_vat_reverse_charge / 100
 
-    @intra_community_acquisitions_total_invoice_amount_vat_reverse_charge.setter
-    def intra_community_acquisitions_total_invoice_amount_vat_reverse_charge(self, value):
-        self._intra_community_acquisitions_total_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+    @ica_acquisitions_invoice_amount_vat_reverse_charge.setter
+    def ica_acquisitions_invoice_amount_vat_reverse_charge(self, value):
+        self._ica_acquisitions_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def ica_refunds_invoice_amount_vat_reverse_charge(self):
+        return self._ica_refunds_invoice_amount_vat_reverse_charge / 100
+
+    @ica_refunds_invoice_amount_vat_reverse_charge.setter
+    def ica_refunds_invoice_amount_vat_reverse_charge(self, value):
+        self._ica_refunds_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+
+
+    @hybrid_property
+    def ica_total_invoice_amount_vat_reverse_charge(self):
+        return self._ica_total_invoice_amount_vat_reverse_charge / 100
+
+    @ica_total_invoice_amount_vat_reverse_charge.setter
+    def ica_total_invoice_amount_vat_reverse_charge(self, value):
+        self._ica_total_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
 
 
     @hybrid_property

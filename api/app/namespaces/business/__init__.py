@@ -1,6 +1,5 @@
 from .model_parent import Business
-from .schema_parent import business_dto, business_sub_dto, business_admin_dto
-
+from .schema_parent import business_sub_dto, business_dto, business_admin_dto
 
 BASE_ROUTE = "business"
 
