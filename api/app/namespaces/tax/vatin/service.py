@@ -203,7 +203,16 @@ class VATINService:
             vatin = VATIN.query.filter(VATIN.country_code==country_code, VATIN.number==number, VATIN.valid_to >= date.today()).first()
 
             if vatin:
-                continue
+                if isinstance(vatin.business_id, int):
+                    continue
+
+                else:
+                    vatin.business_id = seller_firm_id
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        raise
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
@@ -352,6 +361,7 @@ class VATINService:
                     return vatin
 
                 except:
+                    db.session.rollback()
                     raise UnprocessableEntity('Can not create VATIN.')
 
             except:
@@ -363,7 +373,7 @@ class VATINService:
     def process_single_submit(seller_firm_public_id: str, vatin_data_raw: VATINInterface) -> VATIN:
         from ...business.seller_firm.service import SellerFirmService
 
-        country_code, number = VATINService.vat_precheck(country_code_temp=vatin_data_raw.get('country_code'), number_temp=vatin_data_raw.get('number'))
+        country_code, number = VATINService.vat_precheck(vatin_data_raw.get('country_code'), vatin_data_raw.get('number'))
 
         if not country_code or not number:
             raise
@@ -457,6 +467,7 @@ class VIESService:
                 current_app.logger.warning('Exception: {} | ZEEP Request failed for VATIN: {}-{}'.format(e, country_code, number))
 
         finally:
+            print('FINALlY vatin_data:', vatin_data, flush=True)
             return vatin_data
 
 

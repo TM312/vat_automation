@@ -806,7 +806,6 @@ class TransactionService:
     def get_tax_jurisdiction(tax_treatment_code: str, departure_country: Country, arrival_country: Country) -> Country:
         if (
             tax_treatment_code == 'DISTANCE_SALE'
-            or tax_treatment_code == 'NON_TAXABLE_DISTANCE_SALE'
             or tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION'
             or tax_treatment_code == 'LOCAL_ACQUISITION'
             ):
