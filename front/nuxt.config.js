@@ -71,7 +71,7 @@ export default {
 
     axios: {
         // proxy: true,
-        baseURL: 'http://api.tax-automation.com',
+        baseURL: 'http://127.0.0.1:5000',
         /* "94.237.95.140:5000", */
         /* "http://api.tax-automation.com", */
         /*  "http://127.0.0.1:5000"  */

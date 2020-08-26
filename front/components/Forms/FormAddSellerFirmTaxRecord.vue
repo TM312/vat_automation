@@ -126,10 +126,18 @@
             }
         },
 
+        async fetch() {
+            const { store } = this.$nuxt.context;
+            if (this.countries.length == 0) {
+                await store.dispatch("country/get_all");
+            }
+        },
+
         computed: {
             ...mapState({
                 countries: state => state.country.countries,
                 sellerFirm: state => state.seller_firm.seller_firm,
+                vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(e => e.country_code)
             }),
 
 
@@ -150,17 +158,20 @@
             },
 
             optionsCountryCode() {
-                const countriesShort = this.countries.filter(country => (country.code !== undefined && country.code !== null))
+                const countriesShortTotal = this.countries.filter(country => (country.code !== undefined && country.code !== null))
+                const countryCodesShortTotal = countriesShortTotal.map(country => country.code);
+                const countryIntersection = this.getCountryIntersection(this.vatCountries, countryCodesShortTotal)
 
-                let options = countriesShort.map(country => {
-                    let properties = {
-                        value: country.code,
-                        text: country.name
+                let options = countryIntersection.map(country_code => {
+                    let formTuple = {
+                        value: country_code,
+                        text: countriesShortTotal.find(country => country.code === country_code).name
                     };
-                    return properties;
-
+                    return formTuple;
                     })
+
                 return options;
+
             },
 
             selected() {
@@ -260,6 +271,15 @@
         },
 
         methods: {
+
+            getCountryIntersection(countriesVat, countries) {
+                var t;
+                if (countriesVat.length > countries.length) t = countries, countries = countriesVat, countriesVat = t; // indexOf to loop over shorter
+                return countriesVat.filter(function (e) {
+                    return countries.indexOf(e) > -1;
+                });
+            },
+
 
             test(timespan) {
                 if (typeof(timespan) === 'string') {

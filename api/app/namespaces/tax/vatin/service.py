@@ -350,19 +350,27 @@ class VATINService:
 
         vatin = VATINService.get_vatin(country_code, number, date.today())
 
-        if vatin:
+        if vatin and vatin.valid:
             return vatin
 
         else:
             try:
                 vatin_data = VIESService.send_request(country_code, number)
-                try:
-                    vatin = VATINService.create(vatin_data)
-                    return vatin
+                if vatin:
+                    vatin.update(vatin_data)
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        raise
+                else:
+                    try:
+                        vatin = VATINService.create(vatin_data)
+                        return vatin
 
-                except:
-                    db.session.rollback()
-                    raise UnprocessableEntity('Can not create VATIN.')
+                    except:
+                        db.session.rollback()
+                        raise UnprocessableEntity('Can not create VATIN.')
 
             except:
                 raise FailedDependency('Could not validate country code and number at the VIES database.')

@@ -28,7 +28,14 @@
                             <b-icon v-if="data.value === true" icon="check-circle" variant="success"></b-icon>
                             <b-icon v-else-if="data.value === false" icon="x-circle" variant="danger"></b-icon>
                             <span v-else>
-                                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
+                                <b-button
+                                    size="sm"
+                                    variant="outline-primary"
+                                    :disabled="buttonValidateBusy"
+                                    @click="validate(data.item)"
+                                >
+                                    Retry Validation
+                                </b-button>
                             </span>
                         </template>
 
@@ -75,6 +82,7 @@
             return {
                 editMode: false,
                 flashCounter: false,
+                buttonValidateBusy: false,
 
                 fields: [
                     { key: "vatin", label: "VATIN", sortable: false },
@@ -115,13 +123,23 @@
             },
 
             async evaluateRefresh() {
-                if (this.editMode === true) {
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    );
+                await this.$store.dispatch("seller_firm/get_by_public_id", this.$route.params.public_id);
+            },
+
+            async validate(item) {
+                this.buttonValidateBusy = true
+
+                const payload = {
+                    country_code: item.country_code,
+                    number: item.number
                 }
-            }
+
+                await this.$store.dispatch("vatin/validate", payload)
+
+                await this.evaluateRefresh()
+
+                this.buttonValidateBusy = false
+            },
 
 
         }
