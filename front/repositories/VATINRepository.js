@@ -17,7 +17,11 @@ export default ($axios) => ({
     },
 
     verify(payload) {
-        return $axios.post(`${resource}/verify/`, payload)
+        return $axios.post(`${resource}/verify`, payload)
+    },
+
+    validate(payload) {
+        return $axios.post(`${resource}/validate`, payload)
     },
 
     update_by_public_id(vatin_public_id, payload) {

@@ -83,6 +83,22 @@ services:
 
     # ##^#new
 
+    # migration:
+    #     container_name: migration
+    #     build:
+    #         context: ./api
+    #         dockerfile: Dockerfile
+    #         args:
+    #             - PYTHON_VERSION=${PYTHON_VERSION}
+
+    #     image: ${OWNER_NAME}/migration:${VERSION_NUMBER}
+    #     environment:
+    #         - FLASK_ENV=${FLASK_ENV}
+    #     command: flask db upgrade
+    #     depends_on:
+    #         - postgres
+    #     networks:
+    #         - internal
 
     api:
         container_name: api
@@ -108,7 +124,7 @@ services:
         networks:
             - internal
             - web
-        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn --bind 0.0.0.0:5000 wsgi:app"
+        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && flask db upgrade && gunicorn --bind 0.0.0.0:5000 wsgi:app"
 
 
     postgres:

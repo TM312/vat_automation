@@ -57,6 +57,16 @@ export const actions = {
         }
     },
 
+    async validate({ commit }, vatin_data) {
+        const res = await this.$repositories.vatin.validate(vatin_data)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_VATIN', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
     async get_by_id({ commit }, vatin_id) {
 
         const res = await this.$repositories.vatin.get_by_id(vatin_id)

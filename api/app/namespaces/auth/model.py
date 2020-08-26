@@ -7,6 +7,8 @@ class Token(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     auth_token = db.Column(db.String(256), unique=True, nullable=False)
+    iss = db.Column(db.String(40))
+    exp = db.Column(db.DateTime)
     iat = db.Column(db.DateTime, nullable=False)
     sub = db.Column(db.String(36), nullable=False)
     blacklisted_on = db.Column(db.DateTime, default=datetime.utcnow)

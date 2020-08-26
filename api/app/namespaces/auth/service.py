@@ -27,6 +27,21 @@ class TokenService:
 
 
     @staticmethod
+    def create(token_data: TokenInterface) -> Token:
+        blacklisted_token = Token(
+            auth_token=token_data['auth_token'],
+            iss=token_data['iss'],
+            exp=token_data['exp'],
+            iat=token_data['iat'],
+            sub=token_data['sub']
+        )
+        db.session.add(blacklisted_token)
+        db.session.commit()
+
+        return blacklisted_token
+
+
+    @staticmethod
     def login_user(user_data: UserInterface) -> Dict:
         # fetch the user data
         user = UserService.get_by_email(user_data.get('email'))
@@ -68,13 +83,21 @@ class TokenService:
         payload = TokenService.decode_auth_token(auth_token)
         if isinstance(payload, dict):
             # mark the token as blacklisted
-            blacklisted_token = Token(
-                auth_token = auth_token,
-                iat = datetime.fromtimestamp(payload['iat'] / 1e3),
-                sub = payload['sub']
-            )
-            db.session.add(blacklisted_token)
-            db.session.commit()
+
+            token_data = {
+                'auth_token': auth_token,
+                'iss': payload['iss'],
+                'exp': datetime.fromtimestamp(payload['exp']),
+                'iat': datetime.fromtimestamp(payload['iat']),
+                'sub': payload['sub']
+            }
+
+            try:
+                TokenService.create(token_data)
+
+            except:
+                db.session.rollback()
+                raise
 
             response_object = {
                 'status': 'success',

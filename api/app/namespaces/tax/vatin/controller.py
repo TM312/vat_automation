@@ -61,7 +61,7 @@ class VATINIdResource(Resource):
 class VATINVerifyResource(Resource):
     #@login_required
     @ns.expect(vatin_verify_dto, validate=False)
-    @ns.marshal_with(vatin_verify_dto)
+    @ns.marshal_with(vatin_verify_dto, envelope='data')
     def post(self) -> bool:
         """Verify VATIN"""
         return VATINService.process_verification_request(request.json)
@@ -71,7 +71,7 @@ class VATINVerifyResource(Resource):
 class VATINValidateResource(Resource):
     #@login_required
     @ns.expect(vatin_verify_dto, validate=True)
-    @ns.marshal_with(vatin_validate_dto)
+    @ns.marshal_with(vatin_validate_dto, envelope='data')
 
     def post(self) -> VATIN:
         """Validate VATIN"""

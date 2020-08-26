@@ -26,18 +26,22 @@
 
                         <template v-slot:cell(valid)="data">
                             <b-icon v-if="data.value === true" icon="check-circle" variant="success"></b-icon>
-                            <span v-else-if="data.value == undefined" icon="check-circle" variant="success">
-                                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
-                                {{ data.value }}
-                            </span>
                             <b-icon v-else-if="data.value === false" icon="x-circle" variant="danger"></b-icon>
-
+                            <span v-else>
+                                <b-button size="sm" variant="outline-primary">Validate</b-button><br>
+                            </span>
                         </template>
+
+                        <template v-slot:cell(valid_to)="data">
+                            <span v-if="data.item.valid"> {{ data.value }}</span>
+                            <span v-else-if="data.item.valid === null"></span>
+                        </template>
+
 
                         <template v-slot:cell(initial_tax_date)="data">
                             <span v-if="data.value"> {{ data.value }}</span>
+                            <span v-else-if="data.item.valid === null"></span>
                             <span v-else><i>Not yet used.</i></span>
-
                         </template>
 
                     </b-table>
