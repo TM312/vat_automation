@@ -75,7 +75,6 @@ class VATINValidateResource(Resource):
 
     def post(self) -> VATIN:
         """Validate VATIN"""
-        print('request.json: ', request.json, flush=True)
         return VATINService.process_validation_request(request.json)
 
 

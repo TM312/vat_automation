@@ -142,9 +142,9 @@
                     border-variant="warning"
                     class="my-3"
                 >
-                    <b-card-title>Attention</b-card-title>
+                    <b-card-title>Validation Error</b-card-title>
                     <b-card-text>
-                        <p>Retry the validation now or validate it at a later stage after the submission.</p>
+                        <p>We have not been abel to validate the provided Vat Number. You can retry the validation at a later stage after the submission.</p>
                         <p>Make sure that the vat number has been validated <i>before</i> submitting transaction reports for this firm.</p>
                     </b-card-text>
                 </b-card>
@@ -277,7 +277,6 @@
                     this.payload
                 );
 
-
                 if (this.vatin.valid === null) {
                     // this.reset()
                     this.buttonVerifyDisabled = false
@@ -322,10 +321,7 @@
 
                 this.payload.request_date = null
 
-                await this.$store.dispatch(
-                    "vatin/validate",
-                    this.payload
-                );
+                await this.$store.dispatch( "vatin/validate", this.payload)
 
 
                 if (this.vatin) {

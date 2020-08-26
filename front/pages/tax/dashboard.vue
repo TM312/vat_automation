@@ -38,12 +38,19 @@
 
         async fetch() {
             const { store } = this.$nuxt.context;
-            if (this.countries.length == 0 || this.currencies.length == 0 || this.taxTreatments.length == 0) {
+            if (this.countries.length == 0) {
                 await store.dispatch("country/get_all");
-                await store.dispatch("currency/get_all");
-                await store.dispatch("tax_treatment/get_all");
-                await store.dispatch("utils/get_all_key_account_notifications");
             }
+
+            if (this.currencies.length == 0) {
+                await store.dispatch("currency/get_all");
+            }
+
+            if (this.taxTreatments.length == 0) {
+                await store.dispatch("tax_treatment/get_all")
+            }
+
+            await store.dispatch("utils/get_all_key_account_notifications");
         },
 
         data() {
