@@ -92,7 +92,7 @@ class VATINService:
 
     @staticmethod
     def get_vatin(country_code: str, number: str, date: date) -> VATIN:
-        return VATIN.query.filter(VATIN.country_code == country_code, VATIN.number==number, VATIN.valid_from<=date, VATIN.valid_to>=date).first()
+        return VATIN.query.filter(VATIN.country_code == country_code, VATIN.number==number, VATIN.valid_to>=date).first()
 
 
 
@@ -200,9 +200,9 @@ class VATINService:
             if (country_code is None or number is None):
                 continue
 
-            vatin = VATIN.query.filter(VATIN.country_code==country_code, VATIN.number==number, VATIN.valid_to >= date.today()).first()
+            vatin = VATINService.get_vatin(country_code, number, date.today())
 
-            if vatin:
+            if vatin and vatin.valid:
                 if isinstance(vatin.business_id, int):
                     continue
 
@@ -217,11 +217,8 @@ class VATINService:
             else:
                 # VIES DB is unreliable therefore reducing requests per second
                 sleep(randint(4, 6))
-                print("SLEEP in create_vatins", flush=True)
                 vatin_data = VIESService.send_request(country_code, number)
-
-                if seller_firm_id:
-                    vatin_data['business_id'] = seller_firm_id
+                vatin_data['business_id'] = seller_firm_id
 
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
 
@@ -230,17 +227,62 @@ class VATINService:
 
                 vatin_data['valid_from'] = valid_from
 
-                try:
-                    VATINService.create(vatin_data)
+                if vatin:
+                    vatin.update(vatin_data)
+                    try:
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        raise
+                else:
+                    try:
+                        VATINService.create(vatin_data)
 
-                except:
-                    db.session.rollback()
-                    error_counter += 1
+                    except:
+                        db.session.rollback()
+                        error_counter += 1
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)
 
         return response_objects
+
+    @staticmethod
+    def process_validation_request(vatin_data: VATINInterface) -> VATIN:
+        country_code_temp = vatin_data.get('country_code')
+        number_temp = vatin_data.get('number')
+
+        country_code, number = VATINService.vat_precheck(
+            country_code_temp, number_temp)
+        if not country_code or not number:
+            raise UnprocessableEntity(
+                'The submitted country code or number do not conform with the required standard.')
+
+        vatin = VATINService.get_vatin(country_code, number, date.today())
+
+        if vatin and vatin.valid:
+            return vatin
+
+        else:
+            vatin_data = VIESService.send_request(country_code, number)
+            if vatin:
+                vatin.update(vatin_data)
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    raise
+            else:
+                try:
+                    vatin = VATINService.create(vatin_data)
+                    return vatin
+
+                except:
+                    db.session.rollback()
+                    raise UnprocessableEntity('Can not create VATIN.')
+
+
+
 
     @staticmethod
     def evaluate_transaction_notification(transaction_id: int, customer_vat_check_required: bool, date: date, number: str) -> None:
@@ -338,43 +380,6 @@ class VATINService:
 
         finally:
             return response_object
-
-    @staticmethod
-    def process_validation_request(vatin_data: VATINInterface) -> VATIN:
-        country_code_temp = vatin_data.get('country_code')
-        number_temp = vatin_data.get('number')
-
-        country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
-        if not country_code or not number:
-            raise UnprocessableEntity('The submitted country code or number do not conform with the required standard.')
-
-        vatin = VATINService.get_vatin(country_code, number, date.today())
-
-        if vatin and vatin.valid:
-            return vatin
-
-        else:
-            try:
-                vatin_data = VIESService.send_request(country_code, number)
-                if vatin:
-                    vatin.update(vatin_data)
-                    try:
-                        db.session.commit()
-                    except:
-                        db.session.rollback()
-                        raise
-                else:
-                    try:
-                        vatin = VATINService.create(vatin_data)
-                        return vatin
-
-                    except:
-                        db.session.rollback()
-                        raise UnprocessableEntity('Can not create VATIN.')
-
-            except:
-                raise FailedDependency('Could not validate country code and number at the VIES database.')
-
 
 
     @staticmethod
