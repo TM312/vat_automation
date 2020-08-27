@@ -235,20 +235,18 @@ class SellerFirmService:
         else:
             raise
 
+        # if multiple files containing data for the same seller are uploaded, the same notification is used and extended in terms of tags
         seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm.id, g.user.id, datetime.utcnow(), subject='Data Upload')
-        if isinstance(seller_firm_notification, SellerFirmNotification):
-            if not tag in seller_firm_notification.tags:
-                seller_firm_notification.tags.append(tag)
-                seller_firm_notification.modify()
-                try:
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    raise
-        else:
+        if not isinstance(seller_firm_notification, SellerFirmNotification):
             seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+
+        if not tag in seller_firm_notification.tags:
             seller_firm_notification.tags.append(tag)
-            seller_firm_notification.modify()
+
+            #if the same data has been uploaded within 5 minutes it is not being considered as modified.
+            if (datetime.utcnow() - seller_firm_notification.created_on) >= timedelta(minutes=5):
+                seller_firm_notification.modify()
+
             try:
                 db.session.commit()
             except:
@@ -320,17 +318,28 @@ class SellerFirmService:
             seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code)
             if not seller_firm:
                 try:
-                    new_seller_firm = SellerFirmService.create(seller_firm_data)
-                    new_seller_firm.accounting_firms.append(g.user.employer)
+                    seller_firm = SellerFirmService.create(seller_firm_data)
+                    seller_firm.accounting_firms.append(g.user.employer)
                     db.session.commit()
 
                 except:
                     db.session.rollback()
                     error_counter += 1
-                    db.session.commit()
 
             else:
                 error_counter += 1
+
+
+        #Prepare SellerFirmNotification
+        seller_firm_notification_data = {
+            'subject': 'New Seller Firm',
+            'status': 'success',
+            'seller_firm_id': seller_firm.id,
+            'created_by': user_id
+        }
+
+        seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter)
 

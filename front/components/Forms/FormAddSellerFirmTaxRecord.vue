@@ -137,7 +137,7 @@
             ...mapState({
                 countries: state => state.country.countries,
                 sellerFirm: state => state.seller_firm.seller_firm,
-                vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(e => e.country_code)
+                vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(vatin => vatin.country_code)
             }),
 
 
@@ -158,14 +158,15 @@
             },
 
             optionsCountryCode() {
-                const countriesShortTotal = this.countries.filter(country => (country.code !== undefined && country.code !== null))
-                const countryCodesShortTotal = countriesShortTotal.map(country => country.code);
+                const countriesShortTotal = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
+                const countryCodesShortTotal = countriesShortTotal.map(country => country.vat_country_code);
                 const countryIntersection = this.getCountryIntersection(this.vatCountries, countryCodesShortTotal)
 
-                let options = countryIntersection.map(country_code => {
+                let options = countryIntersection.map(vat_country_code => {
+                    let country = countriesShortTotal.find(country => country.vat_country_code === vat_country_code)
                     let formTuple = {
-                        value: country_code,
-                        text: countriesShortTotal.find(country => country.code === country_code).name
+                        value: country.code,
+                        text: country.name
                     };
                     return formTuple;
                     })
