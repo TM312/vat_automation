@@ -1,8 +1,10 @@
 import os
+import redis
 from datetime import datetime
 from typing import List, Type
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 
 class Config(object):
@@ -12,8 +14,8 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BCRYPT_LOG_ROUNDS = 14
     COMPANY_NAME = 'Tax-Automation.com'
-    TOKEN_LIFESPAN_LOGIN = 420  # in minutes
-    TOKEN_LIFESPAN_REGISTRATION = 360  # in minutes
+    TOKEN_LIFESPAN_LOGIN = 420  # in minutes (used for Auth Token)
+    TOKEN_LIFESPAN_REGISTRATION = 360  # in minutes (used for Auth Token)
     # domain is put here for production
     FRONTEND_HOST = os.getenv('SERVER_ADDRESS')
 
@@ -29,13 +31,16 @@ class Config(object):
     EMAIL_CONFIRMATION_MAX_AGE = 3600  # 3600 #in seconds
 
     # Static Data Paths
-    BASE_PATH_SEEDS = '/home/data/seeds'
-    BASE_PATH_LOGS = '/home/data/logs'
-    BASE_PATH_TEMPLATES = '/home/data/templates'
-    BASE_PATH_DATA_SELLER_FIRM = '/home/data/seller_firm_data'
-    BASE_PATH_STATIC_DATA_SELLER_FIRM = '/home/data/seller_firm_data/static'
-    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = '/home/data/seller_firm_data/transaction'
-    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = '/home/data/seller_firm_data/tax_record'
+    datapath = '/home/data'
+
+    BASE_PATH_SEEDS = datapath + '/seeds'
+    BASE_PATH_LOGS = datapath + '/logs'
+    BASE_PATH_TEMPLATES = datapath + '/templates'
+
+    BASE_PATH_DATA_SELLER_FIRM = datapath + '/seller_firm_data'
+    BASE_PATH_STATIC_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/static'
+    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/transaction'
+    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/tax_record'
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
@@ -57,7 +62,7 @@ class Config(object):
 
     TRANSACTIONS_PER_QUERY = NOTIFICATIONS_PER_QUERY = 25
 
-    TIMESPAN_SIMILARITY = 60 #in min
+    TIMESPAN_SIMILARITY = 60 #in min (used for Notifications to decide if creating a new one or updating an existing one)
 
     # administrator list
     ADMINS = ['thomas.moellers@unisg.ch']
@@ -68,11 +73,33 @@ class Config(object):
 class Development(Config):
     DEBUG = True
     DEVELOPMENT = True
-    # structure: dialect+driver://username:password@host:port/database
+    # structure: dialect + driver       : // username  : password  @ host : port / database
     #           [DB_TYPE]+[DB_CONNECTOR]: // [USERNAME]: [PASSWORD]@[HOST]: [PORT]/[DB_NAME]
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_DEV')
     SECRET_KEY = os.getenv('SECRET_KEY_DEV')
     BCRYPT_LOG_ROUNDS = 4
+
+    # BROKER-MESSAGEQEUE CONFIG
+    CACHE_REDIS_URL = os.environ.get('SESSION_REDIS_URL')
+    SESSION_TYPE = os.environ.get('SESSION_TYPE', 'redis')
+    SESSION_REDIS_URL = redis.from_url(os.environ.get('SESSION_REDIS_URL'))
+
+    """
+    Celery Config
+    - CELERY_BROKER_URL uses `pyamqp`.
+    - CELERY_IMPORTS registers tasks.
+    - BROKER_HEARTBEAT of Celery App must be set to 0
+        so that Rabbitmq will not disconnect the connection.
+        (This issue is still opened in:
+            - https://github.com/celery/celery/issues/5037
+            - https://github.com/celery/celery/issues/5157
+            - https://github.com/celery/celery/issues/4921)
+    """
+    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+    CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
+    CELERY_IMPORTS = ('app.tasks')
+    CELERY_BROKER_HEARTBEAT = 0
+
 
 
 class Testing(Config):
@@ -83,10 +110,12 @@ class Testing(Config):
     CSRF_ENABLED = False  # only for testing config!
 
 
+
 class Staging(Config):
     DEVELOPMENT = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI_STAGE')
     SECRET_KEY = os.getenv('SECRET_KEY_STAGE')
+
 
 
 class Production(Config):

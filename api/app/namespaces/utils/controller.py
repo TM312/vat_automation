@@ -39,3 +39,15 @@ class SellerFirmNotificationResource(Resource):
     def get(self) -> List[SellerFirmNotification]:
         """Get Single TransactionInput"""
         return NotificationService.get_all_key_account_notifications()
+
+
+@ns.route("/tasks")
+class SellerFirmNotificationResource(Resource):
+    def get(self):
+        from app.tasks import long_task
+        room = request.args.get('room')
+        result = long_task.apply_async(retry=True, kwargs={"room": room})
+        current_app.logger.info(
+            "Task (id: {}, state: {}, queue: {}) is registered.".format(
+                task.task_id, task.state, task.queue))
+        return jsonify(result)
