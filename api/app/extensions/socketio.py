@@ -1,7 +1,9 @@
 from flask_socketio import (SocketIO, emit, join_room, leave_room, rooms)
 
 socket_io = SocketIO(
-    manage_session=False, cors_allowed_origins="*", logger=True,
+    manage_session=False,
+    cors_allowed_origins="*",
+    logger=True,
     engineio_logger=True)
 
 
@@ -11,14 +13,19 @@ def default_error_handler(e):
     current_app.logger.error(e)
 
 
-@socket_io.on("connect", namespace='/test')
+@socket_io.on('status', namespace='/events')
+def events_message(message):
+    emit('status', {'status': message['status']})
+
+
+@socket_io.on("connect", namespace='/events')
 def socket_connect():
     from flask import (current_app, session)
     current_app.logger.info("Client (sid: {}) connected.".format(session.sid))
     emit("message", {"status": "Connected"}, broadcast=True)
 
 
-@socket_io.on("disconnect", namespace='/test')
+@socket_io.on("disconnect", namespace='/events')
 def socket_disconnect():
     from flask import (current_app, session)
     current_app.logger.info(
@@ -26,7 +33,7 @@ def socket_disconnect():
     emit("message", {"status": "Disconnected"}, broadcast=True)
 
 
-@socket_io.on('join', namespace='/test')
+@socket_io.on('join', namespace='/events')
 def join(json):
     from flask import (current_app, session)
     room = json['room']
@@ -37,7 +44,7 @@ def join(json):
     emit("message", data)
 
 
-@socket_io.on('leave', namespace='/test')
+@socket_io.on('leave', namespace='/events')
 def leave(json):
     from flask import (current_app, session)
     current_app.logger.info("Client (sid: {}) connected".format(session.sid))
