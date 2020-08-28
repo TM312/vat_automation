@@ -15,14 +15,20 @@ RUN mkdir api && \
 ENV PYTHONDONTWRITEBYTECODE 1 && \
 	PYTHONUNBUFFERED 1
 # install system dependencies
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get update && apt-get install -y \
+	netcat \
+	gcc \
+	musl-dev \
+	curl
 
 # Install the dependencies
 COPY requirements.txt api/requirements.txt
 
 RUN pip3 install --upgrade pip && \
 	pip3 install --no-cache-dir -r api/requirements.txt && \
-	pip3 install gunicorn
+	pip3 install gunicorn && \
+	pip3 install --no-cache-dir cython
+
 
 # copy project
 WORKDIR /home/api
