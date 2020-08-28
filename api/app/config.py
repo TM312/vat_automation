@@ -81,8 +81,11 @@ class Development(Config):
 
     # BROKER-MESSAGEQEUE CONFIG
     CACHE_REDIS_URL = os.environ.get('SESSION_REDIS_URL')
+
+    # Flask Session
     SESSION_TYPE = os.environ.get('SESSION_TYPE', 'redis')
-    SESSION_REDIS_URL = redis.from_url(os.environ.get('SESSION_REDIS_URL'))
+    #https://hackingandslacking.com/managing-flask-session-variables-f4c5ccef54c0
+    SESSION_REDIS = redis.from_url(os.environ.get('SESSION_REDIS_URL'))
 
     """
     Celery Config

@@ -2,7 +2,10 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from app import create_app, create_celery
+from app import (
+    create_app,
+    create_celery
+    )
 
 env = os.getenv("FLASK_ENV")
 app = create_app(env)

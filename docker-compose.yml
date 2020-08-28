@@ -18,22 +18,22 @@ version: '3'
 
 services:
 
-    # front:
-    #     container_name: front
-    #     build:
-    #         context: ./front
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - NODE_VERSION=${NODE_VERSION}
-    #     image: ${OWNER_NAME}/front:${VERSION_NUMBER}
-    #     restart: always
-    #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-    #         - "3000"
-    #     depends_on:
-    #         - api
-    #     networks:
-    #         - web
-    #     command: "npm run start"
+    front:
+        container_name: front
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        image: ${OWNER_NAME}/front:${VERSION_NUMBER}
+        restart: always
+        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+            - "3000"
+        depends_on:
+            - api
+        networks:
+            - web
+        command: "npm run start"
 
 
 
@@ -80,6 +80,7 @@ services:
             - redis
         networks:
             - internal
+                                    #The -A option gives Celery the application module and the Celery instance
         command: bash -c "celery worker -A wsgi:celery -P gevent --concurrency=1000 --loglevel=info"
 
 
@@ -110,7 +111,7 @@ services:
         networks:
             - internal
             - web
-        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn wsgi:app --bind 0.0.0.0:5000 --timeout 180 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --worker-connections 1000 --log-level=debug" #gunicorn --bind 0.0.0.0:5000 wsgi:app"
+        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn wsgi:app --bind 0.0.0.0:5000 --timeout 180 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --worker-connections 1000 --log-level=info" #gunicorn --bind 0.0.0.0:5000 wsgi:app"
 
 
     postgres:
