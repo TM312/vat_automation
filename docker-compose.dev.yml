@@ -35,6 +35,11 @@ services:
         env_file:
             - .dev.env
 
+    flower:
+        env_file:
+            - .dev.env
+
+
 
 
 

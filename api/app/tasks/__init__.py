@@ -18,14 +18,14 @@ def long_task(self, room):
     message = ''
     total = random.randint(5, 10)
     for i in range(total):
-        if not message or random.random() < 0.25:
+        time.sleep(10)
+        if not message:
             message = '{0} {1} {2}...'.format(random.choice(verb),
                                               random.choice(adjective),
                                               random.choice(noun))
         meta = {"current": i, "total": total, "status": message, "room": room}
         self.update_state(state='PROGRESS', meta=meta)
-        socket_io.emit("message", meta, room=room, namespace='/status')
-        time.sleep(1)
+        socket_io.emit(message, meta, room=room, namespace='/status')
 
     result = {
         "current": 100,
@@ -34,5 +34,4 @@ def long_task(self, room):
         "result": 42,
         "room": room
     }
-    socket_io.emit("message", result, room=room, namespace='/status')
     return result
