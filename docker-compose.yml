@@ -41,7 +41,7 @@ services:
     # ## new
     rabbitmq:
         container_name: rabbitmq
-        image: rabbitmq:3-alpine
+        image: rabbitmq:management #3-alpine
         ports:
             - "15672:15672"
             - "5672:5672"
@@ -52,6 +52,7 @@ services:
             retries: 3
         networks:
             - internal
+            - web
 
     redis:
         container_name: redis
@@ -75,6 +76,8 @@ services:
             args:
                 - PYTHON_VERSION=${PYTHON_VERSION}
         image: celery:latest
+        ports:
+            - "5555:5555"
         depends_on:
             - rabbitmq
             - redis
@@ -82,6 +85,18 @@ services:
             - internal
                                     #The -A option gives Celery the application module and the Celery instance
         command: bash -c "celery worker -A wsgi:celery -P gevent --concurrency=1000 --loglevel=info"
+
+
+    flower:
+        # https://www.distributedpython.com/2018/10/13/flower-docker/
+        container_name: flower
+        image: mher/flower
+        ports:
+            - 8888:8888
+        depends_on:
+            - celery-worker
+        networks:
+            - internal
 
 
     # ##^#new

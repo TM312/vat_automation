@@ -60,21 +60,32 @@ class AsyncTask(Resource):
         current_app.logger.info(
             "Task (id: {}, state: {}, queue: {}) is registered.".format(
                 result.task_id, result.state, result.queue))
+
+        print('Result attributes: ', result.__dict__, flush=True)
         return {
-            "task_id": result.id
+            "task_id": result.id,
         }
 
 
 @ns.route("/status/<string:task_id>")
 class AsyncTaskStatus(Resource):
     def get(self, task_id):
-       from app.tasks import long_task
-       current_app.logger.debug("{} {}".format(
-           request.method, request.url_rule))
-       task = long_task.AsyncResult(task_id)
-       current_app.logger.info(
-           "Task (id: {}, state: {}, queue: {}) is retrieved from backend {}."
-           .format(task.task_id, task.state, task.queue, task.backend))
-       return {
-           "state": task.state
-       }
+        from app.tasks import long_task
+        current_app.logger.debug("{} {}".format(
+            request.method, request.url_rule))
+        result = long_task.AsyncResult(task_id)
+        current_app.logger.info(
+            "Task (id: {}, state: {}, queue: {}) is retrieved from backend {}."
+            .format(result.task_id, result.state, result.queue, result.backend))
+
+        if result.ready():
+            return {
+                "state": result.state,
+                "ready": result.ready(),
+                'result': result.get()
+            }
+        else:
+            return {
+                "state": result.state,
+                "ready": result.ready(),
+            }
