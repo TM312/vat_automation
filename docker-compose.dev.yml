@@ -2,6 +2,14 @@ version: '3'
 
 services:
 
+    front:
+        build:
+            context: ./front
+            dockerfile: Dockerfile.dev
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        command: "npm run dev"
+
     proxy:
         container_name: proxy
         build:
@@ -36,6 +44,9 @@ services:
             - .dev.env
 
     flower:
+        ports:
+            - 8888:8888
+
         env_file:
             - .dev.env
 

@@ -51,17 +51,16 @@ class AsyncTask(Resource):
     def get(self):
         from app.tasks import long_task
         room = request.args.get('room')
-        print('room', room, flush=True)
         try:
             result = long_task.apply_async(retry=True, kwargs={"room": room})
         except:
             raise
 
-        current_app.logger.info(
-            "Task (id: {}, state: {}, queue: {}) is registered.".format(
-                result.task_id, result.state, result.queue))
+        # current_app.logger.info(
+        #     "Task (id: {}, state: {}, queue: {}) is registered.".format(
+        #         result.task_id, result.state, result.queue))
 
-        print('Result attributes: ', result.__dict__, flush=True)
+        # print('Result attributes: ', result.__dict__, flush=True)
         return {
             "task_id": result.id,
         }

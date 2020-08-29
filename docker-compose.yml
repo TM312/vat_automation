@@ -91,8 +91,10 @@ services:
         # https://www.distributedpython.com/2018/10/13/flower-docker/
         container_name: flower
         image: mher/flower
-        ports:
-            - 8888:8888
+        expose:
+            - "8888"
+        # ports:
+        #     - 8888:8888
         depends_on:
             - celery-worker
         networks:

@@ -64,7 +64,10 @@ export default {
         '@nuxtjs/proxy',
         '@nuxtjs/auth',
         '@nuxtjs/toast',
+        // Doc: https: //github.com/richardeschloss/nuxt-socket-io
+        'nuxt-socket-io'
     ],
+
     bootstrapVue: {
         icons: true,
     },
@@ -82,29 +85,9 @@ export default {
         https: false,
         withCredentials: true,
     },
+
     auth: {
         strategies: {
-            // local_seller: {
-            //     _scheme: 'local',
-            //     endpoints: {
-            //         login: {
-            //             url: '/auth/login',
-            //             method: 'post',
-            //             propertyName: 'token',
-            //         },
-            //         logout: {
-            //             url: '/auth/logout',
-            //             method: 'post',
-            //         },
-            //         user: {
-            //             url: 'user/seller/self',
-            //             method: 'get',
-            //             propertyName: 'data',
-            //         },
-            //     },
-            //     tokenRequired: true,
-            //     tokenType: '',
-            // },
             local_tax_auditor: {
                 _scheme: 'local',
                 endpoints: {
@@ -140,6 +123,7 @@ export default {
             }
         }
     },
+
     toast: {
         register: [
             // Register custom toasts
@@ -156,6 +140,18 @@ export default {
         ],
     },
 
+    // https://medium.com/javascript-in-plain-english/introduction-to-nuxt-socket-io-b78c5322d389
+    io: {
+        sockets: [{
+            name: 'home',
+            url: 'http://127.0.0.1', // nginx reroutes to api
+            default: true,
+            vuex: {
+                mutations: [{ progress: 'status/SET_PROGRESS' }]
+            }
+        }]
+    },
+
     /*
      ** Build configuration
      */
@@ -170,9 +166,9 @@ export default {
         /*
          ** You can extend webpack config here
          */
-        /* ESLint will run on save during npm run dev */
         extend(config, ctx) {
             // Run ESLint on save
+            /* ESLint will run on save during npm run dev */
             if (ctx.isDev && ctx.isClient) {
                 config.module.rules.push({
                     enforce: 'pre',
