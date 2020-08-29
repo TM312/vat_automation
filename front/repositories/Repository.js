@@ -21,6 +21,7 @@ import TransactionInputRepository from './TransactionInputRepository'
 import UserRepository from './UserRepository'
 import AdminRepository from './AdminRepository'
 import SellerRepository from './SellerRepository'
+import StatusRepository from './StatusRepository' //!!
 import TaxAuditorRepository from './TaxAuditorRepository'
 import UtilsRepository from './UtilsRepository'
 
@@ -48,6 +49,7 @@ export default ($axios) => ({
     user: UserRepository($axios),
     admin: AdminRepository($axios),
     seller: SellerRepository($axios),
+    status: StatusRepository($axios), //!!
     tax_auditor: TaxAuditorRepository($axios),
     utils: UtilsRepository($axios)
 })

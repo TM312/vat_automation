@@ -12,26 +12,27 @@ def long_task(self, room):
     reports (Retrieved from https://blog.miguelgrinberg.com/post/using-celery-with-flask).
     """
 
-    verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
-    adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
-    noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter', 'bit']
-    message = ''
+    message = 'here comes the message'
     total = random.randint(5, 10)
     for i in range(total):
-        time.sleep(10)
-        if not message:
-            message = '{0} {1} {2}...'.format(random.choice(verb),
-                                              random.choice(adjective),
-                                              random.choice(noun))
-        meta = {"current": i, "total": total, "status": message, "room": room}
+        time.sleep(2)
+        meta = {"current": i, "total": total, "status": message, 'result': 'pending...', "room": room}
         self.update_state(state='PROGRESS', meta=meta)
-        socket_io.emit(message, meta, room=room, namespace='/status')
+
+        socket_io.emit(
+            'message',
+            meta,
+            room=room,
+            namespace='/status'
+        )
 
     result = {
         "current": 100,
         "total": 100,
         "status": "Task completed!",
-        "result": 42,
+        "result": '42',
         "room": room
     }
+    socket_io.emit('message', result, room=room, namespace='/status')
+
     return result
