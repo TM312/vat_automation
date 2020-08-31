@@ -5,6 +5,7 @@ from app.extensions import db
 from flask import current_app, g
 
 from .model import TaxAuditor
+from .interface import TaxAuditorInterface
 
 
 
@@ -23,42 +24,20 @@ class TaxAuditorService:
 
 
     @staticmethod
-    def create_self(tax_auditor_data) -> TaxAuditor:
-        tax_auditor = TaxAuditor.query.filter_by(email=tax_auditor_data.get('email')).first()
-        if not tax_auditor:
-            #create new tax_auditor based on TaxAuditor model
-            new_tax_auditor = TaxAuditor(
-                email=tax_auditor_data.get('email'),
-                password=tax_auditor_data.get('password'),
-                employer_id=accounting_firm.id,
-                role='employee'
-            )
+    def create(tax_auditor_data: TaxAuditorInterface) -> TaxAuditor:
+        new_tax_auditor = TaxAuditor(
+            name = tax_auditor_data.get('name'),
+            email = tax_auditor_data.get('email'),
+            employer_id = tax_auditor_data.get('employer_id'),
+            role = tax_auditor_data.get('role'),
+            password = tax_auditor_data.get('password'),
+            location = tax_auditor_data.get('location')
+        )
 
-            db.session.add(new_tax_auditor)
-            db.session.commit()
+        db.session.add(new_tax_auditor)
+        db.session.commit()
 
-            response_object = {
-                'status': 'success',
-                'message': 'Successfully registered.'
-            }
-
-            # """ Send Confirmation Email to tax_auditor email """
-            # confirmation_link = EmailService.generate_confirmation_url(new_tax_auditor.email)
-            # print(confirmation_link)
-            # EmailService.send_email(
-            #     subject='Registration',
-            #     recipients = [new_tax_auditor.email],
-            #     template='email_confirmation.html',
-            #     confirmation_link=confirmation_link,
-            # )
-
-            return response_object
-        else:
-            response_object = {
-                'status': 'error',
-                'message': 'A tax_auditor with the this email address already exists. Try logging in instead.'.format(public_id)
-            }
-            return response_object
+        return new_tax_auditor
 
     @staticmethod
     def update(tax_auditor_id: int, data_changes) -> TaxAuditor:

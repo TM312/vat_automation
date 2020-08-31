@@ -56,16 +56,52 @@ services:
 
     redis:
         container_name: redis
-        image: redis:5-alpine
+        build:
+            context: ./redis
+            dockerfile: Dockerfile
+            args:
+                - REDIS_VERSION=${REDIS_VERSION}
         ports:
             - "6379:6379"
+        depends_on:
+            - helper
         healthcheck:
             test: ['CMD', 'redis-cli', 'ping']
             interval: 30s
             timeout: 15s
             retries: 3
         networks:
+            - web
             - internal
+        sysctls:
+            - net.core.somaxconn=511
+
+    helper:
+        container_name: helper
+        image: alpine
+        command: sh -c "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+        privileged: true
+
+
+
+    celery-beat:
+        container_name: celery-beat
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+        ports:
+            - "6013:6013"
+        depends_on:
+            - postgres
+            - rabbitmq
+            - redis
+            # - celery-worker
+        networks:
+            - internal
+                                    #The -A option gives Celery the application module and the Celery instance
+        command: bash -c "celery beat -A wsgi:celery --loglevel=info"
 
 
     celery-worker:
@@ -75,10 +111,10 @@ services:
             dockerfile: Dockerfile
             args:
                 - PYTHON_VERSION=${PYTHON_VERSION}
-        image: celery:latest
         ports:
             - "5555:5555"
         depends_on:
+            - postgres
             - rabbitmq
             - redis
         networks:

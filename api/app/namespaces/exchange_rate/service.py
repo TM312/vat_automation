@@ -156,5 +156,4 @@ class ExchangeRateService:
         for cube in root.findall('.//ex:Cube[@currency]', namespaces=namespaces):
             # data is added to dict
             exchange_rate_dict[str(cube.attrib['currency'])] = cube.attrib['rate']
-        #daily_rate_dict['Date'] = datetime.date.today().strftime("%d.%m.%y")
         return exchange_rate_dict
