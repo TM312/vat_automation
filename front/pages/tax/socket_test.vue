@@ -2,7 +2,7 @@
     <b-container>
         <h1>Socket Status Component</h1>
         <hr>
-        <h1>Progress: {{ progress }} </h1>
+        <h1>Progress: {{ parseInt(result.current / result.total * 100) }}% </h1>
         <b-button
             @click="getLongTask"
             variant="outline-primary"

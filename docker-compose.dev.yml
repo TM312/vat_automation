@@ -39,7 +39,15 @@ services:
         env_file:
             - .dev.env
 
+    redis:
+        env_file:
+            - .dev.env
+
     celery-worker:
+        env_file:
+            - .dev.env
+
+    celery-beat:
         env_file:
             - .dev.env
 

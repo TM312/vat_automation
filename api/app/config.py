@@ -1,13 +1,28 @@
 import os
 import redis
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Type
+from celery.schedules import crontab
+
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+# Create Celery beat schedule:
+# celery_schedule = {
+#     'new_users': {
+#         'task': 'app.tasks.periodic.new_users',
+#         'schedule': timedelta(seconds=10),
+#     },
+#     # 'schedule-name': {
+#     #     'task': 'app.tasks.periodic.periodic_task',
+#     #     'schedule': timedelta(seconds=5),
+#     # },
+# }
 
 
 class Config(object):
+
     DEBUG = True
     TESTING = False
     CSRF_ENABLED = True
@@ -100,8 +115,11 @@ class Development(Config):
     """
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
     CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
-    CELERY_IMPORTS = ('app.tasks')
+    CELERY_IMPORTS = ('app.tasks.asyncr', 'app.tasks.periodic')
     CELERY_BROKER_HEARTBEAT = 0
+
+    # CELERYBEAT_SCHEDULE = celery_schedule
+
 
 
 
