@@ -20,13 +20,6 @@ def events_message(message):
 
 @socket_io.on("connect", namespace='/events')
 def socket_connect():
-    print("", flush=True)
-    print("", flush=True)
-    print("", flush=True)
-    print('The client just connected', flush=True)
-    print("", flush=True)
-    print("", flush=True)
-    print("", flush=True)
     from flask import (current_app, session)
     current_app.logger.info("Client (sid: {}) connected.".format(session.sid))
     emit("message", {"status": "There is a connection..."}, broadcast=True)

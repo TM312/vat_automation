@@ -70,10 +70,10 @@ class DistanceSaleResource(Resource):
         return AccountService.process_single_submit(seller_firm_public_id, account_data=request.json)
 
 
-@ns.route("/csv")
-class AccountInformationResource(Resource):
-    @login_required
-    # @confirmation_required
-    def post(self):
-        account_information_files: List[BinaryIO] = request.files.getlist("files")
-        return AccountService.process_account_files_upload(account_information_files)
+# @ns.route("/csv")
+# class AccountInformationResource(Resource):
+#     @login_required
+#     # @confirmation_required
+#     def post(self):
+#         account_information_files: List[BinaryIO] = request.files.getlist("files")
+#         return AccountService.process_account_files_upload(account_information_files)

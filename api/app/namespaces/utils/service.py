@@ -88,6 +88,35 @@ class NotificationService:
 
 
     @staticmethod
+    def handle_seller_firm_notification_data_upload(seller_firm_id: int, user_id: int, tag: str, seller_firm_notification_data: SellerFirmNotificationInterface) -> None:
+        # if multiple files containing data for the same seller are uploaded, the same notification is used and extended in terms of tags
+        seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm_id, user_id, datetime.utcnow(), subject='Data Upload')
+        if not isinstance(seller_firm_notification, SellerFirmNotification):
+            seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+
+        if not tag in seller_firm_notification.tags:
+            seller_firm_notification.tags.append(tag)
+
+            #if the same data has been uploaded within 5 minutes it is not being considered as modified.
+            if (datetime.utcnow() - seller_firm_notification.created_on) >= timedelta(minutes=5):
+                seller_firm_notification.modify()
+
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
+
+
+
+
+
+
+
+
+
+    @staticmethod
     def get_by_transaction_input_id_status(transaction_input_id: int, status: str) -> List[TransactionNotification]:
         return TransactionNotification.query.filter_by(transaction_input_id=transaction_input_id).all()
 
@@ -122,6 +151,24 @@ class NotificationService:
 
 
         return new_notification
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

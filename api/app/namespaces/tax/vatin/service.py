@@ -17,6 +17,7 @@ from .interface import VATINInterface
 
 from ...transaction_input import TransactionInput
 from ...utils.service import InputService, NotificationService
+from ...tag.service import TagService
 
 
 
@@ -176,7 +177,15 @@ class VATINService:
         return response_object
 
 
-    # celery task !!
+    @staticmethod
+    def handle_vatin_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
+        response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm_id)
+        tag = TagService.get_by_code('VAT_NUMBER')
+        NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
+
+        return response_object
+
+
     @staticmethod
     def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, seller_firm_id: int) -> List[Dict]:
 

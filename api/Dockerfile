@@ -1,6 +1,13 @@
 ARG PYTHON_VERSION
+# ARG USER_ID
+# ARG GROUP_ID
+
 # Defining the base image
 FROM python:$PYTHON_VERSION
+
+# RUN echo "The User ID is really: $USER_ID"
+# RUN echo "The Group ID is really: $GROUP_ID"
+# RUN echo "The PYTHON_VERSION is really: $PYTHON_VERSION"
 
 # Set maintainer
 LABEL maintainer="Thomas Moellers <thomas.moellers@unisg.ch>"
@@ -47,3 +54,7 @@ WORKDIR /home/api
 
 # Add wait-for-it
 RUN chmod +x wait-for-it.sh
+
+# RUN addgroup --gid 1237 tm
+# RUN adduser --disabled-password --gecos '' --uid 10239 --gid 1237 tm
+# USER tm

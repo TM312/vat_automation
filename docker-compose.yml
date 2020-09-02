@@ -83,6 +83,29 @@ services:
         privileged: true
 
 
+    celery-worker:
+        # container_name: celery-worker
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+                # - GROUP_ID=1237
+                # - USER_ID=10239
+
+        volumes:
+            - seller_firm_data:/home/data/seller_firm_data
+
+        depends_on:
+            - postgres
+            - rabbitmq
+            - redis
+        networks:
+            - internal
+                                    #The -A option gives Celery the application module and the Celery instance
+                                    # https://stackoverflow.com/questions/59651428/runtimewarningyoure-running-the-worker-with-superuser-privilegesthis-is-absol
+        command: bash -c "celery worker -A wsgi:celery -P gevent --concurrency=20 --loglevel=info"
+
 
     celery-beat:
         container_name: celery-beat
@@ -91,36 +114,19 @@ services:
             dockerfile: Dockerfile
             args:
                 - PYTHON_VERSION=${PYTHON_VERSION}
-        ports:
-            - "6013:6013"
+                # - GROUP_ID=${GROUP_ID}
+                # - USER_ID=${USER_ID}
+
         depends_on:
             - postgres
             - rabbitmq
             - redis
-            # - celery-worker
+            - celery-worker
         networks:
             - internal
                                     #The -A option gives Celery the application module and the Celery instance
         command: bash -c "celery beat -A wsgi:celery --loglevel=info"
 
-
-    celery-worker:
-        container_name: celery-worker
-        build:
-            context: ./api
-            dockerfile: Dockerfile
-            args:
-                - PYTHON_VERSION=${PYTHON_VERSION}
-        ports:
-            - "5555:5555"
-        depends_on:
-            - postgres
-            - rabbitmq
-            - redis
-        networks:
-            - internal
-                                    #The -A option gives Celery the application module and the Celery instance
-        command: bash -c "celery worker -A wsgi:celery -P gevent --concurrency=1000 --loglevel=info"
 
 
     flower:
@@ -147,6 +153,8 @@ services:
             dockerfile: Dockerfile
             args:
                 - PYTHON_VERSION=${PYTHON_VERSION}
+                # - GROUP_ID=${GROUP_ID}
+                # - USER_ID=${USER_ID}
         image: ${OWNER_NAME}/api:${VERSION_NUMBER}
         restart: always
         expose:
@@ -157,10 +165,10 @@ services:
             - redis #new
             - celery-worker #new
         volumes:
-            - logs:/logs
-            - seeds:/seeds
-            - templates:/templates
-            - seller_firm_data:/seller_firm_data
+            - logs:/home/data/logs
+            - seeds:/home/data/seeds
+            - templates:/home/data/templates
+            - seller_firm_data:/home/data/seller_firm_data
         networks:
             - internal
             - web
