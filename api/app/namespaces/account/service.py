@@ -6,6 +6,8 @@ import pandas as pd
 from . import Account
 from .interface import AccountInterface
 from ..utils.service import InputService
+from ..tag.service import TagService
+from ..utils.service import NotificationService
 
 
 
@@ -30,7 +32,6 @@ class AccountService:
         if account:
             return account
         else:
-            print("Function: AccountService -> get_by_given_id_channel_code", flush=True)
             raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
 
 
@@ -110,33 +111,41 @@ class AccountService:
 
 
 
+    # @staticmethod
+    # def process_account_files_upload(account_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
+    #     from ..business.seller_firm.service import SellerFirmService
+
+    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+
+    #     file_type = 'account_list'
+    #     df_encoding = 'utf-8'
+    #     delimiter = ';'
+    #     basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
+    #     user_id = g.user.id
+    #     seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+
+    #     for file in account_information_files:
+    #         file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
+    #         AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
+
+    #     response_object = {
+    #         'status': 'success',
+    #         'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(account_information_files)))
+    #     }
+
+    #     return response_object
+
+
     @staticmethod
-    def process_account_files_upload(account_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
-        from ..business.seller_firm.service import SellerFirmService
-
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
-
-        file_type = 'account_list'
-        df_encoding = 'utf-8'
-        delimiter = ';'
-        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
-        user_id = g.user.id
-        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
-
-        for file in account_information_files:
-            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-
-        response_object = {
-            'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(account_information_files)))
-        }
+    def handle_account_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
+        response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id)
+        tag = TagService.get_by_code('ACCOUNT')
+        NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
 
         return response_object
 
 
 
-    # celery task !!
     @staticmethod
     def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 

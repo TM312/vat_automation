@@ -170,90 +170,104 @@ class SellerFirmService:
 
     @staticmethod
     def process_data_upload(seller_firm_public_id, file: BinaryIO):
+
+        """
+        This function is the main entry point for any file uploaded that relate to a seller firm's data,
+        i.e. account data,
+            item data,
+            distance sale data,
+            vat numbers,
+            transaction reports
+
+        The processing of these functions is handled asynchronously as a celery task.
+
+        A SellerFirmNotification is created/updated in the course of processing.
+
+        """
         DATA_ALLOWED_EXTENSIONS = current_app.config['DATA_ALLOWED_EXTENSIONS']
         BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
         user_id = g.user.id
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        seller_firm_id = seller_firm.id
 
-        # for file in seller_firm_files:
+        # each file is initially stored in a temp folder and undergoes sanitizing
         file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
 
+        # setting vars
         df_encoding = 'utf-8'
         delimiter = ';' if InputService.infer_delimiter(file_path_tbd) != '\t' else '\t'
         df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
         file_type = InputService.determine_file_type(df)
         data_type = InputService.determine_data_type(file_type)
 
-        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
-
         #Prepare SellerFirmNotification
         seller_firm_notification_data = {
             'subject': 'Data Upload',
             'status': 'success',
-            'seller_firm_id': seller_firm.id,
+            'seller_firm_id': seller_firm_id,
             'created_by': user_id
         }
+
+
+        # processing starts here
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 
         if data_type == 'static':
             basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
 
             if file_type == 'account_list':
-                from ...account.service import AccountService
-                response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                tag = TagService.get_by_code('ACCOUNT')
+                from app.tasks.asyncr import async_handle_account_data_upload
+
+                response_object = async_handle_account_data_upload.apply_async(
+                    retry=True,
+                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                    )
+
+                # response_object = { 'status':'success'}
 
             elif file_type == 'distance_sale_list':
-                from ...distance_sale.service import DistanceSaleService
-                response_object = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                tag = TagService.get_by_code('DISTANCE_SALE')
+                from app.tasks.asyncr import async_handle_distance_sale_data_upload
+                response_object = async_handle_distance_sale_data_upload.apply_async(
+                    retry=True,
+                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                    )
 
             elif file_type == 'item_list':
-                from ...item.service import ItemService
-                response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-                tag = TagService.get_by_code('ITEM')
+                from app.tasks.asyncr import async_handle_item_data_upload
+                response_object = async_handle_item_data_upload.apply_async(
+                    retry=True,
+                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                    )
 
             elif file_type == 'vat_numbers':
-                from ...tax.vatin.service import VATINService
-                response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
-                tag = TagService.get_by_code('VAT_NUMBER')
+                from app.tasks.asyncr import async_handle_vatin_data_upload
+                response_object = async_handle_vatin_data_upload.apply_async(
+                    retry=True,
+                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                    )
+
+
 
         elif data_type == 'recurring':
             basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
 
             if file_type == 'transactions_amazon':
-
-                from ...transaction_input.service import TransactionInputService
-                try:
-                    response_object = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
-                except:
-                    db.session.rollback()
-                    raise
-                tag = TagService.get_by_code('TRANSACTION')
-
+                from app.tasks.asyncr import async_handle_transaction_input_data_upload
+                response_object = async_handle_transaction_input_data_upload.apply_async(
+                    retry=True,
+                    args=[file_path_in, file_type, df_encoding, delimiter, basepath,
+                          user_id, seller_firm_id, seller_firm_notification_data]
+                )
 
         else:
+            current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} ({})'.format(g.user.name, user_id))
             raise
 
-        # if multiple files containing data for the same seller are uploaded, the same notification is used and extended in terms of tags
-        seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm.id, g.user.id, datetime.utcnow(), subject='Data Upload')
-        if not isinstance(seller_firm_notification, SellerFirmNotification):
-            seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
 
-        if not tag in seller_firm_notification.tags:
-            seller_firm_notification.tags.append(tag)
-
-            #if the same data has been uploaded within 5 minutes it is not being considered as modified.
-            if (datetime.utcnow() - seller_firm_notification.created_on) >= timedelta(minutes=5):
-                seller_firm_notification.modify()
-
-            try:
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-
-        return response_object
+        return {
+            "task_id": response_object.id,
+        }
 
 
     @staticmethod

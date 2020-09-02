@@ -11,7 +11,8 @@ from . import TransactionInput
 from .interface import TransactionInputInterface
 
 from ..account import Account
-from ..utils.service import InputService
+from ..utils.service import InputService, NotificationService
+from ..tag.service import TagService
 
 
 
@@ -166,8 +167,15 @@ class TransactionInputService:
         return response_object
 
 
+    @staticmethod
+    def handle_transaction_input_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
+        response_object = TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
+        tag = TagService.get_by_code('TRANSACTION')
+        NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
 
-    # celery task !!
+        return response_object
+
+
     @staticmethod
     def process_transaction_input_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int) -> List[Dict]:
 

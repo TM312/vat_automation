@@ -7,8 +7,8 @@ from app.extensions import db
 
 from . import DistanceSale
 from .interface import DistanceSaleInterface
-from ..utils.service import InputService
-
+from ..utils.service import InputService, NotificationService
+from ..tag.service import TagService
 
 
 
@@ -117,8 +117,17 @@ class DistanceSaleService:
         return response_object
 
 
+    @staticmethod
+    def handle_distance_sale_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
+        response_object = DistanceSaleService.process_distance_sale_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id)
+        tag = TagService.get_by_code('DISTANCE_SALE')
+        NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
 
-    # celery task !!
+        return response_object
+
+
+
+
     @staticmethod
     def process_distance_sale_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 

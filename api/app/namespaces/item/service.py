@@ -13,6 +13,7 @@ from .interface import ItemInterface
 from ..account import Account
 from ..utils.service import InputService, NotificationService
 from ..transaction_input import TransactionInput
+from ..tag.service import TagService
 
 
 
@@ -190,6 +191,15 @@ class ItemService:
             'status': 'success',
             'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(item_information_files)))
         }
+
+        return response_object
+
+
+    @staticmethod
+    def handle_item_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
+        response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id)
+        tag = TagService.get_by_code('ITEM')
+        NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
 
         return response_object
 
