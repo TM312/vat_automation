@@ -1,7 +1,6 @@
 <template>
     <b-card
-        :bg-variant="cardBgVariant"
-        :text-variant="cardTextVariant"
+        :border-variant="cardBorderVariant"
     >
         <b-card-text>
             <p v-if="notification.subject === 'Data Upload'">
@@ -53,13 +52,13 @@
         },
 
         computed: {
-            cardBgVariant() {
+            cardBorderVariant() {
                 return this.notification.subject === 'New Seller Firm' ? 'primary' : ''
             },
 
-            cardTextVariant() {
-                return this.notification.subject === 'New Seller Firm' ? 'white' : ''
-            }
+            // cardTextVariant() {
+            //     return this.notification.subject === 'New Seller Firm' ? 'white' : ''
+            // }
 
         },
 

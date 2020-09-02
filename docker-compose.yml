@@ -42,6 +42,7 @@ services:
     rabbitmq:
         container_name: rabbitmq
         image: rabbitmq:management #3-alpine
+
         ports:
             - "15672:15672"
             - "5672:5672"
@@ -102,10 +103,15 @@ services:
             - redis
         networks:
             - internal
-                                    #The -A option gives Celery the application module and the Celery instance
-                                    # https://stackoverflow.com/questions/59651428/runtimewarningyoure-running-the-worker-with-superuser-privilegesthis-is-absol
-        command: bash -c "celery worker -A wsgi:celery -P gevent --concurrency=20 --loglevel=info"
 
+        #The -A option gives Celery the application module and the Celery instance
+        # https://stackoverflow.com/questions/59651428/runtimewarningyoure-running-the-worker-with-superuser-privilegesthis-is-absol
+        # Celery 4 has nasty, very hard to find bug in worker.
+        # It works only with 4 defined queues after -Q parameter. If you need more queues, just start more workers.
+        # reference: https://pawelzny.com/python/celery/2017/08/14/celery-4-tasks-best-practices/
+        command: bash -c "celery worker -A wsgi:celery -P gevent --loglevel=info" #-Q default,low_priority,high_priority" !!!
+
+        # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
 
     celery-beat:
         container_name: celery-beat

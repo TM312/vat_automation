@@ -83,9 +83,29 @@ def create_celery(app):
     celery = Celery(app.import_name,
                     broker=app.config.CELERY_BROKER_URL,
                     backend=app.config.CELERY_RESULT_BACKEND)
+
+    # https://pawelzny.com/python/celery/2017/08/07/must-have-celery-4-configuration/
+    #celery.autodiscover_tasks()
+
     # celery.conf.update(app.config)
-    celery.conf.CELERY_IMPORTS = app.config.CELERY_IMPORTS
-    celery.conf.BROKER_HEARTBEAT = app.config.CELERY_BROKER_HEARTBEAT
+    celery.conf.imports = app.config.CELERY_IMPORTS
+    celery.conf.broker_heartbeat = app.config.CELERY_BROKER_HEARTBEAT
+
+    # # To avoid painful upgrade set serializer explicitly in configurations.
+    # # reference: https://pawelzny.com/python/celery/2017/08/07/must-have-celery-4-configuration/
+    celery.conf.task_serializer = 'json'
+    celery.conf.result_serializer = 'json'
+    celery.conf.accept_content = ['json']
+
+    # # I prefer not to create Queues and Exchange manually. I delegate this job to Celery. I found that dynamically created queues works as well as defined manually.
+    # # reference: https://pawelzny.com/python/celery/2017/08/07/must-have-celery-4-configuration/
+    #  celery.conf.task_create_missing_queues = True !!!
+
+    # # tells workers how many tasks it can reserve for itself. If applications has many very long run processes this option should be set to 1. If tasks are quick and not consumes much resources this option may be bigger. Default value is 4. Zero value means “reserve as many tasks as you want”.
+    # # reference: https://pawelzny.com/python/celery/2017/08/07/must-have-celery-4-configuration/
+    celery.conf.worker_prefetch_multiplier = 1
+
+
 
     class ContextTask(celery.Task):
         def __call__(self, *args, **kwargs):
