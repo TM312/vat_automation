@@ -41,9 +41,6 @@ class TransactionInputService:
             per_page = current_app.config['TRANSACTIONS_PER_QUERY']
             page = kwargs.get('page')
             transaction_inputs = base_query.paginate(page, per_page, False).items
-            print('TransactionInputService -> get_by_seller_firm -> per_page:', per_page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> page:', page, flush=True)
-            print('TransactionInputService -> get_by_seller_firm -> transaction_inputs:', transaction_inputs, flush=True)
 
         else:
             transaction_inputs = base_query.all()

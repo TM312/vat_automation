@@ -44,6 +44,10 @@ class VATINService:
         return VATIN.query.filter(VATIN.country_code == country_code, VATIN.business_id == business_id).first()
 
     @staticmethod
+    def get_unvalidated(limit: int) -> List[VATIN]:
+        return VATIN.query.filter_by(valid=None).limit(limit).all()
+
+    @staticmethod
     def update(vatin_id: int, data_changes: VATINInterface) -> VATIN:
         vatin = VATINService.get_by_id(vatin_id)
         vatin.update(data_changes)
@@ -255,6 +259,8 @@ class VATINService:
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)
 
         return response_objects
+
+
 
     @staticmethod
     def process_validation_request(vatin_data: VATINInterface) -> VATIN:
