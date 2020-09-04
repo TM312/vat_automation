@@ -66,8 +66,10 @@
         },
 
         async fetch() {
-            const { store } = this.$nuxt.context;
-            await store.dispatch("channel/get_all");
+            if (this.channels.length == 0) {
+                const { store } = this.$nuxt.context;
+                await store.dispatch("channel/get_all");
+            }
         },
 
         computed: {

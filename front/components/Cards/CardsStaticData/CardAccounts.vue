@@ -58,6 +58,7 @@
 
         data() {
             return {
+                message: '',
                 editMode: false,
                 flashCounter: false,
 
@@ -74,9 +75,6 @@
                 seller_firm: state => state.seller_firm.seller_firm,
             }),
 
-            // countAccounts() {
-            //         return this.$store.getters['seller_firm/countAccounts']
-            // },
 
             cardBorder() {
                 return this.editMode ? "info" : "";

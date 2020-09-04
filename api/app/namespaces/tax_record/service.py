@@ -66,27 +66,27 @@ class TaxRecordService:
 
 
 
-    @staticmethod
-    def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> Dict:
-        from ..business.seller_firm import SellerFirm
-        BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
+    # @staticmethod
+    # def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> Dict:
+    #     from ..business.seller_firm import SellerFirm
+    #     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
 
-        seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
-        if g.user.employer in seller_firm.accounting_firms:
-            user_id = g.user.id
+    #     seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
+    #     if g.user.employer in seller_firm.accounting_firms:
+    #         user_id = g.user.id
 
-            #!!! call as async celery task
-            TaxRecordService.save_as_file(start_date_str, end_date_str, seller_firm_public_id, BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, user_id, tax_jurisdiction_code)
+    #         #!!! call as async celery task
+    #         TaxRecordService.save_as_file(start_date_str, end_date_str, seller_firm_public_id, BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, user_id, tax_jurisdiction_code)
 
 
-            response_object = {
-                'status': 'success',
-                'message': 'A tax record for the period {}-{} is being generated.'.format(start_date_str, end_date_str)
-            }
-            return response_object
+    #         response_object = {
+    #             'status': 'success',
+    #             'message': 'A tax record for the period {}-{} is being generated.'.format(start_date_str, end_date_str)
+    #         }
+    #         return response_object
 
-        else:
-            raise Unauthorized('You are not authorized to retrieve tax records for this seller firm. Please make sure to establish a client relationship between your employer and the seller firm first.')
+    #     else:
+    #         raise Unauthorized('You are not authorized to retrieve tax records for this seller firm. Please make sure to establish a client relationship between your employer and the seller firm first.')
 
 
 

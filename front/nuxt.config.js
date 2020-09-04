@@ -212,7 +212,11 @@ export default {
             url: 'http://127.0.0.1', // nginx reroutes to api
             default: true,
             vuex: {
-                mutations: [{ progress: 'status/SET_PROGRESS' }]
+                mutations: [
+                    { status: 'status/SET_STATUS' },
+                    { new_account: 'seller_firm/PUSH_ACCOUNT' },
+                    { new_item: 'seller_firm/PUSH_ITEM' }
+                ]
             }
         }]
     },

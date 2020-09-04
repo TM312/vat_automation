@@ -50,6 +50,10 @@
                 await store.dispatch("tax_treatment/get_all")
             }
 
+            if (this.channels.length == 0) {
+                await store.dispatch("channel/get_all");
+            }
+
             await store.dispatch("utils/get_all_key_account_notifications");
         },
 
@@ -61,6 +65,7 @@
 
          computed: {
             ...mapState({
+                channels: state => state.channel.channels,
                 countries: state => state.country.countries,
                 currencies: state => state.currency.currencies,
                 taxTreatments: state => state.tax_treatment.tax_treatments,
