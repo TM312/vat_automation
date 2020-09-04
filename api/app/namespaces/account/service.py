@@ -1,13 +1,25 @@
-from flask import g, current_app
-from app.extensions import db
-from typing import List, BinaryIO, Dict
+from typing import (
+    List,
+    BinaryIO,
+    Dict)
+
 import pandas as pd
+
+
+from flask import g, current_app
+from app.extensions import (
+    db,
+    socket_io)
+
+from app.extensions.socketio.emitters import SocketService
 
 from . import Account
 from .interface import AccountInterface
 from ..utils.service import InputService
 from ..tag.service import TagService
 from ..utils.service import NotificationService
+
+
 
 
 
@@ -190,6 +202,32 @@ class AccountService:
                 db.session.rollback()
 
                 error_counter += 1
+
+            metaStatus = {
+                "current": i+1,
+                "total": total_number_accounts,
+                'object': 'account',
+                'title': 'New accounts are being created...',
+            }
+
+            SocketService.emit_status(meta=metaStatus)
+
+
+            metaAccount = {
+                'public_id': str(new_account.public_id),
+                'given_id': new_account.given_id,
+                'channel_code': new_account.channel_code
+            }
+
+            SocketService.emit_new_account(meta=metaAccount)
+
+        metaStatus = {
+            "current": i+1,
+            "total": total_number_accounts,
+            'object': 'account',
+            'title': '{} accounts have been successfully created.'.format(total_number_accounts)
+        }
+        SocketService.emit_status(meta=metaStatus)
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_accounts, error_counter, redundancy_counter=redundancy_counter)

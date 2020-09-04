@@ -1,10 +1,5 @@
-from flask_socketio import (SocketIO, emit, join_room, leave_room, rooms)
-
-socket_io = SocketIO(
-    manage_session=False,
-    cors_allowed_origins="*",
-    logger=True,
-    engineio_logger=True)
+from flask_socketio import (emit, join_room, leave_room, rooms)
+from app.extensions import socket_io
 
 
 @socket_io.on_error_default

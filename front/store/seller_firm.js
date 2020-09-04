@@ -8,21 +8,21 @@ export const mutations = {
     SET_SELLER_FIRMS(state, seller_firms) {
         state.seller_firms = seller_firms
     },
+
     SET_SELLER_FIRM(state, seller_firm) {
         state.seller_firm = seller_firm
+    },
+
+    PUSH_ACCOUNT(state, account) {
+        if (state.seller_firm.accounts.includes(account) === false) state.seller_firm.accounts.push(account)
+    },
+
+    PUSH_ITEM(state, item) {
+        if (state.seller_firm.items.includes(item) === false) state.seller_firm.items.push(item)
     }
 }
 
 export const getters = {
-    // countEmployees: state => state.seller_firm.employees.length,
-    countAccounts: state => state.seller_firm.accounts.length,
-    // countDistanceSales: state => state.seller_firm.distance_sales.length,
-    countItems: state => state.seller_firm.len_items, //!!! does this work?
-    countVatNumbers: state => state.seller_firm.vat_numbers.length,
-    //countTransactionInputsSellerFirm: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
-    // publicId: state => state.seller_firm.public_id,
-    // transactionInputs: state => state.seller_firm.accounts.map(account => account.transaction_inputs),
-    // transactions: state => state.seller_firm.accounts.map(account => account.transactions)
     accountTransactionInputs: state => channelCode => {
         return state.seller_firm.accounts.filter(account => account.channel_code === channelCode).transaction_inputs
     }

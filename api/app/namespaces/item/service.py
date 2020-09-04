@@ -5,7 +5,9 @@ import pandas as pd
 
 from flask import g, current_app
 from werkzeug.exceptions import NotFound, UnsupportedMediaType
-from app.extensions import db
+from app.extensions import (
+    db,
+    socket_io)
 
 from . import Item
 from .interface import ItemInterface
@@ -14,6 +16,8 @@ from ..account import Account
 from ..utils.service import InputService, NotificationService
 from ..transaction_input import TransactionInput
 from ..tag.service import TagService
+
+from app.extensions.socketio.emitters import SocketService
 
 
 
@@ -287,8 +291,41 @@ class ItemService:
 
                     error_counter += 1
 
+                metaStatus = {
+                    "current": i+1,
+                    "total": total_number_items,
+                    'object': 'item',
+                    'title': 'New items are being created...',
+                }
+
+                SocketService.emit_status(meta=metaStatus)
+
+                metaItem = {
+                    'public_id': str(new_item.public_id),
+                    'original_filename': new_item.original_filename,
+                    'sku': new_item.sku,
+                    'brand_name': new_item.brand_name,
+                    'name': new_item.name,
+                    'weight_kg': new_item.weight_kg,
+                    'tax_code_code': new_item.tax_code_code,
+                    'unit_cost_price_currency_code': new_item.unit_cost_price_currency_code,
+                    'unit_cost_price_net': new_item.unit_cost_price_net
+                }
+
+                SocketService.emit_new_item(meta=metaItem)
+
             else:
                 error_counter += 1
+
+
+        metaStatus = {
+            "current": i+1,
+            "total": total_number_items,
+            'object': 'item',
+            'title': '{} items have been successfully created.'.format(total_number_items)
+        }
+
+        SocketService.emit_status(meta=metaStatus)
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)

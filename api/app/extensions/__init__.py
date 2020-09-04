@@ -7,8 +7,7 @@ from flask_caching import Cache
 from flask_mail import Mail
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-
-from .socketio import socket_io
+from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -22,3 +21,8 @@ limiter = Limiter(
 
 session = Session()
 cache = Cache()
+socket_io = SocketIO(
+    manage_session=False,
+    cors_allowed_origins="*",
+    logger=True,
+    engineio_logger=True)

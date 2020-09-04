@@ -19,19 +19,19 @@ def periodic_vatin_validation():
         from ..asyncr import async_process_validation_request
         vatin_list = VATINService.get_unvalidated(limit=50)
         app.logger.info('Unvalidated vatins: {}'.format(len(vatin_list)))
-        if len(vatin_list) > 0:
-            for i, vatin in enumerate(vatin_list):
-                vatin_data = {
-                    'country_code': vatin.country_code,
-                    'number': vatin.number
-                }
 
-                # Auto retry takes list of expected exceptions and retry task when one of these occurs.
-                # In that case always set max_retries boundary.
-                # Never let tasks repeat infinitely.
-                async_process_validation_request.apply_async(
-                    eta=datetime.now() + timedelta(seconds=i * random.randint(25, 45)),
-                    auto_retry=[HTTPException],
-                    max_retries=1,
-                    default_retry_delay=300,
-                    args=[vatin_data])
+        for i, vatin in enumerate(vatin_list):
+            vatin_data = {
+                'country_code': vatin.country_code,
+                'number': vatin.number
+            }
+
+            # Auto retry takes list of expected exceptions and retry task when one of these occurs.
+            # In that case always set max_retries boundary.
+            # Never let tasks repeat infinitely.
+            async_process_validation_request.apply_async(
+                eta=datetime.now() + timedelta(seconds=i * random.randint(25, 45)),
+                auto_retry=[HTTPException],
+                max_retries=1,
+                default_retry_delay=300,
+                args=[vatin_data])
