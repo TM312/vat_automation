@@ -38,7 +38,7 @@ class TransactionInputService:
         #base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
         base_query = TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).order_by(TransactionInput.complete_date.desc())
         if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
-            per_page = current_app.config['TRANSACTIONS_PER_QUERY']
+            per_page = current_app.config.TRANSACTIONS_PER_QUERY
             page = kwargs.get('page')
             transaction_inputs = base_query.paginate(page, per_page, False).items
 
@@ -142,7 +142,7 @@ class TransactionInputService:
 
     @staticmethod
     def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO]) -> Dict:
-        BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config["BASE_PATH_TRANSACTION_DATA_SELLER_FIRM"]
+        BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
 
         file_type='item_list'
         df_encoding = 'utf-8'
@@ -384,7 +384,6 @@ class TransactionInputService:
 
 
         # after all transaction inputs have been stored transactions are created
-        print('all transaction inputs have been stored', flush=True)
         for transaction_input in transaction_inputs:
             if not transaction_input.processed:
                 try:

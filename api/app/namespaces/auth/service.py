@@ -46,7 +46,7 @@ class TokenService:
         # fetch the user data
         user = UserService.get_by_email(user_data.get('email'))
         if user and user.check_password(user_data.get('password')):
-            token_lifespan = current_app.config["TOKEN_LIFESPAN_REGISTRATION"]
+            token_lifespan = current_app.config.TOKEN_LIFESPAN_REGISTRATION
             auth_token = TokenService.encode_auth_token(public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:
                 # UserService.ping(user, method_name=inspect.stack()[0][3], service_context=TokenService.__name__)
@@ -116,14 +116,14 @@ class TokenService:
         """
         try:
             payload = {
-                'iss': current_app.config["COMPANY_NAME"].lower(),
+                'iss': current_app.config.COMPANY_NAME.lower(),
                 'exp': datetime.utcnow() + timedelta(minutes=token_lifespan),
                 'iat': datetime.utcnow(),
                 'sub': public_id
             }
             auth_token = jwt.encode(
                 payload,
-                current_app.config["SECRET_KEY"],
+                current_app.config.SECRET_KEY,
                 algorithm='HS256'
             )
             return auth_token
@@ -139,7 +139,7 @@ class TokenService:
         :return: integer|string
         """
         try:
-            key = current_app.config["SECRET_KEY"]
+            key = current_app.config.SECRET_KEY
             payload = jwt.decode(auth_token, key)
             is_blacklisted_token = TokenService.check_blacklisted(auth_token)
             if is_blacklisted_token:

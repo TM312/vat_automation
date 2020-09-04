@@ -184,8 +184,8 @@ class SellerFirmService:
         A SellerFirmNotification is created/updated in the course of processing.
 
         """
-        DATA_ALLOWED_EXTENSIONS = current_app.config['DATA_ALLOWED_EXTENSIONS']
-        BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
+        DATA_ALLOWED_EXTENSIONS = current_app.config.DATA_ALLOWED_EXTENSIONS
+        BASE_PATH_DATA_SELLER_FIRM = current_app.config.BASE_PATH_DATA_SELLER_FIRM
         user_id = g.user.id
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
@@ -214,7 +214,7 @@ class SellerFirmService:
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
 
         if data_type == 'static':
-            basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+            basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
             if file_type == 'account_list':
                 from app.tasks.asyncr import async_handle_account_data_upload
@@ -250,7 +250,7 @@ class SellerFirmService:
 
 
         elif data_type == 'recurring':
-            basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+            basepath = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
 
             if file_type == 'transactions_amazon':
                 from app.tasks.asyncr import async_handle_transaction_input_data_upload
@@ -273,7 +273,7 @@ class SellerFirmService:
     @staticmethod
     #kwargs can contain: seller_firm_public_id
     def process_seller_firm_information_files_upload(file: BinaryIO, claimed: bool, **kwargs: Dict[str, str]) -> Dict:
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         file_type = 'seller_firm'
         df_encoding = 'utf-8'

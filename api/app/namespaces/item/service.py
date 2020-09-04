@@ -113,7 +113,7 @@ class ItemService:
             raise
 
         if not 'valid_to' in item_data:
-            TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+            TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
             item_data['valid_to'] = TAX_DEFAULT_VALIDITY
 
         else:
@@ -145,16 +145,34 @@ class ItemService:
     def compare_calculation_reference(transaction_id: int, transaction_input: TransactionInput, item: Item):
         notification_data_list = []
         if item.name and transaction_input.item_name and item.name != transaction_input.item_name:
-            notification_data = NotificationService.create_transaction_notification_data(main_subject='Item Name', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_name, calculated_value=item.name, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(
+                main_subject='Item Name',
+                original_filename=transaction_input.original_filename,
+                status='info',
+                reference_value=transaction_input.item_name,
+                calculated_value=item.name,
+                transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
         if item.weight_kg and transaction_input.item_weight_kg and item.weight_kg != transaction_input.item_weight_kg:
-            notification_data = NotificationService.create_transaction_notification_data(main_subject='Item Weight', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.item_weight_kg, calculated_value=item.weight_kg, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(
+                main_subject='Item Weight',
+                original_filename=transaction_input.original_filename,
+                status='info',
+                reference_value='{}kg'.format(transaction_input.item_weight_kg),
+                calculated_value='{}kg'.format(item.weight_kg),
+                transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
 
         if item.asin and transaction_input.asin and item.asin != transaction_input.asin:
-            notification_data = NotificationService.create_transaction_notification_data(main_subject='ASIN', original_filename=transaction_input.original_filename, status='info', reference_value=transaction_input.asin, calculated_value=item.asin, transaction_id=transaction_id)
+            notification_data = NotificationService.create_transaction_notification_data(
+                main_subject='ASIN',
+                original_filename=transaction_input.original_filename,
+                status='info',
+                reference_value=transaction_input.asin,
+                calculated_value=item.asin,
+                transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 
         try:
@@ -173,7 +191,7 @@ class ItemService:
     def process_item_files_upload(item_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
         from ..business.seller_firm.service import SellerFirmService
 
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         file_type='item_list'
         df_encoding = 'utf-8'
@@ -239,7 +257,7 @@ class ItemService:
                 if not valid_from:
                     valid_from = date.today()
                 if not valid_to:
-                    TAX_DEFAULT_VALIDITY = current_app.config["TAX_DEFAULT_VALIDITY"]
+                    TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
                     valid_to = TAX_DEFAULT_VALIDITY
 
                 redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)

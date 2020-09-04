@@ -4,6 +4,8 @@ from app.extensions import db
 
 from . import TaxCode
 from .interface import TaxCodeInterface
+from ...transaction_input import TransactionInput
+from ...utils.service import NotificationService
 
 
 class TaxCodeService:
@@ -51,3 +53,23 @@ class TaxCodeService:
         db.session.commit()
 
         return new_tax_code
+
+
+
+
+    @staticmethod
+    def compare_calculation_reference(transaction_id: int, transaction_input: TransactionInput, tax_code_code: str, calculated_tax_code_code) -> None:
+        if calculated_tax_code_code != tax_code_code:
+            notification_data=NotificationService.create_transaction_notification_data(
+                main_subject='Item Tax Code',
+                original_filename=transaction_input.original_filename,
+                status='warning',
+                reference_value=tax_code_code,
+                calculated_value=calculated_tax_code_code,
+                transaction_id=transaction_id
+            )
+            try:
+                NotificationService.create_transaction_notification(notification_data)
+            except:
+                db.session.rollback()
+                raise

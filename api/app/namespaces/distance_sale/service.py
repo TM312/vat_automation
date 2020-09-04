@@ -80,7 +80,7 @@ class DistanceSaleService:
         distance_sale_data['valid_from'] = datetime.strptime(distance_sale_data['valid_from'], "%Y-%m-%d").date()
 
         if not 'valid_to' in distance_sale_data:
-            TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+            TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
             distance_sale_data['valid_to'] = TAX_DEFAULT_VALIDITY
 
         else:
@@ -96,7 +96,7 @@ class DistanceSaleService:
     def process_distance_sale_files_upload(distance_sale_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
         from ..business.seller_firm.service import SellerFirmService
 
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         file_type = 'distance_sale_list'
         df_encoding = 'utf-8'
@@ -160,7 +160,7 @@ class DistanceSaleService:
             if not valid_from:
                 valid_from = date.today()
             if not valid_to:
-                TAX_DEFAULT_VALIDITY = current_app.config['TAX_DEFAULT_VALIDITY']
+                TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
                 valid_to = TAX_DEFAULT_VALIDITY
 
             redundancy_counter += DistanceSaleService.handle_redundancy(seller_firm_id, arrival_country_code, valid_from)

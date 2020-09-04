@@ -12,8 +12,9 @@ class BusinessService:
     @staticmethod
     def get_by_name_address_or_None(name: str, address: str) -> Union[AccountingFirm, SellerFirm, CustomerFirm]:
         business = BusinessService.get_by_name_or_None(name)
-        if isinstance(business, None):
+        if not isinstance(business, Business):
             business = BusinessService.get_by_address_or_None(address)
+
         return business
 
 

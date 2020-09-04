@@ -161,7 +161,7 @@ class VATINService:
     def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
         from ...business.seller_firm.service import SellerFirmService
 
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config["BASE_PATH_STATIC_DATA_SELLER_FIRM"]
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
         file_type='vat_numbers'
         df_encoding = 'utf-8'
@@ -297,25 +297,22 @@ class VATINService:
                     raise UnprocessableEntity('Can not create VATIN.')
 
 
-
-
     @staticmethod
-    def evaluate_transaction_notification(transaction_id: int, customer_vat_check_required: bool, date: date, number: str) -> None:
+    def compare_calculation_reference_old_transaction(transaction_id: int, transaction_input: TransactionInput, customer_vat_check_required: bool, tax_date: date, number: str) -> None:
         if number and not customer_vat_check_required:
-            OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config['OLD_TRANSACTION_TOLERANCE_DAYS']
+            OLD_TRANSACTION_TOLERANCE_DAYS = current_app.config.OLD_TRANSACTION_TOLERANCE_DAYS
 
             reference_value = str(OLD_TRANSACTION_TOLERANCE_DAYS)
-            calculated_value = str(date.today() - date).days
+            calculated_value = str((date.today() - tax_date).days)
 
-            notification_data = {
-                   'subject': 'Old Transaction',
-                    'original_filename': transaction_input.original_filename,
-                    'status': 'info',
-                    'reference_value': reference_value,
-                    'calculated_value': calculated_value,
-                    'message': 'Due to the age of the tax date the customer firm VAT Number ({}) it was assumed to be valid without further checks.'.format(number),
-                    'transaction_id': transaction_input.id
-                   }
+            notification_data=NotificationService.create_transaction_notification_data(
+                main_subject='Transaction too old – No VAT check',
+                original_filename=transaction_input.original_filename,
+                status='info',
+                reference_value='Transaction age tolerance: {} days.'.format(reference_value),
+                calculated_value='Actual transaction age: {} days.'.format(calculated_value),
+                transaction_id=transaction_id
+                )
             try:
                 NotificationService.create_transaction_notification(notification_data)
             except:
@@ -447,8 +444,6 @@ class VATINService:
 
     @staticmethod
     def verify_regex(country_code: str, number: str) -> None:
-        print('country_code:', country_code, flush=True)
-        print('number:', number, flush=True)
         country = dict(
             map(
                 lambda x, y: (x, y),
@@ -561,8 +556,3 @@ class VIESService:
         }
 
         return vatin_data
-
-
-    @staticmethod
-    def sanitize_response_detail(vat: VATIN, parameter: str) -> str:
-        return None if vat[parameter] == '---' else parameter

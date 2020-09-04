@@ -15,14 +15,14 @@ class LogService:
 
     @staticmethod
     def setup_logging(app):
-        MAIL_USERNAME = current_app.config["MAIL_USERNAME"]
-        MAIL_PASSWORD = current_app.config["MAIL_PASSWORD"]
-        MAIL_SERVER = current_app.config["MAIL_SERVER"]
-        MAIL_PORT = current_app.config["MAIL_PORT"]
-        COMPANY_NAME = current_app.config["COMPANY_NAME"]
-        ADMINS = current_app.config["ADMINS"]
-        MAIL_USE_TLS = current_app.config["MAIL_USE_TLS"]
-        BASE_PATH_LOGS = current_app.config["BASE_PATH_LOGS"]
+        MAIL_USERNAME = current_app.config.MAIL_USERNAME
+        MAIL_PASSWORD = current_app.config.MAIL_PASSWORD
+        MAIL_SERVER = current_app.config.MAIL_SERVER
+        MAIL_PORT = current_app.config.MAIL_PORT
+        COMPANY_NAME = current_app.config.COMPANY_NAME
+        ADMINS = current_app.config.ADMINS
+        MAIL_USE_TLS = current_app.config.MAIL_USE_TLS
+        BASE_PATH_LOGS = current_app.config.BASE_PATH_LOGS
 
         today_as_str = date.today().strftime('%Y%m%d')
         credentials = (MAIL_USERNAME, MAIL_PASSWORD)

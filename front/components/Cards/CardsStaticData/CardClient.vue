@@ -2,10 +2,7 @@
     <b-card border-variant="primary">
         <b-card-title>
             <b-row>
-                <b-col cols="auto" class="mr-auto">{{ sellerFirm.name }}
-                    <!-- <span v-if="sellerFirm.accounting_firm_client_id">{{ sellerFirm.accounting_firm_client_id }} </span>
-                    <span v-else class="text-muted"><i>No ID assigned to this client.</i></span> -->
-                </b-col>
+                <b-col cols="auto" class="mr-auto">{{ sellerFirm.name }}</b-col>
                 <b-col cols="auto">
                     <button-follow-seller-firm :sellerFirm="sellerFirm" />
                     <b-button v-if="$auth.user.role === 'admin'" size="sm" variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">Delete</b-button>
@@ -21,16 +18,27 @@
             <b-row>
                 <b-col cols="auto"><b>Tax Auditors: </b></b-col>
                 <b-col cols="auto" class="mr-auto">
-                    <b-avatar
-                        v-for="taxAuditor in sellerFirm.tax_auditors"
-                        :key="taxAuditor.public_id"
-                        :id="`popover-target-${taxAuditor.public_id}`"
-                        :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
-                        :text="taxAuditor.initials"
-                        class="mr-1"
-                        >
+                    <div v-if="sellerFirm.tax_auditors.length === 1">
+                        <b-avatar
+                            v-for="taxAuditor in sellerFirm.tax_auditors"
+                            :key="taxAuditor.public_id"
+                            :id="`popover-target-${taxAuditor.public_id}`"
+                            :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
+                            :text="taxAuditor.initials"
+                        />
+                    </div>
+                    <div v-else>
+                        <b-avatar-group>
+                            <b-avatar
+                                v-for="taxAuditor in sellerFirm.tax_auditors"
+                                :key="taxAuditor.public_id"
+                                :id="`popover-target-${taxAuditor.public_id}`"
+                                :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
+                                :text="taxAuditor.initials"
+                            />
+                        </b-avatar-group>
+                    </div>
 
-                    </b-avatar>
                     <b-popover
                         v-for="(taxAuditor, index) in sellerFirm.tax_auditors"
                         :key="index"

@@ -1,6 +1,6 @@
 
 from typing import List, BinaryIO
-from flask import request
+from flask import request, g
 
 from flask_restx import Namespace, Resource
 from flask.wrappers import Response
@@ -67,7 +67,12 @@ class TaxRecordSellerFirmResource(Resource):
 
     @login_required
     @ns.marshal_with(tax_record_dto, envelope='data')
-    def post(self, seller_firm_public_id) -> TaxRecord:
+    def post(self, seller_firm_public_id):
+        from app.tasks.asyncr import async_create_tax_record_by_seller_firm_public_id
+
         """Create for the indicated seller firm"""
-        tax_record_data: TaxRecordInterface = request.json
-        return TaxRecordService.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
+        tax_record_data_raw: TaxRecordInterface = request.json
+        user_id = g.user.id
+        async_create_tax_record_by_seller_firm_public_id.apply_async(
+            args=[seller_firm_public_id, user_id, tax_record_data_raw]
+            )

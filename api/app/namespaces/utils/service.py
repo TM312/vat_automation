@@ -17,7 +17,7 @@ from app.extensions import db
 class TemplateService:
 
     def download_file(filename: str):
-        BASE_PATH_TEMPLATES = current_app.config['BASE_PATH_TEMPLATES']
+        BASE_PATH_TEMPLATES = current_app.config.BASE_PATH_TEMPLATES
 
         return send_from_directory(directory=BASE_PATH_TEMPLATES, filename=filename, as_attachment=True)
 
@@ -32,17 +32,12 @@ class HelperService:
         return date
 
 
-class CalcService:
-    @staticmethod
-    def get_sum(*amounts):
-        return sum(amounts)
-
 
 class NotificationService:
 
     @staticmethod
     def get_seller_firm_shared(seller_firm_id: int, user_id: int, time: datetime, subject: str) -> SellerFirmNotification:
-        timespan_in_min = current_app.config['TIMESPAN_SIMILARITY']
+        timespan_in_min = current_app.config.TIMESPAN_SIMILARITY
         seller_firm_notification = SellerFirmNotification.query.filter(
             SellerFirmNotification.seller_firm_id == seller_firm_id,
             SellerFirmNotification.created_by == user_id,
@@ -240,7 +235,7 @@ class InputService:
             except:
                 try:
                     string = df.iloc[i][column]
-                    string = InputService.clean_str(string)
+                    string_trimmed = InputService.clean_str(string)
                     flt = float(string_trimmed)
 
                 except:
@@ -349,8 +344,8 @@ class InputService:
 
     @staticmethod
     def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
-        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config['STATIC_DATA_ALLOWED_EXTENSIONS']
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config.STATIC_DATA_ALLOWED_EXTENSIONS
+        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
         try:
             file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
         except:
@@ -367,7 +362,7 @@ class InputService:
 
     @staticmethod
     def allowed_filesize(file_path: str) -> bool:
-        MAX_FILE_SIZE_INPUT = current_app.config['MAX_FILE_SIZE_INPUT']
+        MAX_FILE_SIZE_INPUT = current_app.config.MAX_FILE_SIZE_INPUT
 
         file_size = os.stat(file_path).st_size
 
@@ -412,12 +407,12 @@ class InputService:
 
 
     def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str):
-        BASE_PATH_DATA_SELLER_FIRM = current_app.config['BASE_PATH_DATA_SELLER_FIRM']
+        BASE_PATH_DATA_SELLER_FIRM = current_app.config.BASE_PATH_DATA_SELLER_FIRM
 
         if data_type == 'static':
-            basepath = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+            basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
         elif data_type == 'recurring':
-            basepath = current_app.config['BASE_PATH_TRANSACTION_DATA_SELLER_FIRM']
+            basepath = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
 
         basepath_tbd = os.path.join(BASE_PATH_DATA_SELLER_FIRM, 'tbd')
         basepath_file_type = os.path.join(basepath, file_type, 'in')

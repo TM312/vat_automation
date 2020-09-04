@@ -8,6 +8,7 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
     'processed': fields.Boolean,
     'channel_code': fields.String,
     'marketplace': fields.String,
+    'given_id': fields.String,
     'transaction_type_public_code': fields.String,
     'shipment_date': fields.Date,
     'complete_date': fields.Date,
@@ -33,7 +34,6 @@ transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
 
     'transactions': fields.List(fields.Nested(transaction_dto)),
     'public_activity_period': fields.String,
-    'given_id': fields.String,
     'account_given_id': fields.String,
 
     'arrival_date': fields.Date,

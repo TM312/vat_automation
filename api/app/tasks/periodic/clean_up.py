@@ -33,4 +33,5 @@ def periodic_vatin_validation():
                     eta=datetime.now() + timedelta(seconds=i * random.randint(25, 45)),
                     auto_retry=[HTTPException],
                     max_retries=1,
+                    default_retry_delay=300,
                     args=[vatin_data])

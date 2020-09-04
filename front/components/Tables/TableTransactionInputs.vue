@@ -77,6 +77,11 @@ export default {
                     sortable: false,
                 },
                 {
+                    key:'given_id',
+                    label: 'Transaction ID',
+                    sortable: false
+                },
+                {
                     key: 'marketplace',
                     sortable: false,
                 },

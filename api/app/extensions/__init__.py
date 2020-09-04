@@ -13,7 +13,7 @@ from .socketio import socket_io
 db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
-cors = CORS(supports_credentials=True, resources={r"/*": {"origins": "*"}})
+cors = CORS(supports_credentials=True, resources={r"/*": {"origins": "*"}}) #!!!! addd domain later
 mail = Mail()
 limiter = Limiter(
     key_func=get_remote_address,
