@@ -78,7 +78,7 @@ class ExchangeRateService:
 
     @staticmethod
     def create_exchange_rates() -> List[ExchangeRate]:
-        SUPPORTED_CURRENCIES = current_app.config['SUPPORTED_CURRENCIES']
+        SUPPORTED_CURRENCIES = current_app.config.SUPPORTED_CURRENCIES
 
         date = date.today()
 

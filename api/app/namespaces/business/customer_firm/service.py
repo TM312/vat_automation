@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List, Dict
 
+from app.extensions import db
 from . import CustomerFirm
 from .interface import CustomerFirmInterface
 
@@ -46,10 +47,6 @@ class CustomerFirmService:
         else:
             raise NotFound('This accounting firm does not exist.')
 
-    @staticmethod
-    def get_by_name_address(name: str, address: str) -> CustomerFirm:
-        return CustomerFirm.query.filter(name=name, address=address).first()
-
 
     @staticmethod
     def create(customer_firm_data: CustomerFirmInterface) -> CustomerFirm:
@@ -58,21 +55,23 @@ class CustomerFirmService:
             address=customer_firm_data.get('address')
         )
 
-        db.session.add(new_customer)
+        db.session.add(new_customer_firm)
         db.session.commit()
 
-        return new_customer
+        return new_customer_firm
 
 
     @staticmethod
     def get_customer_firm_or_None(customer_firm_vatin, customer_relationship):
         if isinstance(customer_firm_vatin, VATIN) and customer_firm_vatin.valid and customer_relationship == 'B2B':
             try:
-                customer_firm= CustomerFirmService.get_or_create_customer_firm(customer_firm_vatin)
-                return customer
+                customer_firm = CustomerFirmService.get_or_create_customer_firm(customer_firm_vatin)
             except:
                 db.session.rollback()
                 raise
+
+            return customer_firm
+
 
     @staticmethod
     def get_customer_relationship(customer_firm_vatin: VATIN, check_required: bool) -> str:
@@ -93,58 +92,53 @@ class CustomerFirmService:
 
 
     @staticmethod
-    def get_vatin_or_None(customer_vat_check_required: bool, country_code_temp: str, number_temp: str, date: date) -> VATIN:
-        if not customer_vat_check_required:
-            return None
-        else:
-            try:
-                customer_firm_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-                if isinstance(customer_firm_vatin, VATIN):
-                    business = BusinessService.get_by_name_address_or_None(customer_firm_vatin.name, customer_firm_vatin.address)
+    def get_vatin_or_None(country_code_temp: str, number_temp: str, date: date) -> VATIN:
 
-                    if isinstance(business, Business):
-                        data_changes = {'business_id': business.id}
-                        customer_firm_vatin.update(data_changes)
-                        db.session.commit()
+        customer_firm_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
+        if isinstance(customer_firm_vatin, VATIN):
+            business = BusinessService.get_by_name_address_or_None(customer_firm_vatin.name, customer_firm_vatin.address)
 
-                    return customer_firm_vatin
+            if isinstance(business, Business):
+                data_changes = {'business_id': business.id}
+                customer_firm_vatin.update(data_changes)
+                db.session.commit()
 
-                else:
-                    return None
-
-
-            except:
-                raise
-
-
-
-
+            return customer_firm_vatin
 
 
     @staticmethod
     def get_or_create_customer_firm(customer_firm_vatin: VATIN) -> CustomerFirm:
-        name = VIESService.sanitize_response_detail(customer_firm_vatin, parameter='name')
-        address = VIESService.sanitize_response_detail(customer_firm_vatin, parameter='address')
+        name = customer_firm_vatin.name if not customer_firm_vatin.name == '---' else None
+        address = customer_firm_vatin.address if not customer_firm_vatin.address == '---' else None
 
-        customer_firm= CustomerFirmService.get_by_name_address(name, address)
+        customer_firm = BusinessService.get_by_name_address_or_None(name, address)
 
         customer_firm_data = {
             'name': name,
             'address': address
         }
 
-        if not (isinstance(name, None) or isinstance(address, None)):
-            if isinstance(customer, Customer) and (name != customer_firm.name or address != customer_firm.address):
-                customer_firm.update(customer_firm_data)
-                db.session.commit()
+        if isinstance(name, str) and isinstance(address, str):
+            if isinstance(customer_firm, Business):
+                if name != customer_firm.name or address != customer_firm.address:
+                    customer_firm.update(customer_firm_data)
+                    db.session.commit()
 
             else:
-                new_customer_firm= CustomerFirmService.create(customer_firm_data)
-                customer_firm = new_customer_firm
+                try:
+                    new_customer_firm = CustomerFirmService.create(customer_firm_data)
+                except:
+                    db.session.rollback()
+                    raise
 
-            if customer_firm_vatin not in customer_firm.vat_numbers:
-                customer_firm.vat_numbers.append(customer_firm_vatin)
-                db.session.commit()
+                    customer_firm = new_customer_firm
+
+            if not customer_firm.vat_numbers or customer_firm_vatin not in customer_firm.vat_numbers:
+                try:
+                    customer_firm.vat_numbers.append(customer_firm_vatin)
+                    db.session.commit()
+                except:
+                    db.session.rollback()
 
         return customer_firm
 

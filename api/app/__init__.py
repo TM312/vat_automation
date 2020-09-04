@@ -16,7 +16,7 @@ def create_app(env):
     # for example if the request goes through one proxy before hitting your application server
     app.wsgi_app = ProxyFix(app.wsgi_app, num_proxies=1)
 
-    # make app.config support dot notation.
+    # make app.config support dot notation. (super cool!)
     FlaskDynaconf(app=app)
 
     register_extensions(app)

@@ -115,7 +115,7 @@ class AccountService:
     # def process_account_files_upload(account_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
     #     from ..business.seller_firm.service import SellerFirmService
 
-    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config['BASE_PATH_STATIC_DATA_SELLER_FIRM']
+    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
 
     #     file_type = 'account_list'
     #     df_encoding = 'utf-8'
