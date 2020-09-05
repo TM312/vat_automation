@@ -28,3 +28,17 @@ class SocketService:
             'new_item',
             meta
         )
+
+    @staticmethod
+    def emit_new_vat_number(meta):
+        socket_io.emit(
+            'new_vat_number',
+            meta
+        )
+
+    @staticmethod
+    def emit_new_distance_sale(meta):
+        socket_io.emit(
+            'new_distance_sale',
+            meta
+        )

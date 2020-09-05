@@ -9,15 +9,21 @@ from random import randint
 from flask import current_app
 from werkzeug.exceptions import HTTPException, FailedDependency, UnprocessableEntity, NotFound
 
-from app.extensions import db
+from app.extensions import (
+    db,
+    socket_io)
 
 from .helpers import MEMBER_COUNTRY_CODES, VIES_WSDL_URL, VATIN_MAX_LENGTH, VIES_OPTIONS
 from . import VATIN
 from .interface import VATINInterface
+from .schema import VatinSchemaSocket
 
 from ...transaction_input import TransactionInput
 from ...utils.service import InputService, NotificationService
 from ...tag.service import TagService
+
+from app.extensions.socketio.emitters import SocketService
+
 
 
 
@@ -251,9 +257,35 @@ class VATINService:
                     try:
                         VATINService.create(vatin_data)
 
+                        status = {
+                            "current": i+1,
+                            "total": total_number_vatins,
+                            'variant': 'success',
+                            'done': False,
+                            'object': 'vatin',
+                            'title': 'New vatins are being registered...',
+                        }
+
+                        SocketService.emit_status(meta=status)
+
+                        vatin_schema = VatinSchemaSocket.get_vatin_sub(new_vatin)
+                        SocketService.emit_new_vatin(meta=vatin_schema)
+
+
                     except:
                         db.session.rollback()
                         error_counter += 1
+
+        status = {
+            "current": i+1,
+            "total": total_number_vatins,
+            'variant': 'success',
+            'done': True,
+            'object': 'vatin',
+            'title': '{} vat numbers have been successfully registered.'.format(total_number_vatins)
+        }
+
+        SocketService.emit_status(meta=status)
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)

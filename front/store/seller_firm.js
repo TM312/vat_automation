@@ -19,6 +19,14 @@ export const mutations = {
 
     PUSH_ITEM(state, item) {
         if (state.seller_firm.items.includes(item) === false) state.seller_firm.items.push(item)
+    },
+
+    PUSH_DISTANCE_SALE(state, distance_sale) {
+        if (state.seller_firm.distance_sales.includes(distance_sale) === false) state.seller_firm.distance_sales.push(distance_sale)
+    },
+
+    PUSH_VAT_NUMBER(state, vat_number) {
+        if (state.seller_firm.vat_numbers.includes(vat_number) === false) state.seller_firm.vat_numbers.push(vat_number)
     }
 }
 

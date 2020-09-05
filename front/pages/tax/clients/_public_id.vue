@@ -23,6 +23,8 @@
             </b-tabs>
         </b-container>
 
+        <toasts-static-data-upload />
+
     </div>
 </template>
 
@@ -30,7 +32,6 @@
     import { mapState } from 'vuex'
     export default {
         layout: "tax",
-        middleware: "auth-tax",
 
         async fetch() {
             const { store } = this.$nuxt.context
@@ -41,28 +42,10 @@
 
         computed: {
             ...mapState({
-                sellerFirm: state => state.seller_firm.seller_firm,
-                status_account: state => state.status.status_account,
-                status_item: state => state.status.status_item,
-                status_vat_number: state => state.status.status_vat_number,
-                status_distance_sale: state => state.status.status_distance_sale
-            }),
-
+                sellerFirm: state => state.seller_firm.seller_firm
+            })
         },
 
-        watch: {
-          displayToast() {
-                if (this.status_account > 0) {
-                    this.makeToast(this.status_account.current, this.status_account.total, this.status_account.object, this.status_account.title)
-                } else if (this.status_item > 0) {
-                    this.makeToast(this.status_item.current, this.status_item.total, this.status_item.object, this.status_item.title)
-                } else if (this.status_vat_number > 0) {
-                    this.makeToast(this.status_vat_number.current, this.status_vat_number.total, this.status_vat_number.object, this.status_vat_number.title)
-                } else if (this.status_distance_sale > 0) {
-                    this.makeToast(this.status_distance_sale.current, this.status_distance_sale.total, this.status_distance_sale.object, this.status_distance_sale.title)
-                }
-            }
-        },
 
         mounted() {
             this.socket = this.$nuxtSocket({
@@ -70,17 +53,6 @@
                 reconnection: false
             })
         },
-
-        methods: {
-            makeToast(current, total, object, title) {
-                this.$bvToast.toast(`${parseInt(current/total * 100)}% : ${current} out of ${total} ${object}s have been added.`, {
-                title: title,
-                variant: 'success',
-                autoHideDelay: 15000,
-                appendToast: false
-                })
-            }
-        }
 
     };
 </script>

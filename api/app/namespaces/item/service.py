@@ -10,6 +10,7 @@ from app.extensions import (
     socket_io)
 
 from . import Item
+from .schema import ItemSchemaSocket
 from .interface import ItemInterface
 
 from ..account import Account
@@ -286,46 +287,39 @@ class ItemService:
                 try:
                     new_item = ItemService.create(item_data)
 
+                    status = {
+                        "current": i+1,
+                        "total": total_number_items,
+                        'variant': 'success',
+                        'done': False,
+                        'object': 'item',
+                        'title': 'New items are being created...',
+                    }
+
+                    SocketService.emit_status(meta=status)
+
+                    item_schema_sub = ItemSchemaSocket.get_item_sub(new_item)
+                    SocketService.emit_new_item(meta=item_schema_sub)
+
                 except:
                     db.session.rollback()
 
                     error_counter += 1
 
-                metaStatus = {
-                    "current": i+1,
-                    "total": total_number_items,
-                    'object': 'item',
-                    'title': 'New items are being created...',
-                }
-
-                SocketService.emit_status(meta=metaStatus)
-
-                metaItem = {
-                    'public_id': str(new_item.public_id),
-                    'original_filename': new_item.original_filename,
-                    'sku': new_item.sku,
-                    'brand_name': new_item.brand_name,
-                    'name': new_item.name,
-                    'weight_kg': new_item.weight_kg,
-                    'tax_code_code': new_item.tax_code_code,
-                    'unit_cost_price_currency_code': new_item.unit_cost_price_currency_code,
-                    'unit_cost_price_net': new_item.unit_cost_price_net
-                }
-
-                SocketService.emit_new_item(meta=metaItem)
-
             else:
                 error_counter += 1
 
 
-        metaStatus = {
+        status = {
             "current": i+1,
             "total": total_number_items,
+            'variant': 'success',
+            'done': True,
             'object': 'item',
             'title': '{} items have been successfully created.'.format(total_number_items)
         }
 
-        SocketService.emit_status(meta=metaStatus)
+        SocketService.emit_status(meta=status)
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)

@@ -3,13 +3,18 @@ import os
 import pandas as pd
 from datetime import date, timedelta, datetime
 from flask import g, current_app
-from app.extensions import db
+from app.extensions import (
+    db,
+    socket_io)
 
 from . import DistanceSale
 from .interface import DistanceSaleInterface
+from .schema import DistanceSaleSchemaSocket
+
 from ..utils.service import InputService, NotificationService
 from ..tag.service import TagService
 
+from app.extensions.socketio.emitters import SocketService
 
 
 class DistanceSaleService:
@@ -179,10 +184,33 @@ class DistanceSaleService:
             try:
                 new_distance_sale = DistanceSaleService.create(distance_sale_data)
 
+                status = {
+                    "current": i+1,
+                    "total": total_number_distance_sales,
+                    'variant': 'success',
+                    'done': False,
+                    'object': 'distance_sale',
+                    'title': 'New distance sales are being registered...',
+                }
+
+                SocketService.emit_status(meta=status)
+
+                distance_sale_schema = DistanceSaleSchemaSocket.get_distance_sale_sub(new_distance_sale)
+                SocketService.emit_new_distance_sale(meta=distance_sale_schema)
+
             except:
                 db.session.rollback()
                 error_counter += 1
 
+        status = {
+            "current": i+1,
+            "total": total_number_distance_sales,
+            'variant': 'success',
+            'done': True,
+            'object': 'distance_sale',
+            'title': '{} distance sales have been successfully registered.'.format(total_number_distance_sales)
+        }
+        SocketService.emit_status(meta=status)
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
 

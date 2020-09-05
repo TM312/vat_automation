@@ -28,3 +28,20 @@ item_admin_dto = item_dto.clone('item_admin', {
     'id': fields.Integer(readonly=True),
     'seller_firm_id': fields.Integer
 })
+
+
+class ItemSchemaSocket:
+
+    @staticmethod
+    def get_item_sub(item):
+        return {
+            'public_id': str(item.public_id),
+            'original_filename': item.original_filename,
+            'sku': item.sku,
+            'brand_name': item.brand_name,
+            'name': item.name,
+            'weight_kg': item.weight_kg,
+            'tax_code_code': item.tax_code_code,
+            'unit_cost_price_currency_code': item.unit_cost_price_currency_code,
+            'unit_cost_price_net': item.unit_cost_price_net
+        }

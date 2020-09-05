@@ -7,6 +7,7 @@ import pandas as pd
 
 
 from flask import g, current_app
+
 from app.extensions import (
     db,
     socket_io)
@@ -14,6 +15,7 @@ from app.extensions import (
 from app.extensions.socketio.emitters import SocketService
 
 from . import Account
+from .schema import AccountSchemaSocket
 from .interface import AccountInterface
 from ..utils.service import InputService
 from ..tag.service import TagService
@@ -198,41 +200,42 @@ class AccountService:
             try:
                 new_account = AccountService.create(account_data)
 
+                status = {
+                    "current": i+1,
+                    "total": total_number_accounts,
+                    'variant': 'success',
+                    'done': False,
+                    'object': 'account',
+                    'title': 'New accounts are being registered...',
+                }
+
+                SocketService.emit_status(meta=status)
+
+                account_schema = AccountSchemaSocket.get_account_sub(new_account)
+                SocketService.emit_new_account(meta=account_schema)
+
             except:
                 db.session.rollback()
 
                 error_counter += 1
 
-            metaStatus = {
-                "current": i+1,
-                "total": total_number_accounts,
-                'object': 'account',
-                'title': 'New accounts are being created...',
-            }
-
-            SocketService.emit_status(meta=metaStatus)
 
 
-            metaAccount = {
-                'public_id': str(new_account.public_id),
-                'given_id': new_account.given_id,
-                'channel_code': new_account.channel_code
-            }
-
-            SocketService.emit_new_account(meta=metaAccount)
-
-        metaStatus = {
+        status = {
             "current": i+1,
             "total": total_number_accounts,
+            'variant': 'success',
+            'done': True,
             'object': 'account',
-            'title': '{} accounts have been successfully created.'.format(total_number_accounts)
+            'title': '{} accounts have been successfully registered.'.format(total_number_accounts)
         }
-        SocketService.emit_status(meta=metaStatus)
+        SocketService.emit_status(meta=status)
 
 
         response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_accounts, error_counter, redundancy_counter=redundancy_counter)
 
         return response_objects
+
 
 
     @staticmethod

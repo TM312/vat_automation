@@ -10,13 +10,7 @@
 </template>
 
 <script>
-    import NavbarTax from "@/components/Navbar/Tax/NavbarTax";
-    import Footer from "@/components/Footer";
     export default {
-        middleware: "auth-tax",
-        components: {
-            NavbarTax,
-            Footer
-        }
+        middleware: 'auth',
     };
 </script>
