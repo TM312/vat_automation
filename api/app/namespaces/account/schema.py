@@ -25,3 +25,14 @@ account_admin_dto = account_dto.clone('account_admin', {
     'id': fields.Integer(readonly=True),
     'seller_firm_id': fields.Integer(readonly=True)
 })
+
+
+class AccountSchemaSocket:
+
+    @staticmethod
+    def get_account_sub(account):
+        return {
+            'public_id': str(account.public_id),
+            'given_id': account.given_id,
+            'channel_code': account.channel_code
+        }

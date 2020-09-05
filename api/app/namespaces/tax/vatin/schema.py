@@ -39,3 +39,23 @@ vatin_admin_dto = vatin_sub_dto.clone('vatin_admin', {
     'business_id': fields.Integer,
 
 })
+
+
+class VatinSchemaSocket:
+
+    @staticmethod
+    def get_vatin_sub(vatin):
+        return {
+            'country_code': vatin.country_code,
+            'number': vatin.number,
+            'public_id': vatin.public_id,
+            'created_on': vatin.created_on,
+            'modified_at': vatin.modified_at,
+            'request_date': vatin.request_date,
+            'valid': vatin.valid,
+            'name': vatin.name,
+            'address': vatin.address,
+            'valid_from': vatin.valid_from,
+            'valid_to': vatin.valid_to,
+            'initial_tax_date': vatin.initial_tax_date,
+        }

@@ -215,7 +215,9 @@ export default {
                 mutations: [
                     { status: 'status/SET_STATUS' },
                     { new_account: 'seller_firm/PUSH_ACCOUNT' },
-                    { new_item: 'seller_firm/PUSH_ITEM' }
+                    { new_item: 'seller_firm/PUSH_ITEM' },
+                    { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
+                    { new_vat_number: 'seller_firm/PUSH_VAT_NUMBER' }
                 ]
             }
         }]

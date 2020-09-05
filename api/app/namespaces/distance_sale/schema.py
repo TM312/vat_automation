@@ -21,3 +21,17 @@ distance_sale_admin_dto = distance_sale_dto.clone('distance_sale_admin', {
     'id': fields.Integer,
     'seller_firm_id': fields.Integer,
 })
+
+
+class DistanceSaleSchemaSocket:
+
+    @staticmethod
+    def get_distance_sale_sub(distance_sale):
+        return {
+            'public_id': str(distance_sale.public_id),
+            'valid_from': distance_sale.valid_from,
+            'valid_to': distance_sale.valid_to,
+            'arrival_country_code': distance_sale.arrival_country_code,
+            'arrival_country': distance_sale.arrival_country.name,
+            'active': distance_sale.active
+        }
