@@ -1,3 +1,4 @@
+import os
 from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import date, datetime, timedelta
@@ -138,6 +139,7 @@ class VATINService:
         new_vatin = VATIN(
             country_code = vatin_data.get('country_code'),
             number = vatin_data.get('number'),
+            original_filename = vatin_data.get('original_filename'),
             initial_tax_date = vatin_data.get('initial_tax_date'),
             valid_from = vatin_data.get('valid_from'),
             request_date = vatin_data.get('request_date'),
@@ -213,9 +215,17 @@ class VATINService:
         error_counter = 0
         total_number_vatins = len(df.index)
         input_type = 'vat number' #only used for response objects
+        original_filename = os.path.basename(file_path_in)[:127]
 
         for i in range(total_number_vatins):
-            country_code, number = VATINService.get_vat_from_df(df, i)
+            try:
+                country_code, number = VATINService.get_vat_from_df(df, i)
+            except:
+                # send error status via socket
+                title = 'Can not read country code/number of vat number in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'vatin', title)
+                return False
+
             if (country_code is None or number is None):
                 continue
 
@@ -231,13 +241,17 @@ class VATINService:
                         db.session.commit()
                     except:
                         db.session.rollback()
-                        raise
+                        # send error status via socket
+                        title = 'An error occured while updating the vat number in row {}. Please get in contact with one of the admins.'.format(i+1)
+                        SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                        return False
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
                 sleep(randint(4, 6))
                 vatin_data = VIESService.send_request(country_code, number)
                 vatin_data['business_id'] = seller_firm_id
+                vatin_data['original_filename'] = original_filename,
 
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
 
@@ -252,45 +266,39 @@ class VATINService:
                         db.session.commit()
                     except:
                         db.session.rollback()
-                        raise
+
+                        # send error status via socket
+                        title = 'An error occured while updating the vat number in row {}. Please get in contact with one of the admins.'.format(i+1)
+                        SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                        return False
+
                 else:
                     try:
                         VATINService.create(vatin_data)
 
-                        status = {
-                            "current": i+1,
-                            "total": total_number_vatins,
-                            'variant': 'success',
-                            'done': False,
-                            'object': 'vatin',
-                            'title': 'New vatins are being registered...',
-                        }
+                        # send status update via socket
+                        title = 'New vat numbers are being registered...'
+                        SocketService.emit_status_success(i+1, total_number_vatins, original_filename, 'vatin', title)
 
-                        SocketService.emit_status(meta=status)
-
+                        # push new distance sale to vuex via socket
                         vatin_schema = VatinSchemaSocket.get_vatin_sub(new_vatin)
                         SocketService.emit_new_vatin(meta=vatin_schema)
-
 
                     except:
                         db.session.rollback()
                         error_counter += 1
 
-        status = {
-            "current": i+1,
-            "total": total_number_vatins,
-            'variant': 'success',
-            'done': True,
-            'object': 'vatin',
-            'title': '{} vat numbers have been successfully registered.'.format(total_number_vatins)
-        }
-
-        SocketService.emit_status(meta=status)
+                        # send error status via socket
+                        title = 'Error at vat number "{}-{}". Please recheck.'.format(country_code, number)
+                        SocketService.emit_status_error(i+1, total_number_vatins, original_filename, 'vatin', title)
+                        return False
 
 
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_vatins, error_counter)
+         # send final status via socket
+        title = '{} vat numbers have been successfully registered.'.format(total_number_vatins)
+        SocketService.emit_status_final(i+1, total_number_vatins, original_filename, 'vatin', title)
 
-        return response_objects
+        return True
 
 
 

@@ -37,7 +37,7 @@ class Country(db.Model):  # type: ignore
     )
 
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
-    distance_sales = db.relationship('DistanceSale', backref='country', lazy=True)
+    distance_sales = db.relationship('DistanceSale', backref='arrival_country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country')
 
     transaction_inputs_departure_country = db.relationship('TransactionInput', backref='departure_country', foreign_keys='TransactionInput.departure_country_code', lazy=True)

@@ -45,6 +45,12 @@ tag_notification_AT = db.Table(
     db.Column('notification_id', db.Integer, db.ForeignKey('notification.id'), primary_key=True)
 )
 
+user_tag_item_AT = db.Table(
+    'user_tag_item_AT',
+    db.Column('user_tag_id', db.Integer, db.ForeignKey('user_tag.id'), primary_key=True),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
+)
+
 seller_firm_accounting_firm_AT = db.Table(
     'seller_firm_accounting_firm_AT',
      db.Column('seller_firm_id', db.Integer, db.ForeignKey('business.id'), primary_key=True),

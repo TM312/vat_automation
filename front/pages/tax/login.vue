@@ -66,22 +66,20 @@ export default {
 
         this.$router.push('/tax/dashboard')
 
-        await this.$toast.success('Successfully signed in!', {
-          duration: 5000,
-        })
       } catch (err) {
         // console.log('ERRRORCODE')
         // console.log(err.response.status)
         const status = err.response.status
         if (status === 401 || status === 404) {
-          this.$toast.error('Invalid password or email.', {
-            duration: 5000,
-          })
+          this.$bvToast.toast('Invalid password or email.', {
+          autoHideDelay: 5000,
+          variant: 'danger'
+        })
         } else {
-          this.$toast.error(
-            'There seems to be a problem. Please try again later.',
-            { duration: 5000 }
-          )
+          this.$bvToast.toast('There seems to be a problem. Please try again later.', {
+            autoHideDelay: 5000,
+            variant: 'danger'
+          })
         }
       }
     },

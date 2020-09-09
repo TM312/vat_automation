@@ -15,9 +15,10 @@ class VATIN(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
-
+    original_filename = db.Column(db.String(128))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
+
     request_date = db.Column(db.Date, nullable=False)
     valid_from = db.Column(db.Date)
 

@@ -9,7 +9,7 @@ from app.extensions import (
 
 from . import DistanceSale
 from .interface import DistanceSaleInterface
-from .schema import DistanceSaleSchemaSocket
+from .schema import DistanceSaleSubSchema
 
 from ..utils.service import InputService, NotificationService
 from ..tag.service import TagService
@@ -154,13 +154,41 @@ class DistanceSaleService:
         error_counter = 0
         total_number_distance_sales = len(df.index)
         input_type = 'distance_sale' # only used for response objects
+        original_filename = os.path.basename(file_path_in)[:128]
 
         for i in range(total_number_distance_sales):
 
-            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            valid_to = InputService.get_date_or_None(df, i, column='valid_to')
-            arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            active = InputService.get_bool(df, i, column='active', value_true=True)
+            try:
+                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            except:
+                # send error status via socket
+                title = 'Can not read column "valid_from" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                return False
+
+            try:
+                valid_to = InputService.get_date_or_None(df, i, column='valid_to')
+            except:
+                # send error status via socket
+                title = 'Can not read column "valid_to" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                return False
+
+            try:
+                arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
+            except:
+                # send error status via socket
+                title = 'Can not read column "arrival_country_code" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                return False
+
+            try:
+                active = InputService.get_bool(df, i, column='active', value_true=True)
+            except:
+                # send error status via socket
+                title = 'Can not read column "active" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                return False
 
             if not valid_from:
                 valid_from = date.today()
@@ -171,7 +199,7 @@ class DistanceSaleService:
             redundancy_counter += DistanceSaleService.handle_redundancy(seller_firm_id, arrival_country_code, valid_from)
             distance_sale_data = {
                 'created_by': user_id,
-                'original_filename' : os.path.basename(file_path_in),
+                'original_filename': original_filename,
                 'seller_firm_id': seller_firm_id,
                 'valid_from': valid_from,
                 'valid_to': valid_to,
@@ -179,42 +207,34 @@ class DistanceSaleService:
                 'active': active
             }
 
-
-
             try:
                 new_distance_sale = DistanceSaleService.create(distance_sale_data)
 
-                status = {
-                    "current": i+1,
-                    "total": total_number_distance_sales,
-                    'variant': 'success',
-                    'done': False,
-                    'object': 'distance_sale',
-                    'title': 'New distance sales are being registered...',
-                }
+                # send status update via socket
+                title ='New distance sales are being registered...'
+                SocketService.emit_status_success(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
 
-                SocketService.emit_status(meta=status)
-
-                distance_sale_schema = DistanceSaleSchemaSocket.get_distance_sale_sub(new_distance_sale)
-                SocketService.emit_new_distance_sale(meta=distance_sale_schema)
+                # push new distance sale to vuex via socket
+                distance_sale_json = DistanceSaleSubSchema.get_distance_sale_sub(new_distance_sale)
+                SocketService.emit_new_distance_sale(meta=distance_sale_json)
 
             except:
                 db.session.rollback()
                 error_counter += 1
 
-        status = {
-            "current": i+1,
-            "total": total_number_distance_sales,
-            'variant': 'success',
-            'done': True,
-            'object': 'distance_sale',
-            'title': '{} distance sales have been successfully registered.'.format(total_number_distance_sales)
-        }
-        SocketService.emit_status(meta=status)
+                # send error status via socket
+                title = 'Error at distance sale arrival country "{}". Please recheck.'.format(arrival_country_code)
+                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                return False
 
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
 
-        return response_objects
+        # send final status via socket
+        title= '{} distance sales have been successfully registered.'.format(total_number_distance_sales)
+        SocketService.emit_status_final(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+
+        # response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
+
+        return True
 
 
     @staticmethod

@@ -46,7 +46,9 @@ export default {
      */
     plugins: [
         // '~/plugins/file-system'
-        '~/plugins/repositories.js'
+        '~/plugins/repositories',
+        '~/plugins/sleep',
+        '~/plugins/findIndexVuex'
     ],
 
     /*
@@ -213,11 +215,13 @@ export default {
             default: true,
             vuex: {
                 mutations: [
-                    { status: 'status/SET_STATUS' },
                     { new_account: 'seller_firm/PUSH_ACCOUNT' },
                     { new_item: 'seller_firm/PUSH_ITEM' },
                     { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
                     { new_vat_number: 'seller_firm/PUSH_VAT_NUMBER' }
+                ],
+                actions: [
+                    { status: 'status/handle_status' },
                 ]
             }
         }]

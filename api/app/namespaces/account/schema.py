@@ -1,5 +1,8 @@
+# import json
 from flask_restx import Model, fields
+# from app.extensions import ma
 
+from . import Account
 from ..transaction import transaction_sub_dto
 from ..transaction_input import transaction_input_sub_dto
 
@@ -27,12 +30,24 @@ account_admin_dto = account_dto.clone('account_admin', {
 })
 
 
-class AccountSchemaSocket:
+class AccountSubSchema:  #(ma.SQLAlchemySchema):
 
     @staticmethod
     def get_account_sub(account):
-        return {
+
+        #added cfeated on
+        account_as_dict = {
             'public_id': str(account.public_id),
             'given_id': account.given_id,
             'channel_code': account.channel_code
         }
+        return account_as_dict
+
+
+    #     class Meta:
+    #         model = Account
+
+    #     public_id = ma.auto_field()
+    #     given_id = ma.auto_field()
+    #     channel_code = ma.auto_field()
+    #     created_on = ma.auto_field()

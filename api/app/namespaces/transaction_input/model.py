@@ -13,10 +13,10 @@ class TransactionInput(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
-    original_filename = db.Column(db.String(128), nullable=False)
+    original_filename = db.Column(db.String(128))
     bundle_id = db.Column(db.Integer, db.ForeignKey('bundle.id'), nullable=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #User --> uploader
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id')) #User --> uploader
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
 
     processed = db.Column(db.Boolean, default=False)
