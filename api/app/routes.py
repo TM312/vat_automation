@@ -10,6 +10,7 @@ def register_routes(api, app):
     from app.namespaces.email import attach_email
     from app.namespaces.exchange_rate import attach_exchange_rate
     from app.namespaces.item import attach_item
+    from app.namespaces.category import attach_category
     from app.namespaces.platform import attach_platform
     from app.namespaces.tag import attach_tag
     from app.namespaces.tax import attach_tax
@@ -17,6 +18,7 @@ def register_routes(api, app):
     from app.namespaces.transaction import attach_transaction
     from app.namespaces.transaction_input import attach_transaction_input
     from app.namespaces.user import attach_user
+    from app.namespaces.user_tag import attach_user_tag
     from app.namespaces.utils import attach_utils
 
 
@@ -33,6 +35,7 @@ def register_routes(api, app):
     attach_email(api, app)
     attach_exchange_rate(api, app)
     attach_item(api, app)
+    attach_category(api, app)
     attach_platform(api, app)
     attach_tag(api, app)
     attach_tax(api, app)
@@ -40,4 +43,5 @@ def register_routes(api, app):
     attach_transaction(api, app)
     attach_transaction_input(api, app)
     attach_user(api, app)
+    attach_user_tag(api, app)
     attach_utils(api, app)

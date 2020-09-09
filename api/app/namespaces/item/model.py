@@ -5,6 +5,8 @@ from app.extensions import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from ..utils.ATs import user_tag_item_AT
+
 
 
 class Item(db.Model):  # type: ignore
@@ -15,6 +17,8 @@ class Item(db.Model):  # type: ignore
     public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid4)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     original_filename = db.Column(db.String(128))
     sku = db.Column(db.String(48), nullable=False)
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
@@ -46,6 +50,12 @@ class Item(db.Model):  # type: ignore
     transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
     transactions = db.relationship('Transaction', backref='item', lazy=True)
 
+    user_tags = db.relationship(
+        "UserTag",
+        secondary=user_tag_item_AT,
+        back_populates="items"
+    )
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -76,4 +86,5 @@ class Item(db.Model):  # type: ignore
     def update(self, data_changes):
         for key, val in data_changes.items():
             setattr(self, key, val)
+        self.modified_at = datetime.utcnow()
         return self

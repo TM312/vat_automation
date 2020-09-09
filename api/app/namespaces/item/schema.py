@@ -30,11 +30,11 @@ item_admin_dto = item_dto.clone('item_admin', {
 })
 
 
-class ItemSchemaSocket:
+class ItemSubSchema:
 
     @staticmethod
     def get_item_sub(item):
-        return {
+        item_as_dict = {
             'public_id': str(item.public_id),
             'original_filename': item.original_filename,
             'sku': item.sku,
@@ -45,3 +45,4 @@ class ItemSchemaSocket:
             'unit_cost_price_currency_code': item.unit_cost_price_currency_code,
             'unit_cost_price_net': item.unit_cost_price_net
         }
+        return item_as_dict

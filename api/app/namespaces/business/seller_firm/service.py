@@ -209,6 +209,8 @@ class SellerFirmService:
             'created_by': user_id
         }
 
+        print('Test PRINT', flush=True)
+
 
         # processing starts here
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
@@ -224,7 +226,13 @@ class SellerFirmService:
                     args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                     )
 
-                # response_object = { 'status':'success'}
+                # ### for debugging ###
+                # from ...account.service import AccountService
+                # response_object = AccountService.handle_account_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data)
+                # print('response_object:', response_object, flush=True)
+                # print("", flush=True)
+                # #### ****** ########
+
 
             elif file_type == 'distance_sale_list':
                 from app.tasks.asyncr import async_handle_distance_sale_data_upload
@@ -232,6 +240,12 @@ class SellerFirmService:
                     retry=True,
                     args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                     )
+
+                # from ...distance_sale.service import DistanceSaleService
+                # response_object = DistanceSaleService.handle_distance_sale_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data)
+                # print('response_object:', response_object, flush=True)
+                # print("", flush=True)
+
 
             elif file_type == 'item_list':
                 from app.tasks.asyncr import async_handle_item_data_upload

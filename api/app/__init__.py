@@ -1,5 +1,15 @@
 # following http://www.patricksoftwareblog.com/structuring-a-flask-project/
-from app.extensions import (db, migrate, bcrypt, mail, cors, limiter, cache, session, socket_io)
+from app.extensions import (
+    db,
+    migrate,
+    #ma,
+    bcrypt,
+    mail,
+    cors,
+    limiter,
+    cache,
+    session,
+    socket_io)
 #from app.logs.service import LogService
 from flask import Flask, jsonify
 from werkzeug.contrib.fixers import ProxyFix
@@ -43,6 +53,7 @@ def register_extensions(app) -> None:
     # extension instance to bind it to the Flask application instance (app)
     db.init_app(app)
     migrate.init_app(app, db)
+    # ma.init_app(app)
     bcrypt.init_app(app)
     cors.init_app(app)
     mail.init_app(app)

@@ -55,10 +55,10 @@ export default {
 
             .catch(err => {
                 console.log(err);
-                this.$toast.error(
-                    "An error occured. Please try again later or contact one of the admins.",
-                    { duration: 5000 }
-                );
+                this.$bvToast.toast('An error occured. Please try again later or contact one of the admins.', {
+                    autoHideDelay: 5000,
+                    variant: 'danger'
+                })
             })
         }
     }

@@ -54,6 +54,17 @@
             })
         },
 
+        beforeDestroy() {
+            this.resetStatus()
+        },
+
+        methods: {
+            resetStatus() {
+                const { store } = this.$nuxt.context
+                store.dispatch('status/clear_all')
+            }
+
+        },
     };
 </script>
 

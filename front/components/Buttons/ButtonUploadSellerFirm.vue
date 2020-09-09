@@ -24,8 +24,6 @@
         },
          data() {
             return {
-                progress: 0,
-                progressBarStyle: "success",
                 uploadInProgress: false
             };
         },
@@ -54,23 +52,12 @@
                 }
             },
 
-            sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            },
-
             async uploadFiles() {
                 this.uploadInProgress = true
                 var config = {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },
-                    // onUploadProgress: function(progressEvent) {
-                    //     this.progress = parseInt(
-                    //         Math.round(
-                    //             (progressEvent.loaded / progressEvent.total) * 100
-                    //         )
-                    //     );
-                    // }.bind(this)
                 };
 
                 // FormData is a standard JS object
@@ -110,7 +97,6 @@
                             "An error occured. Please make sure you have tried to submit valid data.",
                             { duration: 10000 }
                         );
-                        this.progressBarStyle = "danger";
                         this.uploadInProgress = false
                         i = this.files.length
                     }

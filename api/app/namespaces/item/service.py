@@ -10,7 +10,7 @@ from app.extensions import (
     socket_io)
 
 from . import Item
-from .schema import ItemSchemaSocket
+from .schema import ItemSubSchema
 from .interface import ItemInterface
 
 from ..account import Account
@@ -65,7 +65,7 @@ class ItemService:
             return item
 
     @staticmethod
-    def delete_by_id(item_id: str):
+    def delete_by_id(item_id: int):
         item = Item.query.filter(Item.id == item_id).first()
         if item:
             db.session.delete(item)
@@ -250,81 +250,97 @@ class ItemService:
         error_counter = 0
         total_number_items = len(df.index)
         input_type = 'item' # only used for response objects
+        original_filename = os.path.basename(file_path_in)[:128]
 
         for i in range(total_number_items):
 
-            sku = InputService.get_str(df, i, column='SKU')
+            try:
+                sku = InputService.get_str(df, i, column='SKU')
+            except:
+                # send error status via socket
+                title = 'Can not read column "SKU" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
-            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            valid_to = InputService.get_date_or_None(df, i, column='valid_to')
+            try:
+                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            except:
+                # send error status via socket
+                title = 'Can not read column "valid_from" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
-            if sku and seller_firm_id:
-                if not valid_from:
-                    valid_from = date.today()
-                if not valid_to:
-                    TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
-                    valid_to = TAX_DEFAULT_VALIDITY
+            try:
+                valid_to = InputService.get_date_or_None(df, i, column='valid_to')
+            except:
+                # send error status via socket
+                title = 'Can not read column "valid_to" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
-                redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
-                item_data = {
-                    'created_by': user_id,
-                    'original_filename': os.path.basename(file_path_in),
-                    'sku': sku,
-                    'seller_firm_id': seller_firm_id,
-                    'valid_from': valid_from,
-                    'valid_to': valid_to,
-                    'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
-                    'name': InputService.get_str_or_None(df, i, column='name'),
-                    # 'ean': InputService.get_str_or_None(df, i, column='ean'),
-                    # 'asin': InputService.get_str_or_None(df, i, column='asin'),
-                    # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
-                    'weight_kg': InputService.get_float(df, i, column='weight_kg'),
-                    'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
-                    'unit_cost_price_currency_code': InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
-                    'unit_cost_price_net': InputService.get_float(df, i, column='unit_cost_price_net')
-                }
+            if not sku or sku == '':
+                # send error status via socket
+                title = 'No SKU provided in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
-                try:
-                    new_item = ItemService.create(item_data)
+            if not seller_firm_id:
+                # send error status via socket
+                title = 'Can not identify the seller firm for this item (SKU: {}). Please contact one of the admins.'.format(sku)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
-                    status = {
-                        "current": i+1,
-                        "total": total_number_items,
-                        'variant': 'success',
-                        'done': False,
-                        'object': 'item',
-                        'title': 'New items are being created...',
-                    }
+            if not valid_from:
+                valid_from = date.today()
+            if not valid_to:
+                TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
+                valid_to = TAX_DEFAULT_VALIDITY
 
-                    SocketService.emit_status(meta=status)
+            redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
+            item_data = {
+                'created_by': user_id,
+                'original_filename': original_filename,
+                'sku': sku,
+                'seller_firm_id': seller_firm_id,
+                'valid_from': valid_from,
+                'valid_to': valid_to,
+                'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
+                'name': InputService.get_str_or_None(df, i, column='name'),
+                # 'ean': InputService.get_str_or_None(df, i, column='ean'),
+                # 'asin': InputService.get_str_or_None(df, i, column='asin'),
+                # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
+                'weight_kg': InputService.get_float(df, i, column='weight_kg'),
+                'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
+                'unit_cost_price_currency_code': InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
+                'unit_cost_price_net': InputService.get_float(df, i, column='unit_cost_price_net')
+            }
 
-                    item_schema_sub = ItemSchemaSocket.get_item_sub(new_item)
-                    SocketService.emit_new_item(meta=item_schema_sub)
+            try:
+                new_item = ItemService.create(item_data)
 
-                except:
-                    db.session.rollback()
+                # send status update via socket
+                title = 'New items are being registered...'
+                SocketService.emit_status_success(i+1, total_number_items, original_filename, 'item', title)
 
-                    error_counter += 1
+                # push new distance sale to vuex via socket
+                item_schema_sub = ItemSubSchema.get_item_sub(new_item)
+                SocketService.emit_new_item(meta=item_schema_sub)
 
-            else:
-                error_counter += 1
+            except:
+                db.session.rollback()
 
-
-        status = {
-            "current": i+1,
-            "total": total_number_items,
-            'variant': 'success',
-            'done': True,
-            'object': 'item',
-            'title': '{} items have been successfully created.'.format(total_number_items)
-        }
-
-        SocketService.emit_status(meta=status)
+                # send error status via socket
+                title = 'Error at item sku "{}". Please recheck.'.format(sku)
+                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                return False
 
 
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)
+        # send final status via socket
+        title = '{} items have been successfully registered.'.format(total_number_items)
+        SocketService.emit_status_final(i+1, total_number_items, original_filename, 'item', title)
 
-        return response_objects
+        # response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)
+        return True
 
 
 # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information

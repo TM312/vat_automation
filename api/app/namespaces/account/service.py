@@ -1,3 +1,4 @@
+import os
 from typing import (
     List,
     BinaryIO,
@@ -15,7 +16,7 @@ from app.extensions import (
 from app.extensions.socketio.emitters import SocketService
 
 from . import Account
-from .schema import AccountSchemaSocket
+from .schema import AccountSubSchema
 from .interface import AccountInterface
 from ..utils.service import InputService
 from ..tag.service import TagService
@@ -182,16 +183,43 @@ class AccountService:
         error_counter = 0
         total_number_accounts = len(df.index)
         input_type = 'account' # only used for response objects
+        original_filename = os.path.basename(file_path_in)[:128]
 
         for i in range(total_number_accounts):
 
-            given_id = InputService.get_str(df, i, column='account_id')
-            channel_code = InputService.get_str(df, i, column='channel_code')
+            try:
+                given_id = InputService.get_str(df, i, column='account_id')
+            except:
+                # send error status via socket
+                title = 'Can not read column "account_id" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                return False
+
+            if not given_id or given_id == '':
+                # send error status via socket
+                title = 'No account id provided in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                return False
+
+            try:
+                channel_code = InputService.get_str(df, i, column='channel_code')
+            except:
+                # send error status via socket
+                title = 'Can not read column "channel_code" in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                return False
+
+            if not channel_code or channel_code == '':
+                # send error status via socket
+                title = 'No channel provided in row {}.'.format(i+1)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                return False
 
 
             redundancy_counter += AccountService.handle_redundancy(given_id, channel_code)
             account_data = {
                 'created_by': user_id,
+                'original_filename': original_filename,
                 'seller_firm_id' : seller_firm_id,
                 'given_id' : given_id,
                 'channel_code' : channel_code
@@ -200,41 +228,31 @@ class AccountService:
             try:
                 new_account = AccountService.create(account_data)
 
-                status = {
-                    "current": i+1,
-                    "total": total_number_accounts,
-                    'variant': 'success',
-                    'done': False,
-                    'object': 'account',
-                    'title': 'New accounts are being registered...',
-                }
+                # send status update via socket
+                title = 'New accounts are being registered...'
+                SocketService.emit_status_success(i+1, total_number_accounts, original_filename, 'account', title)
 
-                SocketService.emit_status(meta=status)
-
-                account_schema = AccountSchemaSocket.get_account_sub(new_account)
-                SocketService.emit_new_account(meta=account_schema)
+                # push new distance sale to vuex via socket
+                account_json = AccountSubSchema.get_account_sub(new_account)
+                SocketService.emit_new_account(meta=account_json)
 
             except:
                 db.session.rollback()
-
                 error_counter += 1
 
+                # send error status via socket
+                title = 'Error at account "{}" for channel "{}". Please recheck.'.format(given_id, channel_code)
+                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                return False
 
+        # send final status via socket
+        if redundancy_counter > 0:
+            title = '{} accounts have been successfully registered. {} accounts already existed before and have been updated.'.format(total_number_accounts, redundancy_counter)
+        else:
+            title = '{} accounts have been successfully registered.'.format(total_number_accounts)
+        SocketService.emit_status_final(i+1, total_number_accounts, original_filename, 'account', title)
 
-        status = {
-            "current": i+1,
-            "total": total_number_accounts,
-            'variant': 'success',
-            'done': True,
-            'object': 'account',
-            'title': '{} accounts have been successfully registered.'.format(total_number_accounts)
-        }
-        SocketService.emit_status(meta=status)
-
-
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_accounts, error_counter, redundancy_counter=redundancy_counter)
-
-        return response_objects
+        return True
 
 
 
@@ -243,6 +261,7 @@ class AccountService:
 
         new_account = Account(
             created_by = account_data.get('created_by'),
+            original_filename=account_data.get('original_filename'),
             seller_firm_id = account_data.get('seller_firm_id'),
             given_id = account_data.get('given_id'),
             channel_code = account_data.get('channel_code')

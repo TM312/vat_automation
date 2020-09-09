@@ -28,7 +28,6 @@ class Business(db.Model):  # type: ignore
     address = db.Column(db.String(256))
     # logo_image_name = db.Column(db.String(120), default=None)
     vat_numbers = db.relationship('VATIN', backref='business', lazy=True)
-    b_type = db.Column(db.String(50))
 
     accounting_firms = db.relationship(
         'Business',
@@ -36,9 +35,8 @@ class Business(db.Model):  # type: ignore
         primaryjoin="seller_firm_accounting_firm_AT.c.seller_firm_id == Business.id",
         secondaryjoin="seller_firm_accounting_firm_AT.c.accounting_firm_id == Business.id",
         backref='clients'
-        )
-
-
+    )
+    b_type = db.Column(db.String(50))
     __mapper_args__ = {'polymorphic_on': b_type}
 
 

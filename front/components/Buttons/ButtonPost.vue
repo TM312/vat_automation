@@ -26,7 +26,6 @@
         data() {
             return {
                 progress: 0,
-                progressBarStyle: "success",
             };
         },
         methods: {
@@ -39,23 +38,25 @@
 
                         if (response_object.status == "success") {
 
-                            this.$toast.success(response_object.message, {
-                                duration: 5000
-                            });
-
+                            this.$bvToast.toast(response_object.message, {
+                                autoHideDelay: 5000,
+                                variant: 'success'
+                            })
 
                         } else {
-                            this.$toast.error(response_object.message, { duration: 5000 });
+                            this.$bvToast.toast(response_object.message, {
+                                autoHideDelay: 5000,
+                                variant: 'danger'
+                            })
                         }
                     })
 
                     .catch(err => {
                         console.log(err);
-                        this.$toast.error(
-                            "An error occured. Please make sure you have tried to submit valid data.",
-                            { duration: 5000 }
-                        );
-                        this.progressBarStyle = "danger";
+                        this.$bvToast.toast('An error occured. Please make sure you have tried to submit valid data.', {
+                            autoHideDelay: 5000,
+                            variant: 'danger'
+                        })
                     });
 
 
