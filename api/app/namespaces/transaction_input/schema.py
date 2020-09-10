@@ -114,3 +114,28 @@ transaction_input_admin_dto = transaction_input_dto.clone('transaction_input_adm
     'id': fields.Integer(readonly=True),
     'bundle_id': fields.Integer
 })
+
+
+
+class TransactionInputSubSchema:
+
+    @staticmethod
+    def get_transaction_input_sub(transaction_input):
+        transaction_input_as_dict = {
+            'public_id': str(transaction_input.public_id),
+            'processed': transaction_input.processed,
+            'channel_code': transaction_input.channel_code,
+            'marketplace': transaction_input.marketplace,
+            'given_id': transaction_input.given_id,
+            'transaction_type_public_code': transaction_input.transaction_type_public_code,
+            'shipment_date': str(transaction_input.shipment_date),
+            'complete_date': str(transaction_input.complete_date),
+            'item_sku': transaction_input.item_sku,
+            'item_quantity': transaction_input.item_quantity,
+            'sale_total_value_gross': transaction_input.sale_total_value_gross,
+            'currency_code': transaction_input.currency_code,
+            'departure_country_code': transaction_input.departure_country_code,
+            'arrival_country_code': transaction_input.arrival_country_code,
+            'seller_firm_public_id': str(transaction_input.seller_firm_public_id)
+        }
+        return transaction_input_as_dict

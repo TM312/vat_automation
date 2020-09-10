@@ -11,6 +11,7 @@ from app.extensions import (
 
 from . import TransactionInput
 from .interface import TransactionInputInterface
+from .schema import TransactionInputSubSchema
 
 from ..account import Account
 from ..utils.service import InputService, NotificationService
@@ -198,15 +199,19 @@ class TransactionInputService:
 
 
         error_counter = 0
-        total_number_transaction_inputs = len(df.index)
+        total = total_number_transaction_inputs = len(df.index)
         input_type = 'transaction' # only used for response objects
         transaction_inputs = []
+        object_type = 'transaction_input'
+        object_type_human_read = 'transaction'
 
         # send status update via socket
         title = 'Reading transaction file...'
-        SocketService.emit_status_success(1, total_number_transaction_inputs, original_filename, 'transaction_input', title)
+        SocketService.emit_status_success(1, total, original_filename, object_type, title)
 
         for i in range(total_number_transaction_inputs):
+            current = i + 1
+
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
             channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
 
@@ -228,23 +233,23 @@ class TransactionInputService:
 
             # send error status via socket
             if not account_given_id or account_given_id == '':
-                SocketService.emit_status_error_no_value(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', 'UNIQUE_ACCOUNT_IDENTIFIER')
+                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
                 return False
 
             if not channel_code or channel_code == '':
-                SocketService.emit_status_error_no_value(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', 'SALES_CHANNEL')
+                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'SALES_CHANNEL')
                 return False
 
             if not given_id or given_id == '':
-                SocketService.emit_status_error_no_value(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', 'TRANSACTION_EVENT_ID')
+                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'TRANSACTION_EVENT_ID')
                 return False
 
             if not activity_id or activity_id == '':
-                SocketService.emit_status_error_no_value(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', 'ACTIVITY_TRANSACTION_ID')
+                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'ACTIVITY_TRANSACTION_ID')
                 return False
 
             if not item_sku or item_sku == '':
-                SocketService.emit_status_error_no_value(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', 'SELLER_SKU')
+                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'SELLER_SKU')
                 return False
 
             transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
@@ -392,8 +397,8 @@ class TransactionInputService:
                     except:
                         db.session.rollback()
                         # send error status via socket
-                        title = 'Error while updating transaction with id: {} in row {}. Please get in touch with one of the admins.'.format(given_id, i+1)
-                        SocketService.emit_status_error(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', title)
+                        title = 'Error while updating {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
+                        SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
                         return False
 
             else:
@@ -404,14 +409,13 @@ class TransactionInputService:
                 except:
                     db.session.rollback()
                      # send error status via socket
-                    title = 'Error while updating transaction with id: {} in row {}. Please get in touch with one of the admins.'.format(given_id, i+1)
-                    SocketService.emit_status_error(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', title)
+                    title = 'Error while updating {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
+                    SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
                     return False
 
 
 
-        # after all transaction inputs have been stored transactions are created
-        for (transaction_input, i) in enumerate(transaction_inputs):
+            # transactions are being created
             if not transaction_input.processed:
                 try:
                     # create transactions
@@ -421,14 +425,17 @@ class TransactionInputService:
                         db.session.commit()
 
                         # send status update via socket
-                        title = 'New transactions are being processed...''
-                        SocketService.emit_status_success(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', title)
+                        SocketService.emit_status_success_progress(current, total_number_transaction_inputs, original_filename, object_type, object_type_human_read)
+
+                        # push new distance sale to vuex via socket
+                        transaction_input_schema_sub = TransactionInputSubSchema.get_transaction_input_sub(new_transaction_input)
+                        SocketService.emit_new_transaction_input(meta=transaction_input_schema_sub)
 
                 except:
                     db.session.rollback()
                     # send error status via socket
-                    title = 'Error while processing transaction with id: {} in row {}. Please get in touch with one of the admins.'.format(given_id, i+1)
-                    SocketService.emit_status_error(i+1, total_number_transaction_inputs, original_filename, 'transaction_input', title)
+                    title = 'Error while processing {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
+                    SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
                     return False
 
 

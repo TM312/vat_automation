@@ -43,12 +43,7 @@ class AccountService:
 
     @staticmethod
     def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
-        account = Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
-        if account:
-            return account
-        else:
-            raise NotFound('An account for the channel {} and the id {} does not exist in our db. Please add the account before proceeding.'.format(channel_code, account_given_id))
-
+        return Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
 
     @staticmethod
     def update(account_id: int, data_changes: AccountInterface) -> Account:
@@ -114,15 +109,17 @@ class AccountService:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             account_data['seller_firm_id'] = seller_firm.id
-            AccountService.handle_redundancy(account_data['given_id'], account_data['channel_code'])
+            account = AccountService.get_by_given_id_channel_code(account_data['given_id'], account_data['channel_code'])
+            if account:
+                return account
+            else:
+                try:
+                    new_account = AccountService.create(account_data)
+                    return new_account
 
-            try:
-                new_account = AccountService.create(account_data)
-                return new_account
-
-            except:
-                db.session.rollback()
-                raise
+                except:
+                    db.session.rollback()
+                    raise
 
 
 
@@ -181,42 +178,47 @@ class AccountService:
 
         redundancy_counter = 0
         error_counter = 0
-        total_number_accounts = len(df.index)
-        input_type = 'account' # only used for response objects
+        total = total_number_accounts = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
+        object_type = object_type_human_read = 'account'
+
+
+        if not seller_firm_id:
+            # send error status via socket
+            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            return False
 
         for i in range(total_number_accounts):
+            current = i + 1
 
             try:
                 given_id = InputService.get_str(df, i, column='account_id')
             except:
                 # send error status via socket
-                title = 'Can not read column "account_id" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='account_id')
                 return False
 
             if not given_id or given_id == '':
                 # send error status via socket
-                title = 'No account id provided in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                SocketService.emit_status_error_no_value(current, total, original_filename, object_type, column_name='account_id')
                 return False
 
             try:
                 channel_code = InputService.get_str(df, i, column='channel_code')
             except:
                 # send error status via socket
-                title = 'Can not read column "channel_code" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='channel_code')
                 return False
 
             if not channel_code or channel_code == '':
                 # send error status via socket
-                title = 'No channel provided in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                SocketService.emit_status_error_no_value(current, total, original_filename, object_type, column_name='channel_code')
                 return False
 
+            account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
+            if account:
+                continue
 
-            redundancy_counter += AccountService.handle_redundancy(given_id, channel_code)
             account_data = {
                 'created_by': user_id,
                 'original_filename': original_filename,
@@ -229,28 +231,23 @@ class AccountService:
                 new_account = AccountService.create(account_data)
 
                 # send status update via socket
-                title = 'New accounts are being registered...'
-                SocketService.emit_status_success(i+1, total_number_accounts, original_filename, 'account', title)
+                SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
 
                 # push new distance sale to vuex via socket
                 account_json = AccountSubSchema.get_account_sub(new_account)
-                SocketService.emit_new_account(meta=account_json)
+                SocketService.emit_new_object(account_json, object_type)
 
             except:
                 db.session.rollback()
                 error_counter += 1
 
                 # send error status via socket
-                title = 'Error at account "{}" for channel "{}". Please recheck.'.format(given_id, channel_code)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                title = 'Error at {} "{}" for channel "{}". Please recheck.'.format(object_type_human_read, given_id, channel_code)
+                SocketService.emit_status_error(current, total, original_filename, object_type, title)
                 return False
 
         # send final status via socket
-        if redundancy_counter > 0:
-            title = '{} accounts have been successfully registered. {} accounts already existed before and have been updated.'.format(total_number_accounts, redundancy_counter)
-        else:
-            title = '{} accounts have been successfully registered.'.format(total_number_accounts)
-        SocketService.emit_status_final(i+1, total_number_accounts, original_filename, 'account', title)
+        SocketService.emit_status_final(current, total, original_filename, object_type, object_type_human_read)
 
         return True
 

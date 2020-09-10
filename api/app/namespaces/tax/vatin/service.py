@@ -213,17 +213,24 @@ class VATINService:
         from time import sleep
 
         error_counter = 0
-        total_number_vatins = len(df.index)
-        input_type = 'vat number' #only used for response objects
+        total = total_number_vatins = len(df.index)
         original_filename = os.path.basename(file_path_in)[:127]
+        object_type = 'vatin'
+        object_type_human_read = 'vat number'
+
+        if not seller_firm_id:
+            # send error status via socket
+            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            return False
 
         for i in range(total_number_vatins):
+            current = i + 1
             try:
                 country_code, number = VATINService.get_vat_from_df(df, i)
             except:
                 # send error status via socket
-                title = 'Can not read country code/number of vat number in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'vatin', title)
+                title = 'Can not read country code/number of {} in row {}.'.format(current, object_type_human_read)
+                SocketService.emit_status_error(current, total, original_filename, object_type, title)
                 return False
 
             if (country_code is None or number is None):
@@ -242,8 +249,8 @@ class VATINService:
                     except:
                         db.session.rollback()
                         # send error status via socket
-                        title = 'An error occured while updating the vat number in row {}. Please get in contact with one of the admins.'.format(i+1)
-                        SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                        title = 'An error occured while updating the {} in row {}. Please get in contact with one of the admins.'.format(object_type_human_read, current)
+                        SocketService.emit_status_error(current, total, original_filename, object_type, title)
                         return False
 
             else:
@@ -268,8 +275,8 @@ class VATINService:
                         db.session.rollback()
 
                         # send error status via socket
-                        title = 'An error occured while updating the vat number in row {}. Please get in contact with one of the admins.'.format(i+1)
-                        SocketService.emit_status_error(i+1, total_number_accounts, original_filename, 'account', title)
+                        title = 'An error occured while updating the {} in row {}. Please get in contact with one of the admins.'.format(object_type_human_read, current)
+                        SocketService.emit_status_error(current, total, original_filename, object_type, title)
                         return False
 
                 else:
@@ -277,12 +284,11 @@ class VATINService:
                         VATINService.create(vatin_data)
 
                         # send status update via socket
-                        title = 'New vat numbers are being registered...'
-                        SocketService.emit_status_success(i+1, total_number_vatins, original_filename, 'vatin', title)
+                        SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
 
                         # push new distance sale to vuex via socket
                         vatin_schema = VatinSchemaSocket.get_vatin_sub(new_vatin)
-                        SocketService.emit_new_vatin(meta=vatin_schema)
+                        SocketService.emit_new_object(vatin_schema, object_type)
 
                     except:
                         db.session.rollback()
@@ -290,13 +296,12 @@ class VATINService:
 
                         # send error status via socket
                         title = 'Error at vat number "{}-{}". Please recheck.'.format(country_code, number)
-                        SocketService.emit_status_error(i+1, total_number_vatins, original_filename, 'vatin', title)
+                        SocketService.emit_status_error(current, total, original_filename, object_type, title)
                         return False
 
 
-         # send final status via socket
-        title = '{} vat numbers have been successfully registered.'.format(total_number_vatins)
-        SocketService.emit_status_final(i+1, total_number_vatins, original_filename, 'vatin', title)
+        # send final status via socket
+        SocketService.emit_status_final(current, total, original_filename, object_type, object_type_human_read)
 
         return True
 

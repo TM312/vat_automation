@@ -47,8 +47,7 @@ export default {
     plugins: [
         // '~/plugins/file-system'
         '~/plugins/repositories',
-        '~/plugins/sleep',
-        '~/plugins/findIndexVuex'
+        '~/plugins/sleep'
     ],
 
     /*
@@ -218,7 +217,8 @@ export default {
                     { new_account: 'seller_firm/PUSH_ACCOUNT' },
                     { new_item: 'seller_firm/PUSH_ITEM' },
                     { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
-                    { new_vat_number: 'seller_firm/PUSH_VAT_NUMBER' }
+                    { new_vatin: 'seller_firm/PUSH_VAT_NUMBER' },
+                    { new_transaction_input: 'transaction_input/PUSH_TRANSACTION_INPUT' }
                 ],
                 actions: [
                     { status: 'status/handle_status' },
