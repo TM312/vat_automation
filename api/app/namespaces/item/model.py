@@ -20,7 +20,7 @@ class Item(db.Model):  # type: ignore
     modified_at = db.Column(db.DateTime)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     original_filename = db.Column(db.String(128))
-    sku = db.Column(db.String(48), nullable=False)
+    sku = db.Column(db.String(48))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date)

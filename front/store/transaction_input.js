@@ -4,18 +4,26 @@ export const state = () => ({
 })
 
 export const mutations = {
-    SET_TRANSACTION_INPUTS(state, transaction_inputs) {
-        state.transaction_inputs = transaction_inputs
+    SET_TRANSACTION_INPUTS(state, payload) {
+        state.transaction_inputs = payload
     },
 
-    SET_TRANSACTION_INPUT(state, transaction_input) {
-        state.transaction_input = transaction_input
+    SET_TRANSACTION_INPUT(state, payload) {
+        state.transaction_input = payload
     },
 
-    PUSH_TRANSACTION_INPUTS(state, transaction_inputs) {
-        for (let i = 0; i < transaction_inputs.length; i++)
-            if (state.transaction_inputs.includes(transaction_inputs[i]) === false) state.transaction_inputs.push(transaction_inputs[i])
-    }
+    UPDATE_TRANSACTION_INPUTS(state, payload) {
+        Object.assign(state.transaction_inputs[payload.index], payload.transaction_input);
+    },
+
+    PUSH_TRANSACTION_INPUTS(state, payload) {
+        for (let i = 0; i < payload.length; i++)
+            if (state.transaction_inputs.includes(payload[i]) === false) state.transaction_inputs.push(payload[i])
+    },
+
+    PUSH_TRANSACTION_INPUT(state, payload) {
+        state.transaction_inputs.push(payload)
+    },
 
 
 }
@@ -26,6 +34,7 @@ export const mutations = {
 
 
 export const actions = {
+
     async get_all({ commit }) {
         const res = await this.$repositories.transaction_input.get_all()
         const { status, data } = res

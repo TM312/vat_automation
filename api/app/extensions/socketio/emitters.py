@@ -9,30 +9,9 @@ from app.extensions import socket_io
 class SocketService:
 
     @staticmethod
-    def emit_new_account(meta):
+    def emit_new_object(meta, object_type):
         socket_io.emit(
-            'new_account',
-            meta
-        )
-
-    @staticmethod
-    def emit_new_item(meta):
-        socket_io.emit(
-            'new_item',
-            meta
-        )
-
-    @staticmethod
-    def emit_new_vat_number(meta):
-        socket_io.emit(
-            'new_vat_number',
-            meta
-        )
-
-    @staticmethod
-    def emit_new_distance_sale(meta):
-        socket_io.emit(
-            'new_distance_sale',
+            'new_{}'.format(object_type),
             meta
         )
 
@@ -44,32 +23,12 @@ class SocketService:
         )
 
     @staticmethod
-    def emit_status_error(current, total, original_filename, object_type, title):
+    def emit_status_success(current: int, total: int, target: str, object_type: str, title: str):
 
         status = {
             'current': current,
             'total': total,
-            'original_filename': original_filename,
-            'variant': 'danger',
-            'done': False,
-            'object': object_type,
-            'title': title
-        }
-
-        SocketService.emit_status(meta=status)
-
-    @staticmethod
-    def emit_status_error_no_value(current, total, original_filename, object_type, column_name):
-        title = 'No value in column "{}", row {}.'.format(column_name, current)
-        SocketService.emit_status_error(current, total, original_filename, object_type, title)
-
-    @staticmethod
-    def emit_status_success(current, total, original_filename, object_type, title):
-
-        status = {
-            'current': current,
-            'total': total,
-            'original_filename': original_filename,
+            'target': target,
             'variant': '',
             'done': False,
             'object': object_type,
@@ -79,11 +38,68 @@ class SocketService:
         SocketService.emit_status(meta=status)
 
     @staticmethod
-    def emit_status_final(current, total, original_filename, object_type, title):
+    def emit_status_success_progress(current: int, total: int, target: str, object_type: str, object_type_human_read: str):
+        title = 'New {}s are being registered...'.format(object_type_human_read)
+        SocketService.emit_status_success(current, total, target, object_type, title)
+
+
+
+    @staticmethod
+    def emit_status_info_box(current: int, total: int, target: str, object_type: str, message: str):
+
         status = {
             'current': current,
             'total': total,
-            'original_filename': original_filename,
+            'target': 'infobox',
+            'variant': 'info',
+            'done': False,
+            'object': object_type,
+            'message': message
+        }
+
+        SocketService.emit_status(meta=status)
+
+    @staticmethod
+    def emit_status_error(current: int, total: int, target: str, object_type: str, title: str):
+
+        status = {
+            'current': current,
+            'total': total,
+            'target': target,
+            'variant': 'danger',
+            'done': False,
+            'object': object_type,
+            'title': title
+        }
+
+        SocketService.emit_status(meta=status)
+
+    @staticmethod
+    def emit_status_error_no_value(current: int, total: int, target: str, object_type: str, column_name: str):
+        title = 'No value in column "{}", row {}.'.format(column_name, current)
+        SocketService.emit_status_error(current, total, target, object_type, title)
+
+    @staticmethod
+    def emit_status_error_column_read(current: int, total: int, target: str, object_type: str, column_name: str):
+        title = 'Can not read column "{}" in row {}.'.format(column_name, current)
+        SocketService.emit_status_error(current, total, target, object_type, title)
+
+
+    @staticmethod
+    def emit_status_error_no_seller_firm(current: int, total: int, target: str, object_type: str):
+        title = 'Can not identify the seller firm for the uploaded data. Please retry later or contact one of the admins.'
+        SocketService.emit_status_error(current, total, target, object_type, title)
+
+
+
+    @staticmethod
+    def emit_status_final(current: int, total: int, target: str, object_type: str, object_type_human_read: str):
+
+        title = '{} {}s have been successfully registered.'.format(total, object_type_human_read)
+        status = {
+            'current': current,
+            'total': total,
+            'target': target,
             'variant': 'success',
             'done': True,
             'object': object_type,

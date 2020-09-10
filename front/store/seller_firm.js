@@ -13,20 +13,22 @@ export const mutations = {
         state.seller_firm = seller_firm
     },
 
+    // if check is necessary -> if (state.seller_firm.accounts.includes(account) === false) state.seller_firm.accounts.push(account)
+
     PUSH_ACCOUNT(state, account) {
-        if (state.seller_firm.accounts.includes(account) === false) state.seller_firm.accounts.push(account)
+        state.seller_firm.accounts.push(account)
     },
 
     PUSH_ITEM(state, item) {
-        if (state.seller_firm.items.includes(item) === false) state.seller_firm.items.push(item)
+        state.seller_firm.items.push(item)
     },
 
     PUSH_DISTANCE_SALE(state, distance_sale) {
-        if (state.seller_firm.distance_sales.includes(distance_sale) === false) state.seller_firm.distance_sales.push(distance_sale)
+        state.seller_firm.distance_sales.push(distance_sale)
     },
 
     PUSH_VAT_NUMBER(state, vat_number) {
-        if (state.seller_firm.vat_numbers.includes(vat_number) === false) state.seller_firm.vat_numbers.push(vat_number)
+        state.seller_firm.vat_numbers.push(vat_number)
     }
 }
 

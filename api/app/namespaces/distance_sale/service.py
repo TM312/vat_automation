@@ -31,6 +31,15 @@ class DistanceSaleService:
         return DistanceSale.query.filter_by(public_id = distance_sale_public_id).first()
 
     @staticmethod
+    def get_by_arrival_country_seller_firm_id_date(arrival_country_code, seller_firm_id, date) -> DistanceSale:
+        return DistanceSale.query.filter(
+            DistanceSale.arrival_country_code == arrival_country_code,
+            DistanceSale.seller_firm_id == seller_firm_id,
+            DistanceSale.valid_from <= date,
+            DistanceSale.valid_to >= date).first()
+
+
+    @staticmethod
     def update(distance_sale_public_id: DistanceSale, data_changes: DistanceSaleInterface) -> DistanceSale:
         distance_sale.update(data_changes)
         db.session.commit()
@@ -50,7 +59,16 @@ class DistanceSaleService:
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
-            DistanceSaleService.handle_redundancy(seller_firm.id, distance_sale_data['arrival_country_code'], distance_sale_data['valid_from'])
+            distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id_date(distance_sale_data['arrival_country_code'], seller_firm.id, distance_sale_data['valid_from'])
+            if distance_sale:
+                if distance_sale.active == distance_sale_data['active']:
+                    return distance_sale
+                else:
+                    data_changes = {
+                        'valid_to': valid_from - timedelta(days=1)
+                    }
+                    distance_sale.update(data_changes)
+                    db.session.commit()
 
             distance_sale_data['seller_firm_id'] = seller_firm.id
             distance_sale = DistanceSaleService.create(distance_sale_data)
@@ -150,44 +168,46 @@ class DistanceSaleService:
     @staticmethod
     def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
-        redundancy_counter = 0
-        error_counter = 0
-        total_number_distance_sales = len(df.index)
-        input_type = 'distance_sale' # only used for response objects
+        total = total_number_distance_sales = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
+        object_type = 'distance_sale'
+        object_type_human_read = 'distance sale'
+
+
+        if not seller_firm_id:
+            # send error status via socket
+            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            return False
 
         for i in range(total_number_distance_sales):
+            current = i + 1
 
             try:
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             except:
                 # send error status via socket
-                title = 'Can not read column "valid_from" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_from')
                 return False
 
             try:
                 valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             except:
                 # send error status via socket
-                title = 'Can not read column "valid_to" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_to')
                 return False
 
             try:
                 arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
             except:
                 # send error status via socket
-                title = 'Can not read column "arrival_country_code" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='arrival_country_code')
                 return False
 
             try:
                 active = InputService.get_bool(df, i, column='active', value_true=True)
             except:
                 # send error status via socket
-                title = 'Can not read column "active" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='active')
                 return False
 
             if not valid_from:
@@ -196,7 +216,20 @@ class DistanceSaleService:
                 TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
                 valid_to = TAX_DEFAULT_VALIDITY
 
-            redundancy_counter += DistanceSaleService.handle_redundancy(seller_firm_id, arrival_country_code, valid_from)
+
+
+            distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id_date(arrival_country_code, seller_firm_id, valid_from)
+            if distance_sale:
+                if distance_sale.active == active:
+                    continue
+                else:
+                    data_changes = {
+                        'valid_to': valid_from - timedelta(days=1)
+                    }
+                    distance_sale.update(data_changes)
+                    db.session.commit()
+
+
             distance_sale_data = {
                 'created_by': user_id,
                 'original_filename': original_filename,
@@ -211,28 +244,24 @@ class DistanceSaleService:
                 new_distance_sale = DistanceSaleService.create(distance_sale_data)
 
                 # send status update via socket
-                title ='New distance sales are being registered...'
-                SocketService.emit_status_success(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
 
                 # push new distance sale to vuex via socket
                 distance_sale_json = DistanceSaleSubSchema.get_distance_sale_sub(new_distance_sale)
-                SocketService.emit_new_distance_sale(meta=distance_sale_json)
+                SocketService.emit_new_object(distance_sale_json, object_type)
 
             except:
                 db.session.rollback()
-                error_counter += 1
 
                 # send error status via socket
-                title = 'Error at distance sale arrival country "{}". Please recheck.'.format(arrival_country_code)
-                SocketService.emit_status_error(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
+                title = 'Error at {} arrival country "{}". Please recheck.'.format(object_type_human_read, arrival_country_code)
+                SocketService.emit_status_error(current, total, original_filename, object_type, title)
                 return False
 
 
         # send final status via socket
-        title= '{} distance sales have been successfully registered.'.format(total_number_distance_sales)
-        SocketService.emit_status_final(i+1, total_number_distance_sales, original_filename, 'distance_sale', title)
-
-        # response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_distance_sales, error_counter, redundancy_counter=redundancy_counter)
+        title= '{} {}s have been successfully registered.'.format(total, object_type_human_read)
+        SocketService.emit_status_final(current, total, original_filename, object_type, title)
 
         return True
 
@@ -257,25 +286,6 @@ class DistanceSaleService:
 
         return new_distance_sale
 
-
-
-    @staticmethod
-    def handle_redundancy(seller_firm_id: int, arrival_country_code: str, valid_from: date) -> int:
-        redundancy_counter = 0
-        distance_sale = DistanceSale.query.filter(DistanceSale.arrival_country_code == arrival_country_code, DistanceSale.seller_firm_id == seller_firm_id, DistanceSale.valid_to >= valid_from).first()
-        # if an distance_sale with the same sku for the specified validity period already exists, it is being updated or deleted.
-        if distance_sale:
-            if distance_sale.valid_from >= valid_from:
-                db.session.delete(distance_sale)
-
-            else:
-                data_changes = {
-                    'valid_to': valid_from - timedelta(days=1)
-                }
-                distance_sale.update(data_changes)
-                redundancy_counter += 1
-
-        return redundancy_counter
 
 
     @staticmethod

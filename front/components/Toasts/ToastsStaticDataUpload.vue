@@ -2,7 +2,7 @@
     <div>
 
         <hr>
-        <p>status_account_files_lowest: {{ status_account_files_lowest }}</p>
+        <p>status_account_targets_lowest: {{ status_account_targets_lowest }}</p>
         <h2>status_account_lowest: {{ status_account_lowest }}</h2>
 
         <hr>
@@ -11,118 +11,121 @@
 
         <hr>
 
-        percStatusAccountFiles: {{ percStatusAccountFiles }} <br>
-        percStatusItemFiles: {{ percStatusItemFiles }} <br>
-        percStatusVatNumberFiles: {{ percStatusVatNumberFiles }} <br>
-        percStatusDistanceSaleFiles: {{ percStatusDistanceSaleFiles }} <br>
-        percStatusTransactionInputFiles: {{ percStatusTransactionInputFiles }} <br>
+        percStatusAccountTargets: {{ percStatusAccountTargets }} <br>
+        percStatusItemTargets: {{ percStatusItemTargets }} <br>
+        percStatusVatNumberTargets: {{ percStatusVatNumberTargets }} <br>
+        percStatusDistanceSaleTargets: {{ percStatusDistanceSaleTargets }} <br>
+        percStatusTransactionInputTargets: {{ percStatusTransactionInputTargets }} <br>
 
 
-        statusAccountFiles: {{ statusAccountFiles }} <br>
+        statusAccountTargets: {{ statusAccountTargets }} <br>
         lenStatusAccount: {{ lenStatusAccount }} <br>
-        statusItemFiles: {{ statusItemFiles }} <br>
+        statusItemTargets: {{ statusItemTargets }} <br>
         lenStatusItem: {{ lenStatusItem }} <br>
-        statusVatNumberFiles: {{ statusVatNumberFiles }} <br>
+        statusVatNumberTargets: {{ statusVatNumberTargets }} <br>
         lenStatusVatNumber: {{ lenStatusVatNumber }} <br>
-        statusDistanceSaleFiles: {{ statusDistanceSaleFiles }} <br>
+        statusDistanceSaleTargets: {{ statusDistanceSaleTargets }} <br>
         lenStatusDistanceSale: {{ lenStatusDistanceSale }} <br>
-        statusTransactionInputFiles: {{ statusTransactionInputFiles }} <br>
+        statusTransactionInputTargets: {{ statusTransactionInputTargets }} <br>
         lenStatusTransactionInput: {{ lenStatusTransactionInput }} <br>
 
 
         <b-toast
-            no-auto-hide
             :title="status_account_lowest ? status_account_lowest.title : ''"
             :variant="status_account_lowest ? status_account_lowest.variant : ''"
             v-model="toastAccount"
         >
-            <div v-if="lenStatusAccount === 1">
-                <b-progress :value="statusAccountFiles[0].current" :max="statusAccountFiles[0].total" animated></b-progress>
-            </div>
-            <div v-else>
-                <div v-for="(accountFile, i) in statusAccountFiles" :key="i">
-                    <b-progress :value="statusAccountFiles[i].current" :max="statusAccountFiles[i].total" animated></b-progress>
-                    <p><i>Filename: {{ statusAccountFiles[i].original_filename }}</i></p>
-                    <hr>
+            <div v-for="(accountTarget, i) in statusAccountTargets" :key="i" class="py-2">
+                <div v-if="accountTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>{{ accountTarget.message }}</b-card-text>
+                    </b-card>
                 </div>
-
+                <div v-else>
+                    <b-progress :value="statusAccountTargets[i].current" :max="statusAccountTargets[i].total" animated></b-progress>
+                    <p class="mt-2">Filename: <i>{{ statusAccountTargets[i].target }}</i></p>
+                    <hr v-if="statusAccountTargets.length > 1">
+                </div>
             </div>
         </b-toast>
 
         <b-toast
-            no-auto-hide
             :title="status_item_lowest ? status_item_lowest.title : ''"
             :variant="status_item_lowest ? status_item_lowest.variant : ''"
             v-model="toastItem"
         >
-            <div v-if="lenStatusItem === 1">
-                <b-progress :value="statusItemFiles[0].current" :max="statusItemFiles[0].total" animated></b-progress>
-            </div>
-            <div v-else>
-                <div v-for="(itemFile, i) in statusItemFiles" :key="i">
-                    <b-progress :value="statusItemFiles[i].current" :max="statusItemFiles[i].total" animated></b-progress>
-                    <p><i>Filename: {{ statusItemFiles[i].original_filename }}</i></p>
-                    <hr>
+            <div v-for="(itemTarget, i) in statusItemTargets" :key="i" class="py-2">
+                <div v-if="itemTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>{{ itemTarget.message }}</b-card-text>
+                    </b-card>
                 </div>
-
+                <div v-else>
+                    <b-progress :value="statusItemTargets[i].current" :max="statusItemTargets[i].total" animated></b-progress>
+                    <p class="mt-2">Filename: <i>{{ statusItemTargets[i].target }}</i></p>
+                    <hr v-if="statusItemTargets.length > 1">
+                </div>
             </div>
         </b-toast>
 
         <b-toast
-            no-auto-hide
-            :title="status_vat_number_files_lowest.title"
-            :variant="status_vat_number_files_lowest.variant"
+            :title="status_vat_number_lowest.title"
+            :variant="status_vat_number_lowest.variant"
             v-model="toastVatNumber"
         >
-            <div v-if="lenStatusVatNumber === 1">
-                <b-progress :value="statusVatNumberFiles[0].current" :max="statusVatNumberFiles[0].total" animated></b-progress>
-            </div>
-            <div v-else>
-                <div v-for="(vatNumberFile, i) in statusVatNumberFiles" :key="i">
-                    <b-progress :value="statusVatNumberFiles[i].current" :max="statusVatNumberFiles[i].total" animated></b-progress>
-                    <p><i>Filename: {{ statusVatNumberFiles[i].original_filename }}</i></p>
-                    <hr>
+            <div v-for="(vatNumberTarget, i) in statusVatNumberTargets" :key="i" class="py-2">
+                <div v-if="vatNumberTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>{{ vatNumberTarget.message }}</b-card-text>
+                    </b-card>
                 </div>
-
+                <div v-else>
+                    <b-progress :value="statusVatNumberTargets[i].current" :max="statusVatNumberTargets[i].total" animated></b-progress>
+                    <p class="mt-2">Filename: <i>{{ statusVatNumberTargets[i].target }}</i></p>
+                    <hr v-if="statusVatNumberTargets.length > 1">
+                </div>
             </div>
+
         </b-toast>
 
-          <b-toast
-            no-auto-hide
+        <b-toast
             :title="status_distance_sale_lowest ? status_distance_sale_lowest.title : ''"
             :variant="status_distance_sale_lowest ? status_distance_sale_lowest.variant : ''"
             v-model="toastDistanceSale"
         >
-            <div v-if="lenStatusDistanceSale === 1">
-                <b-progress :value="statusDistanceSaleFiles[0].current" :max="statusDistanceSaleFiles[0].total" animated></b-progress>
-            </div>
-            <div v-else>
-                <div v-for="(distanceSaleFile, i) in statusDistanceSaleFiles" :key="i">
-                    <b-progress :value="statusDistanceSaleFiles[i].current" :max="statusDistanceSaleFiles[i].total" animated></b-progress>
-                    <p><i>Filename: {{ statusDistanceSaleFiles[i].original_filename }}</i></p>
-                    <hr>
+            <div v-for="(distanceSaleTarget, i) in statusDistanceSaleTargets" :key="i" class="py-2">
+                <div v-if="distanceSaleTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>{{ distanceSaleTarget.message }}</b-card-text>
+                    </b-card>
+                </div>
+                <div v-else>
+                    <b-progress :value="statusDistanceSaleTargets[i].current" :max="statusDistanceSaleTargets[i].total" animated></b-progress>
+                    <p class="mt-2">Filename: <i>{{ statusDistanceSaleTargets[i].target }}</i></p>
+                    <hr v-if="statusDistanceSaleTargets.length > 1">
                 </div>
 
             </div>
+
         </b-toast>
 
 
         <b-toast
-            no-auto-hide
-            :title="status_transaction_input_files_lowest.title"
-            :variant="status_transaction_input_files_lowest.variant"
+            :title="statis_transaction_input_lowest ? status_transaction_input_lowest.title : ''"
+            :variant="statis_transaction_input_lowest ? status_transaction_input_lowest.variant : ''"
             v-model="toastTransactionInput"
         >
-            <div v-if="lenStatusTransactionInput === 1">
-                <b-progress :value="statusTransactionInputFiles[0].current" :max="statusTransactionInputFiles[0].total" animated></b-progress>
-            </div>
-            <div v-else>
-                <div v-for="(transactionInputFile, i) in statusTransactionInputFiles" :key="i">
-                    <b-progress :value="statusTransactionInputFiles[i].current" :max="statusTransactionInputFiles[i].total" animated></b-progress>
-                    <p><i>Filename: {{ statusTransactionInputFiles }}</i></p>
-                    <hr>
+            <div v-for="(transactionInputTarget, i) in statusTransactionInputTargets" :key="i">
+                <div v-if="transactionInputTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>{{ transactionInputTarget.message }}</b-card-text>
+                    </b-card>
                 </div>
-
+                <div v-else>
+                    <b-progress :value="statusTransactionInputTargets[i].current" :max="statusTransactionInputTargets[i].total" animated></b-progress>
+                    <p class="mt-2">Filename: <i>{{ statusTransactionInputTargets }}</i></p>
+                    <hr v-if="statusTransactionInputTargets.length > 1">
+                </div>
             </div>
         </b-toast>
 
@@ -151,56 +154,56 @@ export default {
         ...mapState({
             sellerFirm: state => state.seller_firm.seller_firm,
 
-            statusAccountFiles: state => state.status.status_account_files,
-            lenStatusAccount: state => state.status.status_account_files.length,
+            statusAccountTargets: state => state.status.status_account_targets,
+            lenStatusAccount: state => state.status.status_account_targets.length,
 
-            statusItemFiles: state => state.status.status_item_files,
-            lenStatusItem: state => state.status.status_item_files.length,
+            statusItemTargets: state => state.status.status_item_targets,
+            lenStatusItem: state => state.status.status_item_targets.length,
 
-            statusVatNumberFiles: state => state.status.status_vat_number_files,
-            lenStatusVatNumber: state => state.status.status_vat_number_files.length,
+            statusVatNumberTargets: state => state.status.status_vat_number_targets,
+            lenStatusVatNumber: state => state.status.status_vat_number_targets.length,
 
-            statusDistanceSaleFiles: state => state.status.status_distance_sale_files,
-            lenStatusDistanceSale: state => state.status.status_distance_sale_files.length,
+            statusDistanceSaleTargets: state => state.status.status_distance_sale_targets,
+            lenStatusDistanceSale: state => state.status.status_distance_sale_targets.length,
 
-            statusTransactionInputFiles: state => state.status.status_transaction_input_files,
-            lenStatusTransactionInput: state => state.status.status_transaction_input_files.length
+            statusTransactionInputTargets: state => state.status.status_transaction_input_targets,
+            lenStatusTransactionInput: state => state.status.status_transaction_input_targets.length
         }),
 
-        percStatusAccountFiles() {
-            return this.$store.getters['status/percStatusAccountFiles']
+        percStatusAccountTargets() {
+            return this.$store.getters['status/percStatusAccountTargets']
         },
-        percStatusItemFiles() {
-            return this.$store.getters['status/percStatusItemFiles']
+        percStatusItemTargets() {
+            return this.$store.getters['status/percStatusItemTargets']
         },
-        percStatusVatNumberFiles() {
-            return this.$store.getters['status/percStatusVatNumberFiles']
+        percStatusVatNumberTargets() {
+            return this.$store.getters['status/percStatusVatNumberTargets']
         },
-        percStatusDistanceSaleFiles() {
-            return this.$store.getters['status/percStatusDistanceSaleFiles']
+        percStatusDistanceSaleTargets() {
+            return this.$store.getters['status/percStatusDistanceSaleTargets']
         },
-        percStatusTransactionInputFiles() {
-            return this.$store.getters['status/percStatusTransactionInputFiles']
-        },
-
-        status_account_files_lowest() {
-            return this.$store.getters['status/status_account_files_lowest']
+        percStatusTransactionInputTargets() {
+            return this.$store.getters['status/percStatusTransactionInputTargets']
         },
 
-        status_item_files_lowest() {
-            return this.$store.getters['status/status_item_files_lowest']
+        status_account_targets_lowest() {
+            return this.$store.getters['status/status_account_targets_lowest']
         },
 
-        status_vat_number_files_lowest() {
-            return this.$store.getters['status/status_vat_number_files_lowest']
+        status_item_targets_lowest() {
+            return this.$store.getters['status/status_item_targets_lowest']
         },
 
-        status_distance_sale_files_lowest() {
-            return this.$store.getters['status/status_distance_sale_files_lowest']
+        status_vat_number_targets_lowest() {
+            return this.$store.getters['status/status_vat_number_targets_lowest']
         },
 
-        status_transaction_input_files_lowest() {
-            return this.$store.getters['status/status_transaction_input_files_lowest']
+        status_distance_sale_targets_lowest() {
+            return this.$store.getters['status/status_distance_sale_targets_lowest']
+        },
+
+        status_transaction_input_targets_lowest() {
+            return this.$store.getters['status/status_transaction_input_targets_lowest']
         },
 
         status_account_lowest() {
@@ -224,12 +227,6 @@ export default {
         },
 
 
-    },
-
-    methods: {
-        sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        },
     },
 
     watch: {
@@ -277,51 +274,90 @@ export default {
             }
         },
 
-        percStatusAccountFiles: {
+        percStatusAccountTargets: {
             handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusAccountFiles) === 1) {
+                if (Math.min(...this.percStatusAccountTargets) === 1) {
                     await this.sleep(10000)
                     const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_ACCOUNT_FILES')
+                    store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
                 }
             }
         },
-        percStatusItemFiles: {
+        percStatusItemTargets: {
             handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusItemFiles) === 1) {
+                if (Math.min(...this.percStatusItemTargets) === 1) {
                     await this.sleep(10000)
                     const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_ITEM_FILES')
+                    store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
                 }
             },
         },
-        percStatusVatNumberFiles: {
+        percStatusVatNumberTargets: {
             handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusVatNumberFiles) === 1) {
+                if (Math.min(...this.percStatusVatNumberTargets) === 1) {
                     await this.sleep(10000)
                     const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_VAT_NUMBER_FILES')
+                    store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
                 }
             }
         },
-        percStatusDistanceSaleFiles: {
+        percStatusDistanceSaleTargets: {
             handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusDistanceSaleFiles) === 1) {
+                if (Math.min(...this.percStatusDistanceSaleTargets) === 1) {
                     await this.sleep(10000)
                     const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_DISTANCE_SALE_FILES')
+                    store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
                 }
             }
         },
-        percStatusTransactionInputFiles: {
+        percStatusTransactionInputTargets: {
             handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusTransactionInputFiles) === 1) {
+                if (Math.min(...this.percStatusTransactionInputTargets) === 1) {
                     await this.sleep(5000)
                     const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_FILES')
+                    store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
                 }
             }
-       }
+       },
+    //    doneStatusAccountTargets (newV, oldV) {
+    //         if (newV === true) {
+    //             await this.sleep(10000)
+    //             const { store } = this.$nuxt.context
+    //             store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
+    //         }
+    //     },
+
+    //     doneStatusItemTargets (newV, oldV) {
+    //         if (newV === true) {
+    //             await this.sleep(10000)
+    //             const { store } = this.$nuxt.context
+    //             store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
+    //         }
+    //     },
+
+    //     doneStatusVatNumberTargets (newV, oldV) {
+    //         if (newV === true) {
+    //             await this.sleep(10000)
+    //             const { store } = this.$nuxt.context
+    //             store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
+    //         }
+    //     },
+
+    //     doneStatusDistanceSaleTargets (newV, oldV) {
+    //         if (newV === true) {
+    //             await this.sleep(10000)
+    //             const { store } = this.$nuxt.context
+    //             store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
+    //         }
+    //     },
+
+    //     doneStatusTransactionInputTargets (newV, oldV) {
+    //         if (newV === true) {
+    //             await this.sleep(5000)
+    //             const { store } = this.$nuxt.context
+    //             store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
+    //         }
+    //     }
         /*eslint-disable */
 
     }

@@ -43,10 +43,13 @@ class ItemService:
             if item:
                 return item
             else:
-                print("Function: ItemService -> get_by_sku_account_date", flush=True)
+                print("Function: ItemService -> get_by_sku_account_date_date", flush=True)
                 raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
 
 
+    @staticmethod
+    def get_by_sku_seller_firm_id(sku: str, seller_firm_id: int) -> Item:
+        return Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id).first()
 
 
     @staticmethod
@@ -135,9 +138,15 @@ class ItemService:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             item_data['seller_firm_id'] = seller_firm.id
-            ItemService.handle_redundancy(item_data['sku'], item_data['seller_firm_id'], item_data['valid_from'])
-
-            new_item = ItemService.create(item_data)
+            item = ItemService.get_by_sku_account_date(item_data['sku'], item_data['seller_firm_id'], item_data['valid_from'])
+            if isinstance(item, Item):
+                return item
+            else:
+                try:
+                    new_item = ItemService.create(item_data)
+                except:
+                    db.session.rollback()
+                    raise
 
         return new_item
 
@@ -248,47 +257,42 @@ class ItemService:
 
         redundancy_counter = 0
         error_counter = 0
-        total_number_items = len(df.index)
-        input_type = 'item' # only used for response objects
+        total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
+        object_type = object_type_human_read = 'item'
+
+
+
+        if not seller_firm_id:
+            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            return False
 
         for i in range(total_number_items):
+            current = i + 1
 
             try:
                 sku = InputService.get_str(df, i, column='SKU')
             except:
-                # send error status via socket
-                title = 'Can not read column "SKU" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='SKU')
+                return False
+
+            if not sku or sku == '':
+                message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
+                SocketService.emit_status_info_box(current, total, original_filename, object_type, message)
                 return False
 
             try:
                 valid_from = InputService.get_date_or_None(df, i, column='valid_from')
             except:
-                # send error status via socket
-                title = 'Can not read column "valid_from" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_from')
                 return False
 
             try:
                 valid_to = InputService.get_date_or_None(df, i, column='valid_to')
             except:
-                # send error status via socket
-                title = 'Can not read column "valid_to" in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_to')
                 return False
 
-            if not sku or sku == '':
-                # send error status via socket
-                title = 'No SKU provided in row {}.'.format(i+1)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
-                return False
-
-            if not seller_firm_id:
-                # send error status via socket
-                title = 'Can not identify the seller firm for this item (SKU: {}). Please contact one of the admins.'.format(sku)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
-                return False
 
             if not valid_from:
                 valid_from = date.today()
@@ -296,7 +300,10 @@ class ItemService:
                 TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
                 valid_to = TAX_DEFAULT_VALIDITY
 
-            redundancy_counter += ItemService.handle_redundancy(sku, seller_firm_id, valid_from)
+            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id) #!!! do items need a validity
+            if item:
+                continue
+
             item_data = {
                 'created_by': user_id,
                 'original_filename': original_filename,
@@ -319,27 +326,24 @@ class ItemService:
                 new_item = ItemService.create(item_data)
 
                 # send status update via socket
-                title = 'New items are being registered...'
-                SocketService.emit_status_success(i+1, total_number_items, original_filename, 'item', title)
+                SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
 
                 # push new distance sale to vuex via socket
                 item_schema_sub = ItemSubSchema.get_item_sub(new_item)
-                SocketService.emit_new_item(meta=item_schema_sub)
+                SocketService.emit_new_object(item_schema_sub, object_type)
 
             except:
                 db.session.rollback()
 
                 # send error status via socket
-                title = 'Error at item sku "{}". Please recheck.'.format(sku)
-                SocketService.emit_status_error(i+1, total_number_items, original_filename, 'item', title)
+                title = 'Error at {} with sku "{}". Please recheck.'.format(object_type_human_read, sku)
+                SocketService.emit_status_error(current, total, original_filename, object_type, title)
                 return False
 
 
         # send final status via socket
-        title = '{} items have been successfully registered.'.format(total_number_items)
-        SocketService.emit_status_final(i+1, total_number_items, original_filename, 'item', title)
+        SocketService.emit_status_final(current, total, original_filename, object_type, object_type_human_read)
 
-        # response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter, redundancy_counter=redundancy_counter)
         return True
 
 
@@ -370,24 +374,3 @@ class ItemService:
         db.session.commit()
 
         return new_item
-
-
-    @staticmethod
-    def handle_redundancy(sku: str, seller_firm_id: int, valid_from: date) -> int:
-        redundancy_counter = 0
-
-        item = Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id, Item.valid_to >= valid_from).first()
-
-        # if an item with the same sku for the specified validity period already exists, it is being updated or deleted.
-        if item:
-            if item.valid_from >= valid_from:
-                db.session.delete(item)
-
-            else:
-                data_changes = {
-                    'valid_to': valid_from - timedelta(days=1)
-                }
-                item.update(data_changes)
-                redundancy_counter += 1
-
-        return redundancy_counter
