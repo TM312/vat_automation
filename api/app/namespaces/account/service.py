@@ -181,11 +181,13 @@ class AccountService:
         total = total_number_accounts = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = object_type_human_read = 'account'
+        account_socket_list = []
+        duplicate_list = []
 
 
         if not seller_firm_id:
             # send error status via socket
-            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
         for i in range(total_number_accounts):
@@ -195,28 +197,32 @@ class AccountService:
                 given_id = InputService.get_str(df, i, column='account_id')
             except:
                 # send error status via socket
-                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='account_id')
+                SocketService.emit_status_error_column_read(current, object_type, column_name='account_id')
                 return False
 
             if not given_id or given_id == '':
                 # send error status via socket
-                SocketService.emit_status_error_no_value(current, total, original_filename, object_type, column_name='account_id')
+                SocketService.emit_status_error_no_value(current, object_type, column_name='account_id')
                 return False
 
             try:
                 channel_code = InputService.get_str(df, i, column='channel_code')
             except:
                 # send error status via socket
-                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='channel_code')
+                SocketService.emit_status_error_column_read(current, object_type, column_name='channel_code')
                 return False
 
             if not channel_code or channel_code == '':
                 # send error status via socket
-                SocketService.emit_status_error_no_value(current, total, original_filename, object_type, column_name='channel_code')
+                SocketService.emit_status_error_no_value(current, object_type, column_name='channel_code')
                 return False
 
             account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
             if account:
+                message = 'The account "{}-{}" has already been registered and skipped consequently.'.format(channel_code, given_id)
+                SocketService.emit_status_infobox(object_type, message)
+                duplicate_list.append('{}: {}'.format(channel_code, given_id))
+                total -= 1
                 continue
 
             account_data = {
@@ -230,24 +236,33 @@ class AccountService:
             try:
                 new_account = AccountService.create(account_data)
 
-                # send status update via socket
-                SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
-
-                # push new distance sale to vuex via socket
-                account_json = AccountSubSchema.get_account_sub(new_account)
-                SocketService.emit_new_object(account_json, object_type)
-
             except:
                 db.session.rollback()
                 error_counter += 1
 
                 # send error status via socket
-                title = 'Error at {} "{}" for channel "{}". Please recheck.'.format(object_type_human_read, given_id, channel_code)
-                SocketService.emit_status_error(current, total, original_filename, object_type, title)
+                message = 'Error at {} "{}" for channel "{}" (file: {}). Please recheck.'.format(object_type_human_read, given_id, channel_code, original_filename)
+                SocketService.emit_status_error(current, total, object_type, message)
                 return False
 
+
+            # send status update via socket
+            SocketService.emit_status_success(current, total, original_filename, object_type)
+
+            # push new distance sale to vuex via socket
+            account_json = AccountSubSchema.get_account_sub(new_account)
+
+            if total < 10:
+                SocketService.emit_new_object(account_json, object_type)
+
+            else:
+                account_socket_list.append(account_json)
+                if current % 10 == 0 or current == total:
+                    SocketService.emit_new_objects(account_socket_list, object_type)
+                    account_socket_list = []
+
         # send final status via socket
-        SocketService.emit_status_final(current, total, original_filename, object_type, object_type_human_read)
+        SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
         return True
 

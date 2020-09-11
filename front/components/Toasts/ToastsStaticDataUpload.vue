@@ -1,133 +1,250 @@
 <template>
     <div>
-
-        <hr>
-        <p>status_account_targets_lowest: {{ status_account_targets_lowest }}</p>
-        <h2>status_account_lowest: {{ status_account_lowest }}</h2>
-
-        <hr>
-        <p>Distance Sales</p>
-        <p>status_distance_sale_lowest: {{ status_distance_sale_lowest }}</p>
-
-        <hr>
-
-        percStatusAccountTargets: {{ percStatusAccountTargets }} <br>
-        percStatusItemTargets: {{ percStatusItemTargets }} <br>
-        percStatusVatNumberTargets: {{ percStatusVatNumberTargets }} <br>
-        percStatusDistanceSaleTargets: {{ percStatusDistanceSaleTargets }} <br>
-        percStatusTransactionInputTargets: {{ percStatusTransactionInputTargets }} <br>
-
-
-        statusAccountTargets: {{ statusAccountTargets }} <br>
-        lenStatusAccount: {{ lenStatusAccount }} <br>
-        statusItemTargets: {{ statusItemTargets }} <br>
-        lenStatusItem: {{ lenStatusItem }} <br>
-        statusVatNumberTargets: {{ statusVatNumberTargets }} <br>
-        lenStatusVatNumber: {{ lenStatusVatNumber }} <br>
-        statusDistanceSaleTargets: {{ statusDistanceSaleTargets }} <br>
-        lenStatusDistanceSale: {{ lenStatusDistanceSale }} <br>
-        statusTransactionInputTargets: {{ statusTransactionInputTargets }} <br>
-        lenStatusTransactionInput: {{ lenStatusTransactionInput }} <br>
-
-
         <b-toast
-            :title="status_account_lowest ? status_account_lowest.title : ''"
-            :variant="status_account_lowest ? status_account_lowest.variant : ''"
+            no-auto-hide
+            :title="titleAccount"
+            :variant="doneStatusAccountTargets ? 'success' : ''"
             v-model="toastAccount"
         >
-            <div v-for="(accountTarget, i) in statusAccountTargets" :key="i" class="py-2">
-                <div v-if="accountTarget.target === 'infobox'">
-                    <b-card border-variant="info">
+            <div v-for="(accountTarget, i) in statusAccountTargets" :key="i" class="pt-2">
+                <div v-if="accountTarget.target !== 'errorbox' && accountTarget.target !== 'infobox'">
+                    <div v-if="statusAccountTargets[i].done">
+                        <b-row no-gutters>
+                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
+                            <b-col cols="11"><p lead>{{statusAccountTargets[i].message }}</p></b-col>
+                        </b-row>
+
+                    </div>
+
+                    <div v-else>
+                        <b-progress :value="statusAccountTargets[i].current" :max="statusAccountTargets[i].total" animated></b-progress>
+                    </div>
+                    <small class="text-muted mt-1">Source: <i>{{ statusAccountTargets[i].target }}</i></small>
+                </div>
+
+                <div v-else-if="accountTarget.target === 'errorbox'">
+                    <b-card border-variant="danger">
                         <b-card-text>{{ accountTarget.message }}</b-card-text>
                     </b-card>
                 </div>
-                <div v-else>
-                    <b-progress :value="statusAccountTargets[i].current" :max="statusAccountTargets[i].total" animated></b-progress>
-                    <p class="mt-2">Filename: <i>{{ statusAccountTargets[i].target }}</i></p>
-                    <hr v-if="statusAccountTargets.length > 1">
+
+                <div v-else-if="accountTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>
+                            {{ accountTarget.message }}
+                            <span v-if="doneStatusAccountTargets && accountTarget.duplicate_list && accountTarget.duplicate_list.length > 2">
+                                <b-icon v-b-modal.account-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
+                                <b-modal id="account-duplicates" title="Account Duplicates">
+                                    <ul>
+                                        <li v-for="(duplicate, index) in accountTarget.duplicate_list" :key="index">{{ duplicate}}</li>
+                                    </ul>
+                                </b-modal>
+                            </span>
+                        </b-card-text>
+                    </b-card>
                 </div>
+
+                <hr v-if="statusAccountTargets.length > 1">
+
             </div>
         </b-toast>
 
         <b-toast
-            :title="status_item_lowest ? status_item_lowest.title : ''"
-            :variant="status_item_lowest ? status_item_lowest.variant : ''"
+            no-auto-hide
+            :title="titleItem"
+            :variant="doneStatusItemTargets ? 'success' : ''"
             v-model="toastItem"
         >
-            <div v-for="(itemTarget, i) in statusItemTargets" :key="i" class="py-2">
-                <div v-if="itemTarget.target === 'infobox'">
-                    <b-card border-variant="info">
+            <div v-for="(itemTarget, i) in statusItemTargets" :key="i" class="pt-2">
+                <div v-if="itemTarget.target !== 'errorbox' && itemTarget.target !== 'infobox'">
+                    <div v-if="statusItemTargets[i].done">
+                        <b-row no-gutters>
+                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
+                            <b-col cols="11"><p lead>{{statusItemTargets[i].message }}</p></b-col>
+                        </b-row>
+
+                    </div>
+
+                    <div v-else>
+                        <b-progress :value="statusItemTargets[i].current" :max="statusItemTargets[i].total" animated></b-progress>
+                    </div>
+                    <small class="text-muted mt-1">Source: <i>{{ statusItemTargets[i].target }}</i></small>
+                </div>
+
+                <div v-else-if="itemTarget.target === 'errorbox'">
+                    <b-card border-variant="danger">
                         <b-card-text>{{ itemTarget.message }}</b-card-text>
                     </b-card>
                 </div>
-                <div v-else>
-                    <b-progress :value="statusItemTargets[i].current" :max="statusItemTargets[i].total" animated></b-progress>
-                    <p class="mt-2">Filename: <i>{{ statusItemTargets[i].target }}</i></p>
-                    <hr v-if="statusItemTargets.length > 1">
+
+                <div v-else-if="itemTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>
+                            {{ itemTarget.message }}
+                            <span v-if="doneStatusItemTargets && itemTarget.duplicate_list && itemTarget.duplicate_list.length > 2">
+                                <b-icon v-b-modal.item-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
+                                <b-modal id="item-duplicates" title="Item Duplicates">
+                                    <ul>
+                                        <li v-for="(duplicate, index) in itemTarget.duplicate_list" :key="index">{{ duplicate}}</li>
+                                    </ul>
+                                </b-modal>
+                            </span>
+                        </b-card-text>
+                    </b-card>
                 </div>
+
+                <hr v-if="statusItemTargets.length > 1">
+
             </div>
         </b-toast>
 
         <b-toast
-            :title="status_vat_number_lowest.title"
-            :variant="status_vat_number_lowest.variant"
+            no-auto-hide
+            :title="titleVatNumber"
+            :variant="doneStatusVatNumberTargets ? 'success' : ''"
             v-model="toastVatNumber"
         >
-            <div v-for="(vatNumberTarget, i) in statusVatNumberTargets" :key="i" class="py-2">
-                <div v-if="vatNumberTarget.target === 'infobox'">
-                    <b-card border-variant="info">
+            <div v-for="(vatNumberTarget, i) in statusVatNumberTargets" :key="i" class="pt-2">
+                <div v-if="vatNumberTarget.target !== 'errorbox' && vatNumberTarget.target !== 'infobox'">
+                    <div v-if="statusVatNumberTargets[i].done">
+                        <b-row no-gutters>
+                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
+                            <b-col cols="11"><p lead>{{statusVatNumberTargets[i].message }}</p></b-col>
+                        </b-row>
+
+                    </div>
+
+                    <div v-else>
+                        <b-progress :value="statusVatNumberTargets[i].current" :max="statusVatNumberTargets[i].total" animated></b-progress>
+                    </div>
+                    <small class="text-muted mt-1">Source: <i>{{ statusVatNumberTargets[i].target }}</i></small>
+                </div>
+
+                <div v-else-if="vatNumberTarget.target === 'errorbox'">
+                    <b-card border-variant="danger">
                         <b-card-text>{{ vatNumberTarget.message }}</b-card-text>
                     </b-card>
                 </div>
-                <div v-else>
-                    <b-progress :value="statusVatNumberTargets[i].current" :max="statusVatNumberTargets[i].total" animated></b-progress>
-                    <p class="mt-2">Filename: <i>{{ statusVatNumberTargets[i].target }}</i></p>
-                    <hr v-if="statusVatNumberTargets.length > 1">
-                </div>
-            </div>
 
+                <div v-else-if="vatNumberTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>
+                            {{ vatNumberTarget.message }}
+                            <span v-if="doneStatusVatNumberTargets && vatNumberTarget.duplicate_list && vatNumberTarget.duplicate_list.length > 2">
+                                <b-icon v-b-modal.vat-number-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
+                                <b-modal id="vat-number-duplicates" title="Vat Number Duplicates">
+                                    <ul>
+                                        <li v-for="(duplicate, index) in vatNumberTarget.duplicate_list" :key="index">{{ duplicate}}</li>
+                                    </ul>
+                                </b-modal>
+                            </span>
+                        </b-card-text>
+                    </b-card>
+                </div>
+
+                <hr v-if="statusItemTargets.length > 1">
+
+            </div>
         </b-toast>
 
         <b-toast
-            :title="status_distance_sale_lowest ? status_distance_sale_lowest.title : ''"
-            :variant="status_distance_sale_lowest ? status_distance_sale_lowest.variant : ''"
+            no-auto-hide
+            :title="titleDistanceSale"
+            :variant="doneStatusDistanceSaleTargets ? 'success' : ''"
             v-model="toastDistanceSale"
         >
-            <div v-for="(distanceSaleTarget, i) in statusDistanceSaleTargets" :key="i" class="py-2">
-                <div v-if="distanceSaleTarget.target === 'infobox'">
-                    <b-card border-variant="info">
+            <div v-for="(distanceSaleTarget, i) in statusDistanceSaleTargets" :key="i" class="pt-2">
+                <div v-if="distanceSaleTarget.target !== 'errorbox' && distanceSaleTarget.target !== 'infobox'">
+                    <div v-if="statusDistanceSaleTargets[i].done">
+                        <b-row no-gutters>
+                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
+                            <b-col cols="11"><p lead>{{statusDistanceSaleTargets[i].message }}</p></b-col>
+                        </b-row>
+
+                    </div>
+
+                    <div v-else>
+                        <b-progress :value="statusDistanceSaleTargets[i].current" :max="statusDistanceSaleTargets[i].total" animated></b-progress>
+                    </div>
+                    <small class="text-muted mt-1">Source: <i>{{ statusDistanceSaleTargets[i].target }}</i></small>
+                </div>
+
+                <div v-else-if="distanceSaleTarget.target === 'errorbox'">
+                    <b-card border-variant="danger">
                         <b-card-text>{{ distanceSaleTarget.message }}</b-card-text>
                     </b-card>
                 </div>
-                <div v-else>
-                    <b-progress :value="statusDistanceSaleTargets[i].current" :max="statusDistanceSaleTargets[i].total" animated></b-progress>
-                    <p class="mt-2">Filename: <i>{{ statusDistanceSaleTargets[i].target }}</i></p>
-                    <hr v-if="statusDistanceSaleTargets.length > 1">
+
+                <div v-else-if="distanceSaleTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>
+                            {{ distanceSaleTarget.message }}
+                            <span v-if="doneStatusDistanceSaleTargets && distanceSaleTarget.duplicate_list && distanceSaleTarget.duplicate_list.length > 2">
+                                <b-icon v-b-modal.distance-sale-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
+                                <b-modal id="distance-sale-duplicates" title="Distance Sale Duplicates">
+                                    <ul>
+                                        <li v-for="(duplicate, index) in distanceSaleTarget.duplicate_list" :key="index">{{ duplicate}}</li>
+                                    </ul>
+                                </b-modal>
+                            </span>
+                        </b-card-text>
+                    </b-card>
                 </div>
 
-            </div>
+                <hr v-if="statusItemTargets.length > 1">
 
+            </div>
         </b-toast>
 
-
         <b-toast
-            :title="statis_transaction_input_lowest ? status_transaction_input_lowest.title : ''"
-            :variant="statis_transaction_input_lowest ? status_transaction_input_lowest.variant : ''"
+            no-auto-hide
+            :title="titleTransactionInput"
+            :variant="doneStatusTransactionInputTargets ? 'success' : ''"
             v-model="toastTransactionInput"
         >
-            <div v-for="(transactionInputTarget, i) in statusTransactionInputTargets" :key="i">
-                <div v-if="transactionInputTarget.target === 'infobox'">
-                    <b-card border-variant="info">
+            <div v-for="(transactionInputTarget, i) in statusTransactionInputTargets" :key="i" class="pt-2">
+                <div v-if="transactionInputTarget.target !== 'errorbox' && transactionInputTarget.target !== 'infobox'">
+                    <div v-if="statusTransactionInputTargets[i].done">
+                        <b-row no-gutters>
+                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
+                            <b-col cols="11"><p lead>{{statusTransactionInputTargets[i].message }}</p></b-col>
+                        </b-row>
+
+                    </div>
+
+                    <div v-else>
+                        <b-progress :value="statusTransactionInputTargets[i].current" :max="statusTransactionInputTargets[i].total" animated></b-progress>
+                    </div>
+                    <small class="text-muted mt-1">Source: <i>{{ statusTransactionInputTargets[i].target }}</i></small>
+                </div>
+
+                <div v-else-if="transactionInputTarget.target === 'errorbox'">
+                    <b-card border-variant="danger">
                         <b-card-text>{{ transactionInputTarget.message }}</b-card-text>
                     </b-card>
                 </div>
-                <div v-else>
-                    <b-progress :value="statusTransactionInputTargets[i].current" :max="statusTransactionInputTargets[i].total" animated></b-progress>
-                    <p class="mt-2">Filename: <i>{{ statusTransactionInputTargets }}</i></p>
-                    <hr v-if="statusTransactionInputTargets.length > 1">
+
+                <div v-else-if="transactionInputTarget.target === 'infobox'">
+                    <b-card border-variant="info">
+                        <b-card-text>
+                            {{ transactionInputTarget.message }}
+                            <span v-if="doneStatusTransactionInputTargets && transactionInputTarget.duplicate_list && transactionInputTarget.duplicate_list.length > 2">
+                                <b-icon v-b-modal.transaction-input-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
+                                <b-modal id="transaction-input-duplicates" title="Transaction Duplicates">
+                                    <ul>
+                                        <li v-for="(duplicate, index) in transactionInputTarget.duplicate_list" :key="index">{{ duplicate}}</li>
+                                    </ul>
+                                </b-modal>
+                            </span>
+                        </b-card-text>
+                    </b-card>
                 </div>
+
+                <hr v-if="statusItemTargets.length > 1">
+
             </div>
         </b-toast>
+
 
 
     </div>
@@ -154,78 +271,89 @@ export default {
         ...mapState({
             sellerFirm: state => state.seller_firm.seller_firm,
 
-            statusAccountTargets: state => state.status.status_account_targets,
-            lenStatusAccount: state => state.status.status_account_targets.length,
+            statusAccountTargets: state => state.status.account_targets,
+            lenStatusAccount: state => state.status.account_targets.length,
 
-            statusItemTargets: state => state.status.status_item_targets,
-            lenStatusItem: state => state.status.status_item_targets.length,
+            statusItemTargets: state => state.status.item_targets,
+            lenStatusItem: state => state.status.item_targets.length,
 
-            statusVatNumberTargets: state => state.status.status_vat_number_targets,
-            lenStatusVatNumber: state => state.status.status_vat_number_targets.length,
+            statusVatNumberTargets: state => state.status.vat_number_targets,
+            lenStatusVatNumber: state => state.status.vat_number_targets.length,
 
-            statusDistanceSaleTargets: state => state.status.status_distance_sale_targets,
-            lenStatusDistanceSale: state => state.status.status_distance_sale_targets.length,
+            statusDistanceSaleTargets: state => state.status.distance_sale_targets,
+            lenStatusDistanceSale: state => state.status.distance_sale_targets.length,
 
-            statusTransactionInputTargets: state => state.status.status_transaction_input_targets,
-            lenStatusTransactionInput: state => state.status.status_transaction_input_targets.length
+            statusTransactionInputTargets: state => state.status.transaction_input_targets,
+            lenStatusTransactionInput: state => state.status.transaction_input_targets.length
         }),
 
-        percStatusAccountTargets() {
-            return this.$store.getters['status/percStatusAccountTargets']
+        doneStatusAccountTargets() {
+            return this.$store.getters['status/doneStatusAccountTargets']
         },
-        percStatusItemTargets() {
-            return this.$store.getters['status/percStatusItemTargets']
+        doneStatusItemTargets() {
+            return this.$store.getters['status/doneStatusItemTargets']
         },
-        percStatusVatNumberTargets() {
-            return this.$store.getters['status/percStatusVatNumberTargets']
+        doneStatusVatNumberTargets() {
+            return this.$store.getters['status/doneStatusVatNumberTargets']
         },
-        percStatusDistanceSaleTargets() {
-            return this.$store.getters['status/percStatusDistanceSaleTargets']
+        doneStatusDistanceSaleTargets() {
+            return this.$store.getters['status/doneStatusDistanceSaleTargets']
         },
-        percStatusTransactionInputTargets() {
-            return this.$store.getters['status/percStatusTransactionInputTargets']
-        },
-
-        status_account_targets_lowest() {
-            return this.$store.getters['status/status_account_targets_lowest']
+        doneStatusTransactionInputTargets() {
+            return this.$store.getters['status/doneStatusTransactionInputTargets']
         },
 
-        status_item_targets_lowest() {
-            return this.$store.getters['status/status_item_targets_lowest']
+        totalStatusAccountTargets() {
+            return this.$store.getters['status/totalStatusAccountTargets']
+        },
+        totalStatusItemTargets() {
+            return this.$store.getters['status/totalStatusItemTargets']
+        },
+        totalStatusVatNumberTargets() {
+            return this.$store.getters['status/totalStatusVatNumberTargets']
+        },
+        totalStatusDistanceSaleTargets() {
+            return this.$store.getters['status/totalStatusDistanceSaleTargets']
+        },
+        totalStatusTransactionInputTargets() {
+            return this.$store.getters['status/totalStatusTransactionInputTargets']
         },
 
-        status_vat_number_targets_lowest() {
-            return this.$store.getters['status/status_vat_number_targets_lowest']
+        titleAccount() {
+            if (this.doneStatusAccountTargets) {
+                return (this.lenStatusAccount === 1) ? 'New accounts' : `${this.totalStatusAccountTargets} new accounts`
+            } else {
+                return 'New accounts are being registered...'
+            }
         },
-
-        status_distance_sale_targets_lowest() {
-            return this.$store.getters['status/status_distance_sale_targets_lowest']
+        titleItem() {
+            if (this.doneStatusItemTargets) {
+                return (this.lenStatusItem === 1) ? 'New items' : `${this.totalStatusItemTargets} new items`
+            } else {
+                return 'New items are being registered...'
+            }
         },
-
-        status_transaction_input_targets_lowest() {
-            return this.$store.getters['status/status_transaction_input_targets_lowest']
+        titleVatNumber() {
+            if (this.doneStatusVatNumberTargets) {
+                return (this.lenStatusVatNumber === 1) ? 'New vat numbers' : `${this.totalStatusVatNumberTargets} new vat numbers`
+            } else {
+                return 'New items are being registered...'
+            }
         },
-
-        status_account_lowest() {
-            return this.$store.getters['status/status_account_lowest']
+        titleDistanceSale() {
+            if (this.doneStatusDistanceSaleTargets) {
+                return (this.lenStatusDistanceSale === 1) ? 'New distance sales' : `${this.totalStatusDistanceSaleTargets} new distance sales`
+            } else {
+                return 'New distance sales are being registered...'
+            }
         },
-
-        status_item_lowest() {
-            return this.$store.getters['status/status_item_lowest']
+        titleTransactionInput() {
+            if (this.doneStatusTransactionInputTargets) {
+                return (this.lenStatusTransactionInput === 1) ? 'New transactions' : `${this.totalStatusTransactionInputTargets} new transactions`
+            } else {
+                return 'New transactions are being registered...'
+            }
         },
-
-        status_vat_number_lowest() {
-            return this.$store.getters['status/status_vat_number_lowest']
-        },
-
-        status_distance_sale_lowest() {
-            return this.$store.getters['status/status_distance_sale_lowest']
-        },
-
-        status_transaction_input_lowest() {
-            return this.$store.getters['status/status_transaction_input_lowest']
-        },
-
 
     },
 
@@ -235,7 +363,6 @@ export default {
 
         lenStatusAccount (newLength, oldLength) {
             if (oldLength === 0) {
-                // this.$bvToast.show('toastAccount')
                 this.toastAccount = true
             } else if (newLength === 0) {
                 this.toastAccount = false
@@ -243,7 +370,6 @@ export default {
         },
         lenStatusItem (newLength, oldLength) {
             if (oldLength === 0) {
-                // this.$bvToast.show('toastItem')
                 this.toastItem = true
             } else if (newLength === 0) {
                 this.toastItem = false
@@ -251,7 +377,6 @@ export default {
         },
         lenStatusVatNumber (newLength, oldLength) {
             if (oldLength === 0) {
-                // this.$bvToast.show('toastVatNumber')
                 this.toastVatNumber = true
             } else if (newLength === 0) {
                 this.toastVatNumber = false
@@ -259,7 +384,6 @@ export default {
         },
         lenStatusDistanceSale (newLength, oldLength) {
             if (oldLength === 0) {
-                // this.$bvToast.show('toastDistanceSale')
                 this.toastDistanceSale = true
             } else if (newLength === 0) {
                 this.toastDistanceSale = false
@@ -267,97 +391,48 @@ export default {
         },
         lenStatusTransactionInput (newLength, oldLength) {
             if (oldLength === 0) {
-                // this.$bvToast.show('toastTransactionInput')
                 this.toastTransactionInput = true
             } else if (newLength === 0) {
                 this.toastTransactionInput = false
             }
         },
 
-        percStatusAccountTargets: {
-            handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusAccountTargets) === 1) {
-                    await this.sleep(10000)
-                    const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
-                }
+        async doneStatusAccountTargets (val, oldVal) {
+            if (val) {
+                await this.sleep(10000)
+                const { store } = this.$nuxt.context
+                store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
             }
         },
-        percStatusItemTargets: {
-            handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusItemTargets) === 1) {
-                    await this.sleep(10000)
-                    const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
-                }
-            },
-        },
-        percStatusVatNumberTargets: {
-            handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusVatNumberTargets) === 1) {
-                    await this.sleep(10000)
-                    const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
-                }
+        async doneStatusItemTargets (val, oldVal) {
+            if (val) {
+                await this.sleep(10000)
+                const { store } = this.$nuxt.context
+                store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
             }
         },
-        percStatusDistanceSaleTargets: {
-            handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusDistanceSaleTargets) === 1) {
-                    await this.sleep(10000)
-                    const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
-                }
+        async doneStatusVatNumberTargets (val, oldVal) {
+            if (val) {
+                await this.sleep(10000)
+                const { store } = this.$nuxt.context
+                store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
             }
         },
-        percStatusTransactionInputTargets: {
-            handler: async function(val, oldVal) {
-                if (Math.min(...this.percStatusTransactionInputTargets) === 1) {
-                    await this.sleep(5000)
-                    const { store } = this.$nuxt.context
-                    store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
-                }
+        async doneStatusDistanceSaleTargets (val, oldVal) {
+            if (val) {
+                await this.sleep(10000)
+                const { store } = this.$nuxt.context
+                store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
+            }
+        },
+        async doneStatusTransactionInputTargets (val, oldVal) {
+            if (val) {
+                await this.sleep(10000)
+                const { store } = this.$nuxt.context
+                store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
             }
        },
-    //    doneStatusAccountTargets (newV, oldV) {
-    //         if (newV === true) {
-    //             await this.sleep(10000)
-    //             const { store } = this.$nuxt.context
-    //             store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
-    //         }
-    //     },
 
-    //     doneStatusItemTargets (newV, oldV) {
-    //         if (newV === true) {
-    //             await this.sleep(10000)
-    //             const { store } = this.$nuxt.context
-    //             store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
-    //         }
-    //     },
-
-    //     doneStatusVatNumberTargets (newV, oldV) {
-    //         if (newV === true) {
-    //             await this.sleep(10000)
-    //             const { store } = this.$nuxt.context
-    //             store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
-    //         }
-    //     },
-
-    //     doneStatusDistanceSaleTargets (newV, oldV) {
-    //         if (newV === true) {
-    //             await this.sleep(10000)
-    //             const { store } = this.$nuxt.context
-    //             store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
-    //         }
-    //     },
-
-    //     doneStatusTransactionInputTargets (newV, oldV) {
-    //         if (newV === true) {
-    //             await this.sleep(5000)
-    //             const { store } = this.$nuxt.context
-    //             store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
-    //         }
-    //     }
         /*eslint-disable */
 
     }

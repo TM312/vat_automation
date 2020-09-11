@@ -19,16 +19,32 @@ export const mutations = {
         state.seller_firm.accounts.push(account)
     },
 
+    PUSH_ACCOUNTS(state, accounts) {
+        state.seller_firm.accounts.push(...accounts)
+    },
+
     PUSH_ITEM(state, item) {
         state.seller_firm.items.push(item)
+    },
+
+    PUSH_ITEMS(state, items) {
+        state.seller_firm.items.push(...items)
     },
 
     PUSH_DISTANCE_SALE(state, distance_sale) {
         state.seller_firm.distance_sales.push(distance_sale)
     },
 
+    PUSH_DISTANCE_SALES(state, distance_sales) {
+        state.seller_firm.distance_sales.push(...distance_sales)
+    },
+
     PUSH_VAT_NUMBER(state, vat_number) {
         state.seller_firm.vat_numbers.push(vat_number)
+    },
+
+    PUSH_VAT_NUMBERS(state, vat_numbers) {
+        state.seller_firm.vat_numbers.push(...vat_numbers)
     }
 }
 

@@ -1,5 +1,13 @@
 from flask_restx import Model, fields
 
+item_price_net_dto = Model('item_price_net', {
+    'public_id': fields.String(readonly=True),
+    'valid_from': fields.Date,
+    'valid_to': fields.Date,
+    'comment': fields.String,
+    'unit_cost_price_net': fields.Float
+})
+
 
 item_sub_dto = Model('item_sub', {
     'public_id': fields.String(readonly=True),
@@ -20,14 +28,15 @@ item_dto = item_sub_dto.clone('item', {
     'ean': fields.String,
     'asin': fields.String,
     'fnsku': fields.String,
-    'valid_from': fields.Date,
-    'valid_to': fields.Date,
+    'unit_cost_price_history': fields.List(fields.Nested(item_price_net_dto)),
+
 })
 
 item_admin_dto = item_dto.clone('item_admin', {
     'id': fields.Integer(readonly=True),
     'seller_firm_id': fields.Integer
 })
+
 
 
 class ItemSubSchema:

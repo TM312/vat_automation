@@ -204,10 +204,10 @@ class TransactionInputService:
         transaction_inputs = []
         object_type = 'transaction_input'
         object_type_human_read = 'transaction'
+        original_filename = os.path.basename(file_path_in)[:128]
+        transaction_input_socket_list = []
+        duplicate_list = []
 
-        # send status update via socket
-        title = 'Reading transaction file...'
-        SocketService.emit_status_success(1, total, original_filename, object_type, title)
 
         for i in range(total_number_transaction_inputs):
             current = i + 1
@@ -223,43 +223,45 @@ class TransactionInputService:
             arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
             complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
 
-            item_date = ItemService.select_date_from_transaction_report(shipment_date, arrival_date, complete_date)
-
             account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
-            item = ItemService.get_by_sku_account_date(item_sku, account, item_date)
+            item = ItemService.get_by_sku_account(item_sku, account)
 
             bundle = BundleService.get_or_create(account.id, item.id, given_id)
 
 
             # send error status via socket
             if not account_given_id or account_given_id == '':
-                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
+                SocketService.emit_status_error_no_value(current, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
                 return False
 
             if not channel_code or channel_code == '':
-                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'SALES_CHANNEL')
+                SocketService.emit_status_error_no_value(current, object_type, 'SALES_CHANNEL')
                 return False
 
             if not given_id or given_id == '':
-                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'TRANSACTION_EVENT_ID')
+                SocketService.emit_status_error_no_value(current, object_type, 'TRANSACTION_EVENT_ID')
                 return False
 
             if not activity_id or activity_id == '':
-                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'ACTIVITY_TRANSACTION_ID')
+                SocketService.emit_status_error_no_value(current, object_type, 'ACTIVITY_TRANSACTION_ID')
                 return False
 
             if not item_sku or item_sku == '':
-                SocketService.emit_status_error_no_value(current, total_number_transaction_inputs, original_filename, object_type, 'SELLER_SKU')
+                SocketService.emit_status_error_no_value(current, object_type, 'SELLER_SKU')
                 return False
 
             transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
             if transaction_input and transaction_input.processed:
+                message = 'The transaction id: "{}" has already been processed. It has been skipped consequently'.format(given_id)
+                SocketService.emit_status_infobox(object_type, message)
+                total -= 1
+                duplicate_list.append(given_id)
                 continue #skipping duplicates
 
             transaction_input_data = {
                 'created_by': user_id,
                 'bundle_id': bundle.id,
-                'original_filename': os.path.basename(file_path_in)[:128],
+                'original_filename': original_filename,
 
                 'seller_firm_id': account.seller_firm_id,
 
@@ -397,8 +399,8 @@ class TransactionInputService:
                     except:
                         db.session.rollback()
                         # send error status via socket
-                        title = 'Error while updating {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
-                        SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
+                        message = 'Error while updating {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
+                        SocketService.emit_status_error(current, total_number_transaction_inputs, object_type, message)
                         return False
 
             else:
@@ -409,8 +411,8 @@ class TransactionInputService:
                 except:
                     db.session.rollback()
                      # send error status via socket
-                    title = 'Error while updating {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
-                    SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
+                    message = 'Error while updating {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
+                    SocketService.emit_status_error(current, total_number_transaction_inputs, object_type, message)
                     return False
 
 
@@ -419,24 +421,32 @@ class TransactionInputService:
             if not transaction_input.processed:
                 try:
                     # create transactions
-                    boolean = TransactionService.create_transaction_s(transaction_input)
-                    if boolean:
-                        transaction_input.update_processed()
-                        db.session.commit()
-
-                        # send status update via socket
-                        SocketService.emit_status_success_progress(current, total_number_transaction_inputs, original_filename, object_type, object_type_human_read)
-
-                        # push new distance sale to vuex via socket
-                        transaction_input_schema_sub = TransactionInputSubSchema.get_transaction_input_sub(new_transaction_input)
-                        SocketService.emit_new_transaction_input(meta=transaction_input_schema_sub)
+                    TransactionService.create_transaction_s(transaction_input)
+                    transaction_input.update_processed()
+                    db.session.commit()
 
                 except:
                     db.session.rollback()
                     # send error status via socket
-                    title = 'Error while processing {} with id: {} in row {}. Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current)
-                    SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, title)
+                    message = 'Error while processing {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
+                    SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, message)
                     return False
+
+
+             # send status update via socket
+            SocketService.emit_status_success(current, total_number_transaction_inputs, original_filename, object_type)
+
+            # push new distance sale to vuex via socket
+            transaction_input_schema_sub = TransactionInputSubSchema.get_transaction_input_sub(new_transaction_input)
+
+            if total <= 1000:
+                transaction_input_socket_list.append(transaction_input_schema_sub)
+                if current % 100 == 0 or current == total:
+                    SocketService.emit_new_objects(transaction_input_socket_list, object_type)
+                    transaction_input_socket_list = []
+
+        # send final status via socket
+        SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
 
         return True

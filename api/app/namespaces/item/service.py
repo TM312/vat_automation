@@ -37,15 +37,8 @@ class ItemService:
         return Item.query.filter_by(public_id = item_public_id).first()
 
     @staticmethod
-    def get_by_sku_account_date(item_sku: str, account: Account, date: date) -> Item:
-        if account.channel.platform_code == 'AMZ':
-            item = Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id, Item.valid_from<=date, Item.valid_to>=date).first()
-            if item:
-                return item
-            else:
-                print("Function: ItemService -> get_by_sku_account_date_date", flush=True)
-                raise NotFound('The item specific SKU "{}" is not listed in the item information of the seller. Please update the item information before proceeding'.format(item_sku))
-
+    def get_by_sku_account(item_sku: str, account: Account) -> Item:
+        return Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id).first()
 
     @staticmethod
     def get_by_sku_seller_firm_id(sku: str, seller_firm_id: int) -> Item:
@@ -98,34 +91,17 @@ class ItemService:
             raise NotFound('This item does not exist.')
 
 
-    @staticmethod
-    def select_date_from_transaction_report(shipment_date: date, arrival_date: date, complete_date: date) -> date:
-        if isinstance(shipment_date, date):
-            item_date = shipment_date
-        elif isinstance(arrival_date, date):
-            item_date = arrival_date
-        else:
-            item_date = complete_date
-        return item_date
 
     @staticmethod
     def process_single_submit(seller_firm_public_id: str, item_data: ItemInterface):
 
         item_data['created_by'] = g.user.id
-        item_data['valid_from'] = datetime.strptime(item_data['valid_from'], "%Y-%m-%d").date()
         try:
             item_data['weight_kg'] = float(item_data['weight_kg'])
             item_data['unit_cost_price_net'] = float(item_data['unit_cost_price_net'])
 
         except:
             raise
-
-        if not 'valid_to' in item_data:
-            TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
-            item_data['valid_to'] = TAX_DEFAULT_VALIDITY
-
-        else:
-            item_data['valid_to'] = datetime.strptime(item_data['valid_to'], "%Y-%m-%d").date()
 
         item = ItemService.create_by_seller_firm_public_id(seller_firm_public_id, item_data)
 
@@ -138,7 +114,7 @@ class ItemService:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             item_data['seller_firm_id'] = seller_firm.id
-            item = ItemService.get_by_sku_account_date(item_data['sku'], item_data['seller_firm_id'], item_data['valid_from'])
+            item = ItemService.get_by_sku_account(item_data['sku'], item_data['seller_firm_id'])
             if isinstance(item, Item):
                 return item
             else:
@@ -149,7 +125,6 @@ class ItemService:
                     raise
 
         return new_item
-
 
 
 
@@ -260,11 +235,13 @@ class ItemService:
         total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = object_type_human_read = 'item'
+        item_socket_list = []
+        duplicate_list = []
 
 
 
         if not seller_firm_id:
-            SocketService.emit_status_error_no_seller_firm(0, total, original_filename, object_type)
+            SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
         for i in range(total_number_items):
@@ -273,35 +250,21 @@ class ItemService:
             try:
                 sku = InputService.get_str(df, i, column='SKU')
             except:
-                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='SKU')
+                SocketService.emit_status_error_column_read(current, object_type, column_name='SKU')
                 return False
 
             if not sku or sku == '':
                 message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
-                SocketService.emit_status_info_box(current, total, original_filename, object_type, message)
-                return False
-
-            try:
-                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            except:
-                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_from')
-                return False
-
-            try:
-                valid_to = InputService.get_date_or_None(df, i, column='valid_to')
-            except:
-                SocketService.emit_status_error_column_read(current, total, original_filename, object_type, column_name='valid_to')
+                SocketService.emit_status_infobox(object_type, message)
                 return False
 
 
-            if not valid_from:
-                valid_from = date.today()
-            if not valid_to:
-                TAX_DEFAULT_VALIDITY = current_app.config.TAX_DEFAULT_VALIDITY
-                valid_to = TAX_DEFAULT_VALIDITY
-
-            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id) #!!! do items need a validity
+            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
             if item:
+                message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
+                SocketService.emit_status_infobox(object_type, message)
+                total -= 1
+                duplicate_list.append(sku)
                 continue
 
             item_data = {
@@ -309,8 +272,6 @@ class ItemService:
                 'original_filename': original_filename,
                 'sku': sku,
                 'seller_firm_id': seller_firm_id,
-                'valid_from': valid_from,
-                'valid_to': valid_to,
                 'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
                 'name': InputService.get_str_or_None(df, i, column='name'),
                 # 'ean': InputService.get_str_or_None(df, i, column='ean'),
@@ -325,24 +286,30 @@ class ItemService:
             try:
                 new_item = ItemService.create(item_data)
 
-                # send status update via socket
-                SocketService.emit_status_success_progress(current, total, original_filename, object_type, object_type_human_read)
-
-                # push new distance sale to vuex via socket
-                item_schema_sub = ItemSubSchema.get_item_sub(new_item)
-                SocketService.emit_new_object(item_schema_sub, object_type)
-
             except:
                 db.session.rollback()
 
                 # send error status via socket
-                title = 'Error at {} with sku "{}". Please recheck.'.format(object_type_human_read, sku)
-                SocketService.emit_status_error(current, total, original_filename, object_type, title)
+                message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
+                SocketService.emit_status_error(current, total, object_type, message)
                 return False
 
+            # send status update via socket
+            SocketService.emit_status_success(current, total, original_filename, object_type)
+
+            # push new distance sale to vuex via socket
+            item_schema_sub = ItemSubSchema.get_item_sub(new_item)
+
+            if total < 10:
+                SocketService.emit_new_object(item_schema_sub, object_type)
+            else:
+                item_socket_list.append(item_schema_sub)
+                if current % 100 == 0 or current == total:
+                    SocketService.emit_new_objects(item_socket_list, object_type)
+                    item_socket_list = []
 
         # send final status via socket
-        SocketService.emit_status_final(current, total, original_filename, object_type, object_type_human_read)
+        SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
         return True
 
@@ -354,16 +321,16 @@ class ItemService:
     def create(item_data: ItemInterface) -> Item:
         new_item = Item(
             created_by = item_data.get('created_by'),
+            active=item_data.get('active'),
+            category_id=item_data.get('category_id'),
             original_filename = item_data.get('original_filename'),
             sku = item_data.get('sku'),
             seller_firm_id = item_data.get('seller_firm_id'),
-            valid_from = item_data.get('valid_from'),
-            valid_to = item_data.get('valid_to'),
             brand_name = item_data.get('brand_name'),
             name = item_data.get('name'),
-            # ean = item_data.get('ean'),
-            # asin = item_data.get('asin'),
-            # fnsku = item_data.get('fnsku'),
+            ean = item_data.get('ean'),
+            asin = item_data.get('asin'),
+            fnsku = item_data.get('fnsku'),
             weight_kg = item_data.get('weight_kg'),
             tax_code_code = item_data.get('tax_code_code'),
             unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
@@ -374,3 +341,27 @@ class ItemService:
         db.session.commit()
 
         return new_item
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # @staticmethod
+    # def select_date_from_transaction_report(shipment_date: date, arrival_date: date, complete_date: date) -> date:
+    #     if isinstance(shipment_date, date):
+    #         item_date = shipment_date
+    #     elif isinstance(arrival_date, date):
+    #         item_date = arrival_date
+    #     else:
+    #         item_date = complete_date
+    #     return item_date

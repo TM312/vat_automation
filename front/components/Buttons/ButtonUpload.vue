@@ -41,10 +41,6 @@
             },
         },
         methods: {
-            sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            },
-
 
             async uploadFiles() {
                 this.uploadInProgress = true
@@ -101,8 +97,5 @@
 
             }
         }
-    };
+    }
 </script>
-
-<style>
-</style>

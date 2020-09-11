@@ -8,15 +8,3 @@
     <Footer />
   </div>
 </template>
-
-<script>
-import NavbarUnauth from '@/components/Navbar/NavbarUnauth'
-import Footer from '@/components/Footer'
-
-export default {
-  components: {
-    NavbarUnauth,
-    Footer,
-  },
-}
-</script>
