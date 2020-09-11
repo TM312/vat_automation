@@ -91,7 +91,7 @@ class TransactionService:
 
         # define foundational vars
         tax_date = TransactionService.get_tax_date(transaction_type, transaction_input)
-        item = ItemService.get_by_sku_account_date(transaction_input.item_sku, account, tax_date)
+        item = ItemService.get_by_sku_account(transaction_input.item_sku, account)
         bundle = BundleService.get_by_id(transaction_input.bundle_id)
         arrival_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='arrival')
         departure_country = TransactionService.get_country(transaction_input, account, bundle, transaction_type, country_type='departure')

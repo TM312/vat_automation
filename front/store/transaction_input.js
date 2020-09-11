@@ -25,6 +25,10 @@ export const mutations = {
         state.transaction_inputs.push(payload)
     },
 
+    PUSH_TRANSACTION_INPUTS_DIRECT(state, payload) {
+        state.transaction_inputs.push(...payload)
+    },
+
 
 }
 

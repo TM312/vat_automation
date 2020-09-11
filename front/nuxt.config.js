@@ -215,10 +215,15 @@ export default {
             vuex: {
                 mutations: [
                     { new_account: 'seller_firm/PUSH_ACCOUNT' },
+                    { new_accounts: 'seller_firm/PUSH_ACCOUNTS' },
                     { new_item: 'seller_firm/PUSH_ITEM' },
+                    { new_items: 'seller_firm/PUSH_ITEMS' },
                     { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
-                    { new_vatin: 'seller_firm/PUSH_VAT_NUMBER' },
-                    { new_transaction_input: 'transaction_input/PUSH_TRANSACTION_INPUT' }
+                    { new_distance_sales: 'seller_firm/PUSH_DISTANCE_SALES' },
+                    { new_vatin: 'seller_firm/PUSH_VAT_NUMBERS' },
+                    { new_vatins: 'seller_firm/PUSH_VAT_NUMBERS' },
+                    { new_transaction_input: 'transaction_input/PUSH_TRANSACTION_INPUT' },
+                    { new_transaction_inputs: 'transaction_input/PUSH_TRANSACTION_INPUTS_DIRECT' }
                 ],
                 actions: [
                     { status: 'status/handle_status' },
