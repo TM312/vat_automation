@@ -117,7 +117,17 @@ class VATINService:
                 country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
                 vatin = VATINService.get_vatin(country_code, number, date)
                 if not isinstance(vatin, VATIN):
-                    vatin_data = VIESService.send_request(country_code, number)
+                    try:
+                        vatin_data = VIESService.send_request(country_code, number)
+                    except:
+                        vatin_data = {
+                            'country_code': country_code,
+                            'number': number,
+                            'valid': None,
+                            'request_date': date.today(),
+                            'name': None,
+                            'address': None
+                        }
 
                     vatin_data['country_code'] = country_code,
                     vatin_data['number'] = number,
@@ -218,6 +228,7 @@ class VATINService:
         object_type = 'vatin'
         object_type_human_read = 'vat number'
         duplicate_list = []
+        duplicate_counter = 0
         vatin_socket_list = []
 
         if not seller_firm_id:
@@ -242,10 +253,12 @@ class VATINService:
 
             if vatin and vatin.valid:
                 if isinstance(vatin.business_id, int):
-                    message = 'The vat number "{}-{}" has already been processed earlier.'.format(country_code, number)
-                    SocketService.emit_status_infobox(object_type, message)
+                    if not duplicate_counter > 2:
+                        message = 'The vat number "{}-{}" has already been processed earlier.'.format(country_code, number)
+                        SocketService.emit_status_info(object_type, message)
                     total -= 1
                     duplicate_list.append(given_id)
+                    duplicate_counter += 1
                     continue #skipping duplicates
 
                 else:
@@ -262,7 +275,22 @@ class VATINService:
             else:
                 # VIES DB is unreliable therefore reducing requests per second
                 sleep(randint(4, 6))
-                vatin_data = VIESService.send_request(country_code, number)
+                try:
+                    vatin_data = VIESService.send_request(country_code, number)
+                except:
+                    vatin_data = {
+                        'country_code': country_code,
+                        'number': number,
+                        'valid': None,
+                        'request_date': date.today(),
+                        'name': None,
+                        'address': None
+                    }
+
+                    # send error status via socket
+                    message = 'Valiation of vat number "{}-{}" temporarily unavailable. Please make sure that it is validated before submitting transaction reports containing the number.'.format(country_code, number)
+                    SocketService.emit_status_warning(object_type, message)
+
                 vatin_data['business_id'] = seller_firm_id
                 vatin_data['original_filename'] = original_filename,
 
@@ -273,7 +301,7 @@ class VATINService:
 
                 vatin_data['valid_from'] = valid_from
 
-                if vatin:
+                if vatin and vatin_data['valid'] != None:
                     vatin.update(vatin_data)
                     try:
                         db.session.commit()
@@ -340,8 +368,19 @@ class VATINService:
             return vatin
 
         else:
-            vatin_data = VIESService.send_request(country_code, number)
-            if vatin:
+            try:
+                vatin_data = VIESService.send_request(country_code, number)
+            except:
+                vatin_data = {
+                    'country_code': country_code,
+                    'number': number,
+                    'valid': None,
+                    'request_date': date.today(),
+                    'name': None,
+                    'address': None
+                }
+
+            if vatin and vatin_data['valid'] != None:
                 vatin.update(vatin_data)
                 try:
                     db.session.commit()
@@ -540,19 +579,11 @@ class VIESService:
                 vatin_data = VIESService.send_request_via_zeep(country_code, number)
 
             except:
-                vatin_data = {
-                    'country_code': country_code,
-                    'number': number,
-                    'valid': None,
-                    'request_date': date.today(),
-                    'name': None,
-                    'address': None
-                }
                 current_app.logger.warning('Exception: {} | ZEEP Request failed for VATIN: {}-{}'.format(e, country_code, number))
+                raise
 
-        finally:
-            print('FINALlY vatin_data:', vatin_data, flush=True)
-            return vatin_data
+
+        return vatin_data
 
 
     @staticmethod

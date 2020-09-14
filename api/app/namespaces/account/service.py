@@ -183,6 +183,7 @@ class AccountService:
         object_type = object_type_human_read = 'account'
         account_socket_list = []
         duplicate_list = []
+        duplicate_counter = 0
 
 
         if not seller_firm_id:
@@ -219,10 +220,12 @@ class AccountService:
 
             account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
             if account:
-                message = 'The account "{}-{}" has already been registered and skipped consequently.'.format(channel_code, given_id)
-                SocketService.emit_status_infobox(object_type, message)
+                if not duplicate_counter > 2:
+                    message = 'The account "{}-{}" has already been registered and skipped consequently.'.format(channel_code, given_id)
+                    SocketService.emit_status_info(object_type, message)
                 duplicate_list.append('{}: {}'.format(channel_code, given_id))
                 total -= 1
+                duplicate_counter +=1
                 continue
 
             account_data = {

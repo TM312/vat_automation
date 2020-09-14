@@ -49,10 +49,23 @@ class SocketService:
 
 
     @staticmethod
-    def emit_status_infobox(object_type: str, message: str):
+    def emit_status_info(object_type: str, message: str):
 
         status = {
             'target': 'infobox',
+            'total': 0,
+            'done': True,
+            'object': object_type,
+            'message': message
+        }
+
+        SocketService.emit_status(meta=status)
+
+    @staticmethod
+    def emit_status_warning(object_type: str, message: str):
+
+        status = {
+            'target': 'warningbox',
             'total': 0,
             'done': True,
             'object': object_type,

@@ -45,6 +45,12 @@ tag_notification_AT = db.Table(
     db.Column('notification_id', db.Integer, db.ForeignKey('notification.id'), primary_key=True)
 )
 
+tag_item_history_AT = db.Table(
+    'tag_item_history_AT',
+    db.Column('tag_code', db.String(24), db.ForeignKey('tag.code'), primary_key=True),
+    db.Column('item_history_id', db.Integer, db.ForeignKey('item_history.id'), primary_key=True)
+)
+
 user_tag_item_AT = db.Table(
     'user_tag_item_AT',
     db.Column('user_tag_id', db.Integer, db.ForeignKey('user_tag.id'), primary_key=True),

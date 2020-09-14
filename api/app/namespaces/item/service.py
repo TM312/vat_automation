@@ -9,7 +9,7 @@ from app.extensions import (
     db,
     socket_io)
 
-from . import Item
+from . import Item, ItemHistory
 from .schema import ItemSubSchema
 from .interface import ItemInterface
 
@@ -237,6 +237,7 @@ class ItemService:
         object_type = object_type_human_read = 'item'
         item_socket_list = []
         duplicate_list = []
+        duplicate_counter = 0
 
 
 
@@ -255,16 +256,53 @@ class ItemService:
 
             if not sku or sku == '':
                 message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
-                SocketService.emit_status_infobox(object_type, message)
+                SocketService.emit_status_info(object_type, message)
                 return False
+
+            try:
+                name = InputService.get_str_or_None(df, i, column='name')
+            except:
+                SocketService.emit_status_error_column_read(current, object_type, column_name='name')
+                return False
+
+            try:
+                unit_cost_price_net = InputService.get_float(df, i, column='unit_cost_price_net')
+            except:
+                SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_net')
+                return False
+
+            try:
+                unit_cost_price_currency_code = InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code')
+            except:
+                SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_currency_code')
+                return False
+
+            try:
+                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            except:
+                pass
 
 
             item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
             if item:
-                message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
-                SocketService.emit_status_infobox(object_type, message)
+                if item.name != name or item.unit_cost_price_net != unit_cost_price_net:
+                    data_changes = {
+                        'name': name,
+                        'unit_cost_price_net': unit_cost_price_net,
+                        'unit_cost_price_currency_code': unit_cost_price_currency_code
+                    }
+                    if isinstance(valid_from, date):
+                        data_changes['valid_from']=valid_from
+
+                    item.update(data_changes)
+
+                elif not duplicate_counter > 2:
+                    message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
+                    SocketService.emit_status_info(object_type, message)
+
                 total -= 1
                 duplicate_list.append(sku)
+                duplicate_counter += 1
                 continue
 
             item_data = {
@@ -273,14 +311,14 @@ class ItemService:
                 'sku': sku,
                 'seller_firm_id': seller_firm_id,
                 'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
-                'name': InputService.get_str_or_None(df, i, column='name'),
+                'name': name,
                 # 'ean': InputService.get_str_or_None(df, i, column='ean'),
                 # 'asin': InputService.get_str_or_None(df, i, column='asin'),
                 # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
                 'weight_kg': InputService.get_float(df, i, column='weight_kg'),
                 'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
-                'unit_cost_price_currency_code': InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code'),
-                'unit_cost_price_net': InputService.get_float(df, i, column='unit_cost_price_net')
+                'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                'unit_cost_price_net': unit_cost_price_net
             }
 
             try:
@@ -340,11 +378,29 @@ class ItemService:
         db.session.add(new_item)
         db.session.commit()
 
+        ItemHistoryService.create(item_data, new_item.id)
+        db.session.commit()
+
         return new_item
 
 
 
 
+class ItemHistoryService:
+
+    @staticmethod
+    def create(item_data, item_id):
+
+        # create new item history
+        new_item_history = ItemHistory(
+            valid_from=item_data.get('valid_from'),
+            unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
+            unit_cost_price_net=item_data.get('unit_cost_price_net'),
+            name=item_data.get('name'),
+            item_id=item_id
+        )
+
+        db.session.add(new_item_history)
 
 
 
