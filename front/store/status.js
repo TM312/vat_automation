@@ -67,9 +67,6 @@ export const mutations = {
 
     SET_ACCOUNT_TARGET_DONE(state, payload) {
         const payload_done = { done: payload.done }
-        console.log('payload_done:', payload_done)
-        console.log('payload.index:', payload.index)
-
         Object.assign(state.account_targets_done[payload.index], payload_done);
     },
 

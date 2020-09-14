@@ -406,7 +406,9 @@ export default {
         },
         async doneStatusItemTargets (val, oldVal) {
             if (val) {
+                console.log('val in watch doneStatusItemTargets:', val, 'time:', Date.now())
                 await this.sleep(10000)
+                console.log('time after sleep :', Date.now())
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
             }

@@ -1,5 +1,5 @@
-from .model import Item
-from .schema import item_dto, item_sub_dto, item_admin_dto, item_price_net_dto
+from .model import Item, ItemHistory
+from .schema import item_dto, item_sub_dto, item_admin_dto, item_history_dto
 
 
 BASE_ROUTE = "item"

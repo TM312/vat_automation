@@ -207,6 +207,7 @@ class TransactionInputService:
         original_filename = os.path.basename(file_path_in)[:128]
         transaction_input_socket_list = []
         duplicate_list = []
+        duplicate_counter = 0
 
 
         for i in range(total_number_transaction_inputs):
@@ -252,10 +253,12 @@ class TransactionInputService:
 
             transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
             if transaction_input and transaction_input.processed:
-                message = 'The transaction id: "{}" has already been processed. It has been skipped consequently'.format(given_id)
-                SocketService.emit_status_infobox(object_type, message)
+                if not duplicate_counter > 2:
+                    message = 'The transaction id: "{}" has already been processed. It has been skipped consequently'.format(given_id)
+                    SocketService.emit_status_info(object_type, message)
                 total -= 1
                 duplicate_list.append(given_id)
+                duplicate_counter +=1
                 continue #skipping duplicates
 
             transaction_input_data = {

@@ -174,6 +174,7 @@ class DistanceSaleService:
         object_type_human_read = 'distance sale'
         distance_sale_socket_list = []
         duplicate_list = []
+        duplicate_counter = 0
 
 
         if not seller_firm_id:
@@ -224,10 +225,12 @@ class DistanceSaleService:
             if distance_sale:
                 if distance_sale.active == active:
                     active_human_read = 'active' if active else 'inactive'
-                    message = 'The distance sale for {} ({}). Registration has been skipped.'.format(distance_sale.arrival_country_code, active_human_read)
-                    SocketService.emit_status_infobox(object_type, message)
+                    if not duplicate_counter > 2:
+                        message = 'The distance sale for {} ({}). Registration has been skipped.'.format(distance_sale.arrival_country_code, active_human_read)
+                        SocketService.emit_status_info(object_type, message)
                     total -= 1
                     duplicate_list.append('{}-{}'.format(distance_sale.arrival_country_code, active_human_read))
+                    duplicate_counter += 1
                     continue
 
                 else:

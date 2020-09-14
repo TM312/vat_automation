@@ -1,3 +1,9 @@
+# http://www.gevent.org/api/gevent.monkey.html
+# https://flask-socketio.readthedocs.io/en/latest/
+
+from gevent import monkey
+monkey.patch_all()
+
 import os
 from dotenv import load_dotenv
 load_dotenv()

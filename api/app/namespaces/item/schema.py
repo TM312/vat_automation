@@ -1,11 +1,15 @@
 from flask_restx import Model, fields
+from ..tag import tag_dto
 
-item_price_net_dto = Model('item_price_net', {
+
+item_history_dto = Model('item_history', {
     'public_id': fields.String(readonly=True),
     'valid_from': fields.Date,
     'valid_to': fields.Date,
     'comment': fields.String,
-    'unit_cost_price_net': fields.Float
+    'name': fields.String,
+    'unit_cost_price_net': fields.Float,
+    'tags': fields.List(fields.Nested(tag_dto))
 })
 
 
@@ -28,7 +32,7 @@ item_dto = item_sub_dto.clone('item', {
     'ean': fields.String,
     'asin': fields.String,
     'fnsku': fields.String,
-    'unit_cost_price_history': fields.List(fields.Nested(item_price_net_dto)),
+    'item_history': fields.List(fields.Nested(item_history_dto)),
 
 })
 
