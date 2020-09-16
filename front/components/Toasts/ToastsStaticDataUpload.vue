@@ -1,5 +1,6 @@
 <template>
     <div>
+        <toast-data-upload-invalid-file />
         <b-toast
             no-auto-hide
             :title="titleAccount"
@@ -287,7 +288,6 @@ export default {
             statusTransactionInputTargets: state => state.status.transaction_input_targets,
             lenStatusTransactionInput: state => state.status.transaction_input_targets.length,
 
-
         }),
 
         doneStatusAccountTargets() {
@@ -367,71 +367,71 @@ export default {
         lenStatusAccount (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastAccount = true
-            } else if (newLength === 0) {
-                this.toastAccount = false
             }
         },
         lenStatusItem (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastItem = true
-            } else if (newLength === 0) {
-                this.toastItem = false
             }
         },
         lenStatusVatNumber (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastVatNumber = true
-            } else if (newLength === 0) {
-                this.toastVatNumber = false
             }
         },
         lenStatusDistanceSale (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastDistanceSale = true
-            } else if (newLength === 0) {
-                this.toastDistanceSale = false
             }
         },
         lenStatusTransactionInput (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastTransactionInput = true
-            } else if (newLength === 0) {
-                this.toastTransactionInput = false
             }
         },
 
 
         async doneStatusAccountTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastAccount = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
             }
         },
         async doneStatusItemTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastItem = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
             }
         },
         async doneStatusVatNumberTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastVatNumber = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
             }
         },
         async doneStatusDistanceSaleTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastDistanceSale = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
             }
         },
         async doneStatusTransactionInputTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastTransactionInput = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
             }

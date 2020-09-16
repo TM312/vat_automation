@@ -60,13 +60,10 @@
 <script>
     // Validation1: not uploading the same file multiple times.
     // Validation2: not uploading no file at all
-    import { BIcon } from "bootstrap-vue";
 
     export default {
         name: "CardDataUpload",
-        components: {
-            BIcon
-        },
+
         props: {
             // eslint-disable-next-line
             urlEndpointUpload: {

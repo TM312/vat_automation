@@ -66,13 +66,13 @@
                         await this.$axios
                         .post(this.urlEndpointUpload, data, config)
 
-                        .then(response => {
-                            // !!! delete later below
-                            let taskId = response.data;
-                            console.log('taskId:', taskId)
-
+                        .then(
                             this.$emit('removeFile', i)
-                        })
+                            // response => {
+                            // // !!! delete later below
+                            // let taskId = response.data;
+                            // }
+                        )
 
                     } catch(err) {
                         console.log(err);

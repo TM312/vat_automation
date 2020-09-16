@@ -1,5 +1,6 @@
 <template>
     <div>
+        <toast-data-upload-invalid-file />
         <b-toast
                 no-auto-hide
                 :title="titleSellerFirm"
@@ -96,14 +97,14 @@ export default {
         lenStatusSellerFirm (newLength, oldLength) {
             if (oldLength === 0) {
                 this.toastSellerFirm = true
-            } else if (newLength === 0) {
-                this.toastSellerFirm = false
             }
         },
 
        async doneStatusSellerFirmTargets (val, oldVal) {
             if (val) {
-                await this.sleep(12000)
+                await this.sleep(11000)
+                this.toastSellerFirm = false
+                await this.sleep(1000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_SELLER_FIRM_TARGETS')
             }

@@ -79,8 +79,8 @@ class TransactionService:
         activity_id = transaction_input.activity_id
         item_sku = transaction_input.item_sku
 
-        try: !!!!!! here in function socket integration
-            account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
+        #!!!!!! here in function socket integration
+        account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
         platform_code = account.channel.platform_code
         transaction_type = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, platform_code)
 
@@ -491,7 +491,7 @@ class TransactionService:
 
 
             elif customer_relationship == "B2C":
-                active = DistanceSaleHistoryService.get_active(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, tax_date=tax_date)
+                active = DistanceSaleHistoryService.get_active(seller_firm_id=account.seller_firm_id, arrival_country_code=arrival_country.code, date=tax_date)
 
                 if departure_country.code != arrival_country.code and active:
                     tax_treatment_code = 'DISTANCE_SALE'

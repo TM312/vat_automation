@@ -27,34 +27,36 @@ class DistanceSale(db.Model):  # type: ignore
     def __repr__(self):
         return '<DistanceSale (seller firm id: {}): {} -> {}>'.format(self.seller_firm_id, self.arrival_country_code, self.active)
 
-    def update(self, data_changes):
+    def update(self, data_changes, **kwargs):
         for key, val in data_changes.items():
             """
             Change of state 'active' is tracked for each distance sale. A distance sale history object is created whenever one of these attributes is being updated.
+            'update' takes "valid_from" as an optional argument (**kwargs)
+
             """
             if key == 'active':
-                valid_from = date.today() if not isinstance(data_changes.get('valid_from'), date) else data_changes.get('valid_from')
+                valid_from = kwargs.get('valid_from') if isinstance(kwargs.get('valid_from'), date) else date.today()
 
                  # Get the current distance sale history
                 distance_sale_history = DistanceSaleHistory.query.filter_by(distance_sale_id = self.id).order_by(DistanceSaleHistory.valid_from.desc()).first()
-                if isinstance(distance_sale_history, DistanceSaleHistory):
-                    distance_sale_history.valid_to = valid_from-timedelta(days=1)
+                if not isinstance(distance_sale_history, DistanceSaleHistory):
+                    raise
+
+                if distance_sale_history.active == val:
+                    continue
 
                 else:
-                    arrival_country_code = (
-                        data_changes.get('arrival_country_code')
-                        if isinstance(data_changes.get('arrival_country_code'), str)
-                        else self.arrival_country_code
-                    )
+                    distance_sale_history.valid_to = valid_from-timedelta(days=1)
 
                     #create new distance sale history
                     new_distance_sale_history = DistanceSaleHistory(
+                        distance_sale_id=self.id,
                         valid_from = valid_from,
-                        arrival_country_code = arrival_country_code,
-                        active = val,
-                        distance_sale_id = self.id
+                        arrival_country_code=self.arrival_country_code,
+                        active = val
                     )
                     db.session.add(new_distance_sale_history)
+
                     self.distance_sale_history.append(new_distance_sale_history)
 
             setattr(self, key, val)

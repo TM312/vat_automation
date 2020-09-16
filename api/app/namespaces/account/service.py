@@ -213,7 +213,7 @@ class AccountService:
 
                     # send error status via socket
                     message = 'Error at {} "{}" for channel "{}" (file: {}). Please recheck.'.format(object_type_human_read, given_id, channel_code, original_filename)
-                    SocketService.emit_status_error(current, total, object_type, message)
+                    SocketService.emit_status_error(object_type, message)
                     return False
 
 

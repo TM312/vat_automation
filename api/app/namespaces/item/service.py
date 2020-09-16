@@ -261,15 +261,16 @@ class ItemService:
                         'unit_cost_price_currency_code': unit_cost_price_currency_code
                     }
                     if isinstance(valid_from, date):
-                        data_changes['valid_from']=valid_from
+                        item.update(data_changes, valid_from=valid_from)
 
-                    try:
+                    else:
                         item.update(data_changes)
+                    try:
                         db.session.commit()
                     except:
                         db.session.rollback()
                         message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
-                        SocketService.emit_status_error(current, total, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
                 elif not duplicate_counter > 2:
@@ -306,7 +307,7 @@ class ItemService:
 
                     # send error status via socket
                     message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
-                    SocketService.emit_status_error(current, total, object_type, message)
+                    SocketService.emit_status_error(object_type, message)
                     return False
 
                 # send status update via socket

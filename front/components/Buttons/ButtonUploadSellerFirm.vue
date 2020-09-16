@@ -70,25 +70,28 @@
                         await this.$axios
                         .post(this.urlEndpointUpload, data, config)
 
-                        // .then(response => {
-                        //     let responseObjects = response.data;
+                        .then(
+                            this.$emit('removeFile', i)
+                            // response => {
+                            // let responseObjects = response.data;
 
-                        //     for (var j = 0; j < responseObjects.length; j++) {
-                        //         let responseObject = responseObjects[j]
+                            // for (var j = 0; j < responseObjects.length; j++) {
+                            //     let responseObject = responseObjects[j]
 
-                        //         if (responseObject.status == "success") {
+                            //     if (responseObject.status == "success") {
 
-                        //             this.$toast.success(responseObject.message, {
-                        //                 duration: 10000
-                        //             });
+                            //         this.$toast.success(responseObject.message, {
+                            //             duration: 10000
+                            //         });
 
 
-                        //         } else {
-                        //             this.$toast.error(responseObject.message, { duration: 10000 });
-                        //         }
-                        //     }
-                        //     this.$emit('removeFile', i)
-                        // })
+                            //     } else {
+                            //         this.$toast.error(responseObject.message, { duration: 10000 });
+                            //     }
+                            // }
+
+                        // }
+                        )
 
                     } catch(err) {
                         // console.log(err);

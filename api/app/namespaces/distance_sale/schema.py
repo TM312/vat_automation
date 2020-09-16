@@ -13,10 +13,8 @@ distance_sale_history_dto = Model('distance_sale_history', {
 
 distance_sale_sub_dto = Model('distance_sale_sub', {
     'public_id': fields.String(readonly=True),
-    'valid_from': fields.Date,
-    'valid_to': fields.Date,
     'arrival_country_code': fields.String,
-    'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True),
+    'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True), #change later
     'active': fields.Boolean
 })
 
@@ -40,10 +38,8 @@ class DistanceSaleSubSchema:
     def get_distance_sale_sub(distance_sale):
         distance_sale_as_dict = {
             'public_id': str(distance_sale.public_id),
-            'valid_from': str(distance_sale.valid_from),
-            'valid_to': str(distance_sale.valid_to),
             'arrival_country_code': distance_sale.arrival_country_code,
-            'arrival_country': distance_sale.arrival_country.name,
+            'arrival_country': distance_sale.arrival_country.name, #!!!! change later
             'active': distance_sale.active,
         }
         return distance_sale_as_dict
