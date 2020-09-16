@@ -81,41 +81,6 @@ class NotificationService:
 
 
 
-
-    @staticmethod
-    def handle_seller_firm_notification_data_upload(seller_firm_id: int, user_id: int, tag: str, seller_firm_notification_data: SellerFirmNotificationInterface) -> None:
-        # if multiple files containing data for the same seller are uploaded, the same notification is used and extended in terms of tags
-        seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm_id, user_id, datetime.utcnow(), subject='Data Upload')
-        if not isinstance(seller_firm_notification, SellerFirmNotification):
-            seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
-
-        if not tag in seller_firm_notification.tags:
-            seller_firm_notification.tags.append(tag)
-
-            #if the same data has been uploaded within 5 minutes it is not being considered as modified.
-            if (datetime.utcnow() - seller_firm_notification.created_on) >= timedelta(minutes=5):
-                seller_firm_notification.modify()
-
-            try:
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-
-
-
-
-
-
-
-
-
-
-    @staticmethod
-    def get_by_transaction_input_id_status(transaction_input_id: int, status: str) -> List[TransactionNotification]:
-        return TransactionNotification.query.filter_by(transaction_input_id=transaction_input_id).all()
-
-
     @staticmethod
     def create_transaction_notification_data(main_subject: str, original_filename: str, status: str, reference_value: str, calculated_value: str, transaction_id: int) -> Dict:
 
@@ -146,6 +111,27 @@ class NotificationService:
 
 
         return new_notification
+
+
+    @staticmethod
+    def handle_seller_firm_notification_data_upload(seller_firm_id: int, user_id: int, tag: str, seller_firm_notification_data: SellerFirmNotificationInterface) -> None:
+        # if multiple files containing data for the same seller are uploaded, the same notification is used and extended in terms of tags
+        seller_firm_notification = NotificationService.get_seller_firm_shared(seller_firm_id, user_id, datetime.utcnow(), subject='Data Upload')
+        if not isinstance(seller_firm_notification, SellerFirmNotification):
+            seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+
+        if not tag in seller_firm_notification.tags:
+            seller_firm_notification.tags.append(tag)
+
+            #if the same data has been uploaded within 5 minutes it is not being considered as modified.
+            if (datetime.utcnow() - seller_firm_notification.created_on) >= timedelta(minutes=5):
+                seller_firm_notification.modify()
+
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
 
 
 
@@ -306,7 +292,10 @@ class InputService:
         elif ('arrival_country_code' in column_name_list and 'active' in column_name_list):
             return 'distance_sale_list'
 
-        elif ('SKU' in column_name_list and 'name' in column_name_list and 'tax_code' in column_name_list and 'unit_cost_price_currency_code' in column_name_list):
+        elif ('SKU' in column_name_list
+            and 'name' in column_name_list
+            and 'tax_code' in column_name_list
+            and 'unit_cost_price_currency_code' in column_name_list):
             return 'item_list'
 
         elif ('country_code' in column_name_list and 'number' in column_name_list):
@@ -318,6 +307,11 @@ class InputService:
               and 'ACTIVITY_TRANSACTION_ID' in column_name_list
               and 'SELLER_SKU' in column_name_list ):
               return 'transactions_amazon'
+
+        elif ('seller_firm_name' in column_name_list
+            and	'address' in column_name_list
+            and	'establishment_country_code' in column_name_list):
+            return 'seller_firm'
 
         else:
             os.remove(file_path_in)
@@ -331,6 +325,10 @@ class InputService:
 
         elif file_type in ['transactions_amazon']:
             return 'recurring'
+
+        elif file_type in ['seller_firm']:
+            return 'business'
+
         else:
             raise
 
@@ -394,27 +392,32 @@ class InputService:
             os.makedirs(basepath_in, exist_ok=True)
 
             file_path_in = os.path.join(basepath_in, stored_filename)
-            file.save(file_path_in)
+
+            try:
+                file.save(file_path_in)
+            except:
+                raise UnprocessableEntity('Can not store file. Please contact one of the admins.')
 
             if InputService.allowed_filesize(file_path=file_path_in):
                 return file_path_in
 
             else:
-                raise RequestEntityTooLarge('Uploaded files exceed the file limit. Please reduce the number of files to be processed at once.')
+                raise RequestEntityTooLarge('The uploaded file "{}" exceeds the file limit.'.format(stored_filename))
 
         else:
-            raise UnsupportedMediaType('The file {} is not allowed. Please recheck if the file extension matches {}'.format(filename, allowed_extensions))
+            raise UnsupportedMediaType('The file type "{}" is not allowed. Please recheck if the file extension matches one of the following: {}'.format(filename, allowed_extensions))
 
 
     def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str):
-        BASE_PATH_DATA_SELLER_FIRM = current_app.config.BASE_PATH_DATA_SELLER_FIRM
 
         if data_type == 'static':
             basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
         elif data_type == 'recurring':
             basepath = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
+        elif data_type == 'business':
+            basepath = current_app.config.BASE_PATH_BUSINESS_DATA
 
-        basepath_tbd = os.path.join(BASE_PATH_DATA_SELLER_FIRM, 'tbd')
+        basepath_tbd = os.path.join(current_app.config.DATAPATH, 'tbd')
         basepath_file_type = os.path.join(basepath, file_type, 'in')
         os.makedirs(basepath_file_type, exist_ok=True)
 
@@ -448,14 +451,10 @@ class InputService:
             try:
                 if file_name.lower().endswith('.csv') or file_name.lower().endswith('.txt'):
                     df_raw = pd.read_csv(file_path, encoding=df_encoding, delimiter=delimiter)
-
                     df = InputService.clean_df(df_raw)
-                    # """ below: delete later !!! """
-                    # pd.set_option('display.max_columns', None)
-                    # print('df.head()', df.head(), flush=True)
+
                 else:
-                    raise UnsupportedMediaType(
-                        'File extension invalid (file: {}).'.format(file_name))
+                    raise UnsupportedMediaType('File extension invalid (file: {}).'.format(file_name))
                 return df
             except:
                 raise UnsupportedMediaType('Cannot read file {}.'.format(file_name))

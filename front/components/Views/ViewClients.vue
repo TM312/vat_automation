@@ -2,7 +2,7 @@
     <div>
         <b-card
             v-if="countClients === 0"
-            sub-title="A List of Your Customers Will Appear Here Once You Start Upload Data"
+            sub-title="A List of Your Customers Will Appear Here Once You Start Uploading Data"
             class="text-center py-5"
         >
         </b-card>

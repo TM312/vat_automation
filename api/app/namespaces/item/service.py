@@ -30,7 +30,7 @@ class ItemService:
 
     @staticmethod
     def get_by_id(item_id: int) -> Item:
-        return Item.query.filter(Item.id == item_id).first()
+        return Item.query.filter_by(id = item_id).first()
 
     @staticmethod
     def get_by_public_id(item_public_id: str) -> Item:
@@ -38,11 +38,17 @@ class ItemService:
 
     @staticmethod
     def get_by_sku_account(item_sku: str, account: Account) -> Item:
-        return Item.query.filter(Item.sku==item_sku, Item.seller_firm_id==account.seller_firm_id).first()
+        return Item.query.filter(
+            Item.sku==item_sku,
+            Item.seller_firm_id==account.seller_firm_id
+            ).first()
 
     @staticmethod
     def get_by_sku_seller_firm_id(sku: str, seller_firm_id: int) -> Item:
-        return Item.query.filter(Item.sku == sku, Item.seller_firm_id == seller_firm_id).first()
+        return Item.query.filter(
+            Item.sku == sku,
+            Item.seller_firm_id == seller_firm_id
+            ).first()
 
 
     @staticmethod
@@ -62,7 +68,7 @@ class ItemService:
 
     @staticmethod
     def delete_by_id(item_id: int):
-        item = Item.query.filter(Item.id == item_id).first()
+        item = ItemService.get_by_id(item_id)
         if item:
             db.session.delete(item)
             db.session.commit()
@@ -177,52 +183,15 @@ class ItemService:
 
 
     @staticmethod
-    def process_item_files_upload(item_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
-        from ..business.seller_firm.service import SellerFirmService
-
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
-
-        file_type='item_list'
-        df_encoding = 'utf-8'
-        delimiter = None
-        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
-        user_id = g.user.id
-        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
-
-
-        for file in item_information_files:
-            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-
-        response_object = {
-            'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(item_information_files)))
-        }
-
-        return response_object
-
-
-    @staticmethod
     def handle_item_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
-        response_object = ItemService.process_item_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id)
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+        response_object = ItemService.create_items(df, file_path_in, user_id, seller_firm_id)
         tag = TagService.get_by_code('ITEM')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_object
 
-
-
-    # celery task !!
-    @staticmethod
-    def process_item_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
-
-        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = ItemService.create_items(df, file_path_in, user_id, seller_firm_id)
-
-        # celery task !!
-        InputService.move_file_to_out(file_path_in, basepath, file_type)
-
-        return response_objects
 
 
 
@@ -294,7 +263,14 @@ class ItemService:
                     if isinstance(valid_from, date):
                         data_changes['valid_from']=valid_from
 
-                    item.update(data_changes)
+                    try:
+                        item.update(data_changes)
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
+                        SocketService.emit_status_error(current, total, object_type, message)
+                        return False
 
                 elif not duplicate_counter > 2:
                     message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
@@ -305,38 +281,39 @@ class ItemService:
                 duplicate_counter += 1
                 continue
 
-            item_data = {
-                'created_by': user_id,
-                'original_filename': original_filename,
-                'sku': sku,
-                'seller_firm_id': seller_firm_id,
-                'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
-                'name': name,
-                # 'ean': InputService.get_str_or_None(df, i, column='ean'),
-                # 'asin': InputService.get_str_or_None(df, i, column='asin'),
-                # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
-                'weight_kg': InputService.get_float(df, i, column='weight_kg'),
-                'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
-                'unit_cost_price_currency_code': unit_cost_price_currency_code,
-                'unit_cost_price_net': unit_cost_price_net
-            }
+            else:
+                item_data = {
+                    'created_by': user_id,
+                    'original_filename': original_filename,
+                    'sku': sku,
+                    'seller_firm_id': seller_firm_id,
+                    'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
+                    'name': name,
+                    # 'ean': InputService.get_str_or_None(df, i, column='ean'),
+                    # 'asin': InputService.get_str_or_None(df, i, column='asin'),
+                    # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
+                    'weight_kg': InputService.get_float(df, i, column='weight_kg'),
+                    'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
+                    'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                    'unit_cost_price_net': unit_cost_price_net
+                }
 
-            try:
-                new_item = ItemService.create(item_data)
+                try:
+                    new_item = ItemService.create(item_data)
 
-            except:
-                db.session.rollback()
+                except:
+                    db.session.rollback()
 
-                # send error status via socket
-                message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
-                SocketService.emit_status_error(current, total, object_type, message)
-                return False
+                    # send error status via socket
+                    message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
+                    SocketService.emit_status_error(current, total, object_type, message)
+                    return False
 
-            # send status update via socket
-            SocketService.emit_status_success(current, total, original_filename, object_type)
+                # send status update via socket
+                SocketService.emit_status_success(current, total, original_filename, object_type)
 
-            # push new distance sale to vuex via socket
-            item_schema_sub = ItemSubSchema.get_item_sub(new_item)
+                # push new distance sale to vuex via socket
+                item_schema_sub = ItemSubSchema.get_item_sub(new_item)
 
             if total < 10:
                 SocketService.emit_new_object(item_schema_sub, object_type)
@@ -352,7 +329,7 @@ class ItemService:
         return True
 
 
-# List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
+    # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
 
 
     @staticmethod
@@ -379,7 +356,6 @@ class ItemService:
         db.session.commit()
 
         ItemHistoryService.create(item_data, new_item.id)
-        db.session.commit()
 
         return new_item
 
@@ -387,6 +363,14 @@ class ItemService:
 
 
 class ItemHistoryService:
+
+    @staticmethod
+    def get_by_item_id_date(item_id: int, date: date):
+        return ItemHistory.query.filter(
+            ItemHistory.item_id == item_id,
+            ItemHistory.valid_from <= date,
+            ItemHistory.valid_to >= date
+            ).first()
 
     @staticmethod
     def create(item_data, item_id):
@@ -401,6 +385,7 @@ class ItemHistoryService:
         )
 
         db.session.add(new_item_history)
+        db.session.commit()
 
 
 

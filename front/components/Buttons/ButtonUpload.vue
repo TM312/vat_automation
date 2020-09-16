@@ -2,18 +2,15 @@
     <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
         <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
         <b-spinner v-else small label="Spinning"></b-spinner>
-         Upload
+        Upload
     </b-button>
 </template>
 
 <script>
-    import { BIcon } from "bootstrap-vue";
 
     export default {
         name: 'ButtonUpload',
-        components: {
-            BIcon
-        },
+
         props: {
             urlEndpointUpload: {
                 type: String,
@@ -31,7 +28,7 @@
             };
         },
         computed: {
-             buttonDisabled() {
+            buttonDisabled() {
                 if (this.files.length == 0 || this.uploadInProgress) {
                     return true
                 } else {
@@ -40,6 +37,14 @@
 
             },
         },
+
+        mounted() {
+            this.socket = this.$nuxtSocket({
+                name: 'home',
+                reconnection: false
+            })
+        },
+
         methods: {
 
             async uploadFiles() {
@@ -62,31 +67,16 @@
                         .post(this.urlEndpointUpload, data, config)
 
                         .then(response => {
-                            let responseObjects = response.data;
+                            // !!! delete later below
+                            let taskId = response.data;
+                            console.log('taskId:', taskId)
 
-                            for (var j = 0; j < responseObjects.length; j++) {
-                                let responseObject = responseObjects[j]
-
-                                if (responseObject.status == "success") {
-
-                                    this.$toast.success(responseObject.message, {
-                                        duration: 10000
-                                    });
-
-
-                                } else {
-                                    this.$toast.error(responseObject.message, { duration: 10000 });
-                                }
-                            }
                             this.$emit('removeFile', i)
                         })
 
                     } catch(err) {
                         console.log(err);
-                        this.$toast.error(
-                            "An error occured. Please make sure you have tried to submit valid data.",
-                            { duration: 10000 }
-                        );
+
                         i = this.files.length
                     }
 

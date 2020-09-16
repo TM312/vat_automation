@@ -46,12 +46,14 @@ class Config(object):
     EMAIL_CONFIRMATION_MAX_AGE = 3600  # 3600 #in seconds
 
     # Static Data Paths
-    datapath = '/home/data'
+    basepath = '/home'
 
-    BASE_PATH_SEEDS = datapath + '/seeds'
-    BASE_PATH_LOGS = datapath + '/logs'
-    BASE_PATH_TEMPLATES = datapath + '/templates'
+    BASE_PATH_SEEDS = basepath + '/seeds'
+    BASE_PATH_LOGS = basepath + '/logs'
+    BASE_PATH_TEMPLATES = basepath + '/templates'
 
+    DATAPATH = datapath = basepath + '/data'
+    BASE_PATH_BUSINESS_DATA = datapath + '/business_data'
     BASE_PATH_DATA_SELLER_FIRM = datapath + '/seller_firm_data'
     BASE_PATH_STATIC_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/static'
     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/transaction'

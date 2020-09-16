@@ -23,7 +23,7 @@ class TokenService:
 
     @staticmethod
     def get_by_id(auth_token: TokenInterface) -> Token:
-        return Token.query.filter(Token.auth_token == auth_token).first()
+        return Token.query.filter_by(auth_token = auth_token).first()
 
 
     @staticmethod

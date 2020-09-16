@@ -1,4 +1,4 @@
 from mypy_extensions import TypedDict
 
-class UserTagInterface(TypedDict, total=False):
+class ItemTagInterface(TypedDict, total=False):
     name: str

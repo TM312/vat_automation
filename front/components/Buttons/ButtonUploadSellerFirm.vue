@@ -1,28 +1,25 @@
 <template>
-    <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
-        <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
-        <b-spinner v-else small label="Spinning"></b-spinner>
-         Upload
-    </b-button>
+        <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
+            <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
+            <b-spinner v-else small label="Spinning"></b-spinner>
+            Upload
+        </b-button>
 </template>
 
 <script>
     import { mapState } from 'vuex'
-    import { BIcon } from "bootstrap-vue";
 
     export default {
         name: 'ButtonUploadSellerFirm',
-        components: {
-            BIcon
-        },
-        props: {
 
+        props: {
             files: {
                 type: Array,
                 required: true
             }
         },
-         data() {
+
+        data() {
             return {
                 uploadInProgress: false
             };
@@ -45,6 +42,8 @@
                 }
             }
         },
+
+
         methods: {
             enableButton() {
                 if (this.files.length == 0) {
@@ -71,32 +70,32 @@
                         await this.$axios
                         .post(this.urlEndpointUpload, data, config)
 
-                        .then(response => {
-                            let responseObjects = response.data;
+                        // .then(response => {
+                        //     let responseObjects = response.data;
 
-                            for (var j = 0; j < responseObjects.length; j++) {
-                                let responseObject = responseObjects[j]
+                        //     for (var j = 0; j < responseObjects.length; j++) {
+                        //         let responseObject = responseObjects[j]
 
-                                if (responseObject.status == "success") {
+                        //         if (responseObject.status == "success") {
 
-                                    this.$toast.success(responseObject.message, {
-                                        duration: 10000
-                                    });
+                        //             this.$toast.success(responseObject.message, {
+                        //                 duration: 10000
+                        //             });
 
 
-                                } else {
-                                    this.$toast.error(responseObject.message, { duration: 10000 });
-                                }
-                            }
-                            this.$emit('removeFile', i)
-                        })
+                        //         } else {
+                        //             this.$toast.error(responseObject.message, { duration: 10000 });
+                        //         }
+                        //     }
+                        //     this.$emit('removeFile', i)
+                        // })
 
                     } catch(err) {
-                        console.log(err);
-                        this.$toast.error(
-                            "An error occured. Please make sure you have tried to submit valid data.",
-                            { duration: 10000 }
-                        );
+                        // console.log(err);
+                        // this.$toast.error(
+                        //     "An error occured. Please make sure you have tried to submit valid data.",
+                        //     { duration: 10000 }
+                        // );
                         this.uploadInProgress = false
                         i = this.files.length
                     }

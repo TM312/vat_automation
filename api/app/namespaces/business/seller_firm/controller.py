@@ -91,4 +91,4 @@ class SellerFirmInformationResource(Resource):
     def post(self) -> Response:
         """Create an unclaimed seller firm as a client"""
         seller_firm_information_file: BinaryIO = request.files["file"]
-        return SellerFirmService.process_seller_firm_information_files_upload(seller_firm_information_file, claimed=False)
+        return SellerFirmService.process_seller_firm_information_file_upload(seller_firm_information_file)

@@ -4,7 +4,7 @@ from .file_upload import (
     async_handle_item_data_upload,
     async_handle_transaction_input_data_upload,
     async_handle_vatin_data_upload,
-    long_task
+    async_handle_seller_firm_data_upload
     )
 
 from .clean_up import (

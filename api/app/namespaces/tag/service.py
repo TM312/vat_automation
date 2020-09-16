@@ -12,20 +12,20 @@ class TagService:
         return tags
 
     @staticmethod
-    def get_by_code(code: str) -> Tag:
-        return Tag.query.filter_by(code=code).first()
+    def get_by_code(tag_code: str) -> Tag:
+        return Tag.query.filter_by(code=tag_code).first()
 
 
     @staticmethod
-    def delete_by_code(code: str):
-        tag = Tag.query.filter(Tag.code == code).first()
+    def delete_by_code(tag_code: str):
+        tag = TagService.get_by_code(tag_code)
         if tag:
             db.session.delete(tag)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Tag (code: {}) has been successfully deleted.'.format(code)
+                'message': 'Tag (code: {}) has been successfully deleted.'.format(tag_code)
             }
             return response_object
         else:

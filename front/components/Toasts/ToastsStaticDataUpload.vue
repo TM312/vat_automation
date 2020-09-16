@@ -263,13 +263,14 @@ export default {
             toastItem: false,
             toastVatNumber: false,
             toastDistanceSale: false,
-            toastTransactionInput: false
+            toastTransactionInput: false,
+            toastSellerFirm: false
         }
     },
 
     computed: {
         ...mapState({
-            sellerFirm: state => state.seller_firm.seller_firm,
+            // sellerFirm: state => state.seller_firm.seller_firm,
 
             statusAccountTargets: state => state.status.account_targets,
             lenStatusAccount: state => state.status.account_targets.length,
@@ -284,7 +285,9 @@ export default {
             lenStatusDistanceSale: state => state.status.distance_sale_targets.length,
 
             statusTransactionInputTargets: state => state.status.transaction_input_targets,
-            lenStatusTransactionInput: state => state.status.transaction_input_targets.length
+            lenStatusTransactionInput: state => state.status.transaction_input_targets.length,
+
+
         }),
 
         doneStatusAccountTargets() {
@@ -321,39 +324,39 @@ export default {
 
         titleAccount() {
             if (this.doneStatusAccountTargets) {
-                return (this.lenStatusAccount === 1) ? 'New accounts' : `${this.totalStatusAccountTargets} new accounts`
+                return (this.lenStatusAccount === 1) ? 'Uploaded accounts processed' : `${this.totalStatusAccountTargets} uploaded accounts processed`
             } else {
                 return 'New accounts are being registered...'
             }
         },
         titleItem() {
             if (this.doneStatusItemTargets) {
-                return (this.lenStatusItem === 1) ? 'New items' : `${this.totalStatusItemTargets} new items`
+                return (this.lenStatusItem === 1) ? 'Uploaded items processed' : `${this.totalStatusItemTargets} uploaded items processed`
             } else {
                 return 'New items are being registered...'
             }
         },
         titleVatNumber() {
             if (this.doneStatusVatNumberTargets) {
-                return (this.lenStatusVatNumber === 1) ? 'New vat numbers' : `${this.totalStatusVatNumberTargets} new vat numbers`
+                return (this.lenStatusVatNumber === 1) ? 'Uploaded vat numbers processed' : `${this.totalStatusVatNumberTargets} uploaded vat numbers processed`
             } else {
                 return 'New items are being registered...'
             }
         },
         titleDistanceSale() {
             if (this.doneStatusDistanceSaleTargets) {
-                return (this.lenStatusDistanceSale === 1) ? 'New distance sales' : `${this.totalStatusDistanceSaleTargets} new distance sales`
+                return (this.lenStatusDistanceSale === 1) ? 'Uploaded distance sales processed' : `${this.totalStatusDistanceSaleTargets} uploaded distance sales processed`
             } else {
                 return 'New distance sales are being registered...'
             }
         },
         titleTransactionInput() {
             if (this.doneStatusTransactionInputTargets) {
-                return (this.lenStatusTransactionInput === 1) ? 'New transactions' : `${this.totalStatusTransactionInputTargets} new transactions`
+                return (this.lenStatusTransactionInput === 1) ? 'Uploaded transactions processed' : `${this.totalStatusTransactionInputTargets} uploaded transactions processed`
             } else {
                 return 'New transactions are being registered...'
             }
-        },
+        }
 
     },
 
@@ -397,43 +400,42 @@ export default {
             }
         },
 
+
         async doneStatusAccountTargets (val, oldVal) {
             if (val) {
-                await this.sleep(10000)
+                await this.sleep(12000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_ACCOUNT_TARGETS')
             }
         },
         async doneStatusItemTargets (val, oldVal) {
             if (val) {
-                console.log('val in watch doneStatusItemTargets:', val, 'time:', Date.now())
-                await this.sleep(10000)
-                console.log('time after sleep :', Date.now())
+                await this.sleep(12000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_ITEM_TARGETS')
             }
         },
         async doneStatusVatNumberTargets (val, oldVal) {
             if (val) {
-                await this.sleep(10000)
+                await this.sleep(12000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_VAT_NUMBER_TARGETS')
             }
         },
         async doneStatusDistanceSaleTargets (val, oldVal) {
             if (val) {
-                await this.sleep(10000)
+                await this.sleep(12000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_DISTANCE_SALE_TARGETS')
             }
         },
         async doneStatusTransactionInputTargets (val, oldVal) {
             if (val) {
-                await this.sleep(10000)
+                await this.sleep(12000)
                 const { store } = this.$nuxt.context
                 store.commit('status/CLEAR_STATUS_TRANSACTION_INPUT_TARGETS')
             }
-       },
+       }
 
         /*eslint-disable */
 
@@ -442,7 +444,3 @@ export default {
 
 }
 </script>
-
-<style>
-
-</style>

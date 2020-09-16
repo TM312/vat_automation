@@ -87,14 +87,3 @@ class DistanceSaleResource(Resource):
     @ns.marshal_with(vatin_sub_dto, envelope='data')
     def post(self, seller_firm_public_id: str) -> VATIN:
         return VATINService.process_single_submit(seller_firm_public_id, vatin_data_raw=request.json)
-
-
-@ns.route("/csv")
-class VATNumbersResource(Resource):
-    @login_required
-    # @employer_required
-    # @confirmation_required
-    def post(self):
-        vat_numbers_files: List[BinaryIO] = request.files.getlist("files")
-        print(vat_numbers_files, flush=True)
-        return VATINService.process_vat_numbers_files_upload(vat_numbers_files)

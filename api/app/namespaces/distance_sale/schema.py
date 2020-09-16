@@ -2,6 +2,15 @@
 from flask_restx import Model, fields
 
 
+distance_sale_history_dto = Model('distance_sale_history', {
+    'public_id': fields.String(readonly=True),
+    'valid_from': fields.Date,
+    'valid_to': fields.Date,
+    'arrival_country_code': fields.String,
+    'active': fields.Boolean,
+    'comment': fields.String
+})
+
 distance_sale_sub_dto = Model('distance_sale_sub', {
     'public_id': fields.String(readonly=True),
     'valid_from': fields.Date,
@@ -16,6 +25,7 @@ distance_sale_dto = distance_sale_sub_dto.clone('distance_sale', {
     'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'original_filename': fields.String,
+    'distance_sale_history': fields.List(fields.Nested(distance_sale_history_dto))
 })
 
 distance_sale_admin_dto = distance_sale_dto.clone('distance_sale_admin', {

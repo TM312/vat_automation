@@ -12,9 +12,20 @@ from ...email.service import EmailService
 
 
 class SellerService:
+
+    @staticmethod
+    def get_by_public_id(seller_public_id: str) -> Seller:
+        return Seller.query.filter_by(public_id=seller_public_id).first()
+
+    @staticmethod
+    def get_by_email(seller_email: str) -> Seller:
+        return Seller.query.filter_by(email=seller_email).first()
+
+
+
     @staticmethod
     def create(seller_data: SellerInterface) -> Seller:
-        seller = Seller.query.filter_by(email=seller_data.get('email')).first()
+        seller = SellerService.get_by_email(seller_data.get('email')).first()
         if not seller:
             #create new seller based on Seller model
             new_seller = Seller(
@@ -60,16 +71,16 @@ class SellerService:
 
 
     @staticmethod
-    def delete_by_id(public_id: UUID):
+    def delete_by_public_id(seller_public_id: str):
         #check if seller exists in db
-        seller = Seller.query.filter(Seller.public_id == public_id).first()
+        seller = SellerService.get_by_public_id(seller_public_id)
         if seller:
             db.session.delete(seller)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Seller (Public ID: {}) has been successfully deleted.'.format(str(public_id))
+                'message': 'Seller (Public ID: {}) has been successfully deleted.'.format(str(seller_public_id))
             }
             return response_object
         else:

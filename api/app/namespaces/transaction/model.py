@@ -39,7 +39,6 @@ class Transaction(db.Model):  # type: ignore
 
     transaction_input_id = db.Column(db.Integer, db.ForeignKey('transaction_input.id'))
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    # account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
 
     type_code = db.Column(db.String(32), db.ForeignKey('transaction_type.code'), nullable=False)

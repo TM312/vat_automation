@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import DistanceSale
-from . import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto
+from . import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto, distance_sale_history_dto
 from .service import DistanceSaleService
 
 
@@ -16,6 +16,7 @@ ns = Namespace("DistanceSale", description="DistanceSale Related Operations")  #
 ns.add_model(distance_sale_sub_dto.name, distance_sale_sub_dto)
 ns.add_model(distance_sale_dto.name, distance_sale_dto)
 ns.add_model(distance_sale_admin_dto.name, distance_sale_admin_dto)
+ns.add_model(distance_sale_history_dto.name, distance_sale_history_dto)
 
 
 @ns.route("/")
@@ -64,15 +65,3 @@ class DistanceSaleSellerFirmPublicIdResource(Resource):
     @ns.marshal_with(distance_sale_sub_dto, envelope='data')
     def post(self, seller_firm_public_id: str) -> DistanceSale:
         return DistanceSaleService.process_single_submit(seller_firm_public_id, distance_sale_data=request.json)
-
-
-
-@ns.route("/csv")
-class DistanceSaleInformationResource(Resource):
-    @login_required
-    #@employer_required
-    # @confirmation_required
-    #@ns.expect(tax_record_dto, validate=True)
-    def post(self):
-        distance_sale_information_files: List[BinaryIO] = request.files.getlist("files")
-        return DistanceSaleService.process_distance_sale_files_upload(distance_sale_information_files)

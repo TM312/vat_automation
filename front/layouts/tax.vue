@@ -1,6 +1,6 @@
 <template>
     <div>
-        <NavbarTax />
+        <navbar-tax />
         <div class="app-body">
             <!-- <h1>THIS IS THE TAX LAYOUT</h1> -->
             <nuxt />

@@ -36,19 +36,28 @@ class VATINService:
 
     @staticmethod
     def get_by_id(vatin_id: int) -> VATIN:
-        return VATIN.query.filter(VATIN.id == vatin_id).first()
+        return VATIN.query.filter_by(id = vatin_id).first()
 
     @staticmethod
     def get_by_public_id(vatin_public_id: str) -> VATIN:
         return VATIN.query.filter_by(public_id = vatin_public_id).first()
 
-    @staticmethod
-    def get_by_country_code_seller_firm(country_code: str, seller_firm: 'app.namespaces.business.seller_firm.SellerFirm') -> VATIN:
-        return VATIN.query.join(seller_firm.vat_numbers).filter_by(country_code).first()
 
     @staticmethod
-    def get_by_country_code_seller_firm_id(country_code, business_id) -> VATIN:
-        return VATIN.query.filter(VATIN.country_code == country_code, VATIN.business_id == business_id).first()
+    def get_by_country_code_seller_firm_id(country_code: str, business_id: int) -> VATIN:
+        return VATIN.query.filter(
+            VATIN.country_code == country_code,
+            VATIN.business_id == business_id
+            ).first()
+
+    @staticmethod
+    def get_by_country_code_number_date(country_code: str, number: str, date: date) -> VATIN:
+        return VATIN.query.filter(
+            VATIN.country_code == country_code,
+            VATIN.number==number,
+            VATIN.valid_from<=date,
+            VATIN.valid_to>=date
+            ).first()
 
     @staticmethod
     def get_unvalidated(limit: int) -> List[VATIN]:
@@ -71,7 +80,7 @@ class VATINService:
 
     @staticmethod
     def delete_by_id(vatin_id: int):
-        vatin = VATIN.query.filter(VATIN.id == vatin_id).first()
+        vatin = VATINService.get_by_id(vatin_id)
         if vatin:
             db.session.delete(vatin)
             db.session.commit()
@@ -102,11 +111,6 @@ class VATINService:
 
 
 
-    @staticmethod
-    def get_vatin(country_code: str, number: str, date: date) -> VATIN:
-        return VATIN.query.filter(VATIN.country_code == country_code, VATIN.number==number, VATIN.valid_to>=date).first()
-
-
 
     @staticmethod
     def get_vatin_if_number(country_code_temp: str, number_temp: str, date: date) -> VATIN:
@@ -115,7 +119,7 @@ class VATINService:
         else:
             try:
                 country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
-                vatin = VATINService.get_vatin(country_code, number, date)
+                vatin = VATINService.get_by_country_code_number_date(country_code, number, date)
                 if not isinstance(vatin, VATIN):
                     try:
                         vatin_data = VIESService.send_request(country_code, number)
@@ -175,48 +179,18 @@ class VATINService:
         return vatin
 
 
-    @staticmethod
-    def process_vat_numbers_files_upload(vat_numbers_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
-        from ...business.seller_firm.service import SellerFirmService
-
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
-
-        file_type='vat_numbers'
-        df_encoding = 'utf-8'
-        delimiter = ';'
-        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
-        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
-
-        for file in vat_numbers_files:
-            file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-            VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm.id)
-
-        response_object = {
-            'status': 'success',
-            'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(vat_numbers_files)))
-        }
-
-        return response_object
-
 
     @staticmethod
     def handle_vatin_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
-        response_object = VATINService.process_vat_numbers_file(file_path_in, file_type, df_encoding, delimiter, basepath, seller_firm_id)
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+        response_object = VATINService.create_vatins(df, file_path_in, seller_firm_id)
         tag = TagService.get_by_code('VAT_NUMBER')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
+        InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_object
 
 
-    @staticmethod
-    def process_vat_numbers_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, seller_firm_id: int) -> List[Dict]:
-
-        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = VATINService.create_vatins(df, file_path_in, seller_firm_id)
-
-        InputService.move_file_to_out(file_path_in, basepath, file_type)
-
-        return response_objects
 
     @staticmethod
     def create_vatins(df: pd.DataFrame, file_path_in: str, seller_firm_id: int) -> List[Dict]:
@@ -249,9 +223,9 @@ class VATINService:
             if (country_code is None or number is None):
                 continue
 
-            vatin = VATINService.get_vatin(country_code, number, date.today())
+            vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
-            if vatin and vatin.valid:
+            if isisntance(vatin, VATIN) and vatin.valid:
                 if isinstance(vatin.business_id, int):
                     if not duplicate_counter > 2:
                         message = 'The vat number "{}-{}" has already been processed earlier.'.format(country_code, number)
@@ -315,7 +289,7 @@ class VATINService:
 
                 else:
                     try:
-                        VATINService.create(vatin_data)
+                        vatin = VATINService.create(vatin_data)
 
                     except:
                         db.session.rollback()
@@ -331,7 +305,7 @@ class VATINService:
             SocketService.emit_status_success(current, total, original_filename, object_type)
 
             # push new distance sale to vuex via socket
-            vatin_schema = VatinSchemaSocket.get_vatin_sub(new_vatin)
+            vatin_schema = VatinSchemaSocket.get_vatin_sub(vatin)
 
             if total < 10:
                 SocketService.emit_new_object(vatin_schema, object_type)
@@ -362,7 +336,7 @@ class VATINService:
             raise UnprocessableEntity(
                 'The submitted country code or number do not conform with the required standard.')
 
-        vatin = VATINService.get_vatin(country_code, number, date.today())
+        vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
         if vatin and vatin.valid:
             return vatin
@@ -510,7 +484,7 @@ class VATINService:
             vatin_data['number'] = number
             vatin_data['business_id'] = seller_firm.id
 
-            vatin = VATIN.query.filter_by(country_code=country_code, number=number).first()
+            vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
             if not vatin:
                 vatin = VATINService.process_validation_request(vatin_data_raw)

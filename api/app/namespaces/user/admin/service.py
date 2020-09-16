@@ -15,15 +15,20 @@ class AdminService:
 
     @staticmethod
     def get_by_id(admin_id: int) -> Admin:
-        return Admin.query.filter(Admin.id == admin_id).first()
+        return Admin.query.filter_by(id = admin_id).first()
+
+    @staticmethod
+    def get_by_email(admin_email: str) -> Admin:
+        return Admin.query.filter_by(email=admin_email).first()
 
 
     @staticmethod
     def update(admin_id: int, data_changes: AdminInterface) -> Admin:
         admin = AdminService.get_by_id(admin_id)
-        admin.update(data_changes)
-        db.session.commit()
-        return admin
+        if admin:
+            admin.update(data_changes)
+            db.session.commit()
+            return admin
 
     @staticmethod
     def delete_by_id(admin_id: str):
@@ -42,7 +47,7 @@ class AdminService:
 
     @staticmethod
     def create(admin_data: AdminInterface) -> Admin:
-        admin = Admin.query.filter_by(email=admin_data.get('email')).first()
+        admin = AdminService.get_by_email(admin_data.get('email'))
         if not admin:
             #create new admin based on Admin model
             admin = Admin(

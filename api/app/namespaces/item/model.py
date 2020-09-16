@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-from ..utils.ATs import user_tag_item_AT, tag_item_history_AT
+from ..utils.ATs import item_tag_item_AT, tag_item_history_AT
 
 
 
@@ -52,9 +52,9 @@ class Item(db.Model):  # type: ignore
     transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
     transactions = db.relationship('Transaction', backref='item', lazy=True)
 
-    user_tags = db.relationship(
-        "UserTag",
-        secondary=user_tag_item_AT,
+    item_tags = db.relationship(
+        "ItemTag",
+        secondary=item_tag_item_AT,
         back_populates="items"
     )
 
@@ -159,8 +159,8 @@ class ItemHistory(db.Model):  # type: ignore
 
     unit_cost_price_currency_code = db.Column(db.String(4), nullable=False)
     _unit_cost_price_net = db.Column(db.Integer)
-
     name = db.Column(db.String(256))
+    comment = db.Column(db.String(256))
 
 
     @hybrid_property
