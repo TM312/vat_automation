@@ -83,7 +83,7 @@ class Item(db.Model):  # type: ignore
         return '<Item: Seller_id: {} – SKU: {} – validity: {}-{}>'.format(self.seller_firm_id, self.sku, self.valid_from, self.valid_to)
 
 
-    def update(self, data_changes):
+    def update(self, data_changes, **kwargs):
         for key, val in data_changes.items():
             """
             Name or price changes are tracked for each item. A item history object is created whenever one of these attributes is being updated.
@@ -96,7 +96,7 @@ class Item(db.Model):  # type: ignore
                 elif key == 'name':
                     tag = TagService.get_by_code('NAME_CHANGE')
 
-                valid_from = date.today() if not isinstance(data_changes.get('valid_from'), date) else data_changes.get('valid_from')
+                valid_from = kwargs.get('valid_from') if isinstance(kwargs.get('valid_from'), date) else date.today()
 
                  # Get the current item history
                 item_history = ItemHistory.query.filter_by(item_id = self.id).order_by(ItemHistory.valid_from.desc()).first()
@@ -122,7 +122,7 @@ class Item(db.Model):  # type: ignore
                         else self.unit_cost_price_currency_code
                     )
 
-                    #createnew item price
+                    #create new item price
                     new_item_history = ItemHistory(
                         unit_cost_price_net = unit_cost_price_net,
                         unit_cost_price_currency_code = unit_cost_price_currency_code,
@@ -136,6 +136,7 @@ class Item(db.Model):  # type: ignore
                     self.item_history.append(new_item_history)
 
             setattr(self, key, val)
+
         self.modified_at = datetime.utcnow()
         return self
 

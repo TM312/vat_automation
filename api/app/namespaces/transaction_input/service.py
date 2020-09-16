@@ -406,7 +406,7 @@ class TransactionInputService:
                             db.session.rollback()
                             # send error status via socket
                             message = 'Error while updating {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
-                            SocketService.emit_status_error(current, total_number_transaction_inputs, object_type, message)
+                            SocketService.emit_status_error(object_type, message)
                             return False
 
                 else:
@@ -418,7 +418,7 @@ class TransactionInputService:
                         db.session.rollback()
                         # send error status via socket
                         message = 'Error while updating {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
-                        SocketService.emit_status_error(current, total_number_transaction_inputs, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
 
@@ -435,7 +435,7 @@ class TransactionInputService:
                         db.session.rollback()
                         # send error status via socket
                         message = 'Error while processing {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
-                        SocketService.emit_status_error(current, total_number_transaction_inputs, original_filename, object_type, message)
+                        SocketService.emit_status_error(original_filename, object_type, message)
                         return False
 
 

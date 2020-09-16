@@ -370,11 +370,14 @@ class InputService:
 
         return file_size <= MAX_FILE_SIZE_INPUT
 
+    @staticmethod
+    def get_secure_filename(file: BinaryIO) -> str:
+        return secure_filename(file.filename)
 
     @staticmethod
     def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, **kwargs) -> str:
         if InputService.allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
-            stored_filename = secure_filename(file.filename)
+            stored_filename = InputService.get_secure_filename(file)
 
             if 'file_type' in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
                 basepath_in = os.path.join(basepath, kwargs['file_type'], 'in')
@@ -408,6 +411,7 @@ class InputService:
             raise UnsupportedMediaType('The file type "{}" is not allowed. Please recheck if the file extension matches one of the following: {}'.format(filename, allowed_extensions))
 
 
+    @staticmethod
     def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str):
 
         if data_type == 'static':

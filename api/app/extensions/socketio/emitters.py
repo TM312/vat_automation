@@ -75,7 +75,7 @@ class SocketService:
         SocketService.emit_status(meta=status)
 
     @staticmethod
-    def emit_status_error(current: int, total: int, object_type: str, message: str):
+    def emit_status_error(object_type: str, message: str):
 
         status = {
             'target': 'errorbox',
@@ -88,7 +88,13 @@ class SocketService:
 
     @staticmethod
     def emit_status_error_invalid_file(message: str):
-        SocketService.emit_status_error('file', message)
+        status = {
+            'target': 'errorbox',
+            'done': True,
+            'object': 'file',
+            'message': message,
+        }
+        SocketService.emit_status(meta=status)
 
     @staticmethod
     def emit_status_error_no_value(current: int, object_type: str, column_name: str):

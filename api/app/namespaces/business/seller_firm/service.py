@@ -31,7 +31,7 @@ class SellerFirmService:
     @staticmethod
     def get_by_name_establishment_country(seller_firm_name: str, establishment_country_code: str) -> SellerFirm:
         return SellerFirm.query.filter(
-            SellerFirm.name == name,
+            SellerFirm.name == seller_firm_name,
             SellerFirm.establishment_country_code == establishment_country_code
             ).first()
 
@@ -103,7 +103,10 @@ class SellerFirmService:
         name = seller_firm_data_as_client.get('name')
         establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
 
-        if (isinstance(name, str) and isinstance(establishment_country_code, str):
+        if (
+            isinstance(name, str) and
+            isinstance(establishment_country_code, str)
+            ):
             seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
 
             # !!! need to be handled differently
@@ -206,8 +209,10 @@ class SellerFirmService:
         try:
             file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
         except Exception as e:
-            SocketService.emit_status_error_invalid_file(message = e.description)
+            SocketService.emit_status_error_invalid_file(original_filename='unknown', message = e.description)
             return False
+
+        original_filename = InputService.get_secure_filename(file)
 
         # setting vars
         df_encoding = 'utf-8'
@@ -296,6 +301,7 @@ class SellerFirmService:
         else:
             current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} ({})'.format(g.user.name, user_id))
             message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_in)[:128])
+            original_filename = InputService.get_secure_filename(file)
             SocketService.emit_status_error_invalid_file(message)
             return False
 
@@ -481,7 +487,7 @@ class SellerFirmService:
                 except:
                     db.session.rollback()
                     message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current)
-                    SocketService.emit_status_error(current, total, object_type, message)
+                    SocketService.emit_status_error(object_type, message)
                     return False
 
 

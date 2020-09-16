@@ -217,7 +217,7 @@ class VATINService:
             except:
                 # send error status via socket
                 message = 'Can not read country code/number of {} in row {} (file: {}).'.format(current, object_type_human_read, original_filename)
-                SocketService.emit_status_error(current, total, object_type, message)
+                SocketService.emit_status_error(object_type, message)
                 return False
 
             if (country_code is None or number is None):
@@ -243,7 +243,7 @@ class VATINService:
                         db.session.rollback()
                         # send error status via socket
                         message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
-                        SocketService.emit_status_error(current, total, original_filename, object_type, message)
+                        SocketService.emit_status_error(original_filename, object_type, message)
                         return False
 
             else:
@@ -284,7 +284,7 @@ class VATINService:
 
                         # send error status via socket
                         message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
-                        SocketService.emit_status_error(current, total, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
                 else:
@@ -297,7 +297,7 @@ class VATINService:
 
                         # send error status via socket
                         message = 'Error at vat number "{}-{}" (file: {}). Please recheck.'.format(country_code, number, original_filename)
-                        SocketService.emit_status_error(current, total, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
 
