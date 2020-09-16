@@ -18,7 +18,7 @@ def register_routes(api, app):
     from app.namespaces.transaction import attach_transaction
     from app.namespaces.transaction_input import attach_transaction_input
     from app.namespaces.user import attach_user
-    from app.namespaces.user_tag import attach_user_tag
+    from app.namespaces.item_tag import attach_item_tag
     from app.namespaces.utils import attach_utils
 
 
@@ -43,5 +43,5 @@ def register_routes(api, app):
     attach_transaction(api, app)
     attach_transaction_input(api, app)
     attach_user(api, app)
-    attach_user_tag(api, app)
+    attach_item_tag(api, app)
     attach_utils(api, app)

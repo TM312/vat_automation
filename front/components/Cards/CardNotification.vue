@@ -11,7 +11,7 @@
                 </nuxt-link>
             </p>
 
-            <p v-if="notification.subject === 'New Seller Firm'">
+            <p v-else-if="notification.subject === 'New Seller Firm'">
                 <b>{{ notification.created_by }}</b> added
                 <nuxt-link
                     :to="`/tax/clients/${notification.seller_firm_public_id}`"
@@ -19,10 +19,21 @@
                 </nuxt-link>
             </p>
 
+            <p v-else-if="notification.subject === 'New Seller Firms'">
+                <b>{{ notification.created_by }}</b> added
+                <nuxt-link to="/tax/clients/" class="mt-2">
+                {{ notification.message }}
+                </nuxt-link>
+            </p>
+
 
             <b-row v-if="notification.tags && notification.tags.length !== 0" class="mb-2">
                 <b-col>
-                    <b-badge v-for="tag in notification.tags" :key="tag.code" :variant="tag.code === 'TRANSACTION' ? 'success' : 'primary'" class="mr-1">{{ get_code(tag.code) }}</b-badge>
+                    <b-badge
+                        v-for="tag in notification.tags"
+                        :key="tag.code" :variant="tag.code === 'TRANSACTION' ? 'success' : 'primary'"
+                        class="mr-1"
+                    >{{ get_code(tag.code) }}</b-badge>
                 </b-col>
 
             </b-row>
@@ -53,12 +64,12 @@
 
         computed: {
             cardBorderVariant() {
-                return this.notification.subject === 'New Seller Firm' ? 'primary' : ''
-            },
-
-            // cardTextVariant() {
-            //     return this.notification.subject === 'New Seller Firm' ? 'white' : ''
-            // }
+                if (this.notification.subject === 'New Seller Firm' || this.notification.subject === 'New Seller Firms') {
+                    return 'primary'
+                } else {
+                    return ''
+                }
+            }
 
         },
 

@@ -51,9 +51,9 @@ tag_item_history_AT = db.Table(
     db.Column('item_history_id', db.Integer, db.ForeignKey('item_history.id'), primary_key=True)
 )
 
-user_tag_item_AT = db.Table(
-    'user_tag_item_AT',
-    db.Column('user_tag_id', db.Integer, db.ForeignKey('user_tag.id'), primary_key=True),
+item_tag_item_AT = db.Table(
+    'item_tag_item_AT',
+    db.Column('item_tag_id', db.Integer, db.ForeignKey('item_tag.id'), primary_key=True),
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
 )
 

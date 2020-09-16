@@ -9,30 +9,32 @@ from .interface import PlatformInterface
 class PlatformService:
     @staticmethod
     def get_all() -> List[Platform]:
-        platforms = Platform.query.all()
-        return platforms
+        return Platform.query.all()
 
     @staticmethod
-    def get_by_id(platform_id: int) -> Platform:
-        return Platform.query.filter(Platform.code == code).first()
+    def get_by_code(platform_code: int) -> Platform:
+        return Platform.query.filter_by(code=platform_code).first()
 
     @staticmethod
-    def update(platform_id: int, data_changes: PlatformInterface) -> Platform:
-        platform = PlatformService.get_by_id(codplatform_ide)
+    def update(platform_code: int, data_changes: PlatformInterface) -> Platform:
+        platform = PlatformService.get_by_code(platform_code)
         platform.update(data_changes)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
         return platform
 
     @staticmethod
-    def delete_by_id(platform_id: str):
-        platform = Platform.query.filter(Platform.id == platform_id).first()
+    def delete_by_code(platform_code: str):
+        platform = Platform.query.filter_by(code = platform_code).first()
         if platform:
             db.session.delete(platform)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Platform (code: {}) has been successfully deleted.'.format(platform_id)
+                'message': 'Platform (code: {}) has been successfully deleted.'.format(platform_code)
             }
             return response_object
         else:

@@ -14,7 +14,7 @@ class CurrencyService:
 
     @staticmethod
     def get_by_code(code: str) -> Currency:
-        return Currency.query.filter(Currency.code == code).first()
+        return Currency.query.filter_by(code = code).first()
 
     @staticmethod
     def update(code: str, data_changes: CurrencyInterface) -> Currency:
@@ -25,7 +25,7 @@ class CurrencyService:
 
     @staticmethod
     def delete_by_code(code: str):
-        currency = Currency.query.filter(Currency.code == code).first()
+        currency = CurrencyService.get_by_code(code)
         if currency:
             db.session.delete(currency)
             db.session.commit()

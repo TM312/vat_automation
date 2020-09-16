@@ -13,20 +13,21 @@ class ChannelService:
 
     @staticmethod
     def get_by_code(code: str) -> Channel:
-        return Channel.query.filter(Channel.code == code).first()
+        return Channel.query.filter_by(code = code).first()
 
 
     @staticmethod
     def update(code: str, data_changes: ChannelInterface) -> Channel:
         channel = ChannelService.get_by_code(code)
-        channel.update(data_changes)
-        db.session.commit()
-        return channel
+        if isinstance(channel, Channel):
+            channel.update(data_changes)
+            db.session.commit()
+            return channel
 
     @staticmethod
     def delete_by_code(code: str):
-        channel = Channel.query.filter(Channel.code == code).first()
-        if channel:
+        channel = ChannelService.get_by_code(code)
+        if isinstance(channel, Channel):
             db.session.delete(channel)
             db.session.commit()
 

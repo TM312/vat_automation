@@ -14,26 +14,27 @@ class TaxTreatmentService:
         return tax_treatments
 
     @staticmethod
-    def get_by_code(code: str) -> TaxTreatment:
-        return TaxTreatment.query.filter(TaxTreatment.code == code).first()
+    def get_by_code(tax_treatment_code: str) -> TaxTreatment:
+        return TaxTreatment.query.filter_by(code=tax_treatment_code).first()
 
     @staticmethod
-    def update(code: str, data_changes: TaxTreatmentInterface) -> TaxTreatment:
-        tax_treatment = TaxTreatmentService.get_by_code(code)
-        tax_treatment.update(data_changes)
-        db.session.commit()
-        return tax_treatment
+    def update(tax_treatment_code: str, data_changes: TaxTreatmentInterface) -> TaxTreatment:
+        tax_treatment = TaxTreatmentService.get_by_code(tax_treatment_code)
+        if tax_treatment:
+            tax_treatment.update(data_changes)
+            db.session.commit()
+            return tax_treatment
 
     @staticmethod
-    def delete_by_code(code: str):
-        tax_treatment = TaxTreatment.query.filter(TaxTreatment.code == code).first()
+    def delete_by_code(tax_treatment_code: str):
+        tax_treatment = TaxTreatmentService.get_by_code(tax_treatment_code)
         if tax_treatment:
             db.session.delete(tax_treatment)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'TaxTreatment (code: {}) has been successfully deleted.'.format(code)
+                'message': 'TaxTreatment (code: {}) has been successfully deleted.'.format(tax_treatment_code)
             }
             return response_object
         else:

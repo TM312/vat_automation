@@ -4,16 +4,23 @@ from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import datetime
 
-from werkzeug.exceptions import Conflict, NotFound, Unauthorized, UnsupportedMediaType
+from werkzeug.exceptions import Conflict, NotFound, Unauthorized, UnsupportedMediaType, UnprocessableEntity
+from werkzeug.utils import secure_filename
+
 from flask import g, current_app
-from app.extensions import db
+from app.extensions import (
+    db,
+    socket_io)
 
 from .model import SellerFirm
 from .interface import SellerFirmInterface
+#from .schema import SellerFirmSubSchema
 
 from ...utils.service import InputService, NotificationService
 from ...utils import SellerFirmNotification
 from ...tag.service import TagService
+
+from app.extensions.socketio.emitters import SocketService
 
 
 class SellerFirmService:
@@ -21,14 +28,18 @@ class SellerFirmService:
     def get_all() -> List[SellerFirm]:
         return SellerFirm.query.all()
 
+    @staticmethod
+    def get_by_name_establishment_country(seller_firm_name: str, establishment_country_code: str) -> SellerFirm:
+        return SellerFirm.query.filter(
+            SellerFirm.name == name,
+            SellerFirm.establishment_country_code == establishment_country_code
+            ).first()
+
 
     @staticmethod
-    def get_by_identifiers(seller_firm_name: str,
-                           address: str,
-                           establishment_country_code: str
-        ):
-        seller_firm = SellerFirm.query.filter_by(name=seller_firm_name).first()
-        if not seller_firm:
+    def get_by_identifiers(seller_firm_name: str, address: str, establishment_country_code: str ) -> SellerFirm:
+        seller_firm = SellerFirmService.get_by_name_establishment_country(seller_firm_name, establishment_country_code)
+        if not isinstance(seller_firm, SellerFirm):
             seller_firm = SellerFirm.query.filter(
                 SellerFirm.address == address,
                 SellerFirm.establishment_country_code == establishment_country_code,
@@ -92,17 +103,17 @@ class SellerFirmService:
         name = seller_firm_data_as_client.get('name')
         establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
 
-        if (name != None and establishment_country_code != None):
-            seller_firm = SellerFirm.query.filter_by(name=name, establishment_country_code=establishment_country_code).first()
+        if (isinstance(name, str) and isinstance(establishment_country_code, str):
+            seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
 
-        if seller_firm:
+            # !!! need to be handled differently
+            if seller_firm:
+                data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None or k != 'name')}
 
-            data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None or k != 'name')}
+                seller_firm.update(data_changes)
+                db.session.commit()
 
-            seller_firm.update(data_changes)
-            db.session.commit()
-
-            return seller_firm
+                return seller_firm
 
         else:
             seller_firm_data = {
@@ -150,7 +161,7 @@ class SellerFirmService:
         Function may take either:
             - a pd.Dataframe kwargs['df'] and an integer kwargs['i'] as the row index
         or  - a str kwargs['seller_firm_public_id']
-        If both, the later one is prioritized.
+        If both, the latter one is prioritized.
         """
         if isinstance(kwargs.get('seller_firm_public_id'), str):
             seller_firm_public_id = kwargs['seller_firm_public_id']
@@ -185,21 +196,43 @@ class SellerFirmService:
 
         """
         DATA_ALLOWED_EXTENSIONS = current_app.config.DATA_ALLOWED_EXTENSIONS
-        BASE_PATH_DATA_SELLER_FIRM = current_app.config.BASE_PATH_DATA_SELLER_FIRM
+        DATAPATH = current_app.config.DATAPATH
         user_id = g.user.id
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         seller_firm_id = seller_firm.id
 
         # each file is initially stored in a temp folder and undergoes sanitizing
-        file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_DATA_SELLER_FIRM, file_type='tbd')
+        try:
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
+        except Exception as e:
+            SocketService.emit_status_error_invalid_file(message = e.description)
+            return False
 
         # setting vars
         df_encoding = 'utf-8'
         delimiter = ';' if InputService.infer_delimiter(file_path_tbd) != '\t' else '\t'
-        df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
-        file_type = InputService.determine_file_type(df)
-        data_type = InputService.determine_data_type(file_type)
+
+        try:
+            df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
+        except:
+            message = 'Can not read file. Make sure not to change the file encoding ("{}") and delimiter ("{}") of the template.'.format(df_encoding, delimiter)
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
+        try:
+            file_type = InputService.determine_file_type(df)
+        except:
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
+        try:
+            data_type = InputService.determine_data_type(file_type)
+        except:
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
 
         #Prepare SellerFirmNotification
         seller_firm_notification_data = {
@@ -208,8 +241,6 @@ class SellerFirmService:
             'seller_firm_id': seller_firm_id,
             'created_by': user_id
         }
-
-        print('Test PRINT', flush=True)
 
 
         # processing starts here
@@ -226,13 +257,6 @@ class SellerFirmService:
                     args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                     )
 
-                # ### for debugging ###
-                # from ...account.service import AccountService
-                # response_object = AccountService.handle_account_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data)
-                # print('response_object:', response_object, flush=True)
-                # print("", flush=True)
-                # #### ****** ########
-
 
             elif file_type == 'distance_sale_list':
                 from app.tasks.asyncr import async_handle_distance_sale_data_upload
@@ -240,11 +264,6 @@ class SellerFirmService:
                     retry=True,
                     args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                     )
-
-                # from ...distance_sale.service import DistanceSaleService
-                # response_object = DistanceSaleService.handle_distance_sale_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data)
-                # print('response_object:', response_object, flush=True)
-                # print("", flush=True)
 
 
             elif file_type == 'item_list':
@@ -276,7 +295,10 @@ class SellerFirmService:
 
         else:
             current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} ({})'.format(g.user.name, user_id))
-            raise
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_in)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
 
 
         return {
@@ -284,59 +306,152 @@ class SellerFirmService:
         }
 
 
+
+
     @staticmethod
     #kwargs can contain: seller_firm_public_id
-    def process_seller_firm_information_files_upload(file: BinaryIO, claimed: bool, **kwargs: Dict[str, str]) -> Dict:
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
+    def process_seller_firm_information_file_upload(file: BinaryIO) -> Dict:
+        """
+        This function is the entry point for files uploaded to create new seller firms.
 
-        file_type = 'seller_firm'
+        The processing of these functions is handled asynchronously as a celery task.
+
+        A SellerFirmNotification is created/updated in the course of processing.
+
+        """
+
+        user_id = g.user.id
+        if g.user.u_type == 'seller':
+            claimed = True
+        else:
+            claimed = False
+
+        DATA_ALLOWED_EXTENSIONS = current_app.config.DATA_ALLOWED_EXTENSIONS
+        DATAPATH = current_app.config.DATAPATH
+
+        # each file is initially stored in a temp folder and undergoes sanitizing
+        try:
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
+        except Exception as e:
+            SocketService.emit_status_error_invalid_file(message = e.description)
+            return False
+
+
         df_encoding = 'utf-8'
         delimiter = ';'
-        basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
-        user_id = g.user.id
+
+        #Prepare SellerFirmNotification
+        seller_firm_notification_data = {
+            'status': 'success',
+            'created_by': user_id
+        }
+
+        # setting vars
+        try:
+            df = InputService.read_file_path_into_df(file_path_tbd, df_encoding, delimiter)
+        except:
+            message = 'Can not read file. Make sure not to change the file encoding ("{}") and delimiter ("{}") of the template.'.format(df_encoding, delimiter)
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
+        try:
+            file_type = InputService.determine_file_type(df)
+        except:
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
+        try:
+            data_type = InputService.determine_data_type(file_type)
+        except:
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
+
+        # processing starts here
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
+
+        if data_type == 'business':
+            basepath = current_app.config.BASE_PATH_BUSINESS_DATA
+
+            from app.tasks.asyncr import async_handle_seller_firm_data_upload
+
+            response_object = async_handle_seller_firm_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed, seller_firm_notification_data]
+                )
 
 
-        # for file in seller_firm_information_files:
-        file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-        response_objects = SellerFirmService.process_seller_firm_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed=claimed, **kwargs)
+        else:
+            current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} (id: {})'.format(g.user.name, user_id))
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_in)[:128])
+            SocketService.emit_status_error_invalid_file(message)
+            return False
 
-        # response_object = {
-        #     'status': 'success',
-        #     'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(seller_firm_information_files)))
-        # }
-
-        return response_objects
+        return {
+            "task_id": response_object.id,
+        }
 
 
-    # celery task !!
     @staticmethod
-    def process_seller_firm_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, **kwargs) -> List[Dict]:
-
+    def handle_seller_firm_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, claimed: bool, seller_firm_notification_data: Dict) -> Dict:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_objects = SellerFirmService.create_seller_firms(df, file_path_in, user_id, **kwargs)
+        response_object = SellerFirmService.create_seller_firms(df, file_path_in, user_id, claimed, seller_firm_notification_data)
 
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
-
-        return response_objects
-
+        return response_object
 
 
 
     @staticmethod
-    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, **kwargs) -> List[Dict]: #upload only for tax auditors
-        error_counter = 0
-        total_number_items = len(df.index)
-        input_type = 'seller firm'  # only used for response objects
+    # upload only for tax auditors
+    def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, claimed: bool, seller_firm_notification_data: Dict) -> List[Dict]:
+        from ...user.service_parent import UserService
+
+        total = total_number_items = len(df.index)
+        original_filename = os.path.basename(file_path_in)[:128]
+        object_type = 'seller_firm'  # only used for response objects
+        object_type_human_read = 'seller firm'
+        seller_firm_socket_list = []
+        duplicate_list = []
+        duplicate_counter = 0
+
+        user = UserService.get_by_id(user_id)
 
         for i in range(total_number_items):
+            current = i + 1
 
-            seller_firm_name = InputService.get_str_or_None(df, i, column='seller_firm_name')
-            address = InputService.get_str_or_None(df, i, column='address')
-            establishment_country_code = InputService.get_str(df, i, column='establishment_country_code')
+            try:
+                seller_firm_name = InputService.get_str_or_None(df, i, column='seller_firm_name')
+            except:
+                # send error status via socket
+                SocketService.emit_status_error_column_read(current, object_type, column_name='seller_firm_name')
+                return False
+
+            try:
+                address = InputService.get_str_or_None(df, i, column='address')
+            except:
+                # send error status via socket
+                SocketService.emit_status_error_column_read(current, object_type, column_name='address')
+                return False
+
+            try:
+                establishment_country_code = InputService.get_str(df, i, column='establishment_country_code')
+            except:
+                # send error status via socket
+                SocketService.emit_status_error_column_read(current, object_type, column_name='establishment_country_code')
+                return False
+
+            if len(establishment_country_code) > 2:
+                # send error status via socket
+                message = 'Invalid country code in column "establishment_country_code", row {}. Make sure to use the country code as defined in "ISO 3166-1 alpha-2"'.format(current)
+                SocketService.emit_status_error_invalid_value(object_type, message)
+                return False
+
 
             seller_firm_data = {
-                'claimed': kwargs.get('claimed'),
+                'claimed': claimed,
                 'created_by': user_id,
                 'name': seller_firm_name,
                 'address': address,
@@ -344,31 +459,62 @@ class SellerFirmService:
             }
 
             seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code)
-            if not seller_firm:
+            if isinstance(seller_firm, SellerFirm):
+                if not duplicate_counter > 2:
+                    message = 'The uploaded seller firm "{}" (row: {}) is already in the database. Registration has been skipped.'.format(seller_firm.name, current)
+                    SocketService.emit_status_info(object_type, message)
+
+                total -= 1
+                duplicate_list.append('Row {}: {}'.format(current, seller_firm.name))
+                duplicate_counter += 1
+                continue
+
+
+            else:
                 try:
                     seller_firm = SellerFirmService.create(seller_firm_data)
-                    seller_firm.accounting_firms.append(g.user.employer)
+
+                    if user.u_type == 'tax_auditor':
+                        seller_firm.accounting_firms.append(user.employer)
                     db.session.commit()
 
                 except:
                     db.session.rollback()
-                    error_counter += 1
-
-            else:
-                error_counter += 1
-
-
-        #Prepare SellerFirmNotification
-        seller_firm_notification_data = {
-            'subject': 'New Seller Firm',
-            'status': 'success',
-            'seller_firm_id': seller_firm.id,
-            'created_by': user_id
-        }
-
-        seller_firm_notification = NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+                    message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current)
+                    SocketService.emit_status_error(current, total, object_type, message)
+                    return False
 
 
-        response_objects = InputService.create_input_response_objects(file_path_in, input_type, total_number_items, error_counter)
+                # send status update via socket
+                SocketService.emit_status_success(current, total, original_filename, object_type)
 
-        return response_objects
+            # # push new distance sale to vuex via socket
+            # distance_sale_json = S.get_distance_sale_sub(new_distance_sale)
+
+            # if total < 10:
+            #     SocketService.emit_new_object(distance_sale_json, object_type)
+
+            # else:
+            #     distance_sale_socket_list.append(distance_sale_json)
+            #     if current % 10 == 0 or current == total:
+            #         SocketService.emit_new_objects(distance_sale_socket_list, object_type)
+            #         distance_sale_socket_list = []
+
+
+
+        # send final status via socket
+        SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
+
+        if total == 1:
+            seller_firm_notification_data['subject'] = 'New Seller Firm'
+            seller_firm_notification_data['seller_firm_id'] = seller_firm.id
+
+        elif total > 1:
+            seller_firm_notification_data['subject'] = 'New Seller Firms'
+            message = '{} new seller firms'.format(total)
+            seller_firm_notification_data['message'] = message
+
+        NotificationService.create_seller_firm_notification(seller_firm_notification_data)
+
+
+        return True

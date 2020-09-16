@@ -1,13 +1,13 @@
 
 from datetime import datetime
 from app.extensions import db
-from ..utils.ATs import user_tag_item_AT
+from ..utils.ATs import item_tag_item_AT
 
 
 
-class UserTag(db.Model):
-    """ UserTag model """
-    __tablename__ = 'user_tag'
+class ItemTag(db.Model):
+    """ ItemTag model """
+    __tablename__ = 'item_tag'
 
     id = db.Column(db.Integer, primary_key=True)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
@@ -15,6 +15,6 @@ class UserTag(db.Model):
 
     items = db.relationship(
         'Item',
-        secondary=user_tag_item_AT,
-        back_populates='user_tags'
+        secondary=item_tag_item_AT,
+        back_populates='item_tags'
     )

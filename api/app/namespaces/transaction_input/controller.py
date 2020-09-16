@@ -83,12 +83,12 @@ class TransactionInputSellerFirmIdResource(Resource):
 
 
 
-@ns.route("/csv")
-class TransactionInputResource(Resource):
-    @login_required
-    @employer_required
-    # @confirmation_required
-    #@ns.expect(tax_record_dto, validate=True)
-    def post(self):
-        transaction_input_files: List[BinaryIO] = request.files.getlist("files")
-        return TransactionInputService.process_transaction_input_files_upload(transaction_input_files)
+# @ns.route("/csv")
+# class TransactionInputResource(Resource):
+#     @login_required
+#     @employer_required
+#     # @confirmation_required
+#     #@ns.expect(tax_record_dto, validate=True)
+#     def post(self):
+#         transaction_input_files: List[BinaryIO] = request.files.getlist("files")
+#         return TransactionInputService.process_transaction_input_files_upload(transaction_input_files)

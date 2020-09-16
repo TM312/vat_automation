@@ -17,7 +17,23 @@ class ExchangeRateService:
 
     @staticmethod
     def get_by_id(exchange_rate_id: int) -> ExchangeRate:
-        return ExchangeRate.query.filter(ExchangeRate.id == exchange_rate_id).first()
+        return ExchangeRate.query.filter_by(id = exchange_rate_id).first()
+
+    @staticmethod
+    def get_by_base_target_date(base: str, target: str, date: date) -> ExchangeRate:
+        return ExchangeRate.query.filter(
+            ExchangeRate.base==base,
+            ExchangeRate.target==target,
+            ExchangeRate.date==date
+            ).first()
+
+    @staticmethod
+    def get_list_by_base_date(base: str, date: date) -> List[ExchangeRate]:
+        return ExchangeRate.query.filter(
+            ExchangeRate.date == date,
+            ExchangeRate.base == base
+            ).all()
+
 
     @staticmethod
     def update(exchange_rate_id: int, data_changes: ExchangeRateInterface) -> ExchangeRate:
@@ -28,7 +44,7 @@ class ExchangeRateService:
 
     @staticmethod
     def delete_by_id(exchange_rate_id: str):
-        exchange_rate = ExchangeRate.query.filter_by(id = exchange_rate_id).first()
+        exchange_rate = ExchangeRateService.get_by_id(exchange_rate_id)
         if exchange_rate:
             db.session.delete(exchange_rate)
             db.session.commit()
@@ -61,8 +77,8 @@ class ExchangeRateService:
 
     @staticmethod
     def create_between_rate(date: date, base: str, target: str) -> ExchangeRate:
-        rate_base_eur = ExchangeRate.query.filter_by(date=date, base=base, target='EUR').first().rate
-        rate_eur_target = ExchangeRate.query.filter_by(date=date, base='EUR', target=target).first().rate
+        rate_base_eur = ExchangeRateService.get_by_base_target_date(base, 'EUR', date).rate
+        rate_eur_target = ExchangeRateService.get_by_base_target_date('EUR', target, date).rate
 
         rate_base_target = rate_base_eur * rate_eur_target
 
@@ -82,7 +98,7 @@ class ExchangeRateService:
 
         date = date.today()
 
-        exchange_rates_eur = ExchangeRate.query.filter_by(date, base='EUR').all()
+        exchange_rates_eur = ExchangeRateService.get_list_by_base_date('EUR', date)
 
         if len(exchange_rates_eur) == 0:
             #api call to ECB
@@ -128,17 +144,6 @@ class ExchangeRateService:
             ExchangeRateService.create_between_rate(date, base=currency_tuple[0], target=currency_tuple[1])
 
 
-    @staticmethod
-    def get_rate_by_base_target_date(base: str, target: str, date: date):
-        exchange_rate = ExchangeRate.query.filter_by(base=base, target=target, date=date).first()
-
-        if not isinstance(exchange_rate, ExchangeRate):
-            print('get_rate_by_base_taget_date: base: {} | target: {} | date: {} | exchange_rate: {}'.format( base, target, date, exchange_rate), flush=True)
-            print("", flush=True)
-            raise NotFound('The currency pair {}-{} for {} is not available'.format(base, target, date))
-
-
-        return exchange_rate
 
 
 

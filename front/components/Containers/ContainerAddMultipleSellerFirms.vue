@@ -1,15 +1,17 @@
 <template>
-    <div>
+    <b-container fluid>
+        <toast-seller-firm-data-upload />
         <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" />
-        <br />
+        <br>
         <card-data-upload :urlEndpointUpload="urlEndpointUpload" />
-    </div>
+    </b-container>
 </template>
 
 <script>
 
 export default {
-    name: 'AddMultipleClients',
+    name: 'ContainerAddMultipleSellerFirms',
+
     data() {
         return {
             title: 'Multiple Clients',

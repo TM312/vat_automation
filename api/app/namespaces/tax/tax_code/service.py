@@ -15,26 +15,26 @@ class TaxCodeService:
         return tax_codes
 
     @staticmethod
-    def get_by_code(code: str) -> TaxCode:
-        return TaxCode.query.filter(TaxCode.code == code).first()
+    def get_by_code(tax_code_code: str) -> TaxCode:
+        return TaxCode.query.filter_by(code = tax_code_code).first()
 
     @staticmethod
-    def update(code: str, data_changes: TaxCodeInterface) -> TaxCode:
-        tax_code = TaxCodeService.get_by_code(code)
+    def update(tax_code_code: str, data_changes: TaxCodeInterface) -> TaxCode:
+        tax_code = TaxCodeService.get_by_code(tax_code_code)
         tax_code.update(data_changes)
         db.session.commit()
         return tax_code
 
     @staticmethod
-    def delete_by_code(code: str):
-        tax_code = TaxCode.query.filter(TaxCode.code == code).first()
+    def delete_by_code(tax_code_code: str):
+        tax_code = TaxCodeService.get_by_code(tax_code_code)
         if tax_code:
             db.session.delete(tax_code)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'TaxCode (code: {}) has been successfully deleted.'.format(code)
+                'message': 'TaxCode (code: {}) has been successfully deleted.'.format(tax_code_code)
             }
             return response_object
         else:

@@ -1,4 +1,3 @@
-from uuid import UUID
 from typing import List
 
 from werkzeug.exceptions import Conflict, NotFound
@@ -14,30 +13,18 @@ class UserService:
         return users
 
     @staticmethod
-    def get_by_public_id(public_id: UUID) -> User:
-        user = User.query.filter(User.public_id == public_id).first()
-        if user:
-            return user
-        else:
-            raise NotFound('This user does not exist.')
+    def get_by_public_id(public_id: str) -> User:
+        return User.query.filter_by(public_id = public_id).first()
 
 
     @staticmethod
-    def get_by_id(id: int) -> User:
-        user = User.query.filter(User.id == id).first()
-        if user:
-            return user
-        else:
-            raise NotFound('This user does not exist.')
+    def get_by_id(user_id: int) -> User:
+        return User.query.filter_by(id = user_id).first()
+
 
     @staticmethod
-    def get_by_email(email: str) -> User:
-        user = User.query.filter(User.email == email).first()
-        if user:
-            return user
-        else:
-            raise NotFound('This user does not exist.')
-
+    def get_by_email(user_email: str) -> User:
+        return User.query.filter_by(email = user_email).first()
 
     @staticmethod
     def ping(user: User, method_name: str, service_context: str) -> User:
@@ -55,9 +42,9 @@ class UserService:
 
 
     @staticmethod
-    def delete_by_public_id(public_id: UUID):
+    def delete_by_public_id(public_id: str):
         #check if user exists in db
-        user = User.query.filter(User.public_id == public_id).first()
+        user = UserService.get_by_public_id(public_id)
         if user:
             db.session.delete(user)
             db.session.commit()

@@ -42,9 +42,13 @@ class BusinessService:
 
     @staticmethod
     def delete_by_id(business_id: int) -> List[int]:
-        business = Business.query.filter(Business.business_id == business_id).first()
+        business = BusinessService.get_by_id(business_id)
         if not business:
             return []
         db.session.delete(business)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
         return [business_id]

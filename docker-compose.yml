@@ -95,7 +95,7 @@ services:
                 # - USER_ID=10239
 
         volumes:
-            - seller_firm_data:/home/data/seller_firm_data
+            - data:/home/data
 
         depends_on:
             - postgres
@@ -145,6 +145,7 @@ services:
         #     - 8888:8888
         depends_on:
             - celery-worker
+            - celery-beat
         networks:
             - internal
 
@@ -171,10 +172,10 @@ services:
             - redis #new
             - celery-worker #new
         volumes:
-            - logs:/home/data/logs
-            - seeds:/home/data/seeds
-            - templates:/home/data/templates
-            - seller_firm_data:/home/data/seller_firm_data
+            - logs:/home/logs
+            - seeds:/home/seeds
+            - templates:/home/templates
+            - data:/home/data
         networks:
             - internal
             - web
@@ -209,4 +210,4 @@ volumes:
     logs:
     seeds:
     templates:
-    seller_firm_data:
+    data:

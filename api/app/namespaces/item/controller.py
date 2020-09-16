@@ -65,15 +65,3 @@ class ItemSellerFirmPublicIdResource(Resource):
     @ns.marshal_with(item_sub_dto, envelope='data')
     def post(self, seller_firm_public_id: str) -> Item:
         return ItemService.process_single_submit(seller_firm_public_id, item_data=request.json)
-
-
-
-@ns.route("/csv")
-class ItemInformationResource(Resource):
-    @login_required
-    #@employer_required
-    # @confirmation_required
-    #@ns.expect(tax_record_dto, validate=True)
-    def post(self):
-        item_information_files: List[BinaryIO] = request.files.getlist("files")
-        return ItemService.process_item_files_upload(item_information_files)

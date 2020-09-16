@@ -30,39 +30,38 @@ class TaxRecordService:
 
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
-        tax_records = TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
-        return tax_records
+        return TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
 
     @staticmethod
-    def delete_by_public_id(seller_firm_public_id: str):
-        tax_record = TaxRecord.query.filter(TaxRecord.public_id == seller_firm_public_id).first()
+    def delete_by_public_id(tax_record_public_id: str):
+        tax_record = TaxRecordService.get_by_public_id(tax_record_public_id)
         if tax_record:
             db.session.delete(tax_record)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Transaction input (public_id: {}) has been successfully deleted.'.format(seller_firm_public_id)
+                'message': 'Transaction input (public_id: {}) has been successfully deleted.'.format(tax_record_public_id)
             }
             return response_object
         else:
             raise NotFound('This transaction input does not exist.')
 
 
-    def download_tax_record(public_id: str):
-        from ..business.seller_firm import SellerFirm
-        BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
+    # def download_tax_record(tax_record_public_id: str):
+    #     from ..business.seller_firm.service import SellerFirmService
+    #     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
 
-        tax_record = TaxRecord.query.filter_by(public_id = public_id).first()
-        if tax_record:
-            seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
-            if g.user.employer_id == tax_record.seller_firm_id or seller_firm in g.user.employer.clients:
-                send_from_directory(directory=BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, filename=tax_record.filename, as_attachment=True)
-            else:
-                raise Unauthorized('You are not authorized to retrieve a tax record from the seller firm associated with the id {}'.format(public_id))
+    #     tax_record = TaxRecordService.get_by_public_id(tax_record_public_id)
+    #     if tax_record:
+    #         seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
+    #         if g.user.employer_id == tax_record.seller_firm_id or seller_firm in g.user.employer.clients:
+    #             send_from_directory(directory=BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, filename=tax_record.filename, as_attachment=True)
+    #         else:
+    #             raise Unauthorized('You are not authorized to retrieve a tax record from the seller firm associated with the id {}'.format(tax_record_public_id))
 
-        else:
-            raise NotFound('A Tax Record with the given ID does not exist.')
+    #     else:
+    #         raise NotFound('A Tax Record with the given ID does not exist.')
 
 
 

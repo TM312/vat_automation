@@ -1,5 +1,5 @@
-from .model import DistanceSale
-from .schema import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto
+from .model import DistanceSale, DistanceSaleHistory
+from .schema import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto, distance_sale_history_dto
 
 
 BASE_ROUTE = "distance_sale"

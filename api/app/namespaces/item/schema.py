@@ -8,6 +8,7 @@ item_history_dto = Model('item_history', {
     'valid_to': fields.Date,
     'comment': fields.String,
     'name': fields.String,
+    'unit_cost_price_currency_code': fields.String,
     'unit_cost_price_net': fields.Float,
     'tags': fields.List(fields.Nested(tag_dto))
 })

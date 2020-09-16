@@ -76,13 +76,6 @@
         },
         data() {
             return {
-                // selected: null,
-                // options: [
-                //   // { value: null, text: 'Please select an option' },
-                //   // { value: 'Amazon', text: 'Amazon' }
-                // ],
-                progress: 0,
-                progressBarStyle: "success",
                 files: [],
                 fields: [
                     "#",

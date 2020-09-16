@@ -36,9 +36,6 @@ class SellerFirm(Business):
     # IDs for supported platforms
     accounts = db.relationship('Account', backref='seller_firm', lazy='select', cascade='all, delete-orphan')
 
-    # Columns related to Accounting/Tax Service
-    # accounting_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    # accounting_firm_client_id = db.Column(db.String(120), default=None)
 
     tax_auditors = db.relationship('TaxAuditor', secondary=tax_auditor_seller_firm_AT, back_populates='key_accounts')
 
@@ -55,52 +52,6 @@ class SellerFirm(Business):
     # def transaction_ready(self):
     #     return (self.len_items > 0 and self.len_accounts > 0)
 
-    # # @hybrid_property
-    # # def len_tax_records(self):
-    # #     return len(self.tax_records)
-
-    # len_tax_records = column_property(
-    #     select([func.count(TaxRecord.id)])
-    #     .where(TaxRecord.seller_firm_id == id)
-    #     .correlate_except(TaxRecord)
-    # )
-
-    # # @hybrid_property
-    # # def len_transactions(self):
-    # #     return len(self.transactions)
-
-
-
-
-    # @hybrid_property
-    # def len_distance_sales(self):
-    #     return len(self.distance_sales)
-
-    # len_distance_sales = column_property(
-    #     select([func.count(DistanceSale.id)])
-    #     .where(DistanceSale.seller_firm_id == id)
-    #     .correlate_except(DistanceSale)
-    # )
-
-    # # @hybrid_property
-    # # def len_items(self):
-    # #     return len(self.items)
-
-    # len_items = column_property(
-    #     select([func.count(Item.id)])
-    #     .where(Item.seller_firm_id == id)
-    #     .correlate_except(Item)
-    # )
-
-    # # @hybrid_property
-    # # def len_accounts(self):
-    # #     return len(self.accounts)
-
-    # len_accounts = column_property(
-    #     select([func.count(Account.id)])
-    #     .where(Account.seller_firm_id == id)
-    #     .correlate_except(Account)
-    # )
 
 
     def __repr__(self):

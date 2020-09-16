@@ -19,18 +19,47 @@ class VatService:
 
     @staticmethod
     def get_by_id(vat_id: int) -> Vat:
-        return Vat.query.filter(Vat.code == code).first()
+        return Vat.query.filter_by(id=vat_id).first()
+
+    @staticmethod
+    def get_by_tax_code_country_tax_date(tax_code_code: str, country_code: str, tax_date: date) -> Vat:
+        vat = Vat.query.filter(
+            Vat.tax_code_code==tax_code_code,
+            Vat.country_code==country_code,
+            Vat.valid_from<=tax_date,
+            Vat.valid_to>=tax_date
+            ).first()
+        if vat:
+            return vat
+        else:
+            print("Function: VatService -> get_by_tax_code_country_tax_date", flush=True)
+            raise NotFound('The tax rate for the tax code "{}" and the country code "{}" could not be found. Please get in contact with one of the admins.'.format(tax_code, country_code))
+
+    @staticmethod
+    def get_by_tax_rate_type_country_tax_date(country_code: str, tax_rate_type_code: str, tax_date: date) -> Vat:
+        vat = Vat.query.filter(
+            Vat.country_code==country_code,
+            Vat.tax_rate_type_code==tax_rate_type_code,
+            Vat.valid_from<=tax_date,
+            Vat.valid_to>=tax_date
+            ).first()
+        if vat:
+            return vat
+        else:
+            print("Function: VatService -> get_by_tax_rate_type_country_tax_date", flush=True)
+            raise NotFound('The tax rate for the tax rate type "{}" and the country code "{}" could not be found. Please get in contact with one of the admins.'.format(tax_rate_type_code, country_code))
+
 
     @staticmethod
     def update(vat_id: int, data_changes: VatInterface) -> Vat:
-        vat = VatService.get_by_id(codvat_ide)
+        vat = VatService.get_by_id(vat_id)
         vat.update(data_changes)
         db.session.commit()
         return vat
 
     @staticmethod
     def delete_by_id(vat_id: str):
-        vat = Vat.query.filter(Vat.id == vat_id).first()
+        vat = VatService.get_by_id(vat_id)
         if vat:
             db.session.delete(vat)
             db.session.commit()
@@ -61,25 +90,6 @@ class VatService:
 
         return new_vat
 
-
-
-    @staticmethod
-    def get_by_tax_code_country_tax_date(tax_code_code: str, country: 'app.namespaces.country.Country', tax_date: date) -> Vat:
-        vat = Vat.query.filter(Vat.tax_code_code==tax_code_code, Vat.country==country, Vat.valid_from<=tax_date, Vat.valid_to>=tax_date).first()
-        if vat:
-            return vat
-        else:
-            print("Function: VatService -> get_by_tax_code_country_tax_date", flush=True)
-            raise NotFound('The tax rate for the tax code: "{}" and the country: "{}" could not be found. Please get in contact with one of the admins.'.format(tax_code, country.name))
-
-    @staticmethod
-    def get_by_tax_rate_type_country_tax_date(country: 'app.namespaces.country.Country', tax_rate_type_code: str, tax_date: date) -> Vat:
-        vat = Vat.query.filter(Vat.country==country, Vat.tax_rate_type_code==tax_rate_type_code, Vat.valid_from<=tax_date, Vat.valid_to>=tax_date).first()
-        if vat:
-            return vat
-        else:
-            print("Function: VatService -> get_by_tax_rate_type_country_tax_date", flush=True)
-            raise NotFound('The tax rate for the tax rate type "{}" and the country "{}" could not be found. Please get in contact with one of the admins.'.format(tax_rate_type_code, country.name))
 
     @staticmethod
     def compare_reference_calculated_vat_rates(transaction_id: int, transaction_input: 'app.namespaces.transaction_input.TransactionInput', reference_vat_rate: float, calculated_vat_rate: float):

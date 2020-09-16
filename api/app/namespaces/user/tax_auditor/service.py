@@ -19,7 +19,11 @@ class TaxAuditorService:
 
     @staticmethod
     def get_by_id(tax_auditor_id: int) -> TaxAuditor:
-        return TaxAuditor.query.filter(TaxAuditor.id == tax_auditor_id).first()
+        return TaxAuditor.query.filter_by(id = tax_auditor_id).first()
+
+    @staticmethod
+    def get_by_public_id(tax_auditor_public_id: str) -> TaxAuditor:
+        return TaxAuditor.query.filter_by(public_id=tax_auditor_public_id).first()
 
 
 
@@ -49,16 +53,16 @@ class TaxAuditorService:
 
 
     @staticmethod
-    def delete_by_id(public_id: str):
+    def delete_by_public_id(tax_auditor_public_id: str):
         #check if tax_auditor exists in db
-        tax_auditor = TaxAuditor.query.filter(TaxAuditor.public_id == public_id).first()
+        tax_auditor = TaxAuditorService.get_by_public_id(tax_auditor_public_id)
         if tax_auditor:
             db.session.delete(tax_auditor)
             db.session.commit()
 
             response_object = {
                 'status': 'success',
-                'message': 'Tax auditor (Public ID: {}) has been successfully deleted.'.format(public_id)
+                'message': 'Tax auditor (Public ID: {}) has been successfully deleted.'.format(tax_auditor_public_id)
             }
             return response_object
         else:
@@ -71,17 +75,14 @@ class TaxAuditorService:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             if seller_firm in g.user.key_accounts:
-                try:
-                    g.user.key_accounts.remove(seller_firm)
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    raise
+                g.user.key_accounts.remove(seller_firm)
             else:
-                try:
-                    g.user.key_accounts.append(seller_firm)
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    raise
+                g.user.key_accounts.append(seller_firm)
+
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
         return g.user

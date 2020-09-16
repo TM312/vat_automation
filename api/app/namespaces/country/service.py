@@ -20,26 +20,24 @@ class CountryService:
 
     @staticmethod
     def get_eu_by_date(date: date) -> EU:
-        eu = EU.query.filter(EU.valid_from <= date,
-                             EU.valid_to >= date).first()
-        if eu:
-            return eu
-        else:
-            print("Function: CountryService -> get_eu_by_date", flush=True)
-            raise NotFound('A constellation of EU countries has not been defined for the requested date ({})'.format(str(date)))
+        return EU.query.filter(
+            EU.valid_from <= date,
+            EU.valid_to >= date
+            ).first()
 
 
 
     @staticmethod
     def update(code: str, data_changes: CountryInterface) -> Country:
         country = CountryService.get_by_code(code)
-        country.update(data_changes)
-        db.session.commit()
-        return country
+        if isinstance(country, Country):
+            country.update(data_changes)
+            db.session.commit()
+            return country
 
     @staticmethod
     def delete_by_code(code: str):
-        country = Country.query.filter(Country.code == code).first()
+        country = CountryService.get_by_code(code)
         if country:
             db.session.delete(country)
             db.session.commit()

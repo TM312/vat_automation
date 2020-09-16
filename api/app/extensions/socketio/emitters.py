@@ -87,9 +87,18 @@ class SocketService:
         SocketService.emit_status(meta=status)
 
     @staticmethod
+    def emit_status_error_invalid_file(message: str):
+        SocketService.emit_status_error('file', message)
+
+    @staticmethod
     def emit_status_error_no_value(current: int, object_type: str, column_name: str):
         message = 'No value in column "{}", row {}.'.format(column_name, current)
         SocketService.emit_status_error(object_type, message)
+
+    @staticmethod
+    def emit_status_error_invalid_value(object_type: str, message: str):
+        SocketService.emit_status_error(object_type, message)
+
 
     @staticmethod
     def emit_status_error_column_read(current: int, object_type: str, column_name: str):
@@ -129,7 +138,7 @@ class SocketService:
             elif len(duplicate_list) == 2:
                 message = 'The uploaded {}s "{}" and "{}" had already been registered.'.format(object_type_human_read, duplicate_list[0], duplicate_list[1])
             else:
-                message = 'The {} "{}" and {} other ones had been uploaded before.'.format(object_type_human_read, duplicate_list[0], len(duplicate_list)-1)
+                message = 'The {} "{}" and {} others had been uploaded before.'.format(object_type_human_read, duplicate_list[0], len(duplicate_list)-1)
 
             status = {
                 'target': 'infobox',

@@ -35,7 +35,7 @@ class AccountService:
 
     @staticmethod
     def get_by_id(account_id: int) -> Account:
-        return Account.query.filter(Account.id == account_id).first()
+        return Account.query.filter_by(id = account_id).first()
 
     @staticmethod
     def get_by_public_id(account_public_id: str) -> Account:
@@ -43,7 +43,7 @@ class AccountService:
 
     @staticmethod
     def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
-        return Account.query.filter_by(given_id=account_given_id,  channel_code=channel_code).first()
+        return Account.query.filter(Account.given_id==account_given_id, Account.channel_code==channel_code).first()
 
     @staticmethod
     def update(account_id: int, data_changes: AccountInterface) -> Account:
@@ -123,52 +123,16 @@ class AccountService:
 
 
 
-    # @staticmethod
-    # def process_account_files_upload(account_information_files: List[BinaryIO], seller_firm_public_id: str) -> Dict:
-    #     from ..business.seller_firm.service import SellerFirmService
-
-    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
-
-    #     file_type = 'account_list'
-    #     df_encoding = 'utf-8'
-    #     delimiter = ';'
-    #     basepath = BASE_PATH_STATIC_DATA_SELLER_FIRM
-    #     user_id = g.user.id
-    #     seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
-
-    #     for file in account_information_files:
-    #         file_path_in = InputService.store_static_data_upload(file=file, file_type=file_type)
-    #         AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm.id)
-
-    #     response_object = {
-    #         'status': 'success',
-    #         'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(account_information_files)))
-    #     }
-
-    #     return response_object
-
 
     @staticmethod
     def handle_account_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
-        response_object = AccountService.process_account_information_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id)
+        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+        response_object = AccountService.create_accounts(df, file_path_in, user_id, seller_firm_id)
         tag = TagService.get_by_code('ACCOUNT')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
-
-        return response_object
-
-
-
-    @staticmethod
-    def process_account_information_file(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int) -> List[Dict]:
-
-        df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-
-        response_objects = AccountService.create_accounts(df, file_path_in, user_id, seller_firm_id)
-
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
-
-        return response_objects
+        return response_object
 
 
 
@@ -220,6 +184,7 @@ class AccountService:
 
             account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
             if account:
+                print('found account for given_id: {} | channel_code: {} --> {}'.format(given_id, channel_code, account), flush=True)
                 if not duplicate_counter > 2:
                     message = 'The account "{}-{}" has already been registered and skipped consequently.'.format(channel_code, given_id)
                     SocketService.emit_status_info(object_type, message)
@@ -228,41 +193,44 @@ class AccountService:
                 duplicate_counter +=1
                 continue
 
-            account_data = {
-                'created_by': user_id,
-                'original_filename': original_filename,
-                'seller_firm_id' : seller_firm_id,
-                'given_id' : given_id,
-                'channel_code' : channel_code
-            }
-
-            try:
-                new_account = AccountService.create(account_data)
-
-            except:
-                db.session.rollback()
-                error_counter += 1
-
-                # send error status via socket
-                message = 'Error at {} "{}" for channel "{}" (file: {}). Please recheck.'.format(object_type_human_read, given_id, channel_code, original_filename)
-                SocketService.emit_status_error(current, total, object_type, message)
-                return False
-
-
-            # send status update via socket
-            SocketService.emit_status_success(current, total, original_filename, object_type)
-
-            # push new distance sale to vuex via socket
-            account_json = AccountSubSchema.get_account_sub(new_account)
-
-            if total < 10:
-                SocketService.emit_new_object(account_json, object_type)
 
             else:
-                account_socket_list.append(account_json)
-                if current % 10 == 0 or current == total:
-                    SocketService.emit_new_objects(account_socket_list, object_type)
-                    account_socket_list = []
+                account_data = {
+                    'created_by': user_id,
+                    'original_filename': original_filename,
+                    'seller_firm_id' : seller_firm_id,
+                    'given_id' : given_id,
+                    'channel_code' : channel_code
+                }
+
+
+                try:
+                    new_account = AccountService.create(account_data)
+
+                except:
+                    db.session.rollback()
+                    error_counter += 1
+
+                    # send error status via socket
+                    message = 'Error at {} "{}" for channel "{}" (file: {}). Please recheck.'.format(object_type_human_read, given_id, channel_code, original_filename)
+                    SocketService.emit_status_error(current, total, object_type, message)
+                    return False
+
+
+                # send status update via socket
+                SocketService.emit_status_success(current, total, original_filename, object_type)
+
+                # push new distance sale to vuex via socket
+                account_json = AccountSubSchema.get_account_sub(new_account)
+                print('after loop -> total:', total, flush=True)
+                if total < 10:
+                    SocketService.emit_new_object(account_json, object_type)
+
+                else:
+                    account_socket_list.append(account_json)
+                    if current % 10 == 0 or current == total:
+                        SocketService.emit_new_objects(account_socket_list, object_type)
+                        account_socket_list = []
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
@@ -291,17 +259,3 @@ class AccountService:
 
 
 # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
-
-
-    @staticmethod
-    def handle_redundancy(given_id: str, channel_code: str) -> int:
-        redundancy_counter = 0
-
-        account = Account.query.filter(Account.given_id == given_id,  Account.channel_code == channel_code).first()
-
-        # if an account with the same given_id and channel_code already exists, it is being deleted. !!!! need to take care of
-        if account:
-            db.session.delete(account)
-            redundancy_counter += 1
-
-        return redundancy_counter
