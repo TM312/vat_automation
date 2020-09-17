@@ -22,7 +22,7 @@ class VATIN(db.Model):
     request_date = db.Column(db.Date, nullable=False)
     valid_from = db.Column(db.Date)
 
-    initial_tax_date = db.Column(db.Date)
+    initial_tax_date = db.Column(db.Date, default=None)
 
     country_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
     number = db.Column(db.String(16), nullable=False)

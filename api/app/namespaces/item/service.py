@@ -192,6 +192,70 @@ class ItemService:
 
         return response_object
 
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+        try:
+            sku = InputService.get_str(df, i, column='SKU')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='SKU')
+            return False
+
+        if not sku or sku == '':
+            message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
+            SocketService.emit_status_info(object_type, message)
+            return False
+
+        try:
+            name = InputService.get_str_or_None(df, i, column='name')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='name')
+            return False
+
+        try:
+            unit_cost_price_net = InputService.get_float(df, i, column='unit_cost_price_net')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_net')
+            return False
+
+        try:
+            unit_cost_price_currency_code = InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_currency_code')
+            return False
+
+        try:
+            service_start_date = current_app.config.SERVICE_START_DATE
+            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            if isinstance(valid_from, date):
+                valid_from = valid_from if valid_from >= service_start_date else service_start_date
+            else:
+                valid_from = date.today()
+
+        except:
+            # send error status via socket
+            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
+            return False
+
+        try:
+            brand_name = InputService.get_str_or_None(df, i, column='brand_name')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='brand_name')
+            return False
+
+        try:
+            weight_kg = InputService.get_str_or_None(df, i, column='weight_kg')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='weight_kg')
+            return False
+
+        try:
+            tax_code_code = InputService.get_str_or_None(df, i, column='tax_code')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='tax_code')
+            return False
+
+        return sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code
+
 
 
 
@@ -199,14 +263,13 @@ class ItemService:
     @staticmethod
     def create_items(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
 
-        redundancy_counter = 0
-        error_counter = 0
         total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = object_type_human_read = 'item'
         item_socket_list = []
         duplicate_list = []
         duplicate_counter = 0
+        sku_list = []
 
 
 
@@ -217,84 +280,75 @@ class ItemService:
         for i in range(total_number_items):
             current = i + 1
 
-            try:
-                sku = InputService.get_str(df, i, column='SKU')
-            except:
-                SocketService.emit_status_error_column_read(current, object_type, column_name='SKU')
-                return False
-
-            if not sku or sku == '':
-                message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
-                SocketService.emit_status_info(object_type, message)
-                return False
-
-            try:
-                name = InputService.get_str_or_None(df, i, column='name')
-            except:
-                SocketService.emit_status_error_column_read(current, object_type, column_name='name')
-                return False
-
-            try:
-                unit_cost_price_net = InputService.get_float(df, i, column='unit_cost_price_net')
-            except:
-                SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_net')
-                return False
-
-            try:
-                unit_cost_price_currency_code = InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code')
-            except:
-                SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_currency_code')
-                return False
-
-            try:
-                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            except:
-                pass
-
+            sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type)
 
             item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
-            if item:
-                if item.name != name or item.unit_cost_price_net != unit_cost_price_net:
+            if isinstance(item, Item):
+                if item.name == name and item.unit_cost_price_net == unit_cost_price_net:
+                    if item.brand_name != brand_name or item.weight_kg != weight_kg or item.tax_code_code != tax_code_code:
+                        data_changes = {
+                            'brand_name': brand_name,
+                            'weight_kg': weight_kg,
+                            'tax_code_code': tax_code_code
+                        }
+                        try:
+                            item.update(data_changes)
+
+                        except:
+                            db.session.rollback()
+                            message = 'Error at updating {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
+                            SocketService.emit_status_error(object_type, message)
+                            return False
+
+                    else:
+                        if not duplicate_counter > 2:
+                            message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
+                            SocketService.emit_status_info(object_type, message)
+
+                        total -= 1
+                        duplicate_list.append(sku)
+                        duplicate_counter += 1
+                        continue
+
+                else:
+                    item_history = ItemHistoryService.get_by_item_id_date(item.id, valid_from)
                     data_changes = {
                         'name': name,
                         'unit_cost_price_net': unit_cost_price_net,
                         'unit_cost_price_currency_code': unit_cost_price_currency_code
                     }
-                    if isinstance(valid_from, date):
-                        item.update(data_changes, valid_from=valid_from)
 
-                    else:
-                        item.update(data_changes)
                     try:
+                        if item_history.valid_from != valid_from:
+                            item.update(data_changes, valid_from=valid_from)
+
+                        else:
+                            item.update(data_changes, valid_from=item_history.valid_from)
                         db.session.commit()
+
                     except:
                         db.session.rollback()
                         message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
                         SocketService.emit_status_error(object_type, message)
                         return False
 
-                elif not duplicate_counter > 2:
-                    message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
-                    SocketService.emit_status_info(object_type, message)
-
-                total -= 1
-                duplicate_list.append(sku)
-                duplicate_counter += 1
-                continue
 
             else:
+                if sku not in sku_list:
+                    sku_list.append(sku)
+
                 item_data = {
                     'created_by': user_id,
                     'original_filename': original_filename,
                     'sku': sku,
                     'seller_firm_id': seller_firm_id,
-                    'brand_name': InputService.get_str_or_None(df, i, column='brand_name'),
+                    'brand_name': brand_name,
                     'name': name,
                     # 'ean': InputService.get_str_or_None(df, i, column='ean'),
                     # 'asin': InputService.get_str_or_None(df, i, column='asin'),
                     # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
-                    'weight_kg': InputService.get_float(df, i, column='weight_kg'),
-                    'tax_code_code': InputService.get_str_or_None(df, i, column='tax_code'),
+                    'weight_kg': weight_kg,
+                    'tax_code_code': tax_code_code,
                     'unit_cost_price_currency_code': unit_cost_price_currency_code,
                     'unit_cost_price_net': unit_cost_price_net
                 }
@@ -313,16 +367,20 @@ class ItemService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
-                # push new distance sale to vuex via socket
-                item_schema_sub = ItemSubSchema.get_item_sub(new_item)
 
-            if total < 10:
+        for sku in sku_list:
+            # push new distance sale to vuex via socket
+            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
+            item_schema_sub = ItemSubSchema.get_item_sub(item   )
+
+            if len(sku_list) < 10:
                 SocketService.emit_new_object(item_schema_sub, object_type)
             else:
                 item_socket_list.append(item_schema_sub)
-                if current % 100 == 0 or current == total:
-                    SocketService.emit_new_objects(item_socket_list, object_type)
-                    item_socket_list = []
+
+        if len(item_socket_list) > 0:
+            SocketService.emit_new_objects(item_socket_list, object_type)
+            item_socket_list = []
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)

@@ -19,6 +19,7 @@ class Item(db.Model):  # type: ignore
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
+    given_id = db.Column(db.String(40))
     active = db.Column(db.Boolean, default=True)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     original_filename = db.Column(db.String(128))
@@ -64,7 +65,7 @@ class Item(db.Model):  # type: ignore
 
     @weight_kg.setter
     def weight_kg(self, value):
-        self.weight_g = int(value * 1000) if value is not None else None
+        self.weight_g = int(round(value * 1000)) if value is not None else None
 
 
     @hybrid_property
@@ -73,7 +74,7 @@ class Item(db.Model):  # type: ignore
 
     @unit_cost_price_net.setter
     def unit_cost_price_net(self, value):
-        self._unit_cost_price_net = int(value * 100) if value is not None else None
+        self._unit_cost_price_net = int(round(value * 100)) if value is not None else None
 
 
     def __init__(self, **kwargs):
@@ -84,59 +85,92 @@ class Item(db.Model):  # type: ignore
 
 
     def update(self, data_changes, **kwargs):
+        from ..tag.service import TagService
+        from .service import ItemHistoryService
+
         for key, val in data_changes.items():
             """
             Name or price changes are tracked for each item. A item history object is created whenever one of these attributes is being updated.
             """
             if key == 'unit_cost_price_net' or key == 'name':
-                from ..tag.service import TagService
 
                 if key == 'unit_cost_price_net':
                     tag = TagService.get_by_code('PRICE_CHANGE')
+                    print('Get tag by code "PRICE_CHANGE":', tag, flush=True)
                 elif key == 'name':
                     tag = TagService.get_by_code('NAME_CHANGE')
+                    ###
+                    print('Get tag by code "NAME_CHANGE":', tag, flush=True)
 
                 valid_from = kwargs.get('valid_from') if isinstance(kwargs.get('valid_from'), date) else date.today()
 
                  # Get the current item history
-                item_history = ItemHistory.query.filter_by(item_id = self.id).order_by(ItemHistory.valid_from.desc()).first()
-                if isinstance(item_history, ItemHistory):
-                    item_history.valid_to = valid_from-timedelta(days=1)
-                    if not tag in item_history.tags:
-                        item_history.tags.append(tag)
+                item_history = ItemHistoryService.get_by_item_id_date(self.id, valid_from)
+                if not isinstance(item_history, ItemHistory):
+                    raise
+
+                if ((key == 'unit_cost_price_net' and val == item_history.unit_cost_price_net) or
+                    (key == 'name' and val == item_history.name)):
+                    continue
 
                 else:
-                    unit_cost_price_net = (
-                        data_changes.get('unit_cost_price_net')
-                        if isinstance(data_changes.get('unit_cost_price_net'), (int, complex, float))
-                        else self.unit_cost_price_net
-                    )
-                    name = (
-                        data_changes.get('name')
-                        if isinstance(data_changes.get('name'), str)
-                        else self.name
+
+                    if valid_from == item_history.valid_from:
+                        if key == 'unit_cost_price_net':
+                            item_history.unit_cost_price_net = val
+                        elif key == 'name':
+                            item_history.name = val
+
+                        if not tag in item_history.tags:
+                            item_history.tags.append(tag)
+
+                    else:
+                        unit_cost_price_net = (
+                            data_changes.get('unit_cost_price_net')
+                            if isinstance(data_changes.get('unit_cost_price_net'), (int, complex, float))
+                            else self.unit_cost_price_net
                         )
-                    unit_cost_price_currency_code = (
-                        data_changes.get('unit_cost_price_currency_code')
-                        if isinstance(data_changes.get('unit_cost_price_currency_code'), str)
-                        else self.unit_cost_price_currency_code
-                    )
+                        name = (
+                            data_changes.get('name')
+                            if isinstance(data_changes.get('name'), str)
+                            else self.name
+                            )
+                        unit_cost_price_currency_code = (
+                            data_changes.get('unit_cost_price_currency_code')
+                            if isinstance(data_changes.get('unit_cost_price_currency_code'), str)
+                            else self.unit_cost_price_currency_code
+                        )
 
-                    #create new item price
-                    new_item_history = ItemHistory(
-                        unit_cost_price_net = unit_cost_price_net,
-                        unit_cost_price_currency_code = unit_cost_price_currency_code,
-                        name = name,
-                        valid_from=valid_from,
-                        item_id = self.id
-                    )
-                    db.session.add(new_item_history)
-                    new_item_history.tags.append(tag)
+                        if valid_from > item_history.valid_from:
+                            item_history.valid_to = valid_from - timedelta(days=1)
 
-                    self.item_history.append(new_item_history)
+                            item_history_data = {
+                                'unit_cost_price_net': unit_cost_price_net,
+                                'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                                'name': name,
+                                'valid_from': valid_from,
+                                'item_id': self.id
+                            }
+
+                        else:
+                            item_history_data = {
+                                'unit_cost_price_net': unit_cost_price_net,
+                                'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                                'name': name,
+                                'valid_from': valid_from,
+                                'valid_to': item_history.valid_from - timedelta(days=1),
+                                'item_id': self.id
+                            }
+
+                        try:
+                            new_item_history = ItemHistoryService.create(item_history_data)
+                        except:
+                            raise
+
+                        new_item_history.tags.append(tag)
+                        self.item_history.append(new_item_history)
 
             setattr(self, key, val)
-
         self.modified_at = datetime.utcnow()
         return self
 
@@ -170,7 +204,7 @@ class ItemHistory(db.Model):  # type: ignore
 
     @unit_cost_price_net.setter
     def unit_cost_price_net(self, value):
-        self._unit_cost_price_net = int(value * 100) if value is not None else None
+        self._unit_cost_price_net = int(round(value * 100)) if value is not None else None
 
 
     def __repr__(self):

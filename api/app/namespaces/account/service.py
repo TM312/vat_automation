@@ -222,7 +222,6 @@ class AccountService:
 
                 # push new distance sale to vuex via socket
                 account_json = AccountSubSchema.get_account_sub(new_account)
-                print('after loop -> total:', total, flush=True)
                 if total < 10:
                     SocketService.emit_new_object(account_json, object_type)
 

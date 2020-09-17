@@ -199,7 +199,7 @@ class VATINService:
         error_counter = 0
         total = total_number_vatins = len(df.index)
         original_filename = os.path.basename(file_path_in)[:127]
-        object_type = 'vatin'
+        object_type = 'vat_number'
         object_type_human_read = 'vat number'
         duplicate_list = []
         duplicate_counter = 0
@@ -225,18 +225,21 @@ class VATINService:
 
             vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
-            if isisntance(vatin, VATIN) and vatin.valid:
+            if isinstance(vatin, VATIN) and vatin.valid:
                 if isinstance(vatin.business_id, int):
                     if not duplicate_counter > 2:
                         message = 'The vat number "{}-{}" has already been processed earlier.'.format(country_code, number)
                         SocketService.emit_status_info(object_type, message)
                     total -= 1
-                    duplicate_list.append(given_id)
+                    duplicate_list.append('{}-{}'.format(country_code, number))
                     duplicate_counter += 1
                     continue #skipping duplicates
 
                 else:
-                    vatin.business_id = seller_firm_id
+                    data_changes = {
+                        'business_id': seller_firm_id
+                    }
+                    vatin.update(data_changes)
                     try:
                         db.session.commit()
                     except:
@@ -245,6 +248,8 @@ class VATINService:
                         message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
                         SocketService.emit_status_error(original_filename, object_type, message)
                         return False
+
+                    vatin_socket_list = VATINService.push_to_vuex(vatin, object_type, vatin_socket_list, current, total)
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
@@ -268,10 +273,20 @@ class VATINService:
                 vatin_data['business_id'] = seller_firm_id
                 vatin_data['original_filename'] = original_filename,
 
-                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+                try:
+                    service_start_date = current_app.config.SERVICE_START_DATE
+                    valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+                    if isinstance(valid_from, date):
+                        valid_from = valid_from if valid_from >= service_start_date else service_start_date
+                    else:
+                        tolerance = current_app.config.OLD_TRANSACTION_TOLERANCE_DAYS
+                        valid_from = date.today() - timedelta(days=tolerance)
 
-                if not valid_from:
-                    valid_from = date.today()
+                except:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
+                    return False
+
+
 
                 vatin_data['valid_from'] = valid_from
 
@@ -301,27 +316,33 @@ class VATINService:
                         return False
 
 
-            # send status update via socket
-            SocketService.emit_status_success(current, total, original_filename, object_type)
+                # send status update via socket
+                SocketService.emit_status_success(current, total, original_filename, object_type)
 
-            # push new distance sale to vuex via socket
-            vatin_schema = VatinSchemaSocket.get_vatin_sub(vatin)
-
-            if total < 10:
-                SocketService.emit_new_object(vatin_schema, object_type)
-
-            else:
-                vatin_socket_list.append(distance_sale_json)
-                if current % 10 == 0 or current == total:
-                    SocketService.emit_new_objects(vatin_socket_list, object_type)
-                    vatin_socket_list = []
-
+                vatin_socket_list = VATINService.push_to_vuex(vatin, object_type, vatin_socket_list, current, total)
 
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
         return True
+
+
+    @staticmethod
+    def push_to_vuex(vatin: VATIN, object_type: str, vatin_socket_list: List, current: int, total: int):
+        # push new distance sale to vuex via socket
+        vatin_schema = VatinSchemaSocket.get_vatin_sub(vatin)
+
+        if total < 10:
+            SocketService.emit_new_object(vatin_schema, object_type)
+
+        else:
+            vatin_socket_list.append(vatin_schema)
+            if current % 10 == 0 or current == total:
+                SocketService.emit_new_objects(vatin_socket_list, object_type)
+                vatin_socket_list = []
+
+        return vatin_socket_list
 
 
 

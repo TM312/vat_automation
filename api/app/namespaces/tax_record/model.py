@@ -113,7 +113,7 @@ class TaxRecord(db.Model):
 
     @local_sales_sales_invoice_amount_net.setter
     def local_sales_sales_invoice_amount_net(self, value):
-        self._local_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sales_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -122,7 +122,7 @@ class TaxRecord(db.Model):
 
     @local_sales_refunds_invoice_amount_net.setter
     def local_sales_refunds_invoice_amount_net(self, value):
-        self._local_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sales_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -131,7 +131,7 @@ class TaxRecord(db.Model):
 
     @local_sales_total_invoice_amount_net.setter
     def local_sales_total_invoice_amount_net(self, value):
-        self._local_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sales_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -140,7 +140,7 @@ class TaxRecord(db.Model):
 
     @local_sales_sales_invoice_amount_vat.setter
     def local_sales_sales_invoice_amount_vat(self, value):
-        self._local_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sales_sales_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -149,7 +149,7 @@ class TaxRecord(db.Model):
 
     @local_sales_refunds_invoice_amount_vat.setter
     def local_sales_refunds_invoice_amount_vat(self, value):
-        self._local_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sales_refunds_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -158,7 +158,7 @@ class TaxRecord(db.Model):
 
     @local_sales_total_invoice_amount_vat.setter
     def local_sales_total_invoice_amount_vat(self, value):
-        self._local_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sales_total_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -167,7 +167,7 @@ class TaxRecord(db.Model):
 
     @local_sales_sales_invoice_amount_gross.setter
     def local_sales_sales_invoice_amount_gross(self, value):
-        self._local_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sales_sales_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -176,7 +176,7 @@ class TaxRecord(db.Model):
 
     @local_sales_refunds_invoice_amount_gross.setter
     def local_sales_refunds_invoice_amount_gross(self, value):
-        self._local_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sales_refunds_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -185,7 +185,7 @@ class TaxRecord(db.Model):
 
     @local_sales_total_invoice_amount_gross.setter
     def local_sales_total_invoice_amount_gross(self, value):
-        self._local_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sales_total_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -194,7 +194,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_sales_invoice_amount_net.setter
     def local_sale_reverse_charges_sales_invoice_amount_net(self, value):
-        self._local_sale_reverse_charges_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -203,7 +203,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_refunds_invoice_amount_net.setter
     def local_sale_reverse_charges_refunds_invoice_amount_net(self, value):
-        self._local_sale_reverse_charges_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -212,7 +212,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_total_invoice_amount_net.setter
     def local_sale_reverse_charges_total_invoice_amount_net(self, value):
-        self._local_sale_reverse_charges_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -221,7 +221,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_sales_invoice_amount_vat.setter
     def local_sale_reverse_charges_sales_invoice_amount_vat(self, value):
-        self._local_sale_reverse_charges_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_sales_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -230,7 +230,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_refunds_invoice_amount_vat.setter
     def local_sale_reverse_charges_refunds_invoice_amount_vat(self, value):
-        self._local_sale_reverse_charges_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_refunds_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -239,7 +239,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_total_invoice_amount_vat.setter
     def local_sale_reverse_charges_total_invoice_amount_vat(self, value):
-        self._local_sale_reverse_charges_total_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_total_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -248,7 +248,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_sales_invoice_amount_gross.setter
     def local_sale_reverse_charges_sales_invoice_amount_gross(self, value):
-        self._local_sale_reverse_charges_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_sales_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -257,7 +257,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_refunds_invoice_amount_gross.setter
     def local_sale_reverse_charges_refunds_invoice_amount_gross(self, value):
-        self._local_sale_reverse_charges_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_refunds_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -266,7 +266,7 @@ class TaxRecord(db.Model):
 
     @local_sale_reverse_charges_total_invoice_amount_gross.setter
     def local_sale_reverse_charges_total_invoice_amount_gross(self, value):
-        self._local_sale_reverse_charges_total_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_sale_reverse_charges_total_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -275,7 +275,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_sales_invoice_amount_net.setter
     def distance_sales_sales_invoice_amount_net(self, value):
-        self._distance_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._distance_sales_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -284,7 +284,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_refunds_invoice_amount_net.setter
     def distance_sales_refunds_invoice_amount_net(self, value):
-        self._distance_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._distance_sales_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -293,7 +293,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_total_invoice_amount_net.setter
     def distance_sales_total_invoice_amount_net(self, value):
-        self._distance_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._distance_sales_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -302,7 +302,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_sales_invoice_amount_vat.setter
     def distance_sales_sales_invoice_amount_vat(self, value):
-        self._distance_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._distance_sales_sales_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -311,7 +311,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_refunds_invoice_amount_vat.setter
     def distance_sales_refunds_invoice_amount_vat(self, value):
-        self._distance_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._distance_sales_refunds_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -320,7 +320,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_total_invoice_amount_vat.setter
     def distance_sales_total_invoice_amount_vat(self, value):
-        self._distance_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._distance_sales_total_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -329,7 +329,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_sales_invoice_amount_gross.setter
     def distance_sales_sales_invoice_amount_gross(self, value):
-        self._distance_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._distance_sales_sales_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -338,7 +338,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_refunds_invoice_amount_gross.setter
     def distance_sales_refunds_invoice_amount_gross(self, value):
-        self._distance_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._distance_sales_refunds_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -347,7 +347,7 @@ class TaxRecord(db.Model):
 
     @distance_sales_total_invoice_amount_gross.setter
     def distance_sales_total_invoice_amount_gross(self, value):
-        self._distance_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._distance_sales_total_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -356,7 +356,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_sales_invoice_amount_net.setter
     def non_taxable_distance_sales_sales_invoice_amount_net(self, value):
-        self._non_taxable_distance_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -365,7 +365,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_refunds_invoice_amount_net.setter
     def non_taxable_distance_sales_refunds_invoice_amount_net(self, value):
-        self._non_taxable_distance_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -374,7 +374,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_total_invoice_amount_net.setter
     def non_taxable_distance_sales_total_invoice_amount_net(self, value):
-        self._non_taxable_distance_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -383,7 +383,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_sales_invoice_amount_vat.setter
     def non_taxable_distance_sales_sales_invoice_amount_vat(self, value):
-        self._non_taxable_distance_sales_sales_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_sales_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -392,7 +392,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_refunds_invoice_amount_vat.setter
     def non_taxable_distance_sales_refunds_invoice_amount_vat(self, value):
-        self._non_taxable_distance_sales_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_refunds_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -401,7 +401,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_total_invoice_amount_vat.setter
     def non_taxable_distance_sales_total_invoice_amount_vat(self, value):
-        self._non_taxable_distance_sales_total_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_total_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -410,7 +410,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_sales_invoice_amount_gross.setter
     def non_taxable_distance_sales_sales_invoice_amount_gross(self, value):
-        self._non_taxable_distance_sales_sales_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_sales_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -419,7 +419,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_refunds_invoice_amount_gross.setter
     def non_taxable_distance_sales_refunds_invoice_amount_gross(self, value):
-        self._non_taxable_distance_sales_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_refunds_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -428,7 +428,7 @@ class TaxRecord(db.Model):
 
     @non_taxable_distance_sales_total_invoice_amount_gross.setter
     def non_taxable_distance_sales_total_invoice_amount_gross(self, value):
-        self._non_taxable_distance_sales_total_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._non_taxable_distance_sales_total_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -437,7 +437,7 @@ class TaxRecord(db.Model):
 
     @intra_community_sales_sales_invoice_amount_net.setter
     def intra_community_sales_sales_invoice_amount_net(self, value):
-        self._intra_community_sales_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._intra_community_sales_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -446,7 +446,7 @@ class TaxRecord(db.Model):
 
     @intra_community_sales_refunds_invoice_amount_net.setter
     def intra_community_sales_refunds_invoice_amount_net(self, value):
-        self._intra_community_sales_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._intra_community_sales_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -455,7 +455,7 @@ class TaxRecord(db.Model):
 
     @intra_community_sales_total_invoice_amount_net.setter
     def intra_community_sales_total_invoice_amount_net(self, value):
-        self._intra_community_sales_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._intra_community_sales_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -464,7 +464,7 @@ class TaxRecord(db.Model):
 
     @exports_sales_invoice_amount_net.setter
     def exports_sales_invoice_amount_net(self, value):
-        self._exports_sales_invoice_amount_net = int(value * 100) if value is not None else None
+        self._exports_sales_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -473,7 +473,7 @@ class TaxRecord(db.Model):
 
     @exports_refunds_invoice_amount_net.setter
     def exports_refunds_invoice_amount_net(self, value):
-        self._exports_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._exports_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -482,7 +482,7 @@ class TaxRecord(db.Model):
 
     @exports_total_invoice_amount_net.setter
     def exports_total_invoice_amount_net(self, value):
-        self._exports_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._exports_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -491,7 +491,7 @@ class TaxRecord(db.Model):
 
     @ica_acquisitions_invoice_amount_net.setter
     def ica_acquisitions_invoice_amount_net(self, value):
-        self._ica_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
+        self._ica_acquisitions_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -500,7 +500,7 @@ class TaxRecord(db.Model):
 
     @ica_refunds_invoice_amount_net.setter
     def ica_refunds_invoice_amount_net(self, value):
-        self._ica_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._ica_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -509,7 +509,7 @@ class TaxRecord(db.Model):
 
     @ica_total_invoice_amount_net.setter
     def ica_total_invoice_amount_net(self, value):
-        self._ica_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._ica_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -518,7 +518,7 @@ class TaxRecord(db.Model):
 
     @ica_acquisitions_invoice_amount_vat_reverse_charge.setter
     def ica_acquisitions_invoice_amount_vat_reverse_charge(self, value):
-        self._ica_acquisitions_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+        self._ica_acquisitions_invoice_amount_vat_reverse_charge = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -527,7 +527,7 @@ class TaxRecord(db.Model):
 
     @ica_refunds_invoice_amount_vat_reverse_charge.setter
     def ica_refunds_invoice_amount_vat_reverse_charge(self, value):
-        self._ica_refunds_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+        self._ica_refunds_invoice_amount_vat_reverse_charge = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -536,7 +536,7 @@ class TaxRecord(db.Model):
 
     @ica_total_invoice_amount_vat_reverse_charge.setter
     def ica_total_invoice_amount_vat_reverse_charge(self, value):
-        self._ica_total_invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+        self._ica_total_invoice_amount_vat_reverse_charge = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -545,7 +545,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_acquisitions_invoice_amount_net.setter
     def local_acquisitions_acquisitions_invoice_amount_net(self, value):
-        self._local_acquisitions_acquisitions_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_acquisitions_acquisitions_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -554,7 +554,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_refunds_invoice_amount_net.setter
     def local_acquisitions_refunds_invoice_amount_net(self, value):
-        self._local_acquisitions_refunds_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_acquisitions_refunds_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -563,7 +563,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_total_invoice_amount_net.setter
     def local_acquisitions_total_invoice_amount_net(self, value):
-        self._local_acquisitions_total_invoice_amount_net = int(value * 100) if value is not None else None
+        self._local_acquisitions_total_invoice_amount_net = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -572,7 +572,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_acquisitions_invoice_amount_vat.setter
     def local_acquisitions_acquisitions_invoice_amount_vat(self, value):
-        self._local_acquisitions_acquisitions_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_acquisitions_acquisitions_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -581,7 +581,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_refunds_invoice_amount_vat.setter
     def local_acquisitions_refunds_invoice_amount_vat(self, value):
-        self._local_acquisitions_refunds_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_acquisitions_refunds_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -590,7 +590,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_total_invoice_amount_vat.setter
     def local_acquisitions_total_invoice_amount_vat(self, value):
-        self._local_acquisitions_total_invoice_amount_vat = int(value * 100) if value is not None else None
+        self._local_acquisitions_total_invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -599,7 +599,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_acquisitions_invoice_amount_gross.setter
     def local_acquisitions_acquisitions_invoice_amount_gross(self, value):
-        self._local_acquisitions_acquisitions_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_acquisitions_acquisitions_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -608,7 +608,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_refunds_invoice_amount_gross.setter
     def local_acquisitions_refunds_invoice_amount_gross(self, value):
-        self._local_acquisitions_refunds_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_acquisitions_refunds_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -617,7 +617,7 @@ class TaxRecord(db.Model):
 
     @local_acquisitions_total_invoice_amount_gross.setter
     def local_acquisitions_total_invoice_amount_gross(self, value):
-        self._local_acquisitions_total_invoice_amount_gross = int(value * 100) if value is not None else None
+        self._local_acquisitions_total_invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -626,7 +626,7 @@ class TaxRecord(db.Model):
 
     @taxable_turnover_amount.setter
     def taxable_turnover_amount(self, value):
-        self._taxable_turnover_amount = int(value * 100) if value is not None else None
+        self._taxable_turnover_amount = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -635,4 +635,4 @@ class TaxRecord(db.Model):
 
     @payable_vat_amount.setter
     def payable_vat_amount(self, value):
-        self._payable_vat_amount = int(value * 100) if value is not None else None
+        self._payable_vat_amount = int(round(value * 100)) if value is not None else None

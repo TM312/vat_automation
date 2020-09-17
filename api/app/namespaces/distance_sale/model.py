@@ -35,10 +35,11 @@ class DistanceSale(db.Model):  # type: ignore
 
             """
             if key == 'active':
+                from .service import DistanceSaleHistoryService
                 valid_from = kwargs.get('valid_from') if isinstance(kwargs.get('valid_from'), date) else date.today()
 
                  # Get the current distance sale history
-                distance_sale_history = DistanceSaleHistory.query.filter_by(distance_sale_id = self.id).order_by(DistanceSaleHistory.valid_from.desc()).first()
+                distance_sale_history = DistanceSaleHistoryService.get_by_ds_id_date(self.id, valid_from)
                 if not isinstance(distance_sale_history, DistanceSaleHistory):
                     raise
 
@@ -46,18 +47,34 @@ class DistanceSale(db.Model):  # type: ignore
                     continue
 
                 else:
-                    distance_sale_history.valid_to = valid_from-timedelta(days=1)
+                    if valid_from == distance_sale_history.valid_from:
+                        distance_sale_history.active = val
 
-                    #create new distance sale history
-                    new_distance_sale_history = DistanceSaleHistory(
-                        distance_sale_id=self.id,
-                        valid_from = valid_from,
-                        arrival_country_code=self.arrival_country_code,
-                        active = val
-                    )
-                    db.session.add(new_distance_sale_history)
+                    else:
+                        if valid_from > distance_sale_history.valid_from:
+                            distance_sale_history.valid_to = valid_from-timedelta(days=1)
 
-                    self.distance_sale_history.append(new_distance_sale_history)
+                            distance_sale_history_data = {
+                                'valid_from': valid_from,
+                                'arrival_country_code': self.arrival_country_code,
+                                'active': val,
+                                'distance_sale_id': self.id,
+
+                            }
+                        else:
+                            distance_sale_history_data = {
+                                'valid_from': valid_from,
+                                'valid_to': distance_sale_history.valid_from - timedelta(days=1),
+                                'arrival_country_code': self.arrival_country_code,
+                                'active': val,
+                                'distance_sale_id': self.id
+                            }
+
+                        try:
+                            new_distance_sale_history = DistanceSaleHistoryService.create(distance_sale_history_data)
+                        except:
+                            raise
+                        self.distance_sale_history.append(new_distance_sale_history)
 
             setattr(self, key, val)
         self.modified_at = datetime.utcnow()

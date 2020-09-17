@@ -21,7 +21,7 @@ class ExchangeRate(db.Model):
 
     @rate.setter
     def rate(self, value):
-        self._rate = int(value * 10_000) if value is not None else None
+        self._rate = int(round(value * 10_000)) if value is not None else None
 
 
 
