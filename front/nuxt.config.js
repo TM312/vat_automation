@@ -220,8 +220,8 @@ export default {
                     { new_items: 'seller_firm/PUSH_ITEMS' },
                     { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
                     { new_distance_sales: 'seller_firm/PUSH_DISTANCE_SALES' },
-                    { new_vatin: 'seller_firm/PUSH_VAT_NUMBERS' },
-                    { new_vatins: 'seller_firm/PUSH_VAT_NUMBERS' },
+                    { new_vat_number: 'seller_firm/PUSH_VAT_NUMBER' },
+                    { new_vat_numbers: 'seller_firm/PUSH_VAT_NUMBERS' },
                     { new_transaction_input: 'transaction_input/PUSH_TRANSACTION_INPUT' },
                     { new_transaction_inputs: 'transaction_input/PUSH_TRANSACTION_INPUTS_DIRECT' }
                 ],

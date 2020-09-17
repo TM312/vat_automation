@@ -106,7 +106,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_net.setter
     def item_price_net(self, value):
-        self._item_price_net = int(value * 100) if value is not None else None
+        self._item_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def item_price_discount_net(self):
@@ -114,7 +114,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_discount_net.setter
     def item_price_discount_net(self, value):
-        self._item_price_discount_net = int(value * 100) if value is not None else None
+        self._item_price_discount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def item_price_total_net(self):
@@ -122,7 +122,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_total_net.setter
     def item_price_total_net(self, value):
-        self._item_price_total_net = int(value * 100) if value is not None else None
+        self._item_price_total_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_net(self):
@@ -130,7 +130,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_net.setter
     def shipment_price_net(self, value):
-        self._shipment_price_net = int(value * 100) if value is not None else None
+        self._shipment_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_discount_net(self):
@@ -138,7 +138,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_discount_net.setter
     def shipment_price_discount_net(self, value):
-        self._shipment_price_discount_net = int(value * 100) if value is not None else None
+        self._shipment_price_discount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_total_net(self):
@@ -146,7 +146,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_total_net.setter
     def shipment_price_total_net(self, value):
-        self._shipment_price_total_net = int(value * 100) if value is not None else None
+        self._shipment_price_total_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_net(self):
@@ -154,7 +154,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_net.setter
     def gift_wrap_price_net(self, value):
-        self._gift_wrap_price_net = int(value * 100) if value is not None else None
+        self._gift_wrap_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_discount_net(self):
@@ -162,7 +162,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_discount_net.setter
     def gift_wrap_price_discount_net(self, value):
-        self._gift_wrap_price_discount_net = int(value * 100) if value is not None else None
+        self._gift_wrap_price_discount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_total_net(self):
@@ -170,7 +170,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_total_net.setter
     def gift_wrap_price_total_net(self, value):
-        self._gift_wrap_price_total_net = int(value * 100) if value is not None else None
+        self._gift_wrap_price_total_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def item_price_vat(self):
@@ -178,7 +178,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_vat.setter
     def item_price_vat(self, value):
-        self._item_price_vat = int(value * 100) if value is not None else None
+        self._item_price_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def item_price_discount_vat(self):
@@ -186,7 +186,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_discount_vat.setter
     def item_price_discount_vat(self, value):
-        self._item_price_discount_vat = int(value * 100) if value is not None else None
+        self._item_price_discount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def item_price_total_vat(self):
@@ -194,7 +194,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_total_vat.setter
     def item_price_total_vat(self, value):
-        self._item_price_total_vat = int(value * 100) if value is not None else None
+        self._item_price_total_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_vat(self):
@@ -202,7 +202,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_vat.setter
     def shipment_price_vat(self, value):
-        self._shipment_price_vat = int(value * 100) if value is not None else None
+        self._shipment_price_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_discount_vat(self):
@@ -210,7 +210,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_discount_vat.setter
     def shipment_price_discount_vat(self, value):
-        self._shipment_price_discount_vat = int(value * 100) if value is not None else None
+        self._shipment_price_discount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def shipment_price_total_vat(self):
@@ -218,7 +218,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_total_vat.setter
     def shipment_price_total_vat(self, value):
-        self._shipment_price_total_vat = int(value * 100) if value is not None else None
+        self._shipment_price_total_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_vat(self):
@@ -226,7 +226,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_vat.setter
     def gift_wrap_price_vat(self, value):
-        self._gift_wrap_price_vat = int(value * 100) if value is not None else None
+        self._gift_wrap_price_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_discount_vat(self):
@@ -234,7 +234,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_discount_vat.setter
     def gift_wrap_price_discount_vat(self, value):
-        self._gift_wrap_price_discount_vat = int(value * 100) if value is not None else None
+        self._gift_wrap_price_discount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_total_vat(self):
@@ -242,7 +242,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_total_vat.setter
     def gift_wrap_price_total_vat(self, value):
-        self._gift_wrap_price_total_vat = int(value * 100) if value is not None else None
+        self._gift_wrap_price_total_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def total_value_net(self):
@@ -250,7 +250,7 @@ class Transaction(db.Model):  # type: ignore
 
     @total_value_net.setter
     def total_value_net(self, value):
-        self._total_value_net = int(value * 100) if value is not None else None
+        self._total_value_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def total_value_vat(self):
@@ -258,7 +258,7 @@ class Transaction(db.Model):  # type: ignore
 
     @total_value_vat.setter
     def total_value_vat(self, value):
-        self._total_value_vat = int(value * 100) if value is not None else None
+        self._total_value_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def total_value_gross(self):
@@ -266,7 +266,7 @@ class Transaction(db.Model):  # type: ignore
 
     @total_value_gross.setter
     def total_value_gross(self, value):
-        self._total_value_gross = int(value * 100) if value is not None else None
+        self._total_value_gross = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def invoice_amount_net(self):
@@ -274,7 +274,7 @@ class Transaction(db.Model):  # type: ignore
 
     @invoice_amount_net.setter
     def invoice_amount_net(self, value):
-        self._invoice_amount_net = int(value * 100) if value is not None else None
+        self._invoice_amount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def invoice_amount_vat(self):
@@ -282,7 +282,7 @@ class Transaction(db.Model):  # type: ignore
 
     @invoice_amount_vat.setter
     def invoice_amount_vat(self, value):
-        self._invoice_amount_vat = int(value * 100) if value is not None else None
+        self._invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def invoice_amount_gross(self):
@@ -290,7 +290,7 @@ class Transaction(db.Model):  # type: ignore
 
     @invoice_amount_gross.setter
     def invoice_amount_gross(self, value):
-        self._invoice_amount_gross = int(value * 100) if value is not None else None
+        self._invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
     def vat_rate_reverse_charge(self):
@@ -298,7 +298,7 @@ class Transaction(db.Model):  # type: ignore
 
     @vat_rate_reverse_charge.setter
     def vat_rate_reverse_charge(self, value):
-        self._vat_rate_reverse_charge = int(value * 100) if value is not None else None
+        self._vat_rate_reverse_charge = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
@@ -307,7 +307,7 @@ class Transaction(db.Model):  # type: ignore
 
     @invoice_amount_vat_reverse_charge.setter
     def invoice_amount_vat_reverse_charge(self, value):
-        self._invoice_amount_vat_reverse_charge = int(value * 100) if value is not None else None
+        self._invoice_amount_vat_reverse_charge = int(round(value * 100)) if value is not None else None
 
 
 
@@ -318,7 +318,7 @@ class Transaction(db.Model):  # type: ignore
 
     @item_price_vat_rate.setter
     def item_price_vat_rate(self, value):
-        self._item_price_vat_rate = int(value * 10_000) if value is not None else None
+        self._item_price_vat_rate = int(round(value * 10_000)) if value is not None else None
 
     @hybrid_property
     def shipment_price_vat_rate(self):
@@ -326,7 +326,7 @@ class Transaction(db.Model):  # type: ignore
 
     @shipment_price_vat_rate.setter
     def shipment_price_vat_rate(self, value):
-        self._shipment_price_vat_rate = int(value * 10_000) if value is not None else None
+        self._shipment_price_vat_rate = int(round(value * 10_000)) if value is not None else None
 
     @hybrid_property
     def gift_wrap_price_vat_rate(self):
@@ -334,7 +334,7 @@ class Transaction(db.Model):  # type: ignore
 
     @gift_wrap_price_vat_rate.setter
     def gift_wrap_price_vat_rate(self, value):
-        self._gift_wrap_price_vat_rate = int(value * 10_000) if value is not None else None
+        self._gift_wrap_price_vat_rate = int(round(value * 10_000)) if value is not None else None
 
     @hybrid_property
     def invoice_exchange_rate(self):
@@ -342,7 +342,7 @@ class Transaction(db.Model):  # type: ignore
 
     @invoice_exchange_rate.setter
     def invoice_exchange_rate(self, value):
-        self._invoice_exchange_rate = int(value * 10_000) if value is not None else None
+        self._invoice_exchange_rate = int(round(value * 10_000)) if value is not None else None
 
 
 

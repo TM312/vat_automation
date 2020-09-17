@@ -10,7 +10,7 @@ FROM python:$PYTHON_VERSION
 # RUN echo "The PYTHON_VERSION is really: $PYTHON_VERSION"
 
 # Set maintainer
-LABEL maintainer="Thomas Moellers <thomas.moellers@unisg.ch>"
+LABEL maintainer="Thomas Moellers <tmoellers@protonmail.ch>"
 
 # Set the working directory
 WORKDIR /home

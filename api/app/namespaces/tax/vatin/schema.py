@@ -49,7 +49,7 @@ class VatinSchemaSocket:
         vatin_as_dict = {
             'country_code': vatin.country_code,
             'number': vatin.number,
-            'public_id': vatin.public_id,
+            'public_id': str(vatin.public_id),
             'created_on': str(vatin.created_on),
             'modified_at': str(vatin.modified_at),
             'request_date': str(vatin.request_date),
