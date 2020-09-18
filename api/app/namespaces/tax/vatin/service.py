@@ -271,7 +271,7 @@ class VATINService:
                         db.session.rollback()
                         # send error status via socket
                         message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
-                        SocketService.emit_status_error(original_filename, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
 
@@ -344,7 +344,7 @@ class VATINService:
         vat_numbers = VATINService.get_all_by_business_id(seller_firm_id)
         for vat_number in vat_numbers:
             # push new distance sale to vuex via socket
-            vat_number_json = DistanceSaleSubSchema.get_vat_number_sub(vat_number)
+            vat_number_json = VatinSchemaSocket.get_vatin_sub(vat_number)
 
             if len(vat_numbers) < 10:
                 SocketService.emit_new_object(vat_number_json, object_type)

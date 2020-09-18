@@ -66,8 +66,7 @@ class TaxRecordSellerFirmResource(Resource):
         return TaxRecordService.get_all_by_seller_firm_public_id(seller_firm_public_id)
 
     @login_required
-    @ns.marshal_with(tax_record_dto, envelope='data')
-    def post(self, seller_firm_public_id):
+    def post(self, seller_firm_public_id) -> Response:
         from app.tasks.asyncr import async_create_tax_record_by_seller_firm_public_id
 
         """Create for the indicated seller firm"""

@@ -190,22 +190,6 @@ export default {
         }
     },
 
-    toast: {
-        register: [
-            // Register custom toasts
-            // {
-            //   name: 'auth_success',
-            //   message: 'Successfully authenticated',
-            //   options: {
-            //     type: 'success',
-            //     theme: 'outline',
-            //     duration: 5000,
-            //     position: 'top-right'
-            //   }
-            // }
-        ],
-    },
-
     // https://medium.com/javascript-in-plain-english/introduction-to-nuxt-socket-io-b78c5322d389
     io: {
         sockets: [{
@@ -232,7 +216,9 @@ export default {
 
                     { clear_transaction_inputs: 'transaction_input/CLEAR_TRANSACTION_INPUTS' },
                     { new_transaction_input: 'transaction_input/PUSH_TRANSACTION_INPUT' },
-                    { new_transaction_inputs: 'transaction_input/PUSH_TRANSACTION_INPUTS_DIRECT' }
+                    { new_transaction_inputs: 'transaction_input/PUSH_TRANSACTION_INPUTS_DIRECT' },
+
+                    { new_tax_record: 'tax_record/PUSH_TAX_RECORD' }
                 ],
                 actions: [
                     { status: 'status/handle_status' },

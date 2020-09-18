@@ -461,13 +461,13 @@ class ItemHistoryService:
 
         # CASE EARLIER
         if not isinstance(item_history, ItemHistory):
-            print('CASE EARLIER', flush=True)
             #1.
             new_item_history = ItemHistory(item_id=item_id)
+            db.session.add(new_item_history)
             #2.
             item_history = ItemHistoryService.get_oldest(item_id)
             #3. and #4.
-            all_attr = {**item_history.__attr__(), **data_changes}
+            all_attr = {**item_history.attr_as_dict(), **data_changes}
             all_attr['valid_to'] = item_history.valid_from - timedelta(days=1)
             for key, val in all_attr.items():
                 setattr(new_item_history, key, val)
@@ -475,30 +475,34 @@ class ItemHistoryService:
         else:
             # CASE EQUAL
             if valid_from == item_history.valid_from:
-                print('CASE EQUAL', flush=True)
                 for key, val in data_changes.items():
                     setattr(item_history, key, val)
 
             # CASE LATER
             else:
-                print('CASE LATER', flush=True)
+                item_history = ItemHistoryService.get_current(item_id)
                 #1.
                 new_item_history = ItemHistory(item_id=item_id)
+                db.session.add(new_item_history)
                 #(2.) -> already exists
                 #3.
-                all_attr = {**item_history.__attr__(), **data_changes}
+                all_attr = {**item_history.attr_as_dict(), **data_changes}
                 all_attr['valid_from'] = valid_from
 
                 for key, val in all_attr.items():
                     setattr(new_item_history, key, val)
 
                 #4.
-                item_history.valid_to == valid_from - timedelta(days=1)
+                item_history.valid_to = valid_from - timedelta(days=1)
 
 
 
     @staticmethod
     def get_oldest(item_id: int) -> ItemHistory:
+        return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.asc()).first()
+
+    @staticmethod
+    def get_current(item_id: int) -> ItemHistory:
         return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.asc()).first()
 
     @staticmethod

@@ -23,7 +23,7 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'ToastDataUploadInvalidFile.vue',
+    name: 'ToastDataUploadInvalidFile',
 
     data() {
         return {

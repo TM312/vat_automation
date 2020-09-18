@@ -52,14 +52,16 @@ class DistanceSaleHistory(db.Model):  # type: ignore
 
     created_by = db.Column(db.Integer)
     original_filename = db.Column(db.String(128))
+    seller_firm_id = db.Column(db.Integer)
     arrival_country_code = db.Column(db.String(8))
     active = db.Column(db.Boolean)
 
     comment = db.Column(db.String(256))
 
-    def __attr__(self):
+    def attr_as_dict(self):
         return {
             'created_by': self.created_by,
+            'valid_from': self.valid_from,
             'original_filename': self.original_filename,
             'seller_firm_id': self.seller_firm_id,
             'arrival_country_code': self.arrival_country_code,

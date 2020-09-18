@@ -150,7 +150,7 @@ class ItemHistory(db.Model):  # type: ignore
     def __repr__(self):
         return "<ItemHistory {}-{}: {}>".format(str(self.valid_from), str(self.valid_to), self.unit_cost_price_net)
 
-    def __attr__(self):
+    def attr_as_dict(self):
         return {
             'created_by': self.created_by,
             'given_id': self.given_id,

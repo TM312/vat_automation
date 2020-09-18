@@ -10,7 +10,6 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
     'marketplace': fields.String,
     'given_id': fields.String,
     'transaction_type_public_code': fields.String,
-    'shipment_date': fields.Date,
     'complete_date': fields.Date,
     'item_sku': fields.String,
     'item_quantity': fields.Integer,
@@ -18,8 +17,6 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
     'currency_code': fields.String,
     'departure_country_code': fields.String,
     'arrival_country_code': fields.String,
-    'seller_firm_public_id': fields.String(attribute=lambda x: x.seller_firm.public_id, readonly=True),
-
 })
 
 
@@ -30,12 +27,14 @@ transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
     'original_filename': fields.String,
     'bundle_public_id': fields.String(attribute=lambda x: x.bundle.public_id, readonly=True),
     'processed_on': fields.DateTime,
+    'seller_firm_public_id': fields.String(attribute=lambda x: x.seller_firm.public_id, readonly=True),
 
 
     'transactions': fields.List(fields.Nested(transaction_dto)),
     'public_activity_period': fields.String,
     'account_given_id': fields.String,
 
+    'shipment_date': fields.Date,
     'arrival_date': fields.Date,
 
     'item_name': fields.String,
@@ -128,7 +127,6 @@ class TransactionInputSubSchema:
             'marketplace': transaction_input.marketplace,
             'given_id': transaction_input.given_id,
             'transaction_type_public_code': transaction_input.transaction_type_public_code,
-            'shipment_date': str(transaction_input.shipment_date),
             'complete_date': str(transaction_input.complete_date),
             'item_sku': transaction_input.item_sku,
             'item_quantity': transaction_input.item_quantity,
@@ -136,6 +134,6 @@ class TransactionInputSubSchema:
             'currency_code': transaction_input.currency_code,
             'departure_country_code': transaction_input.departure_country_code,
             'arrival_country_code': transaction_input.arrival_country_code,
-            'seller_firm_public_id': str(transaction_input.seller_firm_public_id)
+            # 'seller_firm_public_id': str(transaction_input.seller_firm.public_id)
         }
         return transaction_input_as_dict
