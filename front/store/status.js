@@ -7,6 +7,9 @@ export const state = () => ({
     seller_firm_targets: [],
     file_targets: [],
 
+    tax_record_target: [],
+    tax_record_targets: [],
+
     account_target_index: [],
     item_target_index: [],
     vat_number_target_index: [],
@@ -151,6 +154,10 @@ export const mutations = {
         state.file_targets.push(payload)
     },
 
+    PUSH_TAX_RECORD_TARGET(state, payload) {
+        state.tax_record_targets.push(payload)
+    },
+
 
 
 
@@ -252,6 +259,7 @@ export const mutations = {
         state.transaction_input_targets = []
         state.seller_firm_targets = []
         state.file_targets = []
+        state.tax_record_targets = []
 
         state.account_target_index = []
         state.item_target_index = []
@@ -319,6 +327,15 @@ export const mutations = {
         state.file_target_index = []
         state.file_targets_done = []
         state.file_totals = []
+    },
+
+    CLEAR_STATUS_TAX_RECORD_TARGETS(state) {
+        state.tax_record_targets = []
+        state.tax_record_target = []
+    },
+
+    POP_STATUS_TAX_RECORD_TARGETS(state) {
+        state.tax_record_target = state.tax_record_targets.pop()
     }
 }
 
@@ -348,29 +365,35 @@ export const actions = {
             var index = state.seller_firm_target_index.findIndex(e => e.target === status.target)
         } else if(status.object === 'file') {
         var index = state.file_target_index.findIndex(e => e.target === status.target)
-    }
-        const upperObject = status.object.toUpperCase()
-
-        if (index === -1) {
-            commit(`PUSH_${upperObject}_TARGET`, status)
-            commit(`PUSH_${upperObject}_TARGET_INDEX`, payload_target)
-            commit(`PUSH_${upperObject}_TOTALS`, payload_total)
-
-            if (!status.done) {
-                commit(`PUSH_${upperObject}_TARGET_DONE`, payload_done_false)
-            }
-        } else {
-            const payload_object = { status: status, index: index }
-            commit(`SET_${upperObject}_TARGET`, payload_object)
         }
 
-        if (status.done) {
+        const upperObject = status.object.toUpperCase()
+
+        if (status.object === 'tax_record') {
+            // simple push
+            commit(`PUSH_${upperObject}_TARGET`, status)
+        } else {
             if (index === -1) {
-                const payload_push_done = { done: true }
-                commit(`PUSH_${upperObject}_TARGET_DONE`, payload_push_done)
+                commit(`PUSH_${upperObject}_TARGET`, status)
+                commit(`PUSH_${upperObject}_TARGET_INDEX`, payload_target)
+                commit(`PUSH_${upperObject}_TOTALS`, payload_total)
+
+                if (!status.done) {
+                    commit(`PUSH_${upperObject}_TARGET_DONE`, payload_done_false)
+                }
             } else {
-                const payload_set_done = { done: true, index: index }
-                commit(`SET_${upperObject}_TARGET_DONE`, payload_set_done)
+                const payload_object = { status: status, index: index }
+                commit(`SET_${upperObject}_TARGET`, payload_object)
+            }
+
+            if (status.done) {
+                if (index === -1) {
+                    const payload_push_done = { done: true }
+                    commit(`PUSH_${upperObject}_TARGET_DONE`, payload_push_done)
+                } else {
+                    const payload_set_done = { done: true, index: index }
+                    commit(`SET_${upperObject}_TARGET_DONE`, payload_set_done)
+                }
             }
         }
     }

@@ -38,7 +38,7 @@ class TransactionInputService:
 
     @staticmethod
     def get_all_by_seller_firm_id(seller_firm_id: int) -> List[TransactionInput]:
-        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).limit(250).all()
+        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).limit(100).all()
 
     @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
@@ -291,7 +291,7 @@ class TransactionInputService:
         for i in range(total_number_transaction_inputs):
             current = i + 1
 
-            account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionService.get_df_vars(df, i, current, object_type)
+            account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionInputService.get_df_vars(df, i, current, object_type)
 
             try:
                 account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
@@ -491,7 +491,7 @@ class TransactionInputService:
                         db.session.rollback()
                         # send error status via socket
                         message = 'Error while processing {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current, original_filename)
-                        SocketService.emit_status_error(original_filename, object_type, message)
+                        SocketService.emit_status_error(object_type, message)
                         return False
 
 
@@ -502,7 +502,7 @@ class TransactionInputService:
         # first cleared
         SocketService.emit_clear_objects(object_type)
         # then refilled
-        TransactionInputService.push_all_by_seller_firm_id(seller_firm_id, object_type)
+        TransactionInputService.push_all_by_seller_firm_id(account.seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
@@ -520,8 +520,8 @@ class TransactionInputService:
             transaction_input_json = TransactionInputSubSchema.get_transaction_input_sub(transaction_input)
             socket_list.append(transaction_input_json)
 
-            if len(socket_list) > 0:
-                SocketService.emit_new_objects(socket_list, object_type)
+        if len(socket_list) > 0:
+            SocketService.emit_new_objects(socket_list, object_type)
 
 
 

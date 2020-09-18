@@ -107,14 +107,9 @@
 
 <script>
     import { mapState } from "vuex";
-    import { BIcon } from "bootstrap-vue";
 
     export default {
         name: 'FormAddSellerFirmTaxRecord',
-
-        components: {
-            BIcon
-        },
 
         data() {
             return {
@@ -365,30 +360,32 @@
             },
 
             async submitPayload() {
-                try {
-                    await this.create_by_seller_firm_public_id();
-
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    );
-                    this.$emit('flash')
-                    await this.$toast.success('New tax record succesfully added.', {
-                        duration: 5000
-                    });
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 });
-                }
+                // try {
+                // await this.create_by_seller_firm_public_id();
+                const seller_firm_public_id = this.$route.params.public_id
+                var tax_record_data = this.payload
+                await this.$repositories.tax_record.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
+                //     await this.$store.dispatch(
+                //         "seller_firm/get_by_public_id",
+                //         this.$route.params.public_id
+                //     );
+                //     this.$emit('flash')
+                //     await this.$toast.success('New tax record succesfully added.', {
+                //         duration: 5000
+                //     });
+                // } catch (error) {
+                //     this.$toast.error(error, { duration: 5000 });
+                // }
             },
 
-            async create_by_seller_firm_public_id() {
-                const data_array = [this.$route.params.public_id, this.payload]
+            // async create_by_seller_firm_public_id() {
+            //     const data_array = [this.$route.params.public_id, this.payload]
 
-                await this.$store.dispatch(
-                    "tax_record/create_by_seller_firm_public_id",
-                    data_array
-                );
-            },
+            //     await this.$store.dispatch(
+            //         "tax_record/create_by_seller_firm_public_id",
+            //         data_array
+            //     );
+            // },
         }
     }
 </script>

@@ -25,6 +25,8 @@
 
         <toasts-static-data-upload />
 
+        <toast-new-tax-record />
+
     </div>
 </template>
 

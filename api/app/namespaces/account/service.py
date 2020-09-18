@@ -34,7 +34,7 @@ class AccountService:
 
     @staticmethod
     def get_all_by_seller_firm_id(seller_firm_id: int) -> List[Account]:
-        return Item.query.filter_by(seller_firm_id=seller_firm_id).all()
+        return Account.query.filter_by(seller_firm_id=seller_firm_id).all()
 
     @staticmethod
     def get_by_id(account_id: int) -> Account:
@@ -195,7 +195,6 @@ class AccountService:
 
             account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
             if account:
-                print('found account for given_id: {} | channel_code: {} --> {}'.format(given_id, channel_code, account), flush=True)
                 if not duplicate_counter > 2:
                     message = 'The account "{}-{}" has already been registered and skipped consequently.'.format(channel_code, given_id)
                     SocketService.emit_status_info(object_type, message)
@@ -252,7 +251,7 @@ class AccountService:
             # push accounts to vuex via socket
             account_json = AccountSubSchema.get_account_sub(account)
 
-            if len(items) < 10:
+            if len(accounts) < 10:
                 SocketService.emit_new_object(account_json, object_type)
             else:
                 socket_list.append(account_json)

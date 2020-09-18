@@ -4,6 +4,13 @@ export const state = () => ({
 })
 
 export const mutations = {
+
+    CLEAR_TRANSACTION_INPUTS(state) {
+        while (state.transaction_inputs.length) {
+            state.transaction_inputs.pop()
+        }
+    },
+
     SET_TRANSACTION_INPUTS(state, payload) {
         state.transaction_inputs = payload
     },

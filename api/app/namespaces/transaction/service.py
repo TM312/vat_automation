@@ -15,6 +15,8 @@ from . import TransactionType, Transaction
 from .interface import TransactionInterface
 
 from ..account import Account
+from ..distance_sale import DistanceSale, DistanceSaleHistory
+from ..distance_sale.service import DistanceSaleService, DistanceSaleHistoryService
 from ..transaction_input import TransactionInput
 from ..transaction_input.interface import TransactionInputInterface
 from ..bundle import Bundle
@@ -31,6 +33,8 @@ from ..tax.tax_code.service import TaxCodeService
 from ..tax.vat.service import VatService
 from ..business.seller_firm import SellerFirm
 from ..utils.service import HelperService, NotificationService
+
+from app.extensions.socketio.emitters import SocketService
 
 
 
@@ -80,18 +84,57 @@ class TransactionService:
         item_sku = transaction_input.item_sku
 
         #!!!!!! here in function socket integration
-        account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
+        try:
+            account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
+            return False
+
         platform_code = account.channel.platform_code
-        transaction_type = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, platform_code)
+
+        try:
+            transaction_type = TransactionService.get_transaction_type_by_public_code_account(transaction_input.transaction_type_public_code, platform_code)
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'transaction type', current)
+            return False
+
+        try:
+            tax_date = TransactionService.get_tax_date(transaction_type, transaction_input)
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'tax date', current)
+            return False
+
+        try:
+            item = ItemService.get_by_sku_account(transaction_input.item_sku, account)
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
+            return False
 
 
         # define foundational vars
-        tax_date = TransactionService.get_tax_date(transaction_type, transaction_input)
-        item = ItemService.get_by_sku_account(transaction_input.item_sku, account)
         bundle = BundleService.get_by_id(transaction_input.bundle_id)
-        arrival_country = TransactionService.get_country(transaction_input, platform_code, bundle.id, transaction_type.code, country_type='arrival')
-        departure_country = TransactionService.get_country(transaction_input, platform_code, bundle.id, transaction_type.code, country_type='departure')
-        eu = CountryService.get_eu_by_date(tax_date)
+
+        try:
+            arrival_country = TransactionService.get_country(transaction_input, platform_code, bundle.id, transaction_type.code, country_type='arrival')
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'arrival country', current)
+            return False
+
+        try:
+            departure_country = TransactionService.get_country(transaction_input, platform_code, bundle.id, transaction_type.code, country_type='departure')
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'departure country', current)
+            return False
+
+        try:
+            eu = CountryService.get_eu_by_date(tax_date)
+        except:
+            SocketService.emit_status_error_unidentifiable_object(object_type, 'eu', current)
+            return False
+
+
+
+
 
         customer_vat_check_required: bool = TransactionService.vat_check_required(tax_date=tax_date, number=transaction_input.customer_firm_vat_number)
 
@@ -103,9 +146,7 @@ class TransactionService:
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             tax_treatment_code = TransactionService.get_tax_treatment_code(transaction_type.code, account.seller_firm_id, account.seller_firm.establishment_country_code, transaction_input, eu, customer_relationship, departure_country.code, arrival_country, amazon_vat_calculation_service, tax_date)
-
             new_transaction = TransactionService.calculate_transaction_vars(transaction_input, transaction_type, account, tax_treatment_code, tax_date, item, bundle, arrival_country, departure_country, eu, customer_relationship, customer_firm_vatin, customer_relationship_checked, amazon_vat_calculation_service, customer_vat_check_required)
-
             # check for special case: non taxable distance sale
             if new_transaction.tax_treatment_code == 'DISTANCE_SALE':
                 tax_treatment_code = 'NON_TAXABLE_DISTANCE_SALE'
@@ -468,10 +509,8 @@ class TransactionService:
             departure_country_code: str,
             arrival_country: Country,
             amazon_vat_calculation_service: bool,
-            tax_date: date,
-            **kwargs) -> str:
+            tax_date: date) -> str:
 
-        from ..distance_sale.service import DistanceSaleHistoryService
 
         if transaction_type_code == 'SALE' or transaction_type_code == 'REFUND':
 
@@ -494,9 +533,17 @@ class TransactionService:
 
 
             elif customer_relationship == "B2C":
-                active = DistanceSaleHistoryService.get_active(seller_firm_id=seller_firm_id, arrival_country_code=arrival_country.code, date=tax_date)
 
-                if departure_country_code != arrival_country.code and active:
+                distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country.code, seller_firm_id)
+                distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, tax_date) if isinstance(distance_sale, DistanceSale) else None
+
+                distance_sale_history_active = (
+                    distance_sale_history.active
+                    if isinstance(distance_sale_history, DistanceSaleHistory) and isinstance(distance_sale, DistanceSale)
+                    else False
+                )
+
+                if departure_country_code != arrival_country.code and distance_sale_history_active:
                     tax_treatment_code = 'DISTANCE_SALE'
 
                 else:
@@ -505,8 +552,6 @@ class TransactionService:
         elif transaction_type_code == 'ACQUISITION':
             tax_treatment_code = 'LOCAL_ACQUISITION'
 
-        elif transaction_type_code == 'MOVEMENT' or transaction_type_code == 'INBOUND':
-            tax_treatment_code = kwargs.get('tax_treatment_code')
 
         return tax_treatment_code
 
@@ -515,14 +560,14 @@ class TransactionService:
     def get_country(transaction_input: TransactionInput, platform_code: str, bundle_id: int, transaction_type_code: str, country_type: str) -> Country:
         if transaction_type_code == 'REFUND':
             sale_transaction = TransactionService.get_sale_transaction_by_platform_code_bundle_id(platform_code, bundle_id)
-            if sale_transaction:
+            if isinstance(sale_transaction, Transaction):
                 if country_type == 'arrival':
                     country = sale_transaction.arrival_country
                 elif country_type == 'departure':
                     country = sale_transaction.departure_country
-
                 else:
                     raise
+
             else:
                 if country_type == 'arrival':
                     country_code = transaction_input.sale_arrival_country_code
@@ -542,7 +587,11 @@ class TransactionService:
             else:
                 country = CountryService.get_by_code(transaction_input.departure_country_code)
 
-        return country
+        if not isinstance(country, Country):
+            raise
+
+        else:
+            return country
 
 
     @staticmethod
@@ -594,7 +643,6 @@ class TransactionService:
 
     @staticmethod
     def get_tax_date(transaction_type: TransactionType, transaction_input: TransactionInput) -> date:
-        print('transaction_type: ', transaction_type, flush=True)
         if transaction_type.code == 'SALE':
             tax_date = transaction_input.shipment_date
 
@@ -721,12 +769,12 @@ class TransactionService:
 
             if transaction_type.code == "REFUND":
                 sale_transaction = TransactionService.get_sale_transaction_by_platform_code_bundle_id(platform_code, bundle_id)
-
-                if sale_transaction:
+                if isinstance(sale_transaction, Transaction):
                     exchange_rate_date = sale_transaction.invoice_exchange_rate_date
 
                 else:
                     exchange_rate_date = tax_date - timedelta(days=1)
+
 
             else:
                 exchange_rate_date = tax_date - timedelta(days=1)
@@ -837,7 +885,5 @@ class TransactionService:
                 item_tax_code_code = calculated_item_tax_code_code
         else:
             item_tax_code_code = calculated_item_tax_code_code
-
-        print('item_tax_code: {} | calulcated_tax_code: {}'.format(item_tax_code_code, calculated_item_tax_code_code), flush=True)
 
         return item_tax_code_code, calculated_item_tax_code_code
