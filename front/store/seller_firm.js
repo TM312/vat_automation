@@ -5,6 +5,32 @@ export const state = () => ({
 
 
 export const mutations = {
+
+    CLEAR_ACCOUNTS(state) {
+        while (state.seller_firm.accounts.length) {
+            state.seller_firm.accounts.pop()
+        }
+    },
+
+    CLEAR_ITEMS(state) {
+        while (state.seller_firm.items.length) {
+            state.seller_firm.items.pop()
+        }
+    },
+
+    CLEAR_VAT_NUMBERS(state) {
+        while (state.seller_firm.vat_numbers.length) {
+            state.seller_firm.vat_numbers.pop()
+        }
+    },
+
+    CLEAR_DISTANCE_SALES(state) {
+        while (state.seller_firm.distance_sales.length) {
+            state.seller_firm.distance_sales.pop()
+        }
+    },
+
+
     SET_SELLER_FIRMS(state, seller_firms) {
         state.seller_firms = seller_firms
     },

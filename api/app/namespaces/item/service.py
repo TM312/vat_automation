@@ -25,8 +25,12 @@ from app.extensions.socketio.emitters import SocketService
 class ItemService:
     @staticmethod
     def get_all() -> List[Item]:
-        items = Item.query.all()
-        return items
+        return Item.query.all()
+
+    @staticmethod
+    def get_all_by_seller_firm_id(seller_firm_id: int) -> List[Item]:
+        return Item.query.filter_by(seller_firm_id = seller_firm_id).all()
+
 
     @staticmethod
     def get_by_id(item_id: int) -> Item:
@@ -212,13 +216,13 @@ class ItemService:
             return False
 
         try:
-            unit_cost_price_net = InputService.get_float(df, i, column='unit_cost_price_net')
+            unit_cost_price_net = InputService.get_float_or_None(df, i, column='unit_cost_price_net')
         except:
             SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_net')
             return False
 
         try:
-            unit_cost_price_currency_code = InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code')
+            unit_cost_price_currency_code = InputService.get_str(df, i, column='unit_cost_price_currency_code')
         except:
             SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_currency_code')
             return False
@@ -243,13 +247,13 @@ class ItemService:
             return False
 
         try:
-            weight_kg = InputService.get_str_or_None(df, i, column='weight_kg')
+            weight_kg = InputService.get_float_or_None(df, i, column='weight_kg')
         except:
             SocketService.emit_status_error_column_read(current, object_type, column_name='weight_kg')
             return False
 
         try:
-            tax_code_code = InputService.get_str_or_None(df, i, column='tax_code')
+            tax_code_code = InputService.get_str(df, i, column='tax_code')
         except:
             SocketService.emit_status_error_column_read(current, object_type, column_name='tax_code')
             return False
@@ -266,41 +270,62 @@ class ItemService:
         total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = object_type_human_read = 'item'
-        item_socket_list = []
         duplicate_list = []
         duplicate_counter = 0
-        sku_list = []
-
 
 
         if not seller_firm_id:
             SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
+        # send status update via socket
+        SocketService.emit_status_success(0, total, original_filename, object_type)
+
         for i in range(total_number_items):
             current = i + 1
 
             sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type)
+            if not (
+                isinstance(sku, str) and
+                isinstance(unit_cost_price_net, (float, int, complex)) and
+                isinstance(unit_cost_price_currency_code, str) and
+                isinstance(valid_from, date)
+            ):
+                return False
 
             item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
+
+            item_data = {
+                'valid_from': valid_from,
+                'created_by': user_id,
+                'original_filename': original_filename,
+                'sku': sku,
+                'seller_firm_id': seller_firm_id,
+                'brand_name': brand_name,
+                'name': name,
+                'weight_kg': weight_kg,
+                'tax_code_code': tax_code_code,
+                'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                'unit_cost_price_net': unit_cost_price_net
+            }
+
+            # handling item updates
             if isinstance(item, Item):
-                if item.name == name and item.unit_cost_price_net == unit_cost_price_net:
-                    if item.brand_name != brand_name or item.weight_kg != weight_kg or item.tax_code_code != tax_code_code:
-                        data_changes = {
-                            'brand_name': brand_name,
-                            'weight_kg': weight_kg,
-                            'tax_code_code': tax_code_code
-                        }
-                        try:
-                            item.update(data_changes)
+                item_history = ItemHistoryService.get_by_item_id_date(item.id, valid_from)
+                if isinstance(item_history, ItemHistory):
 
-                        except:
-                            db.session.rollback()
-                            message = 'Error at updating {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
-                            SocketService.emit_status_error(object_type, message)
-                            return False
-
-                    else:
+                    # handling exact duplicates of relevant state
+                    if (
+                        item_history.valid_from == valid_from
+                        and item_history.sku == sku
+                        and item_history.seller_firm_id == seller_firm_id
+                        and item_history.brand_name == brand_name
+                        and item_history.name == name
+                        and item_history.weight_kg == weight_kg
+                        and item_history.tax_code_code == tax_code_code
+                        and item_history.unit_cost_price_currency_code == unit_cost_price_currency_code
+                        and item_history.unit_cost_price_net == unit_cost_price_net
+                        ):
                         if not duplicate_counter > 2:
                             message = 'An item with the given sku "{}" already exists. Registration has been skipped consequently.'.format(sku)
                             SocketService.emit_status_info(object_type, message)
@@ -310,56 +335,27 @@ class ItemService:
                         duplicate_counter += 1
                         continue
 
-                else:
-                    item_history = ItemHistoryService.get_by_item_id_date(item.id, valid_from)
-                    data_changes = {
-                        'name': name,
-                        'unit_cost_price_net': unit_cost_price_net,
-                        'unit_cost_price_currency_code': unit_cost_price_currency_code
-                    }
 
-                    try:
-                        if item_history.valid_from != valid_from:
-                            item.update(data_changes, valid_from=valid_from)
+                    # updating item
+                    else:
+                        data_changes = item_data
+                        try:
+                            item.update(data_changes)
+                            db.session.commit()
 
-                        else:
-                            item.update(data_changes, valid_from=item_history.valid_from)
-                        db.session.commit()
-
-                    except:
-                        db.session.rollback()
-                        message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
-                        SocketService.emit_status_error(object_type, message)
-                        return False
+                        except:
+                            db.session.rollback()
+                            message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
+                            SocketService.emit_status_error(object_type, message)
+                            return False
 
 
+            # handling new item
             else:
-                if sku not in sku_list:
-                    sku_list.append(sku)
-
-                item_data = {
-                    'created_by': user_id,
-                    'original_filename': original_filename,
-                    'sku': sku,
-                    'seller_firm_id': seller_firm_id,
-                    'brand_name': brand_name,
-                    'name': name,
-                    # 'ean': InputService.get_str_or_None(df, i, column='ean'),
-                    # 'asin': InputService.get_str_or_None(df, i, column='asin'),
-                    # 'fnsku': InputService.get_str_or_None(df, i, column='fnsku'),
-                    'weight_kg': weight_kg,
-                    'tax_code_code': tax_code_code,
-                    'unit_cost_price_currency_code': unit_cost_price_currency_code,
-                    'unit_cost_price_net': unit_cost_price_net
-                }
-
                 try:
                     new_item = ItemService.create(item_data)
-
                 except:
                     db.session.rollback()
-
-                    # send error status via socket
                     message = 'Error at {} with sku "{}" (file: {}). Please recheck.'.format(object_type_human_read, sku, original_filename)
                     SocketService.emit_status_error(object_type, message)
                     return False
@@ -367,20 +363,11 @@ class ItemService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
-
-        for sku in sku_list:
-            # push new distance sale to vuex via socket
-            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
-            item_schema_sub = ItemSubSchema.get_item_sub(item   )
-
-            if len(sku_list) < 10:
-                SocketService.emit_new_object(item_schema_sub, object_type)
-            else:
-                item_socket_list.append(item_schema_sub)
-
-        if len(item_socket_list) > 0:
-            SocketService.emit_new_objects(item_socket_list, object_type)
-            item_socket_list = []
+        # following the succesful processing, the vuex store is being reset
+        # first cleared
+        SocketService.emit_clear_objects(object_type)
+        # then refilled
+        ItemService.push_all_by_seller_firm_id(seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
@@ -390,13 +377,30 @@ class ItemService:
 
     # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
 
+    @staticmethod
+    def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
+        socket_list = []
+        items = ItemService.get_all_by_seller_firm_id(seller_firm_id)
+        for item in items:
+            # push new distance sale to vuex via socket
+            item_schema_sub = ItemSubSchema.get_item_sub(item)
+
+            if len(items) < 10:
+                SocketService.emit_new_object(item_schema_sub, object_type)
+            else:
+                socket_list.append(item_schema_sub)
+
+        if len(socket_list) > 0:
+            SocketService.emit_new_objects(socket_list, object_type)
+
 
     @staticmethod
     def create(item_data: ItemInterface) -> Item:
         new_item = Item(
             created_by = item_data.get('created_by'),
-            active=item_data.get('active'),
-            category_id=item_data.get('category_id'),
+            given_id = item_data.get('given_id'),
+            active = item_data.get('active'),
+            category_id = item_data.get('category_id'),
             original_filename = item_data.get('original_filename'),
             sku = item_data.get('sku'),
             seller_firm_id = item_data.get('seller_firm_id'),
@@ -414,7 +418,12 @@ class ItemService:
         db.session.add(new_item)
         db.session.commit()
 
-        ItemHistoryService.create(item_data, new_item.id)
+        item_data['item_id'] = new_item.id
+        try:
+            ItemHistoryService.create(item_data)
+        except:
+            db.session.rollback()
+            raise
 
         return new_item
 
@@ -422,6 +431,75 @@ class ItemService:
 
 
 class ItemHistoryService:
+
+    @staticmethod
+    def handle_update(item_id, data_changes):
+
+        """
+        When updating 3 cases can exist:
+
+        CASE EARLIER: The update's valid_from attribute is EARLIER than any other item history object.
+            1. New item history is created
+            2. Oldest item history retrieved
+            3. Missing data change attributes complemented by those from oldest item history
+            4. New item history valid_to == oldest item history valid_from - timedelta(days=1)
+
+        CASE EQUAL: The update's valid_from attribute is EQUAL to another item history object.
+            1. Data changes are implemented for the retrieved item history object
+
+        CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid item history object.
+            1. New item history is created
+            2. Current item history retrieved
+            3. Missing data change attributes complemented by those from item history
+            4. Current item history valid_to == new item history valid_from - timedelta(days=1)
+
+        """
+
+        # Trying to retrieve item history to decide case
+        valid_from = data_changes['valid_from']
+        item_history = ItemHistoryService.get_by_item_id_date(item_id, valid_from)
+
+        # CASE EARLIER
+        if not isinstance(item_history, ItemHistory):
+            print('CASE EARLIER', flush=True)
+            #1.
+            new_item_history = ItemHistory(item_id=item_id)
+            #2.
+            item_history = ItemHistoryService.get_oldest(item_id)
+            #3. and #4.
+            all_attr = {**item_history.__attr__(), **data_changes}
+            all_attr['valid_to'] = item_history.valid_from - timedelta(days=1)
+            for key, val in all_attr.items():
+                setattr(new_item_history, key, val)
+
+        else:
+            # CASE EQUAL
+            if valid_from == item_history.valid_from:
+                print('CASE EQUAL', flush=True)
+                for key, val in data_changes.items():
+                    setattr(item_history, key, val)
+
+            # CASE LATER
+            else:
+                print('CASE LATER', flush=True)
+                #1.
+                new_item_history = ItemHistory(item_id=item_id)
+                #(2.) -> already exists
+                #3.
+                all_attr = {**item_history.__attr__(), **data_changes}
+                all_attr['valid_from'] = valid_from
+
+                for key, val in all_attr.items():
+                    setattr(new_item_history, key, val)
+
+                #4.
+                item_history.valid_to == valid_from - timedelta(days=1)
+
+
+
+    @staticmethod
+    def get_oldest(item_id: int) -> ItemHistory:
+        return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.asc()).first()
 
     @staticmethod
     def get_by_item_id_date(item_id: int, date: date):
@@ -432,19 +510,36 @@ class ItemHistoryService:
             ).first()
 
     @staticmethod
-    def create(item_data, item_id):
+    def create(item_data) -> ItemHistory:
 
         # create new item history
         new_item_history = ItemHistory(
             valid_from=item_data.get('valid_from'),
+            valid_to=item_data.get('valid_to'),
+            item_id=item_data.get('item_id'),
+
+            created_by = item_data.get('created_by'),
+            given_id = item_data.get('given_id'),
+            active = item_data.get('active'),
+            category_id = item_data.get('category_id'),
+            original_filename = item_data.get('original_filename'),
+            sku = item_data.get('sku'),
+            seller_firm_id = item_data.get('seller_firm_id'),
+            brand_name = item_data.get('brand_name'),
+            name = item_data.get('name'),
+            ean = item_data.get('ean'),
+            asin = item_data.get('asin'),
+            fnsku = item_data.get('fnsku'),
+            weight_kg = item_data.get('weight_kg'),
+            tax_code_code = item_data.get('tax_code_code'),
             unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
-            unit_cost_price_net=item_data.get('unit_cost_price_net'),
-            name=item_data.get('name'),
-            item_id=item_id
+            unit_cost_price_net = item_data.get('unit_cost_price_net')
         )
 
         db.session.add(new_item_history)
         db.session.commit()
+
+        return new_item_history
 
 
 

@@ -31,8 +31,11 @@ from app.extensions.socketio.emitters import SocketService
 class VATINService:
     @staticmethod
     def get_all() -> List[VATIN]:
-        vatins = VATIN.query.all()
-        return vatins
+        return VATIN.query.all()
+
+    @staticmethod
+    def get_all_by_business_id(business_id: int) -> List[VATIN]:
+        return VATIN.query.filter_by(business_id = business_id).all()
 
     @staticmethod
     def get_by_id(vatin_id: int) -> VATIN:
@@ -191,6 +194,32 @@ class VATINService:
         return response_object
 
 
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+        try:
+            country_code, number = VATINService.get_vat_from_df(df, i)
+        except:
+            # send error status via socket
+            message = 'Can not read country code/number of {} in row {} (file: {}).'.format(current, object_type_human_read, original_filename)
+            SocketService.emit_status_error(object_type, message)
+            return False
+
+        try:
+            service_start_date = current_app.config.SERVICE_START_DATE
+            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            if isinstance(valid_from, date):
+                valid_from = valid_from if valid_from >= service_start_date else service_start_date
+            else:
+                tolerance = current_app.config.OLD_TRANSACTION_TOLERANCE_DAYS
+                valid_from = date.today() - timedelta(days=tolerance)
+
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
+            return False
+
+        return country_code, number, valid_from
+
+
 
     @staticmethod
     def create_vatins(df: pd.DataFrame, file_path_in: str, seller_firm_id: int) -> List[Dict]:
@@ -203,25 +232,21 @@ class VATINService:
         object_type_human_read = 'vat number'
         duplicate_list = []
         duplicate_counter = 0
-        vatin_socket_list = []
 
         if not seller_firm_id:
             # send error status via socket
             SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
+        # send status update via socket
+        SocketService.emit_status_success(0, total, original_filename, object_type)
+
         for i in range(total_number_vatins):
             current = i + 1
-            try:
-                country_code, number = VATINService.get_vat_from_df(df, i)
-            except:
-                # send error status via socket
-                message = 'Can not read country code/number of {} in row {} (file: {}).'.format(current, object_type_human_read, original_filename)
-                SocketService.emit_status_error(object_type, message)
-                return False
 
-            if (country_code is None or number is None):
-                continue
+            country_code, number, valid_from = VATINService.get_df_vars(df, i, current, object_type)
+            if not isinstance(country_code, str) and isinstance(number, str) and isinstance(valid_from, date):
+                return False
 
             vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
@@ -249,7 +274,6 @@ class VATINService:
                         SocketService.emit_status_error(original_filename, object_type, message)
                         return False
 
-                    vatin_socket_list = VATINService.push_to_vuex(vatin, object_type, vatin_socket_list, current, total)
 
             else:
                 # VIES DB is unreliable therefore reducing requests per second
@@ -260,10 +284,7 @@ class VATINService:
                     vatin_data = {
                         'country_code': country_code,
                         'number': number,
-                        'valid': None,
                         'request_date': date.today(),
-                        'name': None,
-                        'address': None
                     }
 
                     # send error status via socket
@@ -272,22 +293,6 @@ class VATINService:
 
                 vatin_data['business_id'] = seller_firm_id
                 vatin_data['original_filename'] = original_filename,
-
-                try:
-                    service_start_date = current_app.config.SERVICE_START_DATE
-                    valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-                    if isinstance(valid_from, date):
-                        valid_from = valid_from if valid_from >= service_start_date else service_start_date
-                    else:
-                        tolerance = current_app.config.OLD_TRANSACTION_TOLERANCE_DAYS
-                        valid_from = date.today() - timedelta(days=tolerance)
-
-                except:
-                    SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
-                    return False
-
-
-
                 vatin_data['valid_from'] = valid_from
 
                 if vatin and vatin_data['valid'] != None:
@@ -315,12 +320,15 @@ class VATINService:
                         SocketService.emit_status_error(object_type, message)
                         return False
 
-
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
-                vatin_socket_list = VATINService.push_to_vuex(vatin, object_type, vatin_socket_list, current, total)
 
+        # following the succesful processing, the vuex store is being reset
+        # first cleared
+        SocketService.emit_clear_objects(object_type)
+        # then refilled
+        VATINService.push_all_by_seller_firm_id(seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
@@ -328,21 +336,24 @@ class VATINService:
         return True
 
 
+    # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
+
     @staticmethod
-    def push_to_vuex(vatin: VATIN, object_type: str, vatin_socket_list: List, current: int, total: int):
-        # push new distance sale to vuex via socket
-        vatin_schema = VatinSchemaSocket.get_vatin_sub(vatin)
+    def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
+        socket_list = []
+        vat_numbers = VATINService.get_all_by_business_id(seller_firm_id)
+        for vat_number in vat_numbers:
+            # push new distance sale to vuex via socket
+            vat_number_json = DistanceSaleSubSchema.get_vat_number_sub(vat_number)
 
-        if total < 10:
-            SocketService.emit_new_object(vatin_schema, object_type)
+            if len(vat_numbers) < 10:
+                SocketService.emit_new_object(vat_number_json, object_type)
+            else:
+                socket_list.append(vat_number_json)
 
-        else:
-            vatin_socket_list.append(vatin_schema)
-            if current % 10 == 0 or current == total:
-                SocketService.emit_new_objects(vatin_socket_list, object_type)
-                vatin_socket_list = []
+        if len(socket_list) > 0:
+            SocketService.emit_new_objects(socket_list, object_type)
 
-        return vatin_socket_list
 
 
 

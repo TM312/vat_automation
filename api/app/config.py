@@ -70,7 +70,7 @@ class Config(object):
     TRANSACTION_DATA_ALLOWED_EXTENSIONS = ['txt', 'csv']
 
     STANDARD_SERVICE_TAX_RATE_TYPE = 'S'
-    TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2030', '%d-%m-%Y').date()
+    TAX_DEFAULT_VALIDITY = datetime.strptime('31-12-2035', '%d-%m-%Y').date()
     VATIN_LIFESPAN = 32 # in days
     OLD_TRANSACTION_TOLERANCE_DAYS = 100
     SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
