@@ -30,8 +30,11 @@ class AccountService:
 
     @staticmethod
     def get_all() -> List[Account]:
-        accounts = Account.query.all()
-        return accounts
+        return Account.query.all()
+
+    @staticmethod
+    def get_all_by_seller_firm_id(seller_firm_id: int) -> List[Account]:
+        return Item.query.filter_by(seller_firm_id=seller_firm_id).all()
 
     @staticmethod
     def get_by_id(account_id: int) -> Account:
@@ -123,7 +126,6 @@ class AccountService:
 
 
 
-
     @staticmethod
     def handle_account_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
@@ -133,6 +135,32 @@ class AccountService:
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_object
+
+
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+        try:
+            given_id = InputService.get_str(df, i, column='account_id')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='account_id')
+            return False
+
+        if not given_id or given_id == '':
+            SocketService.emit_status_error_no_value(current, object_type, column_name='account_id')
+            return False
+
+        try:
+            channel_code = InputService.get_str(df, i, column='channel_code')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='channel_code')
+            return False
+
+        if not channel_code or channel_code == '':
+            SocketService.emit_status_error_no_value(current, object_type, column_name='channel_code')
+            return False
+
+        return given_id, channel_code
+
 
 
 
@@ -145,7 +173,6 @@ class AccountService:
         total = total_number_accounts = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = object_type_human_read = 'account'
-        account_socket_list = []
         duplicate_list = []
         duplicate_counter = 0
 
@@ -155,32 +182,16 @@ class AccountService:
             SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
+         # send status update via socket
+        SocketService.emit_status_success(0, total, original_filename, object_type)
+
         for i in range(total_number_accounts):
             current = i + 1
 
-            try:
-                given_id = InputService.get_str(df, i, column='account_id')
-            except:
-                # send error status via socket
-                SocketService.emit_status_error_column_read(current, object_type, column_name='account_id')
+            given_id, channel_code = AccountService.get_df_vars(df, i, current, object_type)
+            if not isinstance(given_id, str) and isinstance(channel_code, str):
                 return False
 
-            if not given_id or given_id == '':
-                # send error status via socket
-                SocketService.emit_status_error_no_value(current, object_type, column_name='account_id')
-                return False
-
-            try:
-                channel_code = InputService.get_str(df, i, column='channel_code')
-            except:
-                # send error status via socket
-                SocketService.emit_status_error_column_read(current, object_type, column_name='channel_code')
-                return False
-
-            if not channel_code or channel_code == '':
-                # send error status via socket
-                SocketService.emit_status_error_no_value(current, object_type, column_name='channel_code')
-                return False
 
             account = AccountService.get_by_given_id_channel_code(given_id, channel_code)
             if account:
@@ -220,21 +231,35 @@ class AccountService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
-                # push new distance sale to vuex via socket
-                account_json = AccountSubSchema.get_account_sub(new_account)
-                if total < 10:
-                    SocketService.emit_new_object(account_json, object_type)
-
-                else:
-                    account_socket_list.append(account_json)
-                    if current % 10 == 0 or current == total:
-                        SocketService.emit_new_objects(account_socket_list, object_type)
-                        account_socket_list = []
+        # following the succesful processing, the vuex store is being reset
+        # first cleared
+        SocketService.emit_clear_objects(object_type)
+        # then refilled
+        AccountService.push_all_by_seller_firm_id(seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
         return True
+
+
+    @staticmethod
+    def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
+        socket_list = []
+        accounts = AccountService.get_all_by_seller_firm_id(seller_firm_id)
+
+        for account in accounts:
+            # push accounts to vuex via socket
+            account_json = AccountSubSchema.get_account_sub(account)
+
+            if len(items) < 10:
+                SocketService.emit_new_object(account_json, object_type)
+            else:
+                socket_list.append(account_json)
+
+
+            if len(socket_list) > 0:
+                SocketService.emit_new_objects(socket_list, object_type)
 
 
 

@@ -23,6 +23,10 @@ class DistanceSaleService:
         return DistanceSale.query.all()
 
     @staticmethod
+    def get_all_by_seller_firm_id(seller_firm_id: int) -> List[DistanceSale]:
+        return DistanceSale.query.filter_by(seller_firm_id = seller_firm_id).all()
+
+    @staticmethod
     def get_by_id(distance_sale_id: int) -> DistanceSale:
         return DistanceSale.query.get(distance_sale_id)
 
@@ -72,7 +76,7 @@ class DistanceSaleService:
                 if distance_sale.active == active or active == DistanceSaleHistoryService.get_active(seller_firm_id, arrival_country_code, valid_from):
                     return distance_sale
                 else:
-                    distance_sale_history = DistanceSaleHistoryService.get_by_ds_id_date(distance_sale.id, valid_from)
+                    distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, valid_from)
                     data_changes = {
                         'active':  active
                     }
@@ -133,8 +137,6 @@ class DistanceSaleService:
         return distance_sale
 
 
-
-
     @staticmethod
     def handle_distance_sale_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
@@ -144,6 +146,37 @@ class DistanceSaleService:
         InputService.move_file_to_out(file_path_in, basepath, file_type)
 
         return response_object
+
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+        try:
+            service_start_date = current_app.config.SERVICE_START_DATE
+            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+            if isinstance(valid_from, date):
+                valid_from = valid_from if valid_from >= service_start_date else service_start_date
+            else:
+                valid_from = date.today()
+
+        except:
+            # send error status via socket
+            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
+            return False
+
+        try:
+            arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
+        except:
+            # send error status via socket
+            SocketService.emit_status_error_column_read(current, object_type, column_name='arrival_country_code')
+            return False
+
+        try:
+            active = InputService.get_bool(df, i, column='active', value_true=True)
+        except:
+            # send error status via socket
+            SocketService.emit_status_error_column_read(current, object_type, column_name='active')
+            return False
+
+        return valid_from, arrival_country_code, active
 
 
 
@@ -155,10 +188,8 @@ class DistanceSaleService:
         original_filename = os.path.basename(file_path_in)[:128]
         object_type = 'distance_sale'
         object_type_human_read = 'distance sale'
-        distance_sale_socket_list = []
         duplicate_list = []
         duplicate_counter = 0
-        arrival_country_list = []
 
 
         if not seller_firm_id:
@@ -166,59 +197,48 @@ class DistanceSaleService:
             SocketService.emit_status_error_no_seller_firm(object_type)
             return False
 
+        SocketService.emit_status_success(0, total, original_filename, object_type)
+
         for i in range(total_number_distance_sales):
             current = i + 1
 
-            try:
-                service_start_date = current_app.config.SERVICE_START_DATE
-                valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-                if isinstance(valid_from, date):
-                    valid_from = valid_from if valid_from >= service_start_date else service_start_date
-                else:
-                    valid_from = date.today()
-
-            except:
-                # send error status via socket
-                SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
+            valid_from, arrival_country_code, active = DistanceSaleService.get_df_vars(df, i, current, object_type)
+            if not isinstance(arrival_country_code, str) and isinstance(active, bool) and isinstance(valid_from, date):
                 return False
 
-            try:
-                arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
-            except:
-                # send error status via socket
-                SocketService.emit_status_error_column_read(current, object_type, column_name='arrival_country_code')
-                return False
-
-            try:
-                active = InputService.get_bool(df, i, column='active', value_true=True)
-            except:
-                # send error status via socket
-                SocketService.emit_status_error_column_read(current, object_type, column_name='active')
-                return False
 
             distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country_code, seller_firm_id)
+
+            distance_sale_data = {
+                'valid_from': valid_from,
+                'created_by': user_id,
+                'original_filename': original_filename,
+                'seller_firm_id': seller_firm_id,
+                'arrival_country_code': arrival_country_code,
+                'active': active
+            }
+
+            # handling distance sale update
             if isinstance(distance_sale, DistanceSale):
-                if distance_sale.active == active or active == DistanceSaleHistoryService.get_active(seller_firm_id, arrival_country_code, valid_from):
+                distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, valid_from)
+
+                # handling exact duplicates
+                if active == distance_sale_history.active:
                     active_human_read = 'active' if active else 'inactive'
                     if not duplicate_counter > 2:
                         message = 'The {} registration for {} (state: {}) is already in the database. Registration has been skipped.'.format(object_type_human_read, distance_sale.arrival_country_code, active_human_read)
                         SocketService.emit_status_info(object_type, message)
+
                     total -= 1
                     duplicate_list.append('{}-{}'.format(distance_sale.arrival_country_code, active_human_read))
                     duplicate_counter += 1
                     continue
 
+                # updating distance_sale
                 else:
-                    distance_sale_history = DistanceSaleHistoryService.get_by_ds_id_date(distance_sale.id, valid_from)
-                    data_changes = {
-                        'active': active
-                    }
-
+                    data_changes = distance_sale_data
                     try:
-                        if distance_sale_history.valid_from != valid_from:
-                            distance_sale.update(data_changes, valid_from=valid_from)
-                        else:
-                            distance_sale.update(data_changes, valid_from=distance_sale_history.valid_from)
+                        distance_sale.update(data_changes)
                         db.session.commit()
 
                     except:
@@ -227,26 +247,13 @@ class DistanceSaleService:
                         SocketService.emit_status_error(object_type, message)
                         return False
 
+            # handling new distance sale
             else:
-                if arrival_country_code not in arrival_country_list:
-                    arrival_country_list.append(arrival_country_code)
-
-                distance_sale_data = {
-                    'created_by': user_id,
-                    'valid_from': valid_from,
-                    'original_filename': original_filename,
-                    'seller_firm_id': seller_firm_id,
-                    'arrival_country_code': arrival_country_code,
-                    'active': active
-                }
-
+                print('HANDLING NEW', flush=True)
                 try:
                     new_distance_sale = DistanceSaleService.create(distance_sale_data)
-
                 except:
                     db.session.rollback()
-
-                    # send error status via socket
                     message = 'Error at {} arrival country "{}" (file: {}). Please recheck.'.format(object_type_human_read, arrival_country_code, original_filename)
                     SocketService.emit_status_error(object_type, message)
                     return False
@@ -255,16 +262,11 @@ class DistanceSaleService:
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
 
-        # push new distance sale to vuex via socket
-        for arrival_country_code in arrival_country_list:
-            distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country_code, seller_firm_id)
-            distance_sale_json = DistanceSaleSubSchema.get_distance_sale_sub(distance_sale)
-
-            distance_sale_socket_list.append(distance_sale_json)
-
-        if len(distance_sale_socket_list) > 0:
-            SocketService.emit_new_objects(distance_sale_socket_list, object_type)
-            distance_sale_socket_list = []
+        # following the succesful processing, the vuex store is being reset
+        # first cleared
+        SocketService.emit_clear_objects(object_type)
+        # then refilled
+        DistanceSaleService.push_all_by_seller_firm_id(seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
@@ -272,8 +274,30 @@ class DistanceSaleService:
         return True
 
 
+    # List all files in a directory using scandir(): Returns an iterator of all the objects in a directory including file attribute information
+
+    @staticmethod
+    def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
+        socket_list = []
+        distance_sales = DistanceSaleService.get_all_by_seller_firm_id(seller_firm_id)
+        for distance_sale in distance_sales:
+            # push new distance sale to vuex via socket
+            distance_sale_json = DistanceSaleSubSchema.get_distance_sale_sub(distance_sale)
+
+            if len(distance_sales) < 10:
+                SocketService.emit_new_object(distance_sale_json, object_type)
+            else:
+                socket_list.append(distance_sale_json)
+
+        if len(socket_list) > 0:
+            SocketService.emit_new_objects(socket_list, object_type)
+
+
+
+
     @staticmethod
     def create(distance_sale_data: DistanceSaleInterface) -> DistanceSale:
+        print('IN DS CREATE')
 
         new_distance_sale = DistanceSale(
             created_by = distance_sale_data.get('created_by'),
@@ -287,17 +311,13 @@ class DistanceSaleService:
         db.session.add(new_distance_sale)
         db.session.commit()
 
-        distance_sale_history_data = {
-            'valid_from': distance_sale_data.get('valid_from'),
-            'arrival_country_code': distance_sale_data.get('arrival_country_code'),
-            'active': distance_sale_data.get('active'),
-            'distance_sale_id': new_distance_sale.id,
-        }
-
+        distance_sale_data['distance_sale_id'] = new_distance_sale.id
         try:
-            DistanceSaleHistoryService.create(distance_sale_history_data)
+            DistanceSaleHistoryService.create(distance_sale_data)
         except:
-            raise #!!!
+            print('IN DS HISTORY CREATE FAILED')
+            db.session.rollback()
+            raise
 
         return new_distance_sale
 
@@ -307,7 +327,80 @@ class DistanceSaleService:
 class DistanceSaleHistoryService:
 
     @staticmethod
-    def get_by_ds_id_date(distance_sale_id: int, date: date) -> DistanceSaleHistory:
+    def handle_update(distance_sale_id, data_changes):
+        print('in DistanceSaleHistoryService.handle_update -> item_id: {} | data_changes: {}'.format(distance_sale_id, data_changes), flush=True)
+        """
+        When updating 3 cases can exist:
+
+        CASE EARLIER: The update's valid_from attribute is EARLIER than any other history object.
+            1. New history object is created
+            2. Oldest history object retrieved
+            3. Missing data change attributes complemented by those from oldest history object
+            4. New history object valid_to == oldest history object valid_from - timedelta(days=1)
+
+        CASE EQUAL: The update's valid_from attribute is EQUAL to another history object.
+            1. Data changes are implemented for the retrieved history object
+
+        CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid history object.
+            1. New history object is created
+            2. Current history object retrieved
+            3. Missing data change attributes complemented by those from history object
+            4. Current history object valid_to == new history object valid_from - timedelta(days=1)
+
+        """
+
+        # Trying to retrieve item history to decide case
+        valid_from = data_changes['valid_from']
+        distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale_id, valid_from)
+
+        print('test isinstance itemHistory:', isinstance(distance_sale_history, DistanceSaleHistory), flush=True)
+
+
+        # CASE EARLIER
+        if not isinstance(distance_sale_history, DistanceSaleHistory):
+            print('CASE EARLIER', flush=True)
+            #1.
+            new_distance_sale_history = DistanceSaleHistory(distance_sale_id=distance_sale_id)
+            #2.
+            distance_sale_history = DistanceSaleHistoryService.get_oldest(distance_sale_id)
+            #3. and #4.
+            all_attr = {**distance_sale_history.__attr__(), **data_changes}
+            all_attr['valid_to'] = distance_sale_history.valid_from - timedelta(days=1)
+            for key, val in all_attr.items():
+                setattr(new_distance_sale_history, key, val)
+
+        else:
+            # CASE EQUAL
+            if valid_from == distance_sale_history.valid_from:
+                print('CASE EQUAL', flush=True)
+                for key, val in data_changes.items():
+                    setattr(distance_sale_history, key, val)
+
+            # CASE LATER
+            else:
+                print('CASE LATER', flush=True)
+                #1.
+                new_distance_sale_history = DistanceSaleHistory(distance_sale_id=distance_sale_id)
+                #(2.) -> already exists
+                #3.
+                all_attr = {**distance_sale_history.__attr__(), **data_changes}
+                all_attr['valid_from'] = valid_from
+
+                for key, val in all_attr.items():
+                    setattr(new_distance_sale_history, key, val)
+
+                #4.
+                distance_sale_history.valid_to == valid_from - timedelta(days=1)
+
+
+
+    @staticmethod
+    def get_oldest(distance_sale_id: int) -> DistanceSaleHistory:
+        return DistanceSaleHistory.query.filter_by(distance_sale_id=distance_sale_id).order_by(DistanceSaleHistory.valid_from.asc()).first()
+
+
+    @staticmethod
+    def get_by_distance_sale_id_date(distance_sale_id: int, date: date) -> DistanceSaleHistory:
         return DistanceSaleHistory.query.filter(
             DistanceSaleHistory.distance_sale_id==distance_sale_id,
             DistanceSaleHistory.valid_from<=date,
@@ -316,15 +409,18 @@ class DistanceSaleHistoryService:
 
 
     @staticmethod
-    def create(distance_sale_history_data):
+    def create(distance_sale_data) -> DistanceSaleHistory:
 
         # create new distance_sale history
         new_distance_sale_history = DistanceSaleHistory(
-            valid_from=distance_sale_history_data.get('valid_from'),
-            valid_to=distance_sale_history_data.get('valid_to'),
-            arrival_country_code = distance_sale_history_data.get('arrival_country_code'),
-            active=distance_sale_history_data.get('active'),
-            distance_sale_id=distance_sale_history_data.get('distance_sale_id')
+            distance_sale_id=distance_sale_data.get('distance_sale_id'),
+            valid_from=distance_sale_data.get('valid_from'),
+            valid_to=distance_sale_data.get('valid_to'),
+
+            created_by=distance_sale_data.get('created_by'),
+            original_filename=distance_sale_data.get('original_filename'),
+            arrival_country_code = distance_sale_data.get('arrival_country_code'),
+            active=distance_sale_data.get('active')
         )
 
         db.session.add(new_distance_sale_history)

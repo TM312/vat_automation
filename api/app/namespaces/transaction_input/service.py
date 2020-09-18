@@ -37,6 +37,10 @@ class TransactionInputService:
         return TransactionInput.query.filter_by(public_id = transaction_input_public_id).first()
 
     @staticmethod
+    def get_all_by_seller_firm_id(seller_firm_id: int) -> List[TransactionInput]:
+        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).limit(250).all()
+
+    @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
         from ..business.seller_firm.service import SellerFirmService
         seller_firm_id = SellerFirmService.get_by_public_id(seller_firm_public_id).id
@@ -187,7 +191,80 @@ class TransactionInputService:
 
         return response_object
 
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
 
+        try:
+            account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='UNIQUE_ACCOUNT_IDENTIFIER')
+            return False
+
+        try:
+            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='SALES_CHANNEL')
+            return False
+
+        try:
+            given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_EVENT_ID')
+            return False
+
+        try:
+            activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='ACTIVITY_TRANSACTION_ID')
+            return False
+
+        try:
+            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='SELLER_SKU')
+            return False
+
+        try:
+            shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_DEPART_DATE')
+            return False
+
+        try:
+            arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_ARRIVAL_DATE')
+            return False
+
+        try:
+            complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
+        except:
+            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_COMPLETE_DATE')
+            return False
+
+
+        # send error status via socket
+        if not account_given_id or account_given_id == '':
+            SocketService.emit_status_error_no_value(current, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
+            return False
+
+        if not channel_code or channel_code == '':
+            SocketService.emit_status_error_no_value(current, object_type, 'SALES_CHANNEL')
+            return False
+
+        if not given_id or given_id == '':
+            SocketService.emit_status_error_no_value(current, object_type, 'TRANSACTION_EVENT_ID')
+            return False
+
+        if not activity_id or activity_id == '':
+            SocketService.emit_status_error_no_value(current, object_type, 'ACTIVITY_TRANSACTION_ID')
+            return False
+
+        if not item_sku or item_sku == '':
+            SocketService.emit_status_error_no_value(current, object_type, 'SELLER_SKU')
+            return False
+
+        return account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date
 
 
     @staticmethod
@@ -205,51 +282,30 @@ class TransactionInputService:
         object_type = 'transaction_input'
         object_type_human_read = 'transaction'
         original_filename = os.path.basename(file_path_in)[:128]
-        transaction_input_socket_list = []
         duplicate_list = []
         duplicate_counter = 0
 
+        # send status update via socket
+        SocketService.emit_status_success(0, total, original_filename, object_type)
 
         for i in range(total_number_transaction_inputs):
             current = i + 1
 
-            account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
-            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
+            account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionService.get_df_vars(df, i, current, object_type)
 
-            given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
-            activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
-            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
+            try:
+                account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
+            except:
+                SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
+                return False
 
-            shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
-            arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
-            complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
-
-            account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
-            item = ItemService.get_by_sku_account(item_sku, account)
+            try:
+                item = ItemService.get_by_sku_account(item_sku, account)
+            except:
+                SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
+                return False
 
             bundle = BundleService.get_or_create(account.id, item.id, given_id)
-
-
-            # send error status via socket
-            if not account_given_id or account_given_id == '':
-                SocketService.emit_status_error_no_value(current, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
-                return False
-
-            if not channel_code or channel_code == '':
-                SocketService.emit_status_error_no_value(current, object_type, 'SALES_CHANNEL')
-                return False
-
-            if not given_id or given_id == '':
-                SocketService.emit_status_error_no_value(current, object_type, 'TRANSACTION_EVENT_ID')
-                return False
-
-            if not activity_id or activity_id == '':
-                SocketService.emit_status_error_no_value(current, object_type, 'ACTIVITY_TRANSACTION_ID')
-                return False
-
-            if not item_sku or item_sku == '':
-                SocketService.emit_status_error_no_value(current, object_type, 'SELLER_SKU')
-                return False
 
             transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
             if transaction_input and transaction_input.processed:
@@ -290,56 +346,56 @@ class TransactionInputService:
                     'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
                     'item_manufacture_country': InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY'),
                     'item_quantity': int(df.iloc[i]['QTY']),
-                    'item_weight_kg': InputService.get_float(df, i, column='ITEM_WEIGHT'),
-                    'item_weight_kg_total': InputService.get_float(df, i, column='TOTAL_ACTIVITY_WEIGHT'),
+                    'item_weight_kg': InputService.get_float_or_None(df, i, column='ITEM_WEIGHT'),
+                    'item_weight_kg_total': InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_WEIGHT'),
 
-                    'check_unit_cost_price_net': InputService.get_float(df, i, column='COST_PRICE_OF_ITEMS'),
+                    'check_unit_cost_price_net': InputService.get_float_or_None(df, i, column='COST_PRICE_OF_ITEMS'),
 
-                    'check_item_price_discount_net': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
-                    'check_item_price_discount_vat': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_discount_gross': InputService.get_float(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL'),
+                    'check_item_price_discount_net': InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
+                    'check_item_price_discount_vat': InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_VAT_AMT'),
+                    'item_price_discount_gross': InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
-                    'check_item_price_net': InputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_EXCL'),
-                    'check_item_price_vat': InputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_gross': InputService.get_float(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL'),
+                    'check_item_price_net': InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_EXCL'),
+                    'check_item_price_vat': InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_VAT_AMT'),
+                    'item_price_gross': InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
-                    'check_item_price_total_net': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
-                    'check_item_price_total_vat': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_VAT_AMT'),
-                    'item_price_total_gross': InputService.get_float(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL'),
+                    'check_item_price_total_net': InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL'),
+                    'check_item_price_total_vat': InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_VAT_AMT'),
+                    'item_price_total_gross': InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL'),
 
-                    'check_item_price_vat_rate': InputService.get_float(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT'),
+                    'check_item_price_vat_rate': InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT'),
 
-                    'check_shipment_price_discount_net': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_EXCL'),
-                    'check_shipment_price_discount_vat': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_discount_gross': InputService.get_float(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL'),
+                    'check_shipment_price_discount_net': InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_EXCL'),
+                    'check_shipment_price_discount_vat': InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_VAT_AMT'),
+                    'shipment_price_discount_gross': InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL'),
 
-                    'check_shipment_price_net': InputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_EXCL'),
-                    'check_shipment_price_vat': InputService.get_float(df, i, column='SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_gross': InputService.get_float(df, i, column='SHIP_CHARGE_AMT_VAT_INCL'),
+                    'check_shipment_price_net': InputService.get_float_or_None(df, i, column='SHIP_CHARGE_AMT_VAT_EXCL'),
+                    'check_shipment_price_vat': InputService.get_float_or_None(df, i, column='SHIP_CHARGE_VAT_AMT'),
+                    'shipment_price_gross': InputService.get_float_or_None(df, i, column='SHIP_CHARGE_AMT_VAT_INCL'),
 
-                    'check_shipment_price_total_net': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_EXCL'),
-                    'check_shipment_price_total_vat': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_VAT_AMT'),
-                    'shipment_price_total_gross': InputService.get_float(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL'),
+                    'check_shipment_price_total_net': InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_EXCL'),
+                    'check_shipment_price_total_vat': InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_VAT_AMT'),
+                    'shipment_price_total_gross': InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL'),
 
-                    'check_shipment_price_vat_rate': InputService.get_float(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT'),
+                    'check_shipment_price_vat_rate': InputService.get_float_or_None(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT'),
 
-                    'check_sale_total_value_net': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL'),
-                    'check_sale_total_value_vat': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_VAT_AMT'),
-                    'sale_total_value_gross': InputService.get_float(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL'),
+                    'check_sale_total_value_net': InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL'),
+                    'check_sale_total_value_vat': InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_VAT_AMT'),
+                    'sale_total_value_gross': InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL'),
 
-                    'check_gift_wrap_price_discount_net': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_EXCL'),
-                    'check_gift_wrap_price_discount_vat': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_discount_gross': InputService.get_float(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL'),
+                    'check_gift_wrap_price_discount_net': InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_EXCL'),
+                    'check_gift_wrap_price_discount_vat': InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_VAT_AMT'),
+                    'gift_wrap_price_discount_gross': InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL'),
 
-                    'check_gift_wrap_price_net': InputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_EXCL'),
-                    'check_gift_wrap_price_vat': InputService.get_float(df, i, column='GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_gross': InputService.get_float(df, i, column='GIFT_WRAP_AMT_VAT_INCL'),
+                    'check_gift_wrap_price_net': InputService.get_float_or_None(df, i, column='GIFT_WRAP_AMT_VAT_EXCL'),
+                    'check_gift_wrap_price_vat': InputService.get_float_or_None(df, i, column='GIFT_WRAP_VAT_AMT'),
+                    'gift_wrap_price_gross': InputService.get_float_or_None(df, i, column='GIFT_WRAP_AMT_VAT_INCL'),
 
-                    'check_gift_wrap_price_total_net': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_EXCL'),
-                    'check_gift_wrap_price_total_vat': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_VAT_AMT'),
-                    'gift_wrap_price_total_gross': InputService.get_float(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL'),
+                    'check_gift_wrap_price_total_net': InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_EXCL'),
+                    'check_gift_wrap_price_total_vat': InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_VAT_AMT'),
+                    'gift_wrap_price_total_gross': InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL'),
 
-                    'check_gift_wrap_price_tax_rate': InputService.get_float(df, i, column='GIFT_WRAP_VAT_RATE_PERCENT'),
+                    'check_gift_wrap_price_tax_rate': InputService.get_float_or_None(df, i, column='GIFT_WRAP_VAT_RATE_PERCENT'),
 
 
                     'currency_code': InputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE'),
@@ -377,9 +433,9 @@ class TransactionInputService:
                     'check_tax_jurisdiction_level': InputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION_LEVEL'),
 
                     'invoice_number': InputService.get_str_or_None(df, i, column='VAT_INV_NUMBER'),
-                    'check_invoice_amount_vat': InputService.get_float(df, i, column='VAT_INV_CONVERTED_AMT'),
+                    'check_invoice_amount_vat': InputService.get_float_or_None(df, i, column='VAT_INV_CONVERTED_AMT'),
                     'check_invoice_currency_code': InputService.get_str_or_None(df, i, column='VAT_INV_CURRENCY_CODE'),
-                    'check_invoice_exchange_rate': InputService.get_float(df, i, column='VAT_INV_EXCHANGE_RATE'),
+                    'check_invoice_exchange_rate': InputService.get_float_or_None(df, i, column='VAT_INV_EXCHANGE_RATE'),
                     'check_invoice_exchange_rate_date': InputService.get_date_or_None(df, i, column='VAT_INV_EXCHANGE_RATE_DATE'),
                     'invoice_url': InputService.get_str_or_None(df, i, column='INVOICE_URL'),
 
@@ -442,20 +498,31 @@ class TransactionInputService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total_number_transaction_inputs, original_filename, object_type)
 
-                # push new distance sale to vuex via socket
-                transaction_input_schema_sub = TransactionInputSubSchema.get_transaction_input_sub(new_transaction_input)
-
-                if total <= 1000:
-                    transaction_input_socket_list.append(transaction_input_schema_sub)
-                    if current % 100 == 0 or current == total:
-                        SocketService.emit_new_objects(transaction_input_socket_list, object_type)
-                        transaction_input_socket_list = []
+        # following the succesful processing, the vuex store is being reset
+        # first cleared
+        SocketService.emit_clear_objects(object_type)
+        # then refilled
+        TransactionInputService.push_all_by_seller_firm_id(seller_firm_id, object_type)
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
 
-
         return True
+
+
+    @staticmethod
+    def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
+        socket_list = []
+        transaction_inputs = TransactionInputService.get_all_by_seller_firm_id(seller_firm_id)
+
+        for transaction_input in transaction_inputs:
+            # push transaction inputs to vuex via socket
+            transaction_input_json = TransactionInputSubSchema.get_transaction_input_sub(transaction_input)
+            socket_list.append(transaction_input_json)
+
+            if len(socket_list) > 0:
+                SocketService.emit_new_objects(socket_list, object_type)
+
 
 
     @staticmethod

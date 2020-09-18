@@ -11,6 +11,12 @@ from app.extensions import socket_io
 class SocketService:
 
     @staticmethod
+    def emit_clear_objects(object_type: str):
+        socket_io.emit(
+            'clear_{}s'.format(object_type)
+        )
+
+    @staticmethod
     def emit_new_object(meta, object_type):
         socket_io.emit(
             'new_{}'.format(object_type),
@@ -114,7 +120,12 @@ class SocketService:
 
     @staticmethod
     def emit_status_error_no_seller_firm(object_type: str):
-        message = 'Can not identify the seller firm for the uploaded data. Please retry later or contact one of the admins.'
+        message = 'Can not identify the seller firm for the uploaded data.'
+        SocketService.emit_status_error(object_type, message)
+
+    @staticmethod
+    def emit_status_error_unidentifiable_object(object_type: str, object_str: str, current: int):
+        message = 'Can not identify the {} in row {}. Have you uploaded all necessary data?'.format(object_str, current)
         SocketService.emit_status_error(object_type, message)
 
 

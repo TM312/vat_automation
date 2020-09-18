@@ -212,7 +212,7 @@ class InputService:
         return string_trimmed
 
     @staticmethod
-    def get_float(df: pd.DataFrame, i:int, column:str) -> float:
+    def get_float_or_None(df: pd.DataFrame, i:int, column:str) -> float:
         if pd.isnull(df.iloc[i][column]):
             return None
         else:
