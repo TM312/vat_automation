@@ -6,14 +6,14 @@ from uuid import UUID
 
 from app.extensions import db
 
-from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauthorized, NotFound
+from werkzeug.exceptions import UnprocessableEntity, InternalServerError, Unauthorized, NotFound, ExpectationFailed
 
 from .interface import TaxRecordDictInterface, TaxRecordInterface
 from . import TaxRecord
 from .schema import TaxRecordSubSchema
 
-from ..utils.service import HelperService, NotificationService, InputService
-from ..utils import TransactionNotification
+from app.namespaces.utils.service import HelperService, NotificationService, InputService
+from app.namespaces.utils import TransactionNotification
 from ..transaction import Transaction
 from ..transaction_input import TransactionInput
 #from ..transaction_input.service import TransactionInputService
@@ -117,8 +117,7 @@ class TaxRecordService:
         try:
             start_date = HelperService.get_date_from_str(tax_record_data_raw.get('start_date'), '%Y-%m-%d')
         except:
-            SocketService.emit_status_error_unidentifiable_object(object_type, 'start date', 0)
-            return False
+            raise ExpectationFailed('start_date')
 
         try:
             end_date = HelperService.get_date_from_str(tax_record_data_raw.get('end_date'), '%Y-%m-%d')
@@ -148,8 +147,10 @@ class TaxRecordService:
         if not isinstance(vatin, VATIN):
             raise NotFound('A VATIN for the indicated tax jurisdiction does not exist for this seller firm.')
 
-
         transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm.id, tax_jurisdiction_code)
+        if len(transactions) == 0:
+            message = 'There are no transactions by this seller for this period and tax jurisdiction.'
+            raise ExpectationFailed(message)
 
         return seller_firm, start_date, end_date, tax_jurisdiction, vatin, transactions
 
@@ -159,13 +160,17 @@ class TaxRecordService:
 
         object_type = 'tax_record'
 
-
-        seller_firm, start_date, end_date, tax_jurisdiction, vatin, transactions = TaxRecordService.retrieve_input_vars(object_type, seller_firm_public_id, tax_record_data_raw)
-
-        if len(transactions) == 0:
-            message = 'There are no transactions by this seller for this period and tax jurisdiction.'
-            SocketService.emit_status_info(object_type, message)
+        try:
+            seller_firm, start_date, end_date, tax_jurisdiction, vatin, transactions = TaxRecordService.retrieve_input_vars(object_type, seller_firm_public_id, tax_record_data_raw)
+        except Exception as e:
+            if e.code == 422:
+                SocketService.emit_status_error_unidentifiable_object(object_type, e.description, 0)
+            elif e.code == 404:
+                SocketService.emit_status_error(object_type, e.description)
+            elif e.code == 417:
+                SocketService.emit_status_info(object_type, e.description)
             return False
+
 
         tax_record = TaxRecordService.get_by_seller_firm_tax_jurisdiction_validity(seller_firm.id, tax_jurisdiction.code, start_date, end_date)
         if isinstance(tax_record, TaxRecord):

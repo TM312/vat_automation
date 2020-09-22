@@ -1,7 +1,7 @@
 
 from datetime import datetime
 from app.extensions import db
-from ..utils.ATs import item_tag_item_AT
+from app.namespaces.utils.ATs import item_tag_item_AT
 
 
 

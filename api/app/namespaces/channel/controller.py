@@ -7,7 +7,7 @@ from . import Channel
 from . import channel_dto
 from .service import ChannelService
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Channel", description="Channel Related Operations")  # noqa

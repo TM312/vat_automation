@@ -1,5 +1,9 @@
 <template>
-    <div></div>
+    <div>
+        statusTaxRecordTargets: {{ statusTaxRecordTargets }} <br>
+        statusTaxRecordTarget: {{ statusTaxRecordTarget }} <br>
+        lenStatusTaxRecords: {{ lenStatusTaxRecords }} <br>
+    </div>
 </template>
 
 <script>
@@ -26,7 +30,8 @@ export default {
 
         lenStatusFile (newLength, oldLength) {
             if (oldLength === 0) {
-            this.makeToast()
+                console.log('watch len status file')
+                this.makeToast()
             }
         /*eslint-disable */
 
@@ -39,9 +44,9 @@ export default {
 
     methods: {
         makeToast() {
-            this.$store.commit('status/POP_STATUS_TAX_RECORD_TARGETS')
+            // this.$store.commit('status/POP_STATUS_TAX_RECORD_TARGETS')
 
-            this.$bvToast.toast(this.statusTaxRecordTarget.message, {
+            this.$bvToast.toast(this.statusTaxRecordTargets[0].message, {
             title: 'New Tax Record',
             variant: this.statusTaxRecordTargets.status,
             autoHideDelay: 10000,

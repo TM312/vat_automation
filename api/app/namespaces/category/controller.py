@@ -8,7 +8,7 @@ from .service import CategoryService
 from . import Category
 from . import category_dto
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Category", description="Item Hierarchy Related Operations")  # noqa

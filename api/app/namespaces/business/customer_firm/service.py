@@ -74,10 +74,13 @@ class CustomerFirmService:
 
 
     @staticmethod
-    def get_customer_relationship(customer_firm_vatin: VATIN, check_required: bool) -> str:
+    def get_customer_relationship(transaction_type_code: str, customer_firm_vatin: VATIN, check_required: bool) -> str:
         customer_relationship_checked = False
 
-        if isinstance(customer_firm_vatin, VATIN):
+        if transaction_type_code == 'MOVEMENT':
+            customer_relationship = 'B2B'
+
+        elif isinstance(customer_firm_vatin, VATIN):
             bool_as_code = 'B2B' if customer_firm_vatin.valid else 'B2C'
             customer_relationship_checked = True
             customer_relationship = 'B2B' if not check_required else bool_as_code

@@ -1,5 +1,5 @@
 from flask_restx import Model, fields
-from ..utils import transaction_notification_dto
+from app.namespaces.utils import transaction_notification_dto
 
 
 transaction_type_dto = Model('transaction_type', {

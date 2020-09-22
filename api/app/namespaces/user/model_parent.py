@@ -9,7 +9,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.extensions import db, bcrypt
 
-# from ..utils.ATs import tax_record_user_AT
+# from app.namespaces.utils.ATs import tax_record_user_AT
 
 
 class User(db.Model):  # type: ignore

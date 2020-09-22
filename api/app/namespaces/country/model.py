@@ -1,7 +1,7 @@
 from flask import current_app
 
 from app.extensions import db
-from ..utils.ATs import eu_country_AT
+from app.namespaces.utils.ATs import eu_country_AT
 
 
 #### ^potentially change to

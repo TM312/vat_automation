@@ -57,6 +57,11 @@ services:
             - .prod.env
 
     postgres:
+        volumes:
+
+    postgres:
+        volumes:
+            - pgdata:/pgdata
         environment:
             - DATABASE=postgres
         ports:

@@ -27,8 +27,8 @@ class TransactionInterface(TypedDict, total=False):
     tax_calculation_date: date
     item_tax_code_code: str
     item_tax_rate_type_code: str
-    shipment_tax_rate_type_code = str
-    gift_wrap_tax_rate_type_code = str
+    shipment_tax_rate_type_code: str
+    gift_wrap_tax_rate_type_code: str
     item_price_net: float
     item_price_discount_net: float
     item_price_total_net: float

@@ -81,9 +81,14 @@ services:
     #     command: "npm run dev"
 
     postgres:
+        volumes:
+            - pgdata_dev:/pgdata
         environment:
             - DATABASE=postgres
         ports:
             - 5432:5432
         env_file:
             - .dev.env
+
+volumes:
+    pgdata_dev:

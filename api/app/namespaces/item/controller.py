@@ -8,7 +8,7 @@ from .service import ItemService
 from . import Item
 from . import item_dto, item_sub_dto, item_admin_dto, item_history_dto
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Item", description="Item Related Operations")  # noqa

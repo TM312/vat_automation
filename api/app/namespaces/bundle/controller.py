@@ -7,7 +7,7 @@ from . import Bundle
 from . import bundle_dto, bundle_admin_dto, bundle_sub_dto
 from .service import BundleService
 from .interface import BundleInterface
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 
 ns = Namespace("Bundle", description="Bundle Related Operations")  # noqa

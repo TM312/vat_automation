@@ -8,7 +8,7 @@ from . import Country, EU
 from . import country_dto, country_sub_dto, eu_dto
 from .service import CountryService
 
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 
 

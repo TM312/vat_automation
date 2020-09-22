@@ -1,10 +1,95 @@
-# version: '3'
+version: '3'
 
-# services:
-#     api:
-#         env_file:
-#             - .test.env
+services:
 
-#     front:
-#         env_file:
-#             - .test.env
+    front:
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        command: "npm run dev"
+
+    proxy:
+        container_name: proxy
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+            args:
+                - NGINX_VERSION=${NGINX_VERSION}
+                - ENVIRONMENT=dev
+        image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
+        restart: unless-stopped
+        # volumes:
+        #       - media_data:/var/lib/media_data:ro
+        ports:
+            - 5000:5000
+            - 80:80
+        networks:
+            - web
+        depends_on:
+            - api
+
+        command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+        # improved version based on: https://stackoverflow.com/questions/57554703/why-use-nginx-with-daemon-off-in-background-with-docker
+        #command: '/bin/sh -c ''while :; do sleep 6h; nginx -s reload; done & exec nginx -g "daemon off;"'''
+
+
+    rabbitmq:
+        env_file:
+            - .test.env
+
+    redis:
+        env_file:
+            - .test.env
+
+    celery-worker:
+        env_file:
+            - .test.env
+
+    celery-beat:
+        env_file:
+            - .test.env
+
+    flower:
+        ports:
+            - 8888:8888
+
+        env_file:
+            - .test.env
+
+
+
+
+
+    api:
+        volumes:
+              - ./api/migrations/:/home/api/migrations
+        env_file:
+            - .test.env
+        #command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && flask run --host 0.0.0.0 --port 5000"
+
+
+    # front:
+    #     build:
+    #         context: ./front
+    #         dockerfile: Dockerfile.test
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     env_file:
+    #         - .test.env
+    #     command: "npm run dev"
+
+    postgres:
+        volumes:
+            - pgdata_test:/pgdata
+        environment:
+            - DATABASE=postgres
+        ports:
+            - 5432:5432
+        env_file:
+            - .test.env
+
+
+volumes:
+    pgdata_test:

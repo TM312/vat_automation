@@ -134,3 +134,57 @@ class SeedCommand(Command):
 
             print("")
             print("DB successfully seeded in {}.".format(str(lengths)))
+
+
+
+class SeedCommandTest():
+    def run(self):
+        time_start = datetime.utcnow()
+        print("Dropping tables...")
+        db.drop_all()
+        db.create_all()
+
+        print('Seeding things...')
+        response_objects = SeedService.seed_things(things_list)
+
+        print('Seeding businesses...')
+        AccountingFirmSeedService.seed_accounting_firm()
+
+        print('Seeding users...')
+        AdminSeedService.seed_admin()
+        TaxAuditorSeedService.seed_tax_auditor()
+
+        print('Appending Transaction Types to Tax Treatments...')
+        TaxTreatmentSeedService.append_transaction_types_to_tax_treatments()
+
+        print('Appending Countries to EU...')
+        EUSeedService.append_countries_to_eu()
+
+        print('Appending Users to Businesses...')
+        AccountingFirmSeedService.append_tax_auditor_to_accounting_firm()
+        AdminSeedService.append_accounting_firm_to_admin()
+
+        print('Appending Channels to Platforms...')
+        PlatformSeedService.append_channels_to_platform()
+
+        db.session.commit()
+
+        print('Creating Vat Rates...')
+        response_object_vat_rates = VatSeedService.seed_tax_rates()
+        response_objects.append(response_object_vat_rates)
+
+        print('Creating Exchange Rates...')
+        response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+
+        response_objects.append(response_object_exchange_rates)
+
+        for response_object in response_objects:
+            print("")
+            for key, val in response_object.items():
+                print(key, ':', val)
+
+        time_end = datetime.utcnow()
+        lengths = time_end - time_start
+
+        print("")
+        print("DB successfully seeded in {}.".format(str(lengths)))

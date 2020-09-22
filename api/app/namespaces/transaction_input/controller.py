@@ -10,7 +10,7 @@ from . import transaction_input_dto, transaction_input_sub_dto, transaction_inpu
 from . import TransactionInput
 from .service import TransactionInputService
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 

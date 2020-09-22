@@ -5,7 +5,7 @@ from typing import List, BinaryIO, Dict
 
 from flask import g, current_app
 from sqlalchemy import or_
-from werkzeug.exceptions import UnsupportedMediaType, NotFound
+from werkzeug.exceptions import UnsupportedMediaType, NotFound, UnprocessableEntity, ExpectationFailed
 from app.extensions import (
     db,
     socket_io)
@@ -15,7 +15,7 @@ from .interface import TransactionInputInterface
 from .schema import TransactionInputSubSchema
 
 from ..account import Account
-from ..utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService
 from ..tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
@@ -197,72 +197,59 @@ class TransactionInputService:
         try:
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='UNIQUE_ACCOUNT_IDENTIFIER')
-            return False
+            raise UnprocessableEntity('UNIQUE_ACCOUNT_IDENTIFIER')
 
         try:
             channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='SALES_CHANNEL')
-            return False
+            raise UnprocessableEntity('SALES_CHANNEL')
 
         try:
             given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_EVENT_ID')
-            return False
+            raise UnprocessableEntity('TRANSACTION_EVENT_ID')
 
         try:
             activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='ACTIVITY_TRANSACTION_ID')
-            return False
+            raise UnprocessableEntity('ACTIVITY_TRANSACTION_ID')
 
         try:
             item_sku = InputService.get_str(df, i, column='SELLER_SKU')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='SELLER_SKU')
-            return False
+            raise UnprocessableEntity('SELLER_SKU')
 
         try:
             shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_DEPART_DATE')
-            return False
+            raise UnprocessableEntity('TRANSACTION_DEPART_DATE')
 
         try:
             arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_ARRIVAL_DATE')
-            return False
+            raise UnprocessableEntity('TRANSACTION_ARRIVAL_DATE')
 
         try:
             complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='TRANSACTION_COMPLETE_DATE')
-            return False
+            raise UnprocessableEntity('TRANSACTION_COMPLETE_DATE')
 
 
         # send error status via socket
         if not account_given_id or account_given_id == '':
-            SocketService.emit_status_error_no_value(current, object_type, 'UNIQUE_ACCOUNT_IDENTIFIER')
-            return False
+            raise ExpectationFailed('UNIQUE_ACCOUNT_IDENTIFIER')
 
         if not channel_code or channel_code == '':
-            SocketService.emit_status_error_no_value(current, object_type, 'SALES_CHANNEL')
-            return False
+            raise ExpectationFailed('SALES_CHANNEL')
 
         if not given_id or given_id == '':
-            SocketService.emit_status_error_no_value(current, object_type, 'TRANSACTION_EVENT_ID')
-            return False
+            raise ExpectationFailed('TRANSACTION_EVENT_ID')
 
         if not activity_id or activity_id == '':
-            SocketService.emit_status_error_no_value(current, object_type, 'ACTIVITY_TRANSACTION_ID')
-            return False
+            raise ExpectationFailed('ACTIVITY_TRANSACTION_ID')
 
         if not item_sku or item_sku == '':
-            SocketService.emit_status_error_no_value(current, object_type, 'SELLER_SKU')
-            return False
+            raise ExpectationFailed('SELLER_SKU')
 
         return account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date
 
@@ -291,7 +278,14 @@ class TransactionInputService:
         for i in range(total_number_transaction_inputs):
             current = i + 1
 
-            account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionInputService.get_df_vars(df, i, current, object_type)
+            try:
+                account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionInputService.get_df_vars(df, i, current, object_type)
+            except Exception as e:
+                if e.code == 422:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                elif e.code == 417:
+                    SocketService.emit_status_error_no_value(current, object_type, e.description)
+                return False
 
             try:
                 account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)

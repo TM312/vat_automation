@@ -132,6 +132,19 @@ class Testing(Config):
     BCRYPT_LOG_ROUNDS = 4
     CSRF_ENABLED = False  # only for testing config!
 
+    # BROKER-MESSAGEQEUE CONFIG
+    CACHE_REDIS_URL = os.environ.get('SESSION_REDIS_URL')
+
+    # Flask Session
+    SESSION_TYPE = os.environ.get('SESSION_TYPE', 'redis')
+    #https://hackingandslacking.com/managing-flask-session-variables-f4c5ccef54c0
+    SESSION_REDIS = redis.from_url(os.environ.get('SESSION_REDIS_URL'))
+
+    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+    CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
+    CELERY_IMPORTS = ('app.tasks.asyncr', 'app.tasks.periodic')
+    CELERY_BROKER_HEARTBEAT = 0
+
 
 
 class Staging(Config):

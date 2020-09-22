@@ -11,7 +11,7 @@ from . import Transaction
 from .service import TransactionService
 from .schema import transaction_dto, transaction_admin_dto, transaction_sub_dto, transaction_type_dto
 
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 ns = Namespace("Transaction", description="Transaction Related Operations")  # noqa
 ns.add_model(transaction_dto.name, transaction_dto)

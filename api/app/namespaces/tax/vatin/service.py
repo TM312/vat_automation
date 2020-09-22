@@ -8,7 +8,7 @@ from random import randint
 
 
 from flask import current_app
-from werkzeug.exceptions import HTTPException, FailedDependency, UnprocessableEntity, NotFound
+from werkzeug.exceptions import HTTPException, FailedDependency, UnprocessableEntity, NotFound, ExpectationFailed
 
 from app.extensions import (
     db,
@@ -195,14 +195,13 @@ class VATINService:
 
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type_human_read: str) -> List:
         try:
             country_code, number = VATINService.get_vat_from_df(df, i)
         except:
             # send error status via socket
             message = 'Can not read country code/number of {} in row {} (file: {}).'.format(current, object_type_human_read, original_filename)
-            SocketService.emit_status_error(object_type, message)
-            return False
+            raise ExpectationFailed(message)
 
         try:
             service_start_date = current_app.config.SERVICE_START_DATE
@@ -214,8 +213,16 @@ class VATINService:
                 valid_from = date.today() - timedelta(days=tolerance)
 
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
-            return False
+            raise UnprocessableEntity('valid_from')
+
+        if not isinstance(country_code, str):
+            raise ExpectationFailed('country_code')
+
+        if not isinstance(number, str):
+            raise ExpectationFailed('number')
+
+        if not isinstance(valid_from, date):
+            raise ExpectationFailed('valid_from')
 
         return country_code, number, valid_from
 
@@ -244,9 +251,15 @@ class VATINService:
         for i in range(total_number_vatins):
             current = i + 1
 
-            country_code, number, valid_from = VATINService.get_df_vars(df, i, current, object_type)
-            if not isinstance(country_code, str) and isinstance(number, str) and isinstance(valid_from, date):
+            try:
+                country_code, number, valid_from = VATINService.get_df_vars(df, i, current, object_type_human_read)
+            except Exception as e:
+                if e.code == 422:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                elif e.code == 417:
+                    SocketService.emit_status_error_invalid_value(object_type, e.description)
                 return False
+
 
             vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
