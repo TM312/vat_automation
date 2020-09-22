@@ -9,7 +9,7 @@ from werkzeug.exceptions import Conflict, Gone, BadRequest
 
 from app.extensions import mail, db
 from ..user.service_parent import UserService
-from ..utils.decorators.asyncd import asyncd
+from app.namespaces.utils.decorators.asyncd import asyncd
 
 
 

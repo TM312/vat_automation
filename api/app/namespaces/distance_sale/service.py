@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from datetime import date, timedelta, datetime
 from flask import g, current_app
+from werkzeug.exceptions import UnprocessableEntity, ExpectationFailed
 from app.extensions import (
     db,
     socket_io)
@@ -11,7 +12,7 @@ from . import DistanceSale, DistanceSaleHistory
 from .interface import DistanceSaleInterface
 from .schema import DistanceSaleSubSchema
 
-from ..utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService
 from ..tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
@@ -158,23 +159,26 @@ class DistanceSaleService:
                 valid_from = date.today()
 
         except:
-            # send error status via socket
-            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
-            return False
+            raise UnprocessableEntity('valid_from')
 
         try:
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
         except:
-            # send error status via socket
-            SocketService.emit_status_error_column_read(current, object_type, column_name='arrival_country_code')
-            return False
+            raise UnprocessableEntity('arrival_country_code')
 
         try:
             active = InputService.get_bool(df, i, column='active', value_true=True)
         except:
-            # send error status via socket
-            SocketService.emit_status_error_column_read(current, object_type, column_name='active')
-            return False
+            raise UnprocessableEntity('active')
+
+        if not isinstance(arrival_country_code, str):
+            raise ExpectationFailed('arrival_country_code')
+
+        if not isinstance(active, bool):
+            raise ExpectationFailed('active')
+
+        if not isinstance(valid_from, date):
+            raise ExpectationFailed('valid_from')
 
         return valid_from, arrival_country_code, active
 
@@ -201,8 +205,13 @@ class DistanceSaleService:
         for i in range(total_number_distance_sales):
             current = i + 1
 
-            valid_from, arrival_country_code, active = DistanceSaleService.get_df_vars(df, i, current, object_type)
-            if not isinstance(arrival_country_code, str) and isinstance(active, bool) and isinstance(valid_from, date):
+            try:
+                valid_from, arrival_country_code, active = DistanceSaleService.get_df_vars(df, i, current, object_type)
+            except UnprocessableEntity as e:
+                SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                return False
+            except ExpectationFailed as e:
+                SocketService.emit_status_error_invalid_value(object_type, e.description)
                 return False
 
 

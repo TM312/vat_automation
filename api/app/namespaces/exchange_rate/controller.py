@@ -8,7 +8,7 @@ from .service import ExchangeRateService
 from . import ExchangeRate
 from . import exchange_rate_dto
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("ExchangeRate", description="ExchangeRate Related Operations")  # noqa

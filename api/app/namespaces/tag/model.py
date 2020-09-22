@@ -1,6 +1,6 @@
 
 from app.extensions import db
-from ..utils.ATs import tag_notification_AT
+from app.namespaces.utils.ATs import tag_notification_AT
 
 class Tag(db.Model):
     """ Tag model, i.e. codes:

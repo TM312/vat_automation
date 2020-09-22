@@ -32,7 +32,7 @@ from ..tax.vatin.service import VATINService
 from ..tax.tax_code.service import TaxCodeService
 from ..tax.vat.service import VatService
 from ..business.seller_firm import SellerFirm
-from ..utils.service import HelperService, NotificationService
+from app.namespaces.utils.service import HelperService, NotificationService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -83,7 +83,6 @@ class TransactionService:
         activity_id = transaction_input.activity_id
         item_sku = transaction_input.item_sku
 
-        #!!!!!! here in function socket integration
         try:
             account = AccountService.get_by_given_id_channel_code(transaction_input.account_given_id, transaction_input.channel_code)
         except:
@@ -141,7 +140,7 @@ class TransactionService:
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
         customer_firm_vatin: VATIN = CustomerFirmService.get_vatin_or_None(country_code_temp=transaction_input.customer_firm_vat_number_country_code, number_temp=transaction_input.customer_firm_vat_number, date=tax_date)
-        customer_relationship, customer_relationship_checked = CustomerFirmService.get_customer_relationship(customer_firm_vatin, check_required=customer_vat_check_required)
+        customer_relationship, customer_relationship_checked = CustomerFirmService.get_customer_relationship(transaction_type.code, customer_firm_vatin, check_required=customer_vat_check_required)
 
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
@@ -253,7 +252,7 @@ class TransactionService:
         total_value_net: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_net, shipment_price_total_net, gift_wrap_price_total_net, item_price_total_net)
         total_value_vat: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, item_price_total_vat, shipment_price_total_vat, gift_wrap_price_total_vat, item_price_total_vat)
         total_value_gross: float = TransactionService.get_total_value(transaction_input.item_quantity, transaction_type, transaction_input.item_price_total_gross, transaction_input.shipment_price_total_gross, transaction_input.gift_wrap_price_total_gross, item_price_total_net)
-
+        # !!! comment: first total_value_gross dann daraus total_value_vat und total_value_net
 
         transaction_currency_code: str = TransactionService.get_transaction_currency(item_history.unit_cost_price_currency_code, transaction_type, transaction_input.currency_code)
 

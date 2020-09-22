@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 from app.extensions import db
-from ..utils.ATs import tax_record_transaction_AT  # , tax_record_user_AT
+from app.namespaces.utils.ATs import tax_record_transaction_AT  # , tax_record_user_AT
 
 
 

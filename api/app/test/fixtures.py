@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 load_dotenv()
-
 import pytest
+
+# from api.commands.seed_command import SeedCommandTest
 
 from app import create_app
 
@@ -26,6 +27,8 @@ def db(app):
 
     with app.app_context():  # 'with' takes care of setup and teardown (instead of 'app.app_context().push()' )
 
+
+        # SeedCommandTest.run()
         #making sure db is empty
         db.drop_all()
         db.create_all()

@@ -9,7 +9,7 @@ from . import platform_dto
 from .service import PlatformService
 
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Platform", description="Platform Related Operations")  # noqa

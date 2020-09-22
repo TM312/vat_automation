@@ -7,7 +7,7 @@ from . import Tag
 from . import tag_dto
 from .service import TagService
 
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 
 ns = Namespace("Tag", description="Tag Related Operations")  # noqa

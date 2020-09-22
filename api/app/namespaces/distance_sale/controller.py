@@ -9,7 +9,7 @@ from . import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto,
 from .service import DistanceSaleService
 
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("DistanceSale", description="DistanceSale Related Operations")  # noqa

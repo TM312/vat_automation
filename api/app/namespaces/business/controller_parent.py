@@ -11,7 +11,7 @@ from . import Business
 from . import business_dto, business_sub_dto, business_admin_dto
 from .service_parent import BusinessService
 
-from ..utils.decorators import login_required, accepted_u_types
+from app.namespaces.utils.decorators import login_required, accepted_u_types
 
 
 ns = Namespace('Business', description='Business Related Operations')  # noqa

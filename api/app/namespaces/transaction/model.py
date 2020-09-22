@@ -5,7 +5,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db  # noqa
 
-from ..utils.ATs import tax_treatment_transaction_type_AT, tax_record_transaction_AT
+from app.namespaces.utils.ATs import tax_treatment_transaction_type_AT, tax_record_transaction_AT
+# from app.namespaces.utils.ATs import tax_treatment_transaction_type_AT, tax_record_transaction_AT
 
 
 

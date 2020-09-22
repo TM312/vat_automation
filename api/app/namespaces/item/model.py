@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-from ..utils.ATs import item_tag_item_AT
+from app.namespaces.utils.ATs import item_tag_item_AT
 
 
 

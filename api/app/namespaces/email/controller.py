@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource
 from .service import EmailService
 from .interface import EmailInterface
 
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 ns = Namespace("email", description="Email Related Operations")  # noqa
 #ns.add_model(email.name, email)

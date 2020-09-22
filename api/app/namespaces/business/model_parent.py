@@ -7,7 +7,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
 
 from ..transaction import Transaction
-from ..utils.ATs import seller_firm_accounting_firm_AT
+from app.namespaces.utils.ATs import seller_firm_accounting_firm_AT
 
 from app.extensions import db  # noqa
 

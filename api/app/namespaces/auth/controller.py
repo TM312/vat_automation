@@ -12,7 +12,7 @@ from .interface import TokenInterface
 
 from ..user.interface_parent import UserInterface
 from ..user import user_dto
-from ..utils.decorators import login_required, accepted_u_types
+from app.namespaces.utils.decorators import login_required, accepted_u_types
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
 ns.add_model(auth_dto.name, auth_dto)

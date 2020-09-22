@@ -7,7 +7,7 @@ from . import ItemTag
 from . import item_tag_dto
 from .service import ItemTagService
 
-from ..utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required
 
 
 ns = Namespace("ItemTag", description="ItemTag Related Operations")  # noqa

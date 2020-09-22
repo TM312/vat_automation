@@ -10,7 +10,7 @@ from . import TaxRecord
 from .service import TaxRecordService
 from .interface import TaxRecordInterface
 
-from ..utils.decorators import login_required, employer_required, accepted_u_types
+from app.namespaces.utils.decorators import login_required, employer_required, accepted_u_types
 
 ns = Namespace("TaxRecord", description="Tax Record Related Operations")  # noqa
 ns.add_model(tax_record_dto.name, tax_record_dto)

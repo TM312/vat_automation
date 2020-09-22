@@ -4,7 +4,7 @@ from datetime import date
 
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
-from ..config import basedir
+from app.config import basedir
 
 
 

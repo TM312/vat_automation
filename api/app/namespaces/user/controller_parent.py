@@ -9,7 +9,7 @@ from . import User, Action
 from . import user_dto, user_dto_admin, user_sub_dto, action_dto
 from .service_parent import UserService
 
-from ..utils.decorators import login_required, accepted_u_types, confirmation_required
+from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("User", description="User Related Operations")  # noqa

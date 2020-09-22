@@ -8,6 +8,7 @@ import pandas as pd
 
 
 from flask import g, current_app
+from werkzeug.exceptions import UnprocessableEntity, NotFound, ExpectationFailed
 
 from app.extensions import (
     db,
@@ -18,9 +19,9 @@ from app.extensions.socketio.emitters import SocketService
 from . import Account
 from .schema import AccountSubSchema
 from .interface import AccountInterface
-from ..utils.service import InputService
+from app.namespaces.utils.service import InputService
 from ..tag.service import TagService
-from ..utils.service import NotificationService
+from app.namespaces.utils.service import NotificationService
 
 
 
@@ -138,26 +139,22 @@ class AccountService:
 
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, current: int) -> List:
         try:
             given_id = InputService.get_str(df, i, column='account_id')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='account_id')
-            return False
-
-        if not given_id or given_id == '':
-            SocketService.emit_status_error_no_value(current, object_type, column_name='account_id')
-            return False
+            raise UnprocessableEntity('account_id')
 
         try:
             channel_code = InputService.get_str(df, i, column='channel_code')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='channel_code')
-            return False
+            raise UnprocessableEntity('channel_code')
 
-        if not channel_code or channel_code == '':
-            SocketService.emit_status_error_no_value(current, object_type, column_name='channel_code')
-            return False
+        if given_id == '' or not isinstance(given_id, str):
+            raise ExpectationFailed('account_id')
+
+        if channel_code == '' or not isinstance(channel_code, str):
+            raise ExpectationFailed('channel_code')
 
         return given_id, channel_code
 
@@ -188,8 +185,13 @@ class AccountService:
         for i in range(total_number_accounts):
             current = i + 1
 
-            given_id, channel_code = AccountService.get_df_vars(df, i, current, object_type)
-            if not isinstance(given_id, str) and isinstance(channel_code, str):
+            try:
+                given_id, channel_code = AccountService.get_df_vars(df, i, current)
+            except Exception as e:
+                if e.code == 422:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                elif e.code == 417:
+                    SocketService.emit_status_error_invalid_value(object_type, e.description)
                 return False
 
 

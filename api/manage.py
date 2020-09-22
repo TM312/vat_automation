@@ -5,7 +5,7 @@ from flask_migrate import MigrateCommand
 from app import create_app
 from app.extensions import db
 
-from commands.seed_command import SeedCommand
+from commands.seed_command import SeedCommand, SeedCommandTest
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -18,6 +18,7 @@ manager = Manager(app)
 app.app_context().push()
 
 manager.add_command("seed_db", SeedCommand)
+# manager.add_command('seed_db_test', SeedCommandTest)
 manager.add_command('db', MigrateCommand)
 
 @manager.command

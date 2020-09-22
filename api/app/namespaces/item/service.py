@@ -4,7 +4,7 @@ from typing import List, BinaryIO, Dict
 import pandas as pd
 
 from flask import g, current_app
-from werkzeug.exceptions import NotFound, UnsupportedMediaType
+from werkzeug.exceptions import NotFound, UnsupportedMediaType, UnprocessableEntity, ExpectationFailed
 from app.extensions import (
     db,
     socket_io)
@@ -14,7 +14,7 @@ from .schema import ItemSubSchema
 from .interface import ItemInterface
 
 from ..account import Account
-from ..utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService
 from ..transaction_input import TransactionInput
 from ..tag.service import TagService
 
@@ -201,31 +201,26 @@ class ItemService:
         try:
             sku = InputService.get_str(df, i, column='SKU')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='SKU')
-            return False
+            raise UnprocessableEntity('SKU')
 
         if not sku or sku == '':
             message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
             SocketService.emit_status_info(object_type, message)
-            return False
 
         try:
             name = InputService.get_str_or_None(df, i, column='name')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='name')
-            return False
+            raise UnprocessableEntity('name')
 
         try:
             unit_cost_price_net = InputService.get_float_or_None(df, i, column='unit_cost_price_net')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_net')
-            return False
+            raise UnprocessableEntity('unit_cost_price_net')
 
         try:
             unit_cost_price_currency_code = InputService.get_str(df, i, column='unit_cost_price_currency_code')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='unit_cost_price_currency_code')
-            return False
+            raise UnprocessableEntity('unit_cost_price_currency_code')
 
         try:
             service_start_date = current_app.config.SERVICE_START_DATE
@@ -236,27 +231,34 @@ class ItemService:
                 valid_from = date.today()
 
         except:
-            # send error status via socket
-            SocketService.emit_status_error_column_read(current, object_type, column_name='valid_from')
-            return False
+            raise UnprocessableEntity('valid_from')
 
         try:
             brand_name = InputService.get_str_or_None(df, i, column='brand_name')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='brand_name')
-            return False
+            raise UnprocessableEntity('brand_name')
 
         try:
             weight_kg = InputService.get_float_or_None(df, i, column='weight_kg')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='weight_kg')
-            return False
+            raise UnprocessableEntity('weight_kg')
 
         try:
             tax_code_code = InputService.get_str(df, i, column='tax_code')
         except:
-            SocketService.emit_status_error_column_read(current, object_type, column_name='tax_code')
-            return False
+            raise UnprocessableEntity('tax_code')
+
+        if not isinstance(sku, str):
+             raise ExpectationFailed('SKU')
+
+        if not isinstance(unit_cost_price_net, (float, int, complex)):
+            raise ExpectationFailed('unit_cost_price_net')
+
+        if not isinstance(unit_cost_price_currency_code, str):
+            raise ExpectationFailed('unit_cost_price_currency_code')
+
+        if not isinstance(valid_from, date):
+            raise ExpectationFailed('valid_from')
 
         return sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code
 
@@ -284,14 +286,15 @@ class ItemService:
         for i in range(total_number_items):
             current = i + 1
 
-            sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type)
-            if not (
-                isinstance(sku, str) and
-                isinstance(unit_cost_price_net, (float, int, complex)) and
-                isinstance(unit_cost_price_currency_code, str) and
-                isinstance(valid_from, date)
-            ):
+            try:
+                sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type)
+            except Exception as e:
+                if e.code == 422:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                if e.code == 417:
+                    SocketService.emit_status_error_invalid_value(object_type, e.description)
                 return False
+
 
             item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
 

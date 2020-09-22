@@ -7,7 +7,7 @@ from . import Account
 from . import account_dto, account_sub_dto, account_admin_dto
 from .service import AccountService
 
-from ..utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Account", description="Account Related Operations")  # noqa
