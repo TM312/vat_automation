@@ -1,55 +1,57 @@
 import AccountRepository from './AccountRepository'
+import AccountingFirmRepository from './AccountingFirmRepository'
+import AdminRepository from './AdminRepository'
 import BundleRepository from './BundleRepository'
 import BusinessRepository from './BusinessRepository'
-import AccountingFirmRepository from './AccountingFirmRepository'
-import CustomerFirmRepository from './CustomerFirmRepository'
-import SellerFirmRepository from './SellerFirmRepository'
 import ChannelRepository from './ChannelRepository'
 import CountryRepository from './CountryRepository'
 import CurrencyRepository from './CurrencyRepository'
+import CustomerFirmRepository from './CustomerFirmRepository'
 import DistanceSaleRepository from './DistanceSaleRepository'
 import ExchangeRateRepository from './ExchangeRateRepository'
 import ItemRepository from './ItemRepository'
 import PlatformRepository from './PlatformRepository'
+import SellerRepository from './SellerRepository'
+import SellerFirmRepository from './SellerFirmRepository'
+import StatusRepository from './StatusRepository'
+import TaxAuditorRepository from './TaxAuditorRepository'
 import TaxCodeRepository from './TaxCodeRepository'
-import TaxTreatmentRepository from './TaxTreatmentRepository'
-import VatRepository from './VatRepository'
-import VATINRepository from './VATINRepository'
+import TaxRateTypeRepository from './TaxRateTypeRepository'
 import TaxRecordRepository from './TaxRecordRepository'
+import TaxTreatmentRepository from './TaxTreatmentRepository'
 import TransactionRepository from './TransactionRepository'
 import TransactionInputRepository from './TransactionInputRepository'
 import UserRepository from './UserRepository'
-import AdminRepository from './AdminRepository'
-import SellerRepository from './SellerRepository'
-import StatusRepository from './StatusRepository' //!!
-import TaxAuditorRepository from './TaxAuditorRepository'
 import UtilsRepository from './UtilsRepository'
+import VatRepository from './VatRepository'
+import VATINRepository from './VATINRepository'
 
 export default ($axios) => ({
     account: AccountRepository($axios),
+    accounting_firm: AccountingFirmRepository($axios),
+    admin: AdminRepository($axios),
     bundle: BundleRepository($axios),
     business: BusinessRepository($axios),
-    accounting_firm: AccountingFirmRepository($axios),
-    customer_firm: CustomerFirmRepository($axios),
-    seller_firm: SellerFirmRepository($axios),
     channel: ChannelRepository($axios),
     country: CountryRepository($axios),
     currency: CurrencyRepository($axios),
+    customer_firm: CustomerFirmRepository($axios),
     distance_sale: DistanceSaleRepository($axios),
     exchange_rate: ExchangeRateRepository($axios),
     item: ItemRepository($axios),
     platform: PlatformRepository($axios),
+    seller: SellerRepository($axios),
+    seller_firm: SellerFirmRepository($axios),
+    status: StatusRepository($axios),
+    tax_auditor: TaxAuditorRepository($axios),
     tax_code: TaxCodeRepository($axios),
-    tax_treatment: TaxTreatmentRepository($axios),
-    vat: VatRepository($axios),
-    vatin: VATINRepository($axios),
+    tax_rate_type: TaxRateTypeRepository($axios),
     tax_record: TaxRecordRepository($axios),
+    tax_treatment: TaxTreatmentRepository($axios),
     transaction: TransactionRepository($axios),
     transaction_input: TransactionInputRepository($axios),
     user: UserRepository($axios),
-    admin: AdminRepository($axios),
-    seller: SellerRepository($axios),
-    status: StatusRepository($axios), //!!
-    tax_auditor: TaxAuditorRepository($axios),
-    utils: UtilsRepository($axios)
+    utils: UtilsRepository($axios),
+    vat: VatRepository($axios),
+    vatin: VATINRepository($axios)
 })

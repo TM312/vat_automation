@@ -340,7 +340,7 @@ export default {
             if (this.doneStatusVatNumberTargets) {
                 return (this.lenStatusVatNumber === 1) ? 'Uploaded vat numbers processed' : `${this.totalStatusVatNumberTargets} uploaded vat numbers processed`
             } else {
-                return 'New items are being registered...'
+                return 'New vat numbers are being registered...'
             }
         },
         titleDistanceSale() {

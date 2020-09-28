@@ -111,7 +111,7 @@ class TransactionInput(db.Model):
     check_tax_calculation_imputation_country = db.Column(db.String(24))
     check_tax_jurisdiction = db.Column(db.String(24))
     check_tax_jurisdiction_level = db.Column(db.String(24))
-    _check_invoice_amount_vat = db.Column(db.Integer, default=0)
+    _check_invoice_amount_vat = db.Column(db.Integer)
     check_invoice_currency_code = db.Column(db.String(8))
     _check_invoice_exchange_rate = db.Column(db.Integer)
     check_invoice_exchange_rate_date = db.Column(db.Date)

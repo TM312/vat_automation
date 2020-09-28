@@ -1,11 +1,11 @@
 <template>
     <div>
         <b-card
-            v-if="transaction_inputs.length === 0 && channelCode"
+            v-if="transactionInputs.length === 0 && channelCode"
             sub-title="No transaction have been registered for this channel."
             class="text-center py-5"
         ></b-card>
-        <b-table v-else :fields="fields" :items="transaction_inputs" hover>
+        <b-table v-else :fields="fieldsBundle" :items="transactionInputs" hover>
 
             <template v-slot:cell(transaction_type_public_code)="data">
                 <nuxt-link :to="`/tax/transactions/${data.item.public_id}`">{{ data.value }}</nuxt-link>
@@ -61,7 +61,7 @@ export default {
 
     data() {
         return {
-            fields: [
+            fieldsBundle: [
                  {
                     key: 'complete_date',
                     sortable: false,
@@ -70,6 +70,7 @@ export default {
                     key: 'transaction_type_public_code',
                     label: 'Public Type',
                     sortable: false,
+                    formatter: value => {return this.capitalize(value)},
                 },
                 {
                     key: 'item_sku',
@@ -128,7 +129,7 @@ export default {
             countries: state => state.country.countries
         }),
 
-        transaction_inputs() {
+        transactionInputs() {
             return this.channelCode ? this.transaction_inputs_full.filter(transaction_input => transaction_input.channel_code === this.channelCode) : this.transaction_inputs_full
         },
 

@@ -1,12 +1,25 @@
 <template>
     <div>
         <b-card
-            no-body
             border-variant="primary"
             header-bg-variant="primary"
             header-text-variant="white"
             >
-            <b-tabs v-if="transactions.length === 0" card>
+
+            <b-tabs pills active-nav-item-class="text-white">
+                <b-tab
+                    v-for="transaction in transactions"
+                    :key="transaction.tax_treatment_code"
+                    :title="capitalize(transaction.tax_treatment_code)"
+                >
+                    <lazy-card-transaction
+                        :transaction="transaction"
+                        class="mt-4"
+                    />
+                </b-tab>
+            </b-tabs>
+
+            <!-- <b-tabs v-if="transactions.length === 0" card>
                  <b-tab
                     v-for="taxTreatment in taxTreatments"
                     :key="taxTreatment.code"
@@ -30,14 +43,14 @@
                         :transaction="transaction"
                     />
                 </b-tab>
-            </b-tabs>
+            </b-tabs> -->
 
         </b-card>
     </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 
 export default {
     name: "ViewTransactions",
@@ -51,16 +64,16 @@ export default {
 
 
     computed: {
-        ...mapState({
-            taxTreatments: state => state.tax_treatment.tax_treatments
-        }),
+        // ...mapState({
+        //     taxTreatments: state => state.tax_treatment.tax_treatments
+        // }),
 
-        filteredTransactions: function() {
-            var transactions = this.transactions
-            return this.taxTreatments.map(function(taxTreatment) {
-                return transactions.filter(transaction => transaction.tax_treatment_code === taxTreatment.code)
-            })
-        }
+        // filteredTransactions: function() {
+        //     var transactions = this.transactions
+        //     return this.taxTreatments.map(function(taxTreatment) {
+        //         return transactions.filter(transaction => transaction.tax_treatment_code === taxTreatment.code)
+        //     })
+        // }
     }
 }
 </script>

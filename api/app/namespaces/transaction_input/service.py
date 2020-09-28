@@ -157,29 +157,6 @@ class TransactionInputService:
         return delimiter
 
 
-    # @staticmethod
-    # def process_transaction_input_files_upload(transaction_input_files: List[BinaryIO]) -> Dict:
-    #     BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
-
-    #     file_type='item_list'
-    #     df_encoding = 'utf-8'
-    #     basepath = BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
-    #     user_id = g.user.id
-
-    #     for file in transaction_input_files:
-    #         delimiter = TransactionInputService.get_df_transaction_input_delimiter(file)
-    #         allowed_extensions = ['csv']
-    #         file_path_in = InputService.store_file(file, allowed_extensions, basepath)
-    #         TransactionInputService.process_transaction_input_file(file_path_in, file_type, df_encoding, delimiter, basepath, user_id)
-
-
-    #     response_object = {
-    #         'status': 'success',
-    #         'message': 'The files ({} in total) have been successfully uploaded and we have initialized their processing.'.format(str(len(transaction_input_files)))
-    #     }
-
-    #     return response_object
-
 
     @staticmethod
     def handle_transaction_input_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
@@ -313,7 +290,6 @@ class TransactionInputService:
                 continue #skipping duplicates
 
             else:
-
                 transaction_input_data = {
                     'created_by': user_id,
                     'bundle_id': bundle.id,

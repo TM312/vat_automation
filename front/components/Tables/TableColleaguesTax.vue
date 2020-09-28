@@ -27,7 +27,7 @@ export default {
                     key: 'role',
                     sortable: true,
                     formatter: value => {
-                        return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        return this.capitalize(value) //value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
                 {

@@ -133,15 +133,12 @@ class TransactionService:
 
 
 
-
-
         customer_vat_check_required: bool = TransactionService.vat_check_required(tax_date=tax_date, number=transaction_input.customer_firm_vat_number)
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
         customer_firm_vatin: VATIN = CustomerFirmService.get_vatin_or_None(country_code_temp=transaction_input.customer_firm_vat_number_country_code, number_temp=transaction_input.customer_firm_vat_number, date=tax_date)
         customer_relationship, customer_relationship_checked = CustomerFirmService.get_customer_relationship(transaction_type.code, customer_firm_vatin, check_required=customer_vat_check_required)
-
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
             tax_treatment_code = TransactionService.get_tax_treatment_code(transaction_type.code, account.seller_firm_id, account.seller_firm.establishment_country_code, transaction_input, eu, customer_relationship, departure_country.code, arrival_country, amazon_vat_calculation_service, tax_date)
@@ -200,6 +197,7 @@ class TransactionService:
             customer_vat_check_required: bool
             ):
 
+
         from ..tax.vatin.service import VATINService
         from ..tax.vat.service import VatService
 
@@ -219,7 +217,6 @@ class TransactionService:
         shipment_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
         gift_wrap_tax_rate_type_code = current_app.config.STANDARD_SERVICE_TAX_RATE_TYPE
         gift_wrap_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
-
 
         item_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=item_tax_rate_type_code, reference_vat_rate=item_vat_temp.rate, calculated_vat_rate=item_vat_temp.rate)
         gift_wrap_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=shipment_tax_rate_type_code, calculated_vat_rate=gift_wrap_vat_temp.rate)
@@ -272,7 +269,6 @@ class TransactionService:
         arrival_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, arrival_country.vat_country_code, transaction_input.check_arrival_seller_vat_number, date=tax_date)
         departure_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, departure_country.vat_country_code, transaction_input.check_departure_seller_vat_number, date=tax_date)
         seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, tax_jurisdiction.vat_country_code, transaction_input.check_seller_vat_number, date=tax_date)
-
 
         transaction_data= {
             # 'account_id': account.id,
@@ -355,6 +351,7 @@ class TransactionService:
 
         try:
             new_transaction = TransactionService.create(transaction_data)
+
         except:
             db.session.rollback()
             raise
@@ -475,10 +472,8 @@ class TransactionService:
         TransactionService.compare_calculation_reference_tax_calculation_date(transaction_id, transaction_input, tax_calculation_date)
         TransactionService.compare_calculation_reference_invoice_currency_code(transaction_id, transaction_input, invoice_currency_code)
         VatService.compare_reference_calculated_vat_rates(transaction_id, transaction_input, reference_vat_rate=reference_vat_rate, calculated_vat_rate=calculated_vat_rate)
-        TaxCodeService.compare_calculation_reference(transaction_id, transaction_input, calculated_item_tax_code_code, item_tax_code_code)
+        TaxCodeService.compare_calculation_reference(transaction_id, transaction_input.original_filename, calculated_item_tax_code_code, item_tax_code_code)
         VATINService.compare_calculation_reference_old_transaction(transaction_id, transaction_input, customer_vat_check_required, tax_date, transaction_input.customer_firm_vat_number)
-
-
 
 
 

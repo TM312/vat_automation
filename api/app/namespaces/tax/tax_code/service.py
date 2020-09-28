@@ -1,11 +1,8 @@
 from typing import List
 from app.extensions import db
 
-
 from . import TaxCode
 from .interface import TaxCodeInterface
-from ...transaction_input import TransactionInput
-from ...utils.service import NotificationService
 
 
 class TaxCodeService:
@@ -58,11 +55,13 @@ class TaxCodeService:
 
 
     @staticmethod
-    def compare_calculation_reference(transaction_id: int, transaction_input: TransactionInput, tax_code_code: str, calculated_tax_code_code) -> None:
+    def compare_calculation_reference(transaction_id: int, original_filename: str, tax_code_code: str, calculated_tax_code_code) -> None:
+        from app.namespaces.utils.service import NotificationService
+
         if calculated_tax_code_code != tax_code_code:
             notification_data=NotificationService.create_transaction_notification_data(
                 main_subject='Item Tax Code',
-                original_filename=transaction_input.original_filename,
+                original_filename=original_filename,
                 status='warning',
                 reference_value=tax_code_code,
                 calculated_value=calculated_tax_code_code,

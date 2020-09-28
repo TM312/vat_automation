@@ -33,7 +33,7 @@
                         v-for="tag in notification.tags"
                         :key="tag.code" :variant="tag.code === 'TRANSACTION' ? 'success' : 'primary'"
                         class="mr-1"
-                    >{{ get_code(tag.code) }}</b-badge>
+                    >{{ capitalize(tag.code) }}</b-badge>
                 </b-col>
 
             </b-row>
@@ -74,16 +74,16 @@
         },
 
 
-        methods: {
-            get_code(code) {
-                return code
-                    .toLowerCase()
-                    .replace("_", " ")
-                    .replace(/(^\w{1})|(\s{1}\w{1})/g, (match) =>
-                        match.toUpperCase()
-                    );
-            },
-        },
+        // methods: {
+        //     get_code(code) {
+        //         return code
+        //             .toLowerCase()
+        //             .replace("_", " ")
+        //             .replace(/(^\w{1})|(\s{1}\w{1})/g, (match) =>
+        //                 match.toUpperCase()
+        //             );
+        //     },
+        // },
     };
 </script>
 

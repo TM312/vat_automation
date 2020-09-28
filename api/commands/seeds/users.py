@@ -33,12 +33,12 @@ class AdminSeedService:
         # gvc = AccountingFirm.query.filter_by(name='Global VAT Compliance').first()
         testAF = AccountingFirm.query.filter_by(name='Test Accounting Firm').first()
 
-        if not isinstance(gvc, AccountingFirm) or not isinstance(testAF, AccountingFirm) or not isinstance(thomas, Admin):
-            raise
+        # if not isinstance(gvc, AccountingFirm) or not isinstance(testAF, AccountingFirm) or not isinstance(thomas, Admin):
+        #     raise
 
-        else:
+        # else:
             # thomas.created_businesses.append(gvc)
-            thomas.created_businesses.append(testAF)
+        thomas.created_businesses.append(testAF)
 
 
 class TaxAuditorSeedService:

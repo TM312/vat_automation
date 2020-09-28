@@ -48,7 +48,7 @@
                         placement="top"
                     >
                         <template v-slot:title>{{ taxAuditor.name }}</template>
-                        <b>Role: </b> {{ get_role(taxAuditor.role) }}
+                        <b>Role: </b> {{ capitalize(taxAuditor.role) }}
                     </b-popover>
                 </b-col>
             </b-row>
@@ -85,10 +85,6 @@
         },
 
         methods: {
-            get_role(role) {
-                return role.replace('_', ' ').replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
-            },
-
             async remove(sellerFirmPublicId) {
                 this.buttonDisabled = true;
                 try {

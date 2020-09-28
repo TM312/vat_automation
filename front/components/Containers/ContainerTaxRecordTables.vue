@@ -66,7 +66,7 @@ export default {
                     sortable: false
                 },
                 {
-                    key: 'netInvoiceAmount',
+                    key: 'netAmount',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
@@ -81,7 +81,7 @@ export default {
                     sortable: false
                 },
                 {
-                    key: 'netInvoiceAmount',
+                    key: 'netAmount',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
@@ -104,21 +104,21 @@ export default {
                     sortable: false,
                 },
                 {
-                    key: 'netInvoiceAmount',
+                    key: 'netAmount',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
                     }
                 },
                 {
-                    key: 'vatInvoiceAmount',
+                    key: 'vatAmount',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
                     }
                 },
                 {
-                    key: 'grossInvoiceAmount',
+                    key: 'grossAmount',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
