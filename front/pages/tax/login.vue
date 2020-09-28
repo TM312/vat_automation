@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid>
+  <b-container fluid style="height: 900px">
     <b-row class="mt-5" align-h="center">
       <b-col cols="6" md="4">
         <b-card>

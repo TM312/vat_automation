@@ -1,2 +1,2 @@
-from .model import Vat, TaxRateType
+from .model import Vat
 from .schema import vat_dto

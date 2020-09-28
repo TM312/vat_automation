@@ -11,7 +11,8 @@ from app.namespaces.country import EU, Country
 from app.namespaces.transaction import TransactionType
 from app.namespaces.tax.tax_code import TaxCode
 from app.namespaces.tax.tax_treatment import TaxTreatment
-from app.namespaces.tax.vat import Vat, TaxRateType
+from app.namespaces.tax.vat import Vat
+from app.namespaces.tax.tax_rate_type import TaxRateType
 from app.namespaces.platform import Platform
 from app.namespaces.channel import Channel
 from app.namespaces.tag import Tag

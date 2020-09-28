@@ -1,7 +1,5 @@
 <template>
-  <b-card>Hi
-
-  </b-card>
+  <div></div>
 </template>
 
 <script>

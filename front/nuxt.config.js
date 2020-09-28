@@ -47,7 +47,8 @@ export default {
     plugins: [
         // '~/plugins/file-system'
         '~/plugins/repositories',
-        '~/plugins/sleep'
+        '~/plugins/sleep',
+        '~/plugins/capitalize'
     ],
 
     /*
@@ -86,6 +87,7 @@ export default {
             'BAvatarGroup',
             'BBadge',
             'BButton',
+            'BButtonGroup',
             'BCard',
             'BCardHeader',
             'BCardFooter',
@@ -124,6 +126,11 @@ export default {
             'BRow',
             'BSpinner',
             'BTable',
+            'BTableLite',
+            // 'BTableSimple',
+            // 'BTr',
+            // 'BTd',
+            // 'BTbody',
             'BTab',
             'BTabs',
             'BToast',
@@ -133,9 +140,9 @@ export default {
             'VBModal',
             'VBPopover',
             'VBTooltip',
-            'VBScrollspy',
             'VBToggle'
-        ]
+        ],
+        directivePlugins: ['VBScrollspyPlugin']
     },
 
     axios: {

@@ -50,6 +50,10 @@
                 await store.dispatch("tax_treatment/get_all")
             }
 
+            if (this.taxRateTypes.length == 0) {
+                await store.dispatch("tax_rate_type/get_all");
+            }
+
             if (this.channels.length == 0) {
                 await store.dispatch("channel/get_all");
             }
@@ -69,6 +73,7 @@
                 countries: state => state.country.countries,
                 currencies: state => state.currency.currencies,
                 taxTreatments: state => state.tax_treatment.tax_treatments,
+                taxRateTypes: state => state.tax_rate_type.tax_rate_types,
                 notifications: state => state.utils.notifications
 
 

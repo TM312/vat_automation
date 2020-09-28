@@ -60,9 +60,11 @@ class Transaction(db.Model):  # type: ignore
     tax_date = db.Column(db.Date, nullable=False)
     tax_calculation_date = db.Column(db.Date, nullable=False)
     item_tax_code_code = db.Column(db.String(40), nullable=False)
+
     item_tax_rate_type_code = db.Column(db.String(8), db.ForeignKey('tax_rate_type.code'), nullable=False)
     shipment_tax_rate_type_code = db.Column(db.String(8), db.ForeignKey('tax_rate_type.code'), nullable=False)
     gift_wrap_tax_rate_type_code = db.Column(db.String(8), db.ForeignKey('tax_rate_type.code'), nullable=False)
+
     _item_price_net = db.Column(db.Integer)
     _item_price_discount_net = db.Column(db.Integer)
     _item_price_total_net = db.Column(db.Integer)
@@ -99,6 +101,8 @@ class Transaction(db.Model):  # type: ignore
     arrival_seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
     departure_seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
     seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
+
+
 
     #cent values
     @hybrid_property

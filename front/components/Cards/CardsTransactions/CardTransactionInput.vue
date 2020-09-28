@@ -1,91 +1,132 @@
 <template>
     <div>
-        <b-card-group deck class="my-5">
-            <b-card
-                title="Base Data"
-            >
-                <b-row cols="2">
-                    <b-col>
-                        <b>Activity ID:</b> {{ transactionInput.activity_id }} <br>
-                        <b>Public Activity Period</b> {{ transactionInput.public_activity_period }}<br>
-                        <b>Original Filename:</b> {{ transactionInput.original_filename }}
-                    </b-col>
-                    <b-col>
-                        <b>Account:</b> {{ transactionInput.account_given_id }}<br>
-                        <b>Channel:</b> {{ transactionInput.channel_code }} <br>
-                        <b>Marketplace</b> {{ transactionInput.marketplace }}<br>
-                        <b>Public Transaction Type:</b> {{ transactionInput.transaction_type_public_code }}
-                    </b-col>
-                </b-row>
+        <b-row cols="1" cols-lg="2" cols-xl="4" class="my-2">
+            <b-col class="my-2 px-2">
+                <b-card title="File" class="h-100">
+                    <b-table-lite borderless small :items="itemsFile" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== ''">{{ data.value }}</span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
+                </b-card>
+            </b-col>
 
-                <b-row>
-                    <b-col cols="auto">
-                         <b>Created On:</b><br>
-                         <b>Uploaded By:</b>
-                    </b-col>
-                    <b-col>
-                        {{ new Date(transactionInput.created_on).toLocaleString() }} <br>
-                        {{ transactionInput.created_by }}
-                    </b-col>
-                </b-row>
+            <b-col class="my-2 px-2">
+                <b-card title="Source" class="h-100">
+                    <b-table-lite borderless small :items="itemsBaseDetails" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== ''">{{ data.value }}</span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
+                </b-card>
+            </b-col>
+
+            <b-col class="my-2 px-2">
+                <b-card title="Dates" class="h-100">
+                    <b-table-lite borderless small :items="itemsDate" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== ''">{{ data.value }}</span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
+                </b-card>
+            </b-col>
+
+            <b-col class="my-2 px-2">
+                <b-card title="Logistics" class="h-100">
+                     <b-table-lite borderless small :items="itemsLogistics" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== '' && Array.isArray(data.value) === false">{{ data.value }}</span>
+                            <span v-else-if="data.value !== '' && Array.isArray(data.value) === true">
+                                {{ data.value[0] }} <br>
+                                {{ data.value[1] }} {{ data.value[2] }}
+                                <span v-if="data.value.length === 3 && data.value[3] !== '' && data.value[3] !== null"><br>{{ data.value[3] }}</span>
+                            </span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
 
 
-            </b-card>
-            <b-card
-                title="Item"
-            >
-                <b>SKU:</b> {{ transactionInput.item_sku }} <br>
-                <b>Name</b> {{ transactionInput.item_name }} <br>
-                <b>Quantity:</b> {{ transactionInput.item_quantity }}<br>
-                <b>Manufacture Country:</b> {{ transactionInput.item_manufacture_country }} <br>
-                <b>Weight:</b>
-                <span v-if="transactionInput.item_weight_kg !== null">{{ Number.parseFloat(transactionInput.item_weight_kg).toFixed(3) }}kg</span>
-                <span v-if="transactionInput.item_weight_kg_total !== null">| Total: {{ Number.parseFloat(transactionInput.item_weight_kg_total).toFixed(3) }}kg</span>
-            </b-card>
 
-        </b-card-group>
-        <b-card-group deck>
-            <b-card title="Logistics">
-                <b-row cols="3">
-                    <b-col>
-                        <b>Departure</b><br>
-                        {{ transactionInput.departure_country_code }}<br>
-                        {{ transactionInput.departure_postal_code }} {{ transactionInput.departure_city }}<br>
-                        <br>
-                        <b>Arrival</b><br>
-                        {{ transactionInput.arrival_country_code }}<br>
-                        {{ transactionInput.arrival_postal_code }} {{ transactionInput.arrival_city }}<br>
-                        {{ transactionInput.arrival_address }}
-                    </b-col>
-                    <b-col>
-                        <b>Shipment</b><br>
-                        <b>Mode:</b> {{ transactionInput.shipment_mode }} <br>
-                        <b>Conditions:</b> {{ transactionInput.shipment_conditions }} <br>
-                    </b-col>
-                    <b-col>
-                        <b-row><b-col><b>Dates</b></b-col></b-row>
+                    <!-- <b-row>
+                        <b-col cols="4" xl="3"><b>Departure:</b></b-col>
+                        <b-col cols="8" xl="9" class="mr-auto">
+                            {{ transactionInput.departure_country_code }} <br>
+                            {{ transactionInput.departure_postal_code }} {{ transactionInput.departure_city }}
+                        </b-col>
+                    </b-row>
+                    <b-row class="my-2">
+                        <b-col cols="4" xl="3"><b>Arrival:</b></b-col>
+                        <b-col cols="8" xl="9" class="mr-auto">
+                             {{ transactionInput.arrival_country_code }} <br>
+                             {{ transactionInput.arrival_postal_code }} {{ transactionInput.arrival_city }} <br>
+                             {{ transactionInput.arrival_address }}
+                        </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col cols="4" xl="3"><b>Mode:</b></b-col>
+                        <b-col cols="8" xl="9" style="white-space: pre-wrap word-wrap:break-word" class="mr-auto">{{ transactionInput.shipment_mode }}</b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col cols="4" xl="3"><b>Conditions:</b></b-col>
+                        <b-col cols="8" xl="9" style="white-space: pre-wrap" class="mr-auto">{{ transactionInput.shipment_conditions }}</b-col> -->
+                    <!-- </b-row> -->
+                </b-card>
+            </b-col>
+        </b-row>
+
+        <b-row cols="1" cols-lg="2" cols-xl="3" class="my-2">
+            <b-col class="my-2 px-2">
+                <b-card title="Item" class="h-100">
+                    <b-table-lite borderless small :items="itemsItem" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== ''">{{ data.value }} </span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
+
+                </b-card>
+            </b-col>
+
+             <b-col class="my-2 px-2">
+                <b-card title="Gross Prices" class="h-100">
+                    <b-table hover borderless :items="itemsGrossPrices" :fields="fieldsGrossPrices"></b-table>
+                </b-card>
+            </b-col>
+
+            <b-col class="my-2 px-2">
+                <b-card class="h-100">
+                    <b-card-title>
                         <b-row>
+                            <b-col cols="auto" class="mr-auto">Invoice</b-col>
                             <b-col cols="auto">
-                                <b>Shipment:</b><br>
-                                <b>Arrival:</b><br>
-                                <b>Complete:</b>
-                            </b-col>
-                            <b-col>
-                                {{ transactionInput.shipment_date }} <br>
-                                {{ transactionInput.arrival_date }} <br>
-                                {{ transactionInput.complete_date }}
+                                <b-button
+                                    v-if="transactionInput.invoice_url"
+                                    class="ml-2"
+                                    size="sm"
+                                    variant="outline-primary"
+                                    :href="transactionInput.invoice_url"
+                                    ><b-icon icon="box-arrow-in-down" /> Download
+                                </b-button>
+
                             </b-col>
                         </b-row>
+                    </b-card-title>
+                    <b-table-lite borderless small :items="itemsInvoice" :fields="fieldsBase" class="mb-4">
+                        <template v-slot:cell(value)="data">
+                            <span v-if="data.value !== ''">{{ data.value }}</span>
+                            <span v-else><text-icon-na /></span>
+                        </template>
+                    </b-table-lite>
+                </b-card>
+            </b-col>
 
 
-                    </b-col>
-                </b-row>
-            </b-card>
-            <b-card title="Prices">
-                <b-table striped hover borderless :items="items" :fields="fields"></b-table>
+        </b-row>
 
-            </b-card>
-        </b-card-group>
+
     </div>
 
 </template>
@@ -100,55 +141,123 @@ export default {
             transactionInput: state => state.transaction_input.transaction_input
         }),
 
-        items() {
+        itemsGrossPrices() {
             return [
                 {
-                    x: 'Item',
-                    price_gross: this.transactionInput.item_price_gross,
-                    price_discount: this.transactionInput.item_price_discount_gross,
-                    price_total: this.transactionInput.item_price_total_gross
+                    x: 'Price',
+                    item: `${Number.parseFloat(this.transactionInput.item_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`
                 },
                 {
-                    x: 'Shipment',
-                    price_gross: this.transactionInput.shipment_price_gross,
-                    price_discount: this.transactionInput.shipment_price_discount_gross,
-                    price_total: this.transactionInput.shipment_price_total_gross
+                    x: 'Discount',
+                    item: `${Number.parseFloat(this.transactionInput.item_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`
                 },
                 {
-                    x: 'Gift Wrap',
-                    price_gross: this.transactionInput.gift_wrap_price_gross,
-                    price_discount: this.transactionInput.gift_wrap_price_discount_gross,
-                    price_total: this.transactionInput.gift_wrap_price_total_gross
-                }
+                    x: 'Total',
+                    item: `${Number.parseFloat(this.transactionInput.item_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
+                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`
+               }
             ]
 
 
         },
 
-        fields() {
+        fieldsGrossPrices() {
             return [
                 {
                     key: 'x',
                     label:'',
-                    sortable: false,
+                    sortable: false
                 },
                 {
-                    key: 'price_gross',
-                    label: `Price Gross (in ${ this.transactionInput.currency_code })`,
-                    sortable: false,
+                    key: 'item',
+                    sortable: false
                 },
                 {
-                    key: 'price_discount',
-                    label: `Price Discount (in ${ this.transactionInput.currency_code})`,
-                    sortable: false,
+                    key: 'shipment',
+                    sortable: false
                 },
                 {
-                    key: 'price_total',
-                    label: `Price Total (in ${ this.transactionInput.currency_code})`,
-                    sortable: false,
+                    key: 'gift_wrap',
+                    sortable: false
                 }
             ]
-        }
+        },
+
+
+        fieldsBase() {
+            return [
+                { key: 'key', label:'' },
+                { key: 'value', label:'' },
+            ]
+        },
+
+        itemsFile() {
+            return [
+                { key: 'Name', value: this.transactionInput.original_filename },
+                { key: 'Uploaded On', value: this.transactionInput.created_on ? this.$dateFns.format(this.transactionInput.created_on, 'MMMM dd, yyyy') : null },
+                { key: 'Uploaded By', value: this.transactionInput.created_by}
+            ]
+        },
+
+        itemsBaseDetails() {
+            return [
+                { key: 'Channel', value: this.transactionInput.channel_code },
+                { key: 'Account', value: this.transactionInput.account_given_id },
+                { key: 'Marketplace', value: this.transactionInput.marketplace},
+                { key: 'Transaction ID', value: this.transactionInput.activity_id},
+                { key: 'Transaction Type', value: this.transactionInput.transaction_type_public_code}
+            ]
+        },
+
+        itemsDate() {
+            return [
+                { key: 'Activity Period', value: this.transactionInput.public_activity_period },
+                { key: 'Shipment', value: this.transactionInput.shipment_date ? this.$dateFns.format(this.transactionInput.shipment_date, 'MMMM dd, yyyy') : null },
+                { key: 'Arrival', value: this.transactionInput.arrival_date ? this.$dateFns.format(this.transactionInput.arrival_date,  'MMMM dd, yyyy') : null },
+                { key: 'Complete', value: this.transactionInput.complete_date ? this.$dateFns.format(this.transactionInput.complete_date,  'MMMM dd, yyyy') : null },
+                { key: 'Tax Calculation', value: this.transactionInput.check_tax_calculation_date ? this.$dateFns.format(this.transactionInput.check_tax_calculation_date,  'MMMM dd, yyyy') : null }
+            ]
+        },
+
+        itemsLogistics() {
+            return [
+                {
+                    key: 'Departure',
+                    value: [this.transactionInput.departure_country_code, this.transactionInput.departure_postal_code, this.transactionInput.departure_city],
+                },
+                {
+                    key: 'Arrival',
+                    value: [this.transactionInput.arrival_country_code, this.transactionInput.arrival_postal_code, this.transactionInput.arrival_city, this.transactionInput.arrival_address],
+                },
+                { key: 'Mode', value: this.capitalize(this.transactionInput.shipment_mode) },
+                { key: 'Conditions', value: this.transactionInput.shipment_conditions }
+            ]
+        },
+
+        itemsInvoice() {
+            return [
+                { key: 'Number', value: this.transactionInput.invoice_number },
+                { key: 'Tax Jurisdiction', value: this.transactionInput.check_tax_jurisdiction },
+                { key: 'Vat Amount', value: this.transactionInput.check_invoice_amount_vat ? `${this.transactionInput.check_invoice_amount_vat} ${this.transactionInput.check_invoice_currency_code}` : null},
+                { key: 'Exchange Rate', value: this.transactionInput.check_invoice_exchange_rate ? `${this.transactionInput.check_invoice_exchange_rate} | Date: ${ this.transactionInput.check_invoice_exchange_rate_date}` : null}
+            ]
+        },
+
+        itemsItem() {
+            return [
+                { key: 'SKU', value: this.transactionInput.item_sku },
+                { key: 'Name', value: this.transactionInput.item_name },
+                { key: 'Quantity', value: this.transactionInput.item_quantity },
+                { key: 'Manufactured In', value: this.transactionInput.item_manufacture_country },
+                { key: 'Item Weight', value: this.transactionInput.item_weight_kg ? `${Number.parseFloat(this.transactionInput.item_weight_kg).toFixed(3)}kg` : null},
+                { key: 'Total Weight', value: this.transactionInput.item_weight_kg_total ? `${Number.parseFloat(this.transactionInput.item_weight_kg_total).toFixed(3)}kg` : null}
+            ]
+        },
     }
 
 }
