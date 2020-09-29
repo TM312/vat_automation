@@ -9,16 +9,7 @@
             </b-row>
 
         </b-card-title>
-        <!-- <template v-slot:title>
-            <b-row>
-                <b-col cols="auto" class="mr-auto">
-                    <h6 class="mb-0">Accounts</h6>
-                </b-col>
-                <b-col cols="auto">
-                    <b-form-checkbox v-model="editMode" name="check-button" switch>Edit Mode</b-form-checkbox>
-                </b-col>
-            </b-row>
-        </template> -->
+
         <b-card-text>
             <h5 v-if="accounts.length === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
             <div v-else>
@@ -29,7 +20,9 @@
 
 
                 <div v-if="editMode===false">
-                    <b-table borderless :items="accounts" :fields="fields" hover></b-table>
+                    <b-table borderless :items="accounts" :fields="fields" hover>
+                        <template v-slot:cell(platform)>Amazon</template>
+                    </b-table>
                 </div>
 
                 <div v-else>
@@ -63,8 +56,9 @@
                 flashCounter: false,
 
                 fields: [
-                    { key: 'channel_code', sortable: false },
-                    { key: 'given_id', label: "Platform ID", sortable: false }
+                    { key: 'platform', sortable: false },
+                    { key: 'channel_code', label: "Channel", sortable: false },
+                    { key: 'given_id', label: "Account ID", sortable: false }
                 ],
             };
         },
