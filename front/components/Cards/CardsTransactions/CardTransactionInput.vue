@@ -47,32 +47,6 @@
                             <span v-else><text-icon-na /></span>
                         </template>
                     </b-table-lite>
-
-
-
-                    <!-- <b-row>
-                        <b-col cols="4" xl="3"><b>Departure:</b></b-col>
-                        <b-col cols="8" xl="9" class="mr-auto">
-                            {{ transactionInput.departure_country_code }} <br>
-                            {{ transactionInput.departure_postal_code }} {{ transactionInput.departure_city }}
-                        </b-col>
-                    </b-row>
-                    <b-row class="my-2">
-                        <b-col cols="4" xl="3"><b>Arrival:</b></b-col>
-                        <b-col cols="8" xl="9" class="mr-auto">
-                             {{ transactionInput.arrival_country_code }} <br>
-                             {{ transactionInput.arrival_postal_code }} {{ transactionInput.arrival_city }} <br>
-                             {{ transactionInput.arrival_address }}
-                        </b-col>
-                    </b-row>
-                    <b-row>
-                        <b-col cols="4" xl="3"><b>Mode:</b></b-col>
-                        <b-col cols="8" xl="9" style="white-space: pre-wrap word-wrap:break-word" class="mr-auto">{{ transactionInput.shipment_mode }}</b-col>
-                    </b-row>
-                    <b-row>
-                        <b-col cols="4" xl="3"><b>Conditions:</b></b-col>
-                        <b-col cols="8" xl="9" style="white-space: pre-wrap" class="mr-auto">{{ transactionInput.shipment_conditions }}</b-col> -->
-                    <!-- </b-row> -->
                 </b-card>
             </b-col>
         </b-row>
@@ -242,7 +216,7 @@ export default {
         itemsInvoice() {
             return [
                 { key: 'Number', value: this.transactionInput.invoice_number },
-                { key: 'Tax Jurisdiction', value: this.transactionInput.check_tax_jurisdiction },
+                { key: 'Tax Jurisdiction', value: this.capitalize(this.transactionInput.check_tax_jurisdiction) },
                 { key: 'Vat Amount', value: this.transactionInput.check_invoice_amount_vat ? `${this.transactionInput.check_invoice_amount_vat} ${this.transactionInput.check_invoice_currency_code}` : null},
                 { key: 'Exchange Rate', value: this.transactionInput.check_invoice_exchange_rate ? `${this.transactionInput.check_invoice_exchange_rate} | Date: ${ this.transactionInput.check_invoice_exchange_rate_date}` : null}
             ]

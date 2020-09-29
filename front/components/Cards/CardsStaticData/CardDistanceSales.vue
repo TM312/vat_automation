@@ -69,8 +69,6 @@
 
                 fields: [
                     { key: "arrival_country", sortable: true },
-                    { key: "valid_from", sortable: true },
-                    { key: "valid_to", sortable: true },
                     { key: "active", sortable: true }
                 ]
             };
