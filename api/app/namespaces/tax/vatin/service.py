@@ -120,33 +120,32 @@ class VATINService:
         if not isinstance(number_temp, str):
             return None
         else:
-            try:
-                country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
-                vatin = VATINService.get_by_country_code_number_date(country_code, number, date)
-                if not isinstance(vatin, VATIN):
-                    try:
-                        vatin_data = VIESService.send_request(country_code, number)
-                    except:
-                        vatin_data = {
-                            'country_code': country_code,
-                            'number': number,
-                            'valid': None,
-                            'request_date': date.today(),
-                            'name': None,
-                            'address': None
-                        }
+            country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
+            vatin = VATINService.get_by_country_code_number_date(country_code, number, date)
+            if not isinstance(vatin, VATIN):
+                try:
+                    vatin_data = VIESService.send_request(country_code, number)
+                    print('vatin_data in get_vatin_if_number', flush=True)
+                    print('vatin_data: ', vatin_data, flush=True)
+                except:
+                    vatin_data = {
+                        'country_code': country_code,
+                        'number': number,
+                        'valid': None,
+                        'request_date': date.today(),
+                        'name': None,
+                        'address': None
+                    }
 
-                    vatin_data['country_code'] = country_code,
-                    vatin_data['number'] = number,
-                    vatin_data['valid_from'] = date if vatin_data.get('valid') else None
+                vatin_data['country_code'] = country_code,
+                vatin_data['number'] = number,
+                vatin_data['valid_from'] = date if vatin_data.get('valid') else None
 
-                    try:
-                        vatin = VATINService.create(vatin_data)
-                    except:
-                        db.session.rollback()
-
-            except:
-                raise
+                try:
+                    vatin = VATINService.create(vatin_data)
+                except:
+                    db.session.rollback()
+                    raise
 
             return vatin
 
@@ -171,15 +170,24 @@ class VATINService:
 
         return new_vatin
 
+
     @staticmethod
-    def get_vatin_or_None_and_verify(transaction_input: TransactionInput, country_code_temp: str, number_temp: str, date: date) -> VATIN:
-        from ...business.service_parent import BusinessService
+    def get_vatin_or_None(country_code_temp: str, number_temp: str, date: date) -> VATIN:
+        print('entering get_vatin_or_None', flush=True)
 
-        vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-        # if isinstance(vatin, VATIN):
-        #     business = BusinessService.get_by_name_address_or_None(vatin.name, vatin.address)
+        business_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
+        if isinstance(business_vatin, VATIN):
+            print('in get_vatin_or_None: business_vatin is found vatin', flush=True)
+            from app.namespaces.business.service_parent import BusinessService
+            from app.namespaces.business import Business
+            business = BusinessService.get_by_name_address_or_None(business_vatin.name, business_vatin.address)
 
-        return vatin
+            if isinstance(business, Business):
+                data_changes = {'business_id': business.id}
+                business_vatin.update(data_changes)
+                db.session.commit()
+
+            return business_vatin
 
 
 

@@ -208,7 +208,7 @@ export default {
                     key: 'Arrival',
                     value: [this.transactionInput.arrival_country_code, this.transactionInput.arrival_postal_code, this.transactionInput.arrival_city, this.transactionInput.arrival_address],
                 },
-                { key: 'Mode', value: this.capitalize(this.transactionInput.shipment_mode) },
+                { key: 'Mode', value: this.transactionInput.shipment_mode ? this.capitalize(this.transactionInput.shipment_mode) : null },
                 { key: 'Conditions', value: this.transactionInput.shipment_conditions }
             ]
         },
@@ -216,7 +216,7 @@ export default {
         itemsInvoice() {
             return [
                 { key: 'Number', value: this.transactionInput.invoice_number },
-                { key: 'Tax Jurisdiction', value: this.capitalize(this.transactionInput.check_tax_jurisdiction) },
+                { key: 'Tax Jurisdiction', value: this.transactionInput.check_tax_jurisdiction ? this.capitalize(this.transactionInput.check_tax_jurisdiction) : null },
                 { key: 'Vat Amount', value: this.transactionInput.check_invoice_amount_vat ? `${this.transactionInput.check_invoice_amount_vat} ${this.transactionInput.check_invoice_currency_code}` : null},
                 { key: 'Exchange Rate', value: this.transactionInput.check_invoice_exchange_rate ? `${this.transactionInput.check_invoice_exchange_rate} | Date: ${ this.transactionInput.check_invoice_exchange_rate_date}` : null}
             ]

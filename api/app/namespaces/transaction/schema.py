@@ -70,8 +70,8 @@ transaction_dto = transaction_sub_dto.clone('transaction', {
     'invoice_amount_net': fields.Float,
     'invoice_amount_vat': fields.Float,
     'invoice_amount_gross': fields.Float,
-    'vat_rate_reverse_charge': fields.Float,
-    'invoice_amount_vat_reverse_charge': fields.Float,
+    'reverse_charge_vat_rate': fields.Float,
+    'invoice_amount_reverse_charge_vat': fields.Float,
     'arrival_seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.arrival_seller_vatin.country_code, x.arrival_seller_vatin.number) if x.arrival_seller_vatin else None, readonly=True),
     'departure_seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.departure_seller_vatin.country_code, x.departure_seller_vatin.number) if x.departure_seller_vatin else None, readonly=True),
     'seller_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.seller_vatin.country_code, x.seller_vatin.number) if x.seller_vatin else None, readonly=True)

@@ -27,6 +27,7 @@ from ..country import Country, EU
 from ..country.service import CountryService
 from ..business.customer_firm import CustomerFirm
 from ..business.customer_firm.service import CustomerFirmService
+from ..business.service_parent import BusinessService
 from ..tax.vatin import VATIN
 from ..tax.vatin.service import VATINService
 from ..tax.tax_code.service import TaxCodeService
@@ -137,7 +138,13 @@ class TransactionService:
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.check_tax_calculation_date)
 
-        customer_firm_vatin: VATIN = CustomerFirmService.get_vatin_or_None(country_code_temp=transaction_input.customer_firm_vat_number_country_code, number_temp=transaction_input.customer_firm_vat_number, date=tax_date)
+        try:
+            customer_firm_vatin: VATIN = VATINService.get_vatin_or_None(country_code_temp=transaction_input.customer_firm_vat_number_country_code, number_temp=transaction_input.customer_firm_vat_number, date=tax_date)
+        except Exception as e:
+            print('ERROR AT CUSTOMER FIRM VATIN', flush=True)
+            print(e, flush=True)
+
+
         customer_relationship, customer_relationship_checked = CustomerFirmService.get_customer_relationship(transaction_type.code, customer_firm_vatin, check_required=customer_vat_check_required)
 
         if transaction_type.code == 'SALE' or transaction_type.code == 'REFUND':
@@ -196,10 +203,6 @@ class TransactionService:
             amazon_vat_calculation_service: bool,
             customer_vat_check_required: bool
             ):
-
-
-        from ..tax.vatin.service import VATINService
-        from ..tax.vat.service import VatService
 
         customer_firm: CustomerFirm = CustomerFirmService.get_customer_firm_or_None(customer_firm_vatin, customer_relationship)
 
@@ -262,18 +265,55 @@ class TransactionService:
         invoice_amount_vat: float = TransactionService.get_invoice_amount(total_value_vat, invoice_exchange_rate)
         invoice_amount_gross: float = TransactionService.get_invoice_amount(total_value_gross, invoice_exchange_rate)
 
-        vat_rate_reverse_charge: float = TransactionService.get_vat_rate_reverse_charge(transaction_input, arrival_country.code, tax_treatment_code, tax_date, item_tax_rate_type_code, item_history.tax_code_code)
-        invoice_amount_vat_reverse_charge: float = TransactionService.get_invoice_amount_vat_reverse_charge(invoice_amount_net, vat_rate_reverse_charge)
+        reverse_charge_vat_rate: float = TransactionService.get_reverse_charge_vat_rate(transaction_input, arrival_country.code, tax_treatment_code, tax_date, item_tax_rate_type_code, item_history.tax_code_code)
+        invoice_amount_reverse_charge_vat: float = TransactionService.get_invoice_amount_reverse_charge_vat(invoice_amount_net, reverse_charge_vat_rate)
 
 
-        arrival_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, arrival_country.vat_country_code, transaction_input.check_arrival_seller_vat_number, date=tax_date)
-        departure_seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, departure_country.vat_country_code, transaction_input.check_departure_seller_vat_number, date=tax_date)
-        seller_vatin = VATINService.get_vatin_or_None_and_verify(transaction_input, tax_jurisdiction.vat_country_code, transaction_input.check_seller_vat_number, date=tax_date)
+        try:
+            arrival_seller_vatin = VATINService.get_vatin_or_None(arrival_country.vat_country_code, transaction_input.check_arrival_seller_vat_number, date=tax_date)
+        except:
+            print('exception in arrival_seller_vatin', flush=True)
+            raise
+        try:
+            departure_seller_vatin = VATINService.get_vatin_or_None(departure_country.vat_country_code, transaction_input.check_departure_seller_vat_number, date=tax_date)
+        except:
+            print('exception in departure_seller_vatin', flush=True)
+            raise
+        try:
+            seller_vatin = VATINService.get_vatin_or_None(tax_jurisdiction.vat_country_code, transaction_input.check_seller_vat_number, date=tax_date)
+        except:
+            print('exception in seller_vatin', flush=True)
+            raise
+
+        seller_firm = BusinessService.get_by_id(account.seller_firm_id)
+        if arrival_seller_vatin in seller_firm.vat_numbers and arrival_seller_vatin.initial_tax_date == None:
+            arrival_seller_vatin.initial_tax_date == tax_date
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
+        if departure_seller_vatin in seller_firm.vat_numbers and departure_seller_vatin.initial_tax_date == None:
+            departure_seller_vatin.initial_tax_date == tax_date
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
+        if seller_vatin in seller_firm.vat_numbers and seller_vatin.initial_tax_date == None:
+            seller_vatin.initial_tax_date == tax_date
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
 
         transaction_data= {
-            # 'account_id': account.id,
             'transaction_input_id': transaction_input.id,
-            'seller_firm_id': account.seller_firm_id,
+            'seller_firm_id': seller_firm.id,
             'item_id': item.id,
 
             'type_code': transaction_type.code,
@@ -340,8 +380,8 @@ class TransactionService:
             'invoice_amount_vat': invoice_amount_vat,
             'invoice_amount_gross': invoice_amount_gross,
 
-            'vat_rate_reverse_charge': vat_rate_reverse_charge,
-            'invoice_amount_vat_reverse_charge': invoice_amount_vat_reverse_charge,
+            'reverse_charge_vat_rate': reverse_charge_vat_rate,
+            'invoice_amount_reverse_charge_vat': invoice_amount_reverse_charge_vat,
 
             'arrival_seller_vatin_id': arrival_seller_vatin.id if arrival_seller_vatin else None,
             'departure_seller_vatin_id': departure_seller_vatin.id if departure_seller_vatin else None,
@@ -438,8 +478,8 @@ class TransactionService:
             invoice_amount_net = transaction_data.get('invoice_amount_net'),
             invoice_amount_vat = transaction_data.get('invoice_amount_vat'),
             invoice_amount_gross = transaction_data.get('invoice_amount_gross'),
-            vat_rate_reverse_charge = transaction_data.get('vat_rate_reverse_charge'),
-            invoice_amount_vat_reverse_charge = transaction_data.get('invoice_amount_vat_reverse_charge'),
+            reverse_charge_vat_rate = transaction_data.get('reverse_charge_vat_rate'),
+            invoice_amount_reverse_charge_vat = transaction_data.get('invoice_amount_reverse_charge_vat'),
             arrival_seller_vatin_id = transaction_data.get('arrival_seller_vatin_id'),
             departure_seller_vatin_id = transaction_data.get('departure_seller_vatin_id'),
             seller_vatin_id = transaction_data.get('seller_vatin_id')
@@ -721,24 +761,24 @@ class TransactionService:
 
 
     @staticmethod
-    def get_invoice_amount_vat_reverse_charge(invoice_amount_net: float, vat_rate_reverse_charge: float) -> float:
-        return invoice_amount_net * vat_rate_reverse_charge
+    def get_invoice_amount_reverse_charge_vat(invoice_amount_net: float, reverse_charge_vat_rate: float) -> float:
+        return invoice_amount_net * reverse_charge_vat_rate
 
 
     @staticmethod
-    def get_vat_rate_reverse_charge(transaction_input: TransactionInput, arrival_country_code: str, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str, tax_code_code: str) -> float:
+    def get_reverse_charge_vat_rate(transaction_input: TransactionInput, arrival_country_code: str, tax_treatment_code: str, tax_date: date, tax_rate_type_code: str, tax_code_code: str) -> float:
         if tax_treatment_code != 'INTRA_COMMUNITY_ACQUISITION':
-            vat_rate_reverse_charge=float(0)
+            reverse_charge_vat_rate=float(0)
         else:
             # tax jurisdiction is arrival country
-            vat_rate_reverse_charge = VatService.get_by_tax_code_country_tax_date(tax_code_code, arrival_country_code, tax_date).rate
+            reverse_charge_vat_rate = VatService.get_by_tax_code_country_tax_date(tax_code_code, arrival_country_code, tax_date).rate
 
-        return vat_rate_reverse_charge
+        return reverse_charge_vat_rate
 
 
     @staticmethod
     def get_sale_transaction_by_platform_code_bundle_id(platform_code: str, bundle_id: int) -> Transaction:
-        from ..transaction_input.service import TransactionInputService
+        from app.namespaces.transaction_input.service import TransactionInputService
 
         if platform_code == 'AMZ':
             sale_transaction_input = TransactionInputService.get_sale_transaction_input_by_bundle_id(bundle_id)

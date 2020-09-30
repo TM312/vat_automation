@@ -77,8 +77,8 @@ _invoice_exchange_rate: int ==                      #multiply by factor 100
 _invoice_amount_net: int ==                         #multiply by factor 100
 _invoice_amount_vat: int ==                         #multiply by factor 100
 _invoice_amount_gross: int ==                       #multiply by factor 100
-_vat_rate_reverse_charge: int ==                    #multiply by factor 10'000
-_invoice_amount_vat_reverse_charge: int ==                      #multiply by factor 100
+_reverse_charge_vat_rate: int ==                    #multiply by factor 10'000
+_invoice_amount_reverse_charge_vat: int ==                      #multiply by factor 100
 
 
 

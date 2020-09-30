@@ -94,19 +94,7 @@ class CustomerFirmService:
         return customer_relationship, customer_relationship_checked
 
 
-    @staticmethod
-    def get_vatin_or_None(country_code_temp: str, number_temp: str, date: date) -> VATIN:
 
-        customer_firm_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
-        if isinstance(customer_firm_vatin, VATIN):
-            business = BusinessService.get_by_name_address_or_None(customer_firm_vatin.name, customer_firm_vatin.address)
-
-            if isinstance(business, Business):
-                data_changes = {'business_id': business.id}
-                customer_firm_vatin.update(data_changes)
-                db.session.commit()
-
-            return customer_firm_vatin
 
 
     @staticmethod
