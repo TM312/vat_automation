@@ -66,7 +66,7 @@ export default {
                     sortable: false
                 },
                 {
-                    key: 'netAmount',
+                    key: 'net',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
@@ -81,14 +81,14 @@ export default {
                     sortable: false
                 },
                 {
-                    key: 'netAmount',
+                    key: 'net',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
                     }
                 },
                 {
-                    key: 'reverseChargeAmount',
+                    key: 'reverseChargeVat',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
@@ -104,21 +104,21 @@ export default {
                     sortable: false,
                 },
                 {
-                    key: 'netAmount',
+                    key: 'net',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
                     }
                 },
                 {
-                    key: 'vatAmount',
+                    key: 'vat',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
                     }
                 },
                 {
-                    key: 'grossAmount',
+                    key: 'gross',
                     sortable: false,
                     formatter: value => {
                         return  `${Number.parseFloat(value).toFixed(2)} ${this.taxRecord.currency_code}`;
@@ -137,21 +137,21 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.local_sales_sales_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sales_sales_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sales_sales_invoice_amount_gross,
+                    'net': this.taxRecord.local_sales_sales_net,
+                    'vat': this.taxRecord.local_sales_sales_vat,
+                    'gross': this.taxRecord.local_sales_sales_gross,
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.local_sales_refunds_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sales_refunds_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sales_refunds_invoice_amount_gross,
+                    'net': this.taxRecord.local_sales_refunds_net,
+                    'vat': this.taxRecord.local_sales_refunds_vat,
+                    'gross': this.taxRecord.local_sales_refunds_gross,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.local_sales_total_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sales_total_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sales_total_invoice_amount_gross,
+                    'net': this.taxRecord.local_sales_total_net,
+                    'vat': this.taxRecord.local_sales_total_vat,
+                    'gross': this.taxRecord.local_sales_total_gross,
                 }
             ]
         },
@@ -160,21 +160,21 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.local_sale_reverse_charges_sales_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sale_reverse_charges_sales_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sale_reverse_charges_sales_invoice_amount_gross,
+                    'net': this.taxRecord.local_sale_reverse_charges_sales_net,
+                    'vat': this.taxRecord.local_sale_reverse_charges_sales_vat,
+                    'gross': this.taxRecord.local_sale_reverse_charges_sales_gross,
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.local_sale_reverse_charges_refunds_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sale_reverse_charges_refunds_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sale_reverse_charges_refunds_invoice_amount_gross,
+                    'net': this.taxRecord.local_sale_reverse_charges_refunds_net,
+                    'vat': this.taxRecord.local_sale_reverse_charges_refunds_vat,
+                    'gross': this.taxRecord.local_sale_reverse_charges_refunds_gross,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.local_sale_reverse_charges_total_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_sale_reverse_charges_total_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_sale_reverse_charges_total_invoice_amount_gross,
+                    'net': this.taxRecord.local_sale_reverse_charges_total_net,
+                    'vat': this.taxRecord.local_sale_reverse_charges_total_vat,
+                    'gross': this.taxRecord.local_sale_reverse_charges_total_gross,
                 }
             ]
         },
@@ -183,21 +183,21 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.distance_sales_sales_invoice_amount_net,
-                    'vatAmount': this.taxRecord.distance_sales_sales_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.distance_sales_sales_invoice_amount_gross,
+                    'net': this.taxRecord.distance_sales_sales_net,
+                    'vat': this.taxRecord.distance_sales_sales_vat,
+                    'gross': this.taxRecord.distance_sales_sales_gross,
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.distance_sales_refunds_invoice_amount_net,
-                    'vatAmount': this.taxRecord.distance_sales_refunds_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.distance_sales_refunds_invoice_amount_gross,
+                    'net': this.taxRecord.distance_sales_refunds_net,
+                    'vat': this.taxRecord.distance_sales_refunds_vat,
+                    'gross': this.taxRecord.distance_sales_refunds_gross,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.distance_sales_total_invoice_amount_net,
-                    'vatAmount': this.taxRecord.distance_sales_total_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.distance_sales_total_invoice_amount_gross,
+                    'net': this.taxRecord.distance_sales_total_net,
+                    'vat': this.taxRecord.distance_sales_total_vat,
+                    'gross': this.taxRecord.distance_sales_total_gross,
                 }
             ]
         },
@@ -206,21 +206,21 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.non_taxable_distance_sales_sales_invoice_amount_net,
-                    'vatAmount': this.taxRecord.non_taxable_distance_sales_sales_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.non_taxable_distance_sales_sales_invoice_amount_gross,
+                    'net': this.taxRecord.non_taxable_distance_sales_sales_net,
+                    'vat': this.taxRecord.non_taxable_distance_sales_sales_vat,
+                    'gross': this.taxRecord.non_taxable_distance_sales_sales_gross,
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.non_taxable_distance_sales_refunds_invoice_amount_net,
-                    'vatAmount': this.taxRecord.non_taxable_distance_sales_refunds_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.non_taxable_distance_sales_refunds_invoice_amount_gross,
+                    'net': this.taxRecord.non_taxable_distance_sales_refunds_net,
+                    'vat': this.taxRecord.non_taxable_distance_sales_refunds_vat,
+                    'gross': this.taxRecord.non_taxable_distance_sales_refunds_gross,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.non_taxable_distance_sales_total_invoice_amount_net,
-                    'vatAmount': this.taxRecord.non_taxable_distance_sales_total_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.non_taxable_distance_sales_total_invoice_amount_gross,
+                    'net': this.taxRecord.non_taxable_distance_sales_total_net,
+                    'vat': this.taxRecord.non_taxable_distance_sales_total_vat,
+                    'gross': this.taxRecord.non_taxable_distance_sales_total_gross,
                 }
             ]
         },
@@ -229,14 +229,14 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.intra_community_sales_sales_invoice_amount_net,                },
+                    'net': this.taxRecord.intra_community_sales_sales_net,                },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.intra_community_sales_refunds_invoice_amount_net,
+                    'net': this.taxRecord.intra_community_sales_refunds_net,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.intra_community_sales_total_invoice_amount_net,
+                    'net': this.taxRecord.intra_community_sales_total_net,
                 }
             ]
         },
@@ -245,15 +245,15 @@ export default {
             return [
                 {
                     'itemName': 'Sales',
-                    'netAmount': this.taxRecord.exports_sales_invoice_amount_net
+                    'net': this.taxRecord.exports_sales_net
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.exports_refunds_invoice_amount_net
+                    'net': this.taxRecord.exports_refunds_net
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.exports_total_invoice_amount_net
+                    'net': this.taxRecord.exports_total_net
                 }
             ]
         },
@@ -262,18 +262,18 @@ export default {
             return [
                 {
                     'itemName': 'Acquisitions',
-                    'netAmount': this.taxRecord.ica_acquisitions_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.ica_acquisitions_invoice_amount_vat_reverse_charge
+                    'net': this.taxRecord.ica_acquisitions_net,
+                    'reverseChargeVat': this.taxRecord.ica_acquisitions_reverse_charge_vat
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.ica_refunds_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.ica_refunds_invoice_amount_vat_reverse_charge
+                    'net': this.taxRecord.ica_refunds_net,
+                    'reverseChargeVat': this.taxRecord.ica_refunds_reverse_charge_vat
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.ica_total_invoice_amount_net,
-                    'reverseChargeAmount': this.taxRecord.ica_total_invoice_amount_vat_reverse_charge
+                    'net': this.taxRecord.ica_total_net,
+                    'reverseChargeVat': this.taxRecord.ica_total_reverse_charge_vat
                 }
             ]
         },
@@ -282,21 +282,21 @@ export default {
             return [
                 {
                     'itemName': 'Acquisitions',
-                    'netAmount': this.taxRecord.local_acquisitions_acquisitions_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_acquisitions_acquisitions_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_acquisitions_acquisitions_invoice_amount_gross,
+                    'net': this.taxRecord.local_acquisitions_acquisitions_net,
+                    'vat': this.taxRecord.local_acquisitions_acquisitions_vat,
+                    'gross': this.taxRecord.local_acquisitions_acquisitions_gross,
                 },
                 {
                     'itemName': 'Refunds',
-                    'netAmount': this.taxRecord.local_acquisitions_refunds_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_acquisitions_refunds_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_acquisitions_refunds_invoice_amount_gross,
+                    'net': this.taxRecord.local_acquisitions_refunds_net,
+                    'vat': this.taxRecord.local_acquisitions_refunds_vat,
+                    'gross': this.taxRecord.local_acquisitions_refunds_gross,
                 },
                 {
                     'itemName': 'Total',
-                    'netAmount': this.taxRecord.local_acquisitions_total_invoice_amount_net,
-                    'vatAmount': this.taxRecord.local_acquisitions_total_invoice_amount_vat,
-                    'grossAmount': this.taxRecord.local_acquisitions_total_invoice_amount_gross,
+                    'net': this.taxRecord.local_acquisitions_total_net,
+                    'vat': this.taxRecord.local_acquisitions_total_vat,
+                    'gross': this.taxRecord.local_acquisitions_total_gross,
                 }
             ]
         }

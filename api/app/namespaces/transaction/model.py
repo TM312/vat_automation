@@ -96,8 +96,8 @@ class Transaction(db.Model):  # type: ignore
     _invoice_amount_net = db.Column(db.Integer)
     _invoice_amount_vat = db.Column(db.Integer)
     _invoice_amount_gross = db.Column(db.Integer)
-    _vat_rate_reverse_charge = db.Column(db.Integer)
-    _invoice_amount_vat_reverse_charge = db.Column(db.Integer)
+    _reverse_charge_vat_rate = db.Column(db.Integer)
+    _invoice_amount_reverse_charge_vat = db.Column(db.Integer)
     arrival_seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
     departure_seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
     seller_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
@@ -298,21 +298,21 @@ class Transaction(db.Model):  # type: ignore
         self._invoice_amount_gross = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def vat_rate_reverse_charge(self):
-        return self._vat_rate_reverse_charge / 100 if self._vat_rate_reverse_charge is not None else None
+    def reverse_charge_vat_rate(self):
+        return self._reverse_charge_vat_rate / 100 if self._reverse_charge_vat_rate is not None else None
 
-    @vat_rate_reverse_charge.setter
-    def vat_rate_reverse_charge(self, value):
-        self._vat_rate_reverse_charge = int(round(value * 100)) if value is not None else None
+    @reverse_charge_vat_rate.setter
+    def reverse_charge_vat_rate(self, value):
+        self._reverse_charge_vat_rate = int(round(value * 100)) if value is not None else None
 
 
     @hybrid_property
-    def invoice_amount_vat_reverse_charge(self):
-        return self._invoice_amount_vat_reverse_charge / 100 if self._invoice_amount_vat_reverse_charge is not None else None
+    def invoice_amount_reverse_charge_vat(self):
+        return self._invoice_amount_reverse_charge_vat / 100 if self._invoice_amount_reverse_charge_vat is not None else None
 
-    @invoice_amount_vat_reverse_charge.setter
-    def invoice_amount_vat_reverse_charge(self, value):
-        self._invoice_amount_vat_reverse_charge = int(round(value * 100)) if value is not None else None
+    @invoice_amount_reverse_charge_vat.setter
+    def invoice_amount_reverse_charge_vat(self, value):
+        self._invoice_amount_reverse_charge_vat = int(round(value * 100)) if value is not None else None
 
 
 

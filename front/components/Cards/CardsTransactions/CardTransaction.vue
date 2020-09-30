@@ -220,9 +220,9 @@
                         gross: `${Number.parseFloat(this.transaction.total_value_gross + this.transaction.gift_wrap_price_vat).toFixed(2)} ${this.transaction.transaction_currency_code}`
                     },
                     {
-                        x: `Reverse Charge (Rate: ${Number.parseFloat(this.transaction.vat_rate_reverse_charge * 100).toFixed(2)}%)`,
+                        x: `Reverse Charge (Rate: ${Number.parseFloat(this.transaction.reverse_charge_vat_rate * 100).toFixed(2)}%)`,
                         net: '-',
-                        vat: `${Number.parseFloat(this.transaction.invoice_amount_vat_reverse_charge).toFixed(2)} ${this.transaction.transaction_currency_code}`,
+                        vat: `${Number.parseFloat(this.transaction.invoice_amount_reverse_charge_vat).toFixed(2)} ${this.transaction.transaction_currency_code}`,
                         gross: '-'
                 }
                 ]

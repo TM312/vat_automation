@@ -60,8 +60,8 @@ class TransactionInterface(TypedDict, total=False):
     invoice_amount_net: float
     invoice_amount_vat: float
     invoice_amount_gross: float
-    vat_rate_reverse_charge: float
-    invoice_amount_vat_reverse_charge: float
+    reverse_charge_vat_rate: float
+    invoice_amount_reverse_charge_vat: float
     arrival_seller_vatin_id: int
     departure_seller_vatin_id: int
     seller_vatin_id: int
