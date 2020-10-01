@@ -17,6 +17,8 @@ from .schema import TransactionInputSubSchema
 from ..account import Account
 from app.namespaces.utils.service import InputService, NotificationService
 from ..tag.service import TagService
+from app.namespaces.bundle import Bundle
+from app.namespaces.bundle.service import BundleService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -35,6 +37,13 @@ class TransactionInputService:
     @staticmethod
     def get_by_public_id(transaction_input_public_id: str) -> TransactionInput:
         return TransactionInput.query.filter_by(public_id = transaction_input_public_id).first()
+
+
+    @staticmethod
+    def get_by_bundle_public_id(bundle_public_id: str) -> List[TransactionInput]:
+        bundle = BundleService.get_by_public_id(bundle_public_id)
+        if isinstance(bundle, Bundle):
+            return TransactionInput.query.filter_by(bundle_id=bundle.id).all()
 
     @staticmethod
     def get_all_by_seller_firm_id(seller_firm_id: int) -> List[TransactionInput]:

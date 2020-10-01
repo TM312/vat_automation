@@ -8,6 +8,10 @@ export default ($axios) => ({
         return $axios.get(`${resource}/${transaction_input_public_id}`)
     },
 
+    get_by_bundle_public_id(bundle_public_id) {
+        return $axios.get(`${resource}/bundle/${bundle_public_id}`)
+    },
+
     delete_all() {
         return $axios.delete(`${resource}/`)
     },

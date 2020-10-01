@@ -69,6 +69,15 @@ class TransactionInputIdResource(Resource):
         return TransactionInputService.update_by_public_id(transaction_input_public_id, data_changes)
 
 
+@ns.route("/bundle/<string:bundle_public_id>")
+@ns.param("bundle_public_id", "TransactionInput Bundle Public ID")
+class TransactionInputBundleIdResource(Resource):
+    @login_required
+    @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
+    def get(self, bundle_public_id: str) -> List[TransactionInput]:
+        """Get Bundle TransactionInputs"""
+        return TransactionInputService.get_by_bundle_public_id(bundle_public_id)
+
 @ns.route("/seller_firm/") #<string:seller_firm_public_id><int:page>")
 @ns.param("seller_firm_public_id", "TransactionInput database ID")
 class TransactionInputSellerFirmIdResource(Resource):
@@ -80,15 +89,3 @@ class TransactionInputSellerFirmIdResource(Resource):
         args = parser.parse_args()
         print('args:', args, flush=True)
         return TransactionInputService.get_by_seller_firm_public_id(args.get('seller_firm_public_id'), paginate=True, page=args.get('page'))
-
-
-
-# @ns.route("/csv")
-# class TransactionInputResource(Resource):
-#     @login_required
-#     @employer_required
-#     # @confirmation_required
-#     #@ns.expect(tax_record_dto, validate=True)
-#     def post(self):
-#         transaction_input_files: List[BinaryIO] = request.files.getlist("files")
-#         return TransactionInputService.process_transaction_input_files_upload(transaction_input_files)

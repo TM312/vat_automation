@@ -1,5 +1,6 @@
 export const state = () => ({
     transaction_inputs: [],
+    transaction_inputs_bundle: [],
     transaction_input: []
 })
 
@@ -7,13 +8,18 @@ export const mutations = {
 
     CLEAR_TRANSACTION_INPUTS(state) {
         state.transaction_inputs = []
-        // while (state.transaction_inputs.length) {
-        //     state.transaction_inputs.pop()
-        // }
+    },
+
+    CLEAR_TRANSACTION_INPUTS_BUNDLE(state) {
+        state.transaction_inputs_bundle = []
     },
 
     SET_TRANSACTION_INPUTS(state, payload) {
         state.transaction_inputs = payload
+    },
+
+    SET_TRANSACTION_INPUTS_BUNDLE(state, payload) {
+        state.transaction_inputs_bundle = payload
     },
 
     SET_TRANSACTION_INPUT(state, payload) {
@@ -51,6 +57,10 @@ export const actions = {
         commit('CLEAR_TRANSACTION_INPUTS')
     },
 
+    async clear_transaction_inputs_bundle({ commit }) {
+        commit('CLEAR_TRANSACTION_INPUTS_BUNDLE')
+    },
+
     async get_all({ commit }) {
         const res = await this.$repositories.transaction_input.get_all()
         const { status, data } = res
@@ -79,6 +89,19 @@ export const actions = {
         const { status, data } = res
         if (status === 200 && data.data) {
             commit('SET_TRANSACTION_INPUT', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+    async get_by_bundle_public_id({ commit }, bundle_public_id) {
+
+        const res = await this.$repositories.transaction_input.get_by_bundle_public_id(bundle_public_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            console.log('SET_TRANSACTION_INPUTS_BUNDLE:')
+            console.log(data.data)
+            commit('SET_TRANSACTION_INPUTS_BUNDLE', data.data)
         } else {
             // Handle error here
         }
