@@ -1,5 +1,6 @@
 from flask_restx import Model, fields
 from app.namespaces.utils import transaction_notification_dto
+from app.namespaces.tax.vatin import vatin_sub_dto
 
 
 transaction_type_dto = Model('transaction_type', {
@@ -31,9 +32,9 @@ transaction_dto = transaction_sub_dto.clone('transaction', {
     'amazon_vat_calculation_service': fields.Boolean,
     'customer_relationship_checked': fields.Boolean,
     'customer_relationship': fields.String,
-    'customer_firm_public_id': fields.String(attribute=lambda x: x.customer_firm.public_id if x.customer_firm else None, readonly=True),
-    'customer_firm_name': fields.String(attribute=lambda x: x.customer_firm.name if x.customer_firm else None, readonly=True),
-    'customer_firm_vatin': fields.String(attribute=lambda x: '{}-{}'.format(x.customer_firm_vatin.country_code, x.customer_firm_vatin.number) if x.customer_firm_vatin else None, readonly=True),
+    'customer_vatin': fields.List(fields.Nested(vatin_sub_dto)),
+    'supplier_relationship': fields.String,
+    'supplier_vatin': fields.List(fields.Nested(vatin_sub_dto)),
     'item_tax_code_code': fields.String,
     'item_tax_rate_type_code': fields.String,
     'shipment_tax_rate_type_code': fields.String,
@@ -83,5 +84,5 @@ transaction_admin_dto = transaction_dto.clone('transaction_admin', {
     'account_id': fields.Integer,
     'transaction_input_id': fields.Integer,
     'item_id': fields.Integer,
-    'customer_firm_id': fields.Integer,
+    'customer_id': fields.Integer,
 })

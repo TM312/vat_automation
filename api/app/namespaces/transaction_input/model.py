@@ -69,53 +69,53 @@ class TransactionInput(db.Model):
     shipment_conditions = db.Column(db.String(24))
     invoice_number = db.Column(db.String(64))
     invoice_url = db.Column(db.String(256))
-    customer_firm_name = db.Column(db.String(64))
-    customer_firm_vat_number = db.Column(db.String(24))
-    customer_firm_vat_number_country_code = db.Column(db.String(8))
+    customer_name = db.Column(db.String(64))
+    customer_vat_number = db.Column(db.String(24))
+    customer_vat_number_country_code = db.Column(db.String(8))
     supplier_vat_number = db.Column(db.String(24))
     supplier_name = db.Column(db.String(128))
 
-    check_tax_calculation_date = db.Column(db.Date)
-    _check_unit_cost_price_net = db.Column(db.Integer, default=0)
+    tax_calculation_date = db.Column(db.Date)
+    _unit_cost_price_net = db.Column(db.Integer, default=0)
 
-    _check_item_price_discount_net = db.Column(db.Integer, default=0)
-    _check_item_price_discount_vat = db.Column(db.Integer, default=0)
-    _check_item_price_net = db.Column(db.Integer, default=0)
-    _check_item_price_vat = db.Column(db.Integer, default=0)
-    _check_item_price_total_net = db.Column(db.Integer, default=0)
-    _check_item_price_total_vat = db.Column(db.Integer, default=0)
-    _check_item_price_vat_rate = db.Column(db.Integer, default=0)
-    _check_shipment_price_discount_net = db.Column(db.Integer, default=0)
-    _check_shipment_price_discount_vat = db.Column(db.Integer, default=0)
-    _check_shipment_price_net = db.Column(db.Integer, default=0)
-    _check_shipment_price_vat = db.Column(db.Integer, default=0)
-    _check_shipment_price_total_net = db.Column(db.Integer, default=0)
-    _check_shipment_price_total_vat = db.Column(db.Integer, default=0)
-    _check_shipment_price_vat_rate = db.Column(db.Integer, default=0)
-    _check_sale_total_value_net = db.Column(db.Integer, default=0)
-    _check_sale_total_value_vat = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_discount_net = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_discount_vat = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_net = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_vat = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_total_net = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_total_vat = db.Column(db.Integer, default=0)
-    _check_gift_wrap_price_tax_rate = db.Column(db.Integer, default=0)
-    check_item_tax_code_code = db.Column(db.String(40))
-    check_departure_seller_vat_country_code = db.Column(db.String(8))
-    check_departure_seller_vat_number = db.Column(db.String(24))
-    check_arrival_seller_vat_country_code = db.Column(db.String(8))
-    check_arrival_seller_vat_number = db.Column(db.String(24))
-    check_seller_vat_country_code = db.Column(db.String(8))
-    check_seller_vat_number = db.Column(db.String(24))
-    check_tax_calculation_imputation_country = db.Column(db.String(24))
-    check_tax_jurisdiction = db.Column(db.String(24))
-    check_tax_jurisdiction_level = db.Column(db.String(24))
-    _check_invoice_amount_vat = db.Column(db.Integer)
-    check_invoice_currency_code = db.Column(db.String(8))
-    _check_invoice_exchange_rate = db.Column(db.Integer)
-    check_invoice_exchange_rate_date = db.Column(db.Date)
-    check_export = db.Column(db.Boolean)
+    _item_price_discount_net = db.Column(db.Integer, default=0)
+    _item_price_discount_vat = db.Column(db.Integer, default=0)
+    _item_price_net = db.Column(db.Integer, default=0)
+    _item_price_vat = db.Column(db.Integer, default=0)
+    _item_price_total_net = db.Column(db.Integer, default=0)
+    _item_price_total_vat = db.Column(db.Integer, default=0)
+    _item_price_vat_rate = db.Column(db.Integer, default=0)
+    _shipment_price_discount_net = db.Column(db.Integer, default=0)
+    _shipment_price_discount_vat = db.Column(db.Integer, default=0)
+    _shipment_price_net = db.Column(db.Integer, default=0)
+    _shipment_price_vat = db.Column(db.Integer, default=0)
+    _shipment_price_total_net = db.Column(db.Integer, default=0)
+    _shipment_price_total_vat = db.Column(db.Integer, default=0)
+    _shipment_price_vat_rate = db.Column(db.Integer, default=0)
+    _sale_total_value_net = db.Column(db.Integer, default=0)
+    _sale_total_value_vat = db.Column(db.Integer, default=0)
+    _gift_wrap_price_discount_net = db.Column(db.Integer, default=0)
+    _gift_wrap_price_discount_vat = db.Column(db.Integer, default=0)
+    _gift_wrap_price_net = db.Column(db.Integer, default=0)
+    _gift_wrap_price_vat = db.Column(db.Integer, default=0)
+    _gift_wrap_price_total_net = db.Column(db.Integer, default=0)
+    _gift_wrap_price_total_vat = db.Column(db.Integer, default=0)
+    _gift_wrap_price_tax_rate = db.Column(db.Integer, default=0)
+    item_tax_code_code = db.Column(db.String(40))
+    departure_seller_vat_country_code = db.Column(db.String(8))
+    departure_seller_vat_number = db.Column(db.String(24))
+    arrival_seller_vat_country_code = db.Column(db.String(8))
+    arrival_seller_vat_number = db.Column(db.String(24))
+    seller_vat_country_code = db.Column(db.String(8))
+    seller_vat_number = db.Column(db.String(24))
+    tax_calculation_imputation_country = db.Column(db.String(24))
+    tax_jurisdiction = db.Column(db.String(24))
+    tax_jurisdiction_level = db.Column(db.String(24))
+    _invoice_amount_vat = db.Column(db.Integer)
+    invoice_currency_code = db.Column(db.String(8))
+    _invoice_exchange_rate = db.Column(db.Integer)
+    invoice_exchange_rate_date = db.Column(db.Date)
+    export = db.Column(db.Boolean)
 
     #weights
     @hybrid_property
@@ -217,214 +217,214 @@ class TransactionInput(db.Model):
         self._gift_wrap_price_total_gross = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_unit_cost_price_net(self):
-        return self._check_unit_cost_price_net / 100 if self._check_unit_cost_price_net is not None else None
+    def unit_cost_price_net(self):
+        return self._unit_cost_price_net / 100 if self._unit_cost_price_net is not None else None
 
-    @check_unit_cost_price_net.setter
-    def check_unit_cost_price_net(self, value):
-        self._check_unit_cost_price_net = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_item_price_discount_net(self):
-        return self._check_item_price_discount_net / 100 if self._check_item_price_discount_net is not None else None
-
-    @check_item_price_discount_net.setter
-    def check_item_price_discount_net(self, value):
-        self._check_item_price_discount_net = int(round(value * 100)) if value is not None else None
+    @unit_cost_price_net.setter
+    def unit_cost_price_net(self, value):
+        self._unit_cost_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_item_price_discount_vat(self):
-        return self._check_item_price_discount_vat / 100 if self._check_item_price_discount_vat is not None else None
+    def item_price_discount_net(self):
+        return self._item_price_discount_net / 100 if self._item_price_discount_net is not None else None
 
-    @check_item_price_discount_vat.setter
-    def check_item_price_discount_vat(self, value):
-        self._check_item_price_discount_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_item_price_net(self):
-        return self._check_item_price_net / 100 if self._check_item_price_net is not None else None
-
-    @check_item_price_net.setter
-    def check_item_price_net(self, value):
-        self._check_item_price_net = int(round(value * 100)) if value is not None else None
+    @item_price_discount_net.setter
+    def item_price_discount_net(self, value):
+        self._item_price_discount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_item_price_vat(self):
-        return self._check_item_price_vat / 100 if self._check_item_price_vat is not None else None
+    def item_price_discount_vat(self):
+        return self._item_price_discount_vat / 100 if self._item_price_discount_vat is not None else None
 
-    @check_item_price_vat.setter
-    def check_item_price_vat(self, value):
-        self._check_item_price_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_item_price_total_net(self):
-        return self._check_item_price_total_net / 100 if self._check_item_price_total_net is not None else None
-
-    @check_item_price_total_net.setter
-    def check_item_price_total_net(self, value):
-        self._check_item_price_total_net = int(round(value * 100)) if value is not None else None
+    @item_price_discount_vat.setter
+    def item_price_discount_vat(self, value):
+        self._item_price_discount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_item_price_total_vat(self):
-        return self._check_item_price_total_vat / 100 if self._check_item_price_total_vat is not None else None
+    def item_price_net(self):
+        return self._item_price_net / 100 if self._item_price_net is not None else None
 
-    @check_item_price_total_vat.setter
-    def check_item_price_total_vat(self, value):
-        self._check_item_price_total_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_shipment_price_discount_net(self):
-        return self._check_shipment_price_discount_net / 100 if self._check_shipment_price_discount_net is not None else None
-
-    @check_shipment_price_discount_net.setter
-    def check_shipment_price_discount_net(self, value):
-        self._check_shipment_price_discount_net = int(round(value * 100)) if value is not None else None
+    @item_price_net.setter
+    def item_price_net(self, value):
+        self._item_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_shipment_price_discount_vat(self):
-        return self._check_shipment_price_discount_vat / 100 if self._check_shipment_price_discount_vat is not None else None
+    def item_price_vat(self):
+        return self._item_price_vat / 100 if self._item_price_vat is not None else None
 
-    @check_shipment_price_discount_vat.setter
-    def check_shipment_price_discount_vat(self, value):
-        self._check_shipment_price_discount_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_shipment_price_net(self):
-        return self._check_shipment_price_net / 100 if self._check_shipment_price_net is not None else None
-
-    @check_shipment_price_net.setter
-    def check_shipment_price_net(self, value):
-        self._check_shipment_price_net = int(round(value * 100)) if value is not None else None
+    @item_price_vat.setter
+    def item_price_vat(self, value):
+        self._item_price_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_shipment_price_vat(self):
-        return self._check_shipment_price_vat / 100 if self._check_shipment_price_vat is not None else None
+    def item_price_total_net(self):
+        return self._item_price_total_net / 100 if self._item_price_total_net is not None else None
 
-    @check_shipment_price_vat.setter
-    def check_shipment_price_vat(self, value):
-        self._check_shipment_price_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_shipment_price_total_net(self):
-        return self._check_shipment_price_total_net / 100 if self._check_shipment_price_total_net is not None else None
-
-    @check_shipment_price_total_net.setter
-    def check_shipment_price_total_net(self, value):
-        self._check_shipment_price_total_net = int(round(value * 100)) if value is not None else None
+    @item_price_total_net.setter
+    def item_price_total_net(self, value):
+        self._item_price_total_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_shipment_price_total_vat(self):
-        return self._check_shipment_price_total_vat / 100 if self._check_shipment_price_total_vat is not None else None
+    def item_price_total_vat(self):
+        return self._item_price_total_vat / 100 if self._item_price_total_vat is not None else None
 
-    @check_shipment_price_total_vat.setter
-    def check_shipment_price_total_vat(self, value):
-        self._check_shipment_price_total_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_sale_total_value_net(self):
-        return self._check_sale_total_value_net / 100 if self._check_sale_total_value_net is not None else None
-
-    @check_sale_total_value_net.setter
-    def check_sale_total_value_net(self, value):
-        self._check_sale_total_value_net = int(round(value * 100)) if value is not None else None
+    @item_price_total_vat.setter
+    def item_price_total_vat(self, value):
+        self._item_price_total_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_sale_total_value_vat(self):
-        return self._check_sale_total_value_vat / 100 if self._check_sale_total_value_vat is not None else None
+    def shipment_price_discount_net(self):
+        return self._shipment_price_discount_net / 100 if self._shipment_price_discount_net is not None else None
 
-    @check_sale_total_value_vat.setter
-    def check_sale_total_value_vat(self, value):
-        self._check_sale_total_value_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_gift_wrap_price_discount_net(self):
-        return self._check_gift_wrap_price_discount_net / 100 if self._check_gift_wrap_price_discount_net is not None else None
-
-    @check_gift_wrap_price_discount_net.setter
-    def check_gift_wrap_price_discount_net(self, value):
-        self._check_gift_wrap_price_discount_net = int(round(value * 100)) if value is not None else None
+    @shipment_price_discount_net.setter
+    def shipment_price_discount_net(self, value):
+        self._shipment_price_discount_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_gift_wrap_price_discount_vat(self):
-        return self._check_gift_wrap_price_discount_vat / 100 if self._check_gift_wrap_price_discount_vat is not None else None
+    def shipment_price_discount_vat(self):
+        return self._shipment_price_discount_vat / 100 if self._shipment_price_discount_vat is not None else None
 
-    @check_gift_wrap_price_discount_vat.setter
-    def check_gift_wrap_price_discount_vat(self, value):
-        self._check_gift_wrap_price_discount_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_gift_wrap_price_net(self):
-        return self._check_gift_wrap_price_net / 100 if self._check_gift_wrap_price_net is not None else None
-
-    @check_gift_wrap_price_net.setter
-    def check_gift_wrap_price_net(self, value):
-        self._check_gift_wrap_price_net = int(round(value * 100)) if value is not None else None
+    @shipment_price_discount_vat.setter
+    def shipment_price_discount_vat(self, value):
+        self._shipment_price_discount_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_gift_wrap_price_vat(self):
-        return self._check_gift_wrap_price_vat / 100 if self._check_gift_wrap_price_vat is not None else None
+    def shipment_price_net(self):
+        return self._shipment_price_net / 100 if self._shipment_price_net is not None else None
 
-    @check_gift_wrap_price_vat.setter
-    def check_gift_wrap_price_vat(self, value):
-        self._check_gift_wrap_price_vat = int(round(value * 100)) if value is not None else None
-
-    @hybrid_property
-    def check_gift_wrap_price_total_net(self):
-        return self._check_gift_wrap_price_total_net / 100 if self._check_gift_wrap_price_total_net is not None else None
-
-    @check_gift_wrap_price_total_net.setter
-    def check_gift_wrap_price_total_net(self, value):
-        self._check_gift_wrap_price_total_net = int(round(value * 100)) if value is not None else None
+    @shipment_price_net.setter
+    def shipment_price_net(self, value):
+        self._shipment_price_net = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_gift_wrap_price_total_vat(self):
-        return self._check_gift_wrap_price_total_vat / 100 if self._check_gift_wrap_price_total_vat is not None else None
+    def shipment_price_vat(self):
+        return self._shipment_price_vat / 100 if self._shipment_price_vat is not None else None
 
-    @check_gift_wrap_price_total_vat.setter
-    def check_gift_wrap_price_total_vat(self, value):
-        self._check_gift_wrap_price_total_vat = int(round(value * 100)) if value is not None else None
+    @shipment_price_vat.setter
+    def shipment_price_vat(self, value):
+        self._shipment_price_vat = int(round(value * 100)) if value is not None else None
 
     @hybrid_property
-    def check_invoice_amount_vat(self):
-        return self._check_invoice_amount_vat / 100 if self._check_invoice_amount_vat is not None else None
+    def shipment_price_total_net(self):
+        return self._shipment_price_total_net / 100 if self._shipment_price_total_net is not None else None
 
-    @check_invoice_amount_vat.setter
-    def check_invoice_amount_vat(self, value):
-        self._check_invoice_amount_vat = int(round(value * 100)) if value is not None else None
+    @shipment_price_total_net.setter
+    def shipment_price_total_net(self, value):
+        self._shipment_price_total_net = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def shipment_price_total_vat(self):
+        return self._shipment_price_total_vat / 100 if self._shipment_price_total_vat is not None else None
+
+    @shipment_price_total_vat.setter
+    def shipment_price_total_vat(self, value):
+        self._shipment_price_total_vat = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def sale_total_value_net(self):
+        return self._sale_total_value_net / 100 if self._sale_total_value_net is not None else None
+
+    @sale_total_value_net.setter
+    def sale_total_value_net(self, value):
+        self._sale_total_value_net = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def sale_total_value_vat(self):
+        return self._sale_total_value_vat / 100 if self._sale_total_value_vat is not None else None
+
+    @sale_total_value_vat.setter
+    def sale_total_value_vat(self, value):
+        self._sale_total_value_vat = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_discount_net(self):
+        return self._gift_wrap_price_discount_net / 100 if self._gift_wrap_price_discount_net is not None else None
+
+    @gift_wrap_price_discount_net.setter
+    def gift_wrap_price_discount_net(self, value):
+        self._gift_wrap_price_discount_net = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_discount_vat(self):
+        return self._gift_wrap_price_discount_vat / 100 if self._gift_wrap_price_discount_vat is not None else None
+
+    @gift_wrap_price_discount_vat.setter
+    def gift_wrap_price_discount_vat(self, value):
+        self._gift_wrap_price_discount_vat = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_net(self):
+        return self._gift_wrap_price_net / 100 if self._gift_wrap_price_net is not None else None
+
+    @gift_wrap_price_net.setter
+    def gift_wrap_price_net(self, value):
+        self._gift_wrap_price_net = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_vat(self):
+        return self._gift_wrap_price_vat / 100 if self._gift_wrap_price_vat is not None else None
+
+    @gift_wrap_price_vat.setter
+    def gift_wrap_price_vat(self, value):
+        self._gift_wrap_price_vat = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_total_net(self):
+        return self._gift_wrap_price_total_net / 100 if self._gift_wrap_price_total_net is not None else None
+
+    @gift_wrap_price_total_net.setter
+    def gift_wrap_price_total_net(self, value):
+        self._gift_wrap_price_total_net = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def gift_wrap_price_total_vat(self):
+        return self._gift_wrap_price_total_vat / 100 if self._gift_wrap_price_total_vat is not None else None
+
+    @gift_wrap_price_total_vat.setter
+    def gift_wrap_price_total_vat(self, value):
+        self._gift_wrap_price_total_vat = int(round(value * 100)) if value is not None else None
+
+    @hybrid_property
+    def invoice_amount_vat(self):
+        return self._invoice_amount_vat / 100 if self._invoice_amount_vat is not None else None
+
+    @invoice_amount_vat.setter
+    def invoice_amount_vat(self, value):
+        self._invoice_amount_vat = int(round(value * 100)) if value is not None else None
 
     #rate values
 
     @hybrid_property
-    def check_item_price_vat_rate(self):
-        return self._check_item_price_vat_rate / 10_000 if self._check_item_price_vat_rate is not None else None
+    def item_price_vat_rate(self):
+        return self._item_price_vat_rate / 10_000 if self._item_price_vat_rate is not None else None
 
-    @check_item_price_vat_rate.setter
-    def check_item_price_vat_rate(self, value):
-        self._check_item_price_vat_rate = int(round(value * 10_000)) if value is not None else None
-
-    @hybrid_property
-    def check_shipment_price_vat_rate(self):
-        return self._check_shipment_price_vat_rate / 10_000 if self._check_shipment_price_vat_rate is not None else None
-
-    @check_shipment_price_vat_rate.setter
-    def check_shipment_price_vat_rate(self, value):
-        self._check_shipment_price_vat_rate = int(round(value * 10_000)) if value is not None else None
+    @item_price_vat_rate.setter
+    def item_price_vat_rate(self, value):
+        self._item_price_vat_rate = int(round(value * 10_000)) if value is not None else None
 
     @hybrid_property
-    def check_gift_wrap_price_tax_rate(self):
-        return self._check_gift_wrap_price_tax_rate / 10_000 if self._check_gift_wrap_price_tax_rate is not None else None
+    def shipment_price_vat_rate(self):
+        return self._shipment_price_vat_rate / 10_000 if self._shipment_price_vat_rate is not None else None
 
-    @check_gift_wrap_price_tax_rate.setter
-    def check_gift_wrap_price_tax_rate(self, value):
-        self._check_gift_wrap_price_tax_rate = int(round(value * 10_000)) if value is not None else None
+    @shipment_price_vat_rate.setter
+    def shipment_price_vat_rate(self, value):
+        self._shipment_price_vat_rate = int(round(value * 10_000)) if value is not None else None
 
     @hybrid_property
-    def check_invoice_exchange_rate(self):
-        return self._check_invoice_exchange_rate / 10_000 if self._check_invoice_exchange_rate is not None else None
+    def gift_wrap_price_tax_rate(self):
+        return self._gift_wrap_price_tax_rate / 10_000 if self._gift_wrap_price_tax_rate is not None else None
 
-    @check_invoice_exchange_rate.setter
-    def check_invoice_exchange_rate(self, value):
-        self._check_invoice_exchange_rate = int(round(value * 10_000)) if value is not None else None
+    @gift_wrap_price_tax_rate.setter
+    def gift_wrap_price_tax_rate(self, value):
+        self._gift_wrap_price_tax_rate = int(round(value * 10_000)) if value is not None else None
+
+    @hybrid_property
+    def invoice_exchange_rate(self):
+        return self._invoice_exchange_rate / 10_000 if self._invoice_exchange_rate is not None else None
+
+    @invoice_exchange_rate.setter
+    def invoice_exchange_rate(self, value):
+        self._invoice_exchange_rate = int(round(value * 10_000)) if value is not None else None
 
 
 

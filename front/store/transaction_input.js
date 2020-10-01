@@ -6,9 +6,10 @@ export const state = () => ({
 export const mutations = {
 
     CLEAR_TRANSACTION_INPUTS(state) {
-        while (state.transaction_inputs.length) {
-            state.transaction_inputs.pop()
-        }
+        state.transaction_inputs = []
+        // while (state.transaction_inputs.length) {
+        //     state.transaction_inputs.pop()
+        // }
     },
 
     SET_TRANSACTION_INPUTS(state, payload) {
@@ -45,6 +46,10 @@ export const mutations = {
 
 
 export const actions = {
+
+    async clear_transaction_inputs({ commit }) {
+        commit('CLEAR_TRANSACTION_INPUTS')
+    },
 
     async get_all({ commit }) {
         const res = await this.$repositories.transaction_input.get_all()

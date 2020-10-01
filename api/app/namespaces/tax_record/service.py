@@ -712,7 +712,7 @@ class TaxRecordService:
     #         arrival_seller_vatin = VATINService.get_by_id(t.arrival_seller_vatin_id)
     #         departure_seller_vatin = VATINService.get_by_id(t.departure_seller_vatin_id)
     #         seller_vatin = VATINService.get_by_id(t.seller_vatin_id)
-    #         customer_firm_vatin=VATINService.get_by_id(t.customer_firm_vatin_id)
+    #         customer_vatin=VATINService.get_by_id(t.customer_vatin_id)
 
     #         info_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'info')
     #         warning_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'warning')
@@ -821,10 +821,10 @@ class TaxRecordService:
     #             'SELLER_VAT_VALID': arrival_seller_vatin.valid if isinstance(arrival_seller_vatin, VATIN) else None,
     #             'SELLER_VAT_CHECKED_DATE': arrival_seller_vatin.created_on if isinstance(arrival_seller_vatin, VATIN) else None,
 
-    #             'CUSTOMER_FIRM_VAT_NUMBER_COUNTRY': customer_firm_vatin.country_code if isinstance(customer_firm_vatin, VATIN) else None,
-    #             'CUSTOMER_FIRM_VAT_NUMBER': customer_firm_vatin.number if isinstance(customer_firm_vatin, VATIN) else None,
-    #             'CUSTOMER_FIRM_VAT_VALID': customer_firm_vatin.valid if isinstance(customer_firm_vatin, VATIN) else None,
-    #             'CUSTOMER_FIRM_VAT_CHECKED_DATE': customer_firm_vatin.created_on if isinstance(customer_firm_vatin, VATIN) else None,
+    #             'CUSTOMER_FIRM_VAT_NUMBER_COUNTRY': customer_vatin.country_code if isinstance(customer_vatin, VATIN) else None,
+    #             'CUSTOMER_FIRM_VAT_NUMBER': customer_vatin.number if isinstance(customer_vatin, VATIN) else None,
+    #             'CUSTOMER_FIRM_VAT_VALID': customer_vatin.valid if isinstance(customer_vatin, VATIN) else None,
+    #             'CUSTOMER_FIRM_VAT_CHECKED_DATE': customer_vatin.created_on if isinstance(customer_vatin, VATIN) else None,
 
     #             'INVOICE_AMOUNT_NET': t.invoice_amount_net,
     #             'INVOICE_AMOUNT_VAT': t.invoice_amount_vat,

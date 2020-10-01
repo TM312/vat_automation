@@ -209,7 +209,8 @@ class SellerFirmService:
         try:
             file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
         except Exception as e:
-            SocketService.emit_status_error_invalid_file(original_filename='unknown', message = e.description)
+            print(e, flush=True)
+            SocketService.emit_status_error_invalid_file(message = e.description)
             return False
 
         original_filename = InputService.get_secure_filename(file)
@@ -467,7 +468,7 @@ class SellerFirmService:
             seller_firm = SellerFirmService.get_by_identifiers(seller_firm_name, address, establishment_country_code)
             if isinstance(seller_firm, SellerFirm):
                 if not duplicate_counter > 2:
-                    message = 'The uploaded seller firm "{}" (row: {}) is already in the database. Registration has been skipped.'.format(seller_firm.name, current)
+                    message = 'The uploaded seller firm "{}" (row: {}) is already in the database. Registration has been skipped.'.format(seller_firm.name, current+1)
                     SocketService.emit_status_info(object_type, message)
 
                 total -= 1
@@ -486,7 +487,7 @@ class SellerFirmService:
 
                 except:
                     db.session.rollback()
-                    message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current)
+                    message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current+1)
                     SocketService.emit_status_error(object_type, message)
                     return False
 

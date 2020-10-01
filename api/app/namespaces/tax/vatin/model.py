@@ -31,7 +31,8 @@ class VATIN(db.Model):
     address = db.Column(db.String(256))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
 
-    transactions_customer_firm = db.relationship('Transaction', backref='customer_firm_vatin', foreign_keys='Transaction.customer_firm_vatin_id', lazy=True)
+    transactions_customer = db.relationship('Transaction', backref='customer_vatin', foreign_keys='Transaction.customer_vatin_id', lazy=True)
+    transactions_supplier = db.relationship('Transaction', backref='supplier_vatin', foreign_keys='Transaction.supplier_vatin_id', lazy=True)
     transactions_arrival_seller = db.relationship('Transaction', backref='arrival_seller_vatin', foreign_keys='Transaction.arrival_seller_vatin_id', lazy=True)
     transactions_departure_seller = db.relationship('Transaction', backref='departure_seller_vatin', foreign_keys='Transaction.departure_seller_vatin_id', lazy=True)
     transactions_seller = db.relationship('Transaction', backref='seller_vatin', foreign_keys='Transaction.seller_vatin_id', lazy=True)

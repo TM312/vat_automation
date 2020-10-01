@@ -46,9 +46,11 @@ class Transaction(db.Model):  # type: ignore
     amazon_vat_calculation_service = db.Column(db.Boolean, nullable=False)
 
     customer_relationship_checked = db.Column(db.Boolean, nullable=False)
-    customer_relationship = db.Column(db.String(16), nullable=False)
-    customer_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'))
-    customer_firm_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
+    customer_relationship = db.Column(db.String(16))
+    customer_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
+
+    supplier_relationship = db.Column(db.String(16))
+    supplier_vatin_id = db.Column(db.Integer, db.ForeignKey('vatin.id'))
 
     tax_jurisdiction_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)
     arrival_country_code = db.Column(db.String(4), db.ForeignKey('country.code'), nullable=False)

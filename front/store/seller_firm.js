@@ -5,6 +5,9 @@ export const state = () => ({
 
 
 export const mutations = {
+    CLEAR_SELLER_FIRM(state) {
+        state.seller_firm = []
+    },
 
     CLEAR_ACCOUNTS(state) {
         while (state.seller_firm.accounts.length) {
@@ -81,6 +84,10 @@ export const getters = {
 }
 
 export const actions = {
+    async clear_seller_firm({ commit }) {
+        commit('CLEAR_SELLER_FIRM')
+    },
+
     async get_all({ commit }) {
         const res = await this.$repositories.seller_firm.get_all()
         const { status, data } = res
