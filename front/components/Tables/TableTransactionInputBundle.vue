@@ -1,6 +1,7 @@
 <template>
     <div>
-        <b-table :fields="fields" :items="transactionInputs" hover :busy="$fetchState.pending && !transactionInputs">
+        <h1>transactionInputs: {{ transactionInputsBundle }}</h1>
+        <b-table :fields="fields" :items="transactionInputsBundle" hover :busy="$fetchState.pending && !transactionInputsBundle">
             <template v-slot:table-busy>
                 <div class="text-center text-secondary my-2">
                     <b-spinner class="align-middle"></b-spinner>
@@ -87,10 +88,6 @@ export default {
                     lable: 'Arrival Country',
                     sortable: true,
                 },
-                // {
-                //     key: 'arrival_date',
-                //     sortable: true,
-                // },
 
                 {
                     key: 'processed',
@@ -101,14 +98,16 @@ export default {
         }
     },
 
-     async fetch() {
+    async fetch() {
+        if (this.transactionInputsBundle.length === 0) {
             const { store } = this.$nuxt.context;
-            await store.dispatch("bundle/get_by_public_id", this.bundlePublicId);
-        },
+            await store.dispatch("transaction_input/get_by_bundle_public_id", this.bundlePublicId);
+        }
+    },
 
     computed: {
         ...mapState({
-            transactionInputs: state => state.bundle.bundle.transaction_inputs
+            transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle
         })
     }
 }
