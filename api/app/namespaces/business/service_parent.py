@@ -2,7 +2,6 @@ from typing import Union, List
 from . import Business
 from .accounting_firm import AccountingFirm
 from .seller_firm import SellerFirm
-from .customer_firm import CustomerFirm
 
 from .interface_parent import BusinessInterface
 
@@ -10,7 +9,7 @@ from .interface_parent import BusinessInterface
 class BusinessService:
 
     @staticmethod
-    def get_by_name_address_or_None(name: str, address: str) -> Union[AccountingFirm, SellerFirm, CustomerFirm]:
+    def get_by_name_address_or_None(name: str, address: str) -> Union[AccountingFirm, SellerFirm]:
         business = BusinessService.get_by_name_or_None(name)
         if not isinstance(business, Business):
             business = BusinessService.get_by_address_or_None(address)
@@ -19,11 +18,11 @@ class BusinessService:
 
 
     @staticmethod
-    def get_by_name_or_None(name: str) -> Union[AccountingFirm, SellerFirm, CustomerFirm]:
+    def get_by_name_or_None(name: str) -> Union[AccountingFirm, SellerFirm]:
         return Business.query.filter_by(name=name).first()
 
     @staticmethod
-    def get_by_address_or_None(address: str) -> Union[AccountingFirm, SellerFirm, CustomerFirm]:
+    def get_by_address_or_None(address: str) -> Union[AccountingFirm, SellerFirm]:
         return Business.query.filter_by(address=address).first()
 
     @staticmethod

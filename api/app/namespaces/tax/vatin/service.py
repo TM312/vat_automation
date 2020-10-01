@@ -208,7 +208,7 @@ class VATINService:
             country_code, number = VATINService.get_vat_from_df(df, i)
         except:
             # send error status via socket
-            message = 'Can not read country code/number of {} in row {} (file: {}).'.format(current, object_type_human_read, original_filename)
+            message = 'Can not read country code/number of {} in row {} (file: {}).'.format(object_type_human_read, current+1, original_filename)
             raise ExpectationFailed(message)
 
         try:
@@ -291,7 +291,7 @@ class VATINService:
                     except:
                         db.session.rollback()
                         # send error status via socket
-                        message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
+                        message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current+1, original_filename)
                         SocketService.emit_status_error(object_type, message)
                         return False
 
@@ -305,15 +305,15 @@ class VATINService:
                     vatin_data = {
                         'country_code': country_code,
                         'number': number,
-                        'request_date': date.today(),
                     }
 
                     # send error status via socket
                     message = 'Valiation of vat number "{}-{}" temporarily unavailable. Please make sure that it is validated before submitting transaction reports containing the number.'.format(country_code, number)
                     SocketService.emit_status_warning(object_type, message)
 
+                vatin_data['request_date'] = date.today()
                 vatin_data['business_id'] = seller_firm_id
-                vatin_data['original_filename'] = original_filename,
+                vatin_data['original_filename'] = original_filename
                 vatin_data['valid_from'] = valid_from
 
                 if vatin and vatin_data['valid'] != None:
@@ -324,7 +324,7 @@ class VATINService:
                         db.session.rollback()
 
                         # send error status via socket
-                        message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current, original_filename)
+                        message = 'An error occured while updating the {} in row {} (file: {}). Please get in contact with one of the admins.'.format(object_type_human_read, current+1, original_filename)
                         SocketService.emit_status_error(object_type, message)
                         return False
 
@@ -386,8 +386,7 @@ class VATINService:
         country_code, number = VATINService.vat_precheck(
             country_code_temp, number_temp)
         if not country_code or not number:
-            raise UnprocessableEntity(
-                'The submitted country code or number do not conform with the required standard.')
+            raise UnprocessableEntity('The submitted country code or number do not conform with the required standard.')
 
         vatin = VATINService.get_by_country_code_number_date(country_code, number, date.today())
 
@@ -397,6 +396,8 @@ class VATINService:
         else:
             try:
                 vatin_data = VIESService.send_request(country_code, number)
+                vatin_data['request_date'] = date.today()
+
             except:
                 vatin_data = {
                     'country_code': country_code,
@@ -406,6 +407,8 @@ class VATINService:
                     'name': None,
                     'address': None
                 }
+
+
 
             if vatin and vatin_data['valid'] != None:
                 vatin.update(vatin_data)
@@ -562,7 +565,7 @@ class VATINService:
     @staticmethod
     def verify_country_code(country_code: str) -> None:
         if not re.match(r"^[a-zA-Z][a-zA-Z]", country_code):
-            msg = "{} is not a valid ISO_3166-1 country code.".format(country_code)
+            msg = "{} is not a valid ISO 3166-1 country code.".format(country_code)
             raise HTTPException(msg)
 
         elif country_code not in MEMBER_COUNTRY_CODES:

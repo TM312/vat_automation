@@ -104,7 +104,7 @@ class SocketService:
 
     @staticmethod
     def emit_status_error_no_value(current: int, object_type: str, column_name: str):
-        message = 'No value in column "{}", row {}.'.format(column_name, current)
+        message = 'No value in column "{}", row {}.'.format(column_name, current+1)
         SocketService.emit_status_error(object_type, message)
 
     @staticmethod
@@ -114,7 +114,7 @@ class SocketService:
 
     @staticmethod
     def emit_status_error_column_read(current: int, object_type: str, column_name: str):
-        message = 'Can not read column "{}" in row {}.'.format(column_name, current)
+        message = 'Can not read column "{}" in row {}.'.format(column_name, current+1)
         SocketService.emit_status_error(object_type, message)
 
 
@@ -125,7 +125,7 @@ class SocketService:
 
     @staticmethod
     def emit_status_error_unidentifiable_object(object_type: str, object_str: str, current: int):
-        message = 'Can not identify the {} in row {}. Have you uploaded all necessary data?'.format(object_str, current)
+        message = 'Can not identify the {} in row {}. Have you uploaded all necessary data?'.format(object_str, current+1)
         SocketService.emit_status_error(object_type, message)
 
 

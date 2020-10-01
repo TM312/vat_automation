@@ -6,7 +6,6 @@ import BusinessRepository from './BusinessRepository'
 import ChannelRepository from './ChannelRepository'
 import CountryRepository from './CountryRepository'
 import CurrencyRepository from './CurrencyRepository'
-import CustomerFirmRepository from './CustomerFirmRepository'
 import DistanceSaleRepository from './DistanceSaleRepository'
 import ExchangeRateRepository from './ExchangeRateRepository'
 import ItemRepository from './ItemRepository'
@@ -35,7 +34,6 @@ export default ($axios) => ({
     channel: ChannelRepository($axios),
     country: CountryRepository($axios),
     currency: CurrencyRepository($axios),
-    customer_firm: CustomerFirmRepository($axios),
     distance_sale: DistanceSaleRepository($axios),
     exchange_rate: ExchangeRateRepository($axios),
     item: ItemRepository($axios),

@@ -119,21 +119,21 @@ export default {
             return [
                 {
                     x: 'Price',
-                    item: `${Number.parseFloat(this.transactionInput.item_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_gross).toFixed(2)} ${this.transactionInput.currency_code}`
+                    item: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.item_price_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    shipment: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.shipment_price_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    gift_wrap: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.gift_wrap_price_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-'
                 },
                 {
                     x: 'Discount',
-                    item: `${Number.parseFloat(this.transactionInput.item_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}`
+                    item: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.item_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    shipment: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.shipment_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    gift_wrap: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.gift_wrap_price_discount_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-'
                 },
                 {
                     x: 'Total',
-                    item: `${Number.parseFloat(this.transactionInput.item_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    shipment: `${Number.parseFloat(this.transactionInput.shipment_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`,
-                    gift_wrap: `${Number.parseFloat(this.transactionInput.gift_wrap_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}`
+                    item: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.item_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    shipment: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.shipment_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-',
+                    gift_wrap: this.transactionInput.currency_code ? `${Number.parseFloat(this.transactionInput.gift_wrap_price_total_gross).toFixed(2)} ${this.transactionInput.currency_code}` : '-'
                }
             ]
 
@@ -184,7 +184,7 @@ export default {
                 { key: 'Account', value: this.transactionInput.account_given_id },
                 { key: 'Marketplace', value: this.transactionInput.marketplace},
                 { key: 'Transaction ID', value: this.transactionInput.activity_id},
-                { key: 'Transaction Type', value: this.transactionInput.transaction_type_public_code}
+                { key: 'Transaction Type', value: this.capitalize(this.transactionInput.transaction_type_public_code)}
             ]
         },
 

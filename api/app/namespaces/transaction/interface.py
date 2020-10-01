@@ -15,8 +15,7 @@ class TransactionInterface(TypedDict, total=False):
     amazon_vat_calculation_service: bool
     customer_relationship_checked: bool
     customer_relationship: str
-    customer_firm_id: int
-    customer_firm_vatin_id: int
+    customer_vatin_id: int
     tax_jurisdiction_code: str
 
     type_code: str

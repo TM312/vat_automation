@@ -204,7 +204,7 @@ class ItemService:
             raise UnprocessableEntity('SKU')
 
         if not sku or sku == '':
-            message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current)
+            message = 'No SKU was provided for at least one of the items (row {}). In order to avoid processing errors, please make sure to add SKUs for all items before uploading any transaction file.'.format(current+1)
             SocketService.emit_status_info(object_type, message)
 
         try:

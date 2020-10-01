@@ -57,13 +57,15 @@
         },
 
         beforeDestroy() {
-            this.resetStatus()
+            this.resetStoreSellerFirm()
         },
 
         methods: {
-            resetStatus() {
+            resetStoreSellerFirm() {
                 const { store } = this.$nuxt.context
                 store.dispatch('status/clear_all')
+                store.dispatch('seller_firm/clear_seller_firm')
+                store.dispatch('transaction_input/clear_transaction_inputs')
             }
 
         },
