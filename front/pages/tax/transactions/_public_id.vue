@@ -6,39 +6,37 @@
             <b-col><h3 class="text-muted text-center">{{ sellerFirm.name }}</h3></b-col>
         </b-row>
         <hr>
-        <h1 v-if="!$fetchState.pending">transactionInput.bundle_public_id: {{ transactionInput.bundle_public_id }}</h1>
         <b-container fluid>
              <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
                 <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transactionInputPublicId="$route.params.public_id"/> </p>
             </b-alert>
             <b-tabs pills card vertical>
                 <b-tab title='Input File' active>
-                    <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mb-1">
-                        <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-                        <table-transaction-input-bundle v-else :bundlePublicId="transactionInput.bundle_public_id"/>
-                    </b-card>
                     <overview-base-data-loading v-if="$fetchState.pending || transactionInput.length === 0" />
                     <card-transaction-input v-else id="file"/>
+
+                    <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
+                        <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
+                        <table-transaction-inputs v-else :transactionInputs="transactionInputsBundle" class="mt-4"/>
+                    </b-card>
+
                 </b-tab>
 
-                <b-tab title='Tax Processes' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || transactionInput.length === 0">
-                    <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mb-1">
-                        <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-                        <table-transaction-input-bundle v-else :bundlePublicId="transactionInput.bundle_public_id"/>
-                    </b-card>
+                <b-tab title='Tax Processes' lazy :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || transactionInput.length === 0">
                     <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
                     <view-transactions v-else :transactions="transactionInput.transactions" />
+
+                    <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
+                        <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
+                        <table-transaction-inputs v-else :transactionInputs="transactionInputsBundle"/>
+                    </b-card>
+
                 </b-tab>
+
 
             </b-tabs>
         </b-container>
 
-
-        <div v-if="!$fetchState.pending">
-            <b-alert :show="transactionInput.processed" variant="info">
-                <p>The transaction has been successfully processed on {{ new Date(transactionInput.processed_on).toLocaleString() }} </p>
-            </b-alert>
-        </div>
     </div>
 </template>
 
@@ -65,9 +63,25 @@
             // }
         },
 
+
+// async fetch() {
+//         if (this.transactionInputsBundle.length === 0) {
+//             const { store } = this.$nuxt.context;
+//             await store.dispatch("transaction_input/get_by_bundle_public_id", this.bundlePublicId);
+//         }
+//     },
+
+    // computed: {
+    //     ...mapState({
+    //         transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle
+    //     })
+    // }
+
+
         computed: {
             ...mapState({
                 transactionInput: state => state.transaction_input.transaction_input,
+                transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle,
                 sellerFirm: state => state.seller_firm.seller_firm
             }),
 

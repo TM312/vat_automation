@@ -8,7 +8,7 @@
                     sub-title="An Overview Of Transactions Will Appear Here Once You Start Uploading Data"
                     class="text-center py-5"
                 ></b-card>
-                <table-transaction-inputs v-else />
+                <table-transaction-inputs :transactionInputs="transactionInputsChannel(null)" v-else />
                 <b-button variant="outline-primary" :disabled="buttonFetchDisabled" @click="refresh" block>
                     <b-spinner v-if="buttonFetchDisabled" small />
                     <b-icon v-else icon="chevron-down" />
@@ -17,7 +17,12 @@
 
             </b-tab>
             <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code">
-                <lazy-table-transaction-inputs :channelCode="account.channel_code" />
+                <b-card
+                    v-if="transactionInputsChannel(account.channel_code).length === 0"
+                    sub-title="No transaction have been registered for this channel."
+                    class="text-center py-5"
+                ></b-card>
+                <lazy-table-transaction-inputs v-else :transactionInputs="transactionInputsChannel(account.channel_code)" />
                 <!-- {{ account.channel_code }} -->
             </b-tab>
         </b-tabs>
@@ -38,7 +43,7 @@
 
         async fetch() {
             if (
-                this.transactionInputs.length === 0 || this.transaction_inputs[0]['seller_firm_public_id'] !== this.$route.params.public_id
+                this.transactionInputs.length === 0 || this.transactionInputs[0]['seller_firm_public_id'] !== this.$route.params.public_id
             ) {
 
                 const { store } = this.$nuxt.context;
@@ -90,6 +95,12 @@
                     }
                 }
             },
+
+            transactionInputsChannel(channelCode) {
+                return channelCode !== null ? this.transactionInputs.filter(transaction_input => transaction_input.channel_code === channelCode) : this.transactionInputs
+            },
+
+
         },
     }
 </script>

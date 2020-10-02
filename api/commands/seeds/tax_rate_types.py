@@ -4,7 +4,7 @@ tax_rate_types = [
     {
         'code': 'S',
         'name': 'Standard Rate',
-        'description': '####'
+        'description': 'Each EU country has a standard rate which applies to the supply of most goods and services. This cannot be less than 15%.'
     },
     {
         'code': 'R',

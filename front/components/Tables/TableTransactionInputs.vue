@@ -1,14 +1,12 @@
 <template>
     <div>
-        <b-card
-            v-if="transactionInputs.length === 0 && channelCode"
-            sub-title="No transaction have been registered for this channel."
-            class="text-center py-5"
-        ></b-card>
-        <b-table v-else :fields="fieldsBundle" :items="transactionInputs" hover>
-
+        <b-table :fields="fieldsBundle" :items="transactionInputs" hover>
             <template v-slot:cell(transaction_type_public_code)="data">
-                <nuxt-link :to="`/tax/transactions/${data.item.public_id}`">{{ data.value }}</nuxt-link>
+                <nuxt-link
+                    v-if="data.item.public_id != $route.params.public_id"
+                    :to="`/tax/transactions/${data.item.public_id}`"
+                >{{ data.value }}</nuxt-link>
+                <span v-else>{{ data.value }}</span>
             </template>
 
             <template v-slot:cell(processed)="data" class="align-center">
@@ -44,17 +42,14 @@
 
 <script>
 
-import { mapState } from 'vuex'
-
 export default {
-    name: 'TableTransactionInputsChannel',
+    name: 'TableTransactionInputs',
 
     props: {
-        // eslint-disable-next-line
-        channelCode: {
-            type: String,
-            required: false
 
+        transactionInputs: {
+            type: [Array, Object],
+            required: true
         }
 
     },
@@ -101,18 +96,8 @@ export default {
                 },
                 {
                     key: 'departure_to_arrival',
-                    // label: 'Departure Country',
                     sortable: false,
                 },
-                // {
-                //     key: 'arrival_country_code',
-                //     label: 'Arrival Country',
-                //     sortable: true,
-                // },
-                // {
-                //     key: 'arrival_date',
-                //     sortable: true,
-                // },
 
                 {
                     key: 'processed',
@@ -123,17 +108,9 @@ export default {
         }
     },
 
-    computed: {
-        ...mapState({
-            transaction_inputs_full: state => state.transaction_input.transaction_inputs,
-            countries: state => state.country.countries
-        }),
 
-        transactionInputs() {
-            return this.channelCode ? this.transaction_inputs_full.filter(transaction_input => transaction_input.channel_code === this.channelCode) : this.transaction_inputs_full
-        },
 
-    },
+    // },
     // methods: {
     //     codeToName(countryCode) {
     //         return this.countries.find(country => country.code == countryCode).name

@@ -13,7 +13,6 @@ notification_dto = Model('notification', {
 })
 
 transaction_notification_dto = notification_dto.clone('transaction_notification', {
-    'transaction_id': fields.Integer(readonly=True),
     'original_filename': fields.String(readonly=True),
     'reference_value': fields.String(readonly=True),
     'calculated_value': fields.String(readonly=True),
@@ -27,5 +26,6 @@ seller_firm_notification_dto = notification_dto.clone('transaction_notification'
 
 transaction_notification_admin_dto = transaction_notification_dto.clone('transaction_notification', {
     'id': fields.Integer(readonly=True),
+    'transaction_id': fields.Integer(readonly=True),
     'n_type': fields.String(readonly=True)
 })
