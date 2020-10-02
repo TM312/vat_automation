@@ -105,10 +105,10 @@
 
         <b-row cols="1" cols-lg="2" cols-xl="4" class="mt-5">
             <b-col v-for="notification in transaction.notifications" :key="notification.public_id" >
-                <alert-transaction-input-notification
+                <card-transaction-input-notification
                     :notification="notification"
                     style="max-width: 50rem;"
-                    class="my-3 h-100"
+                    class="h-100"
                 />
             </b-col>
 

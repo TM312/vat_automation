@@ -83,25 +83,25 @@ export const actions = {
         }
     },
 
-    async get_by_public_id({ commit }, transaction_input_public_id) {
-
-        const res = await this.$repositories.transaction_input.get_by_public_id(transaction_input_public_id)
-        const { status, data } = res
-        if (status === 200 && data.data) {
-            commit('SET_TRANSACTION_INPUT', data.data)
-        } else {
-            // Handle error here
-        }
-    },
-
     async get_by_bundle_public_id({ commit }, bundle_public_id) {
 
         const res = await this.$repositories.transaction_input.get_by_bundle_public_id(bundle_public_id)
         const { status, data } = res
         if (status === 200 && data.data) {
-            console.log('SET_TRANSACTION_INPUTS_BUNDLE:')
-            console.log(data.data)
             commit('SET_TRANSACTION_INPUTS_BUNDLE', data.data)
+        } else {
+            // Handle error here
+        }
+    },
+
+
+    async get_by_public_id({ commit, dispatch }, transaction_input_public_id) {
+
+        const res = await this.$repositories.transaction_input.get_by_public_id(transaction_input_public_id)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            commit('SET_TRANSACTION_INPUT', data.data)
+            dispatch('get_by_bundle_public_id', data.data.bundle_public_id)
         } else {
             // Handle error here
         }
