@@ -44,8 +44,6 @@ export default {
 
     methods: {
         makeToast() {
-            // this.$store.commit('status/POP_STATUS_TAX_RECORD_TARGETS')
-
             this.$bvToast.toast(this.statusTaxRecordTargets[0].message, {
             title: 'New Tax Record',
             variant: this.statusTaxRecordTargets.status,

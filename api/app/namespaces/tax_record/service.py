@@ -42,7 +42,10 @@ class TaxRecordService:
 
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TaxRecord]:
-        return TaxRecord.query.filter_by(public_id=seller_firm_public_id).all()
+        from app.namespaces.business.seller_firm.service import SellerFirmService
+        seller_firm_id = SellerFirmService.get_seller_firm_id(seller_firm_public_id=seller_firm_public_id)
+        if isinstance(seller_firm_id, int):
+            return TaxRecord.query.filter_by(seller_firm_id=seller_firm_id).all()
 
     @staticmethod
     def delete_by_public_id(tax_record_public_id: str):

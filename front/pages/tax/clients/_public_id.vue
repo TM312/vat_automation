@@ -14,7 +14,7 @@
 
                 <b-tab title='Tax Records' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0">
                     <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
-                    <lazy-overview-tax-records v-else :business="sellerFirm" />
+                    <lazy-overview-tax-records v-else />
                 </b-tab>
                 <b-tab title='Upload Files' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0">
                     <lazy-add-data-files :seller_firm_public_id="sellerFirm.public_id" />
@@ -64,8 +64,10 @@
             resetStoreSellerFirm() {
                 const { store } = this.$nuxt.context
                 store.dispatch('status/clear_all')
-                // store.dispatch('seller_firm/clear_seller_firm')
-                // store.dispatch('transaction_input/clear_transaction_inputs')
+                store.dispatch('seller_firm/clear_seller_firm')
+                store.dispatch('transaction_input/clear_transaction_inputs')
+                store.dispatch('tax_record/clear_tax_records')
+
             }
 
         },

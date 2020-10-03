@@ -61,7 +61,7 @@ class TaxRecordResource(Resource):
 class TaxRecordSellerFirmResource(Resource):
     @login_required
     @ns.marshal_list_with(tax_record_sub_dto, envelope='data')
-    def get(self) -> List[TaxRecord]:
+    def get(self, seller_firm_public_id: str) -> List[TaxRecord]:
         """Get Tax Records of Seller Firm """
         return TaxRecordService.get_all_by_seller_firm_public_id(seller_firm_public_id)
 
