@@ -177,7 +177,7 @@ class SellerFirmService:
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
 
-        if seller_firm:
+        if isinstance(seller_firm, SellerFirm):
             seller_firm_id = seller_firm.id
             return seller_firm_id
 

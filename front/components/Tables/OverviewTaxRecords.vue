@@ -19,18 +19,21 @@
     export default {
         name:'OverviewTaxRecords',
 
-        props: {
-            business: {
-                type: [Array, Object],
-                required: true
+        async fetch() {
+            const { store } = this.$nuxt.context
+            if (this.taxRecords.length == 0) {
+                await store.dispatch('tax_record/get_all_by_seller_firm_public_id', this.sellerFirm.public_id)
             }
         },
 
         computed: {
             ...mapState({
-                taxRecords: state => state.seller_firm.seller_firm.tax_records
+                sellerFirm: state => state.seller_firm.seller_firm,
+                taxRecords: state => state.tax_record.tax_records
             }),
         }
+
+
     }
 </script>
 

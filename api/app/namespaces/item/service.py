@@ -158,8 +158,8 @@ class ItemService:
                 main_subject='Item Weight',
                 original_filename=transaction_input.original_filename,
                 status='info',
-                reference_value='{}kg'.format(round(transaction_input.item_weight_kg, 3),
-                calculated_value='{}kg'.format(round(item.weight_kg, 3),
+                reference_value='{}kg'.format(round(transaction_input.item_weight_kg, 3)),
+                calculated_value='{}kg'.format(round(item.weight_kg, 3)),
                 transaction_id=transaction_id)
             notification_data_list.append(notification_data)
 

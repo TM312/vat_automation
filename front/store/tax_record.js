@@ -1,30 +1,38 @@
 export const state = () => ({
     tax_records: [],
-    seller_firm_tax_records: [],
     tax_record: []
 })
 
 export const mutations = {
+    CLEAR_TAX_RECORDS(state) {
+        state.tax_records = []
+    },
+
     PUSH_TAX_RECORD(state, payload) {
         state.tax_records.push(payload)
     },
 
-    SET_TAX_RECORDS(state, tax_records) {
-        state.tax_records = tax_records
+    SET_TAX_RECORDS(state, payload) {
+        state.tax_records = payload
     },
-    SET_SELLER_FIRM_TAX_RECORDS(state, tax_records) {
-        state.seller_firm_tax_records = tax_records
+    SET_SELLER_FIRM_TAX_RECORDS(state, payload) {
+        state.tax_records = payload
     },
     SET_TAX_RECORD(state, tax_record) {
         state.tax_record = tax_record
     },
     // !!!! NOT SURE IF WORKING maybe position of tax_record in array required
-    SPLICE_TAX_RECORDS(state, tax_record) {
-        state.tax_records.splice(tax_record, 1)
+    SPLICE_TAX_RECORDS(state, payload) {
+        state.tax_records.splice(payload, 1)
     }
 }
 
 export const actions = {
+
+    async clear_tax_records({ commit }) {
+        commit('CLEAR_TAX_RECORDS')
+    },
+
     async get_all({ commit }) {
         const res = await this.$repositories.tax_record.get_all()
         const { status, data } = res
@@ -72,7 +80,7 @@ export const actions = {
     async get_all_by_seller_firm_public_id({ commit }, seller_firm_public_id) {
         const res = await this.$repositories.tax_record.get_all_by_seller_firm_public_id(seller_firm_public_id)
         const { status, data } = res
-        if (status === 200 && data.message) {
+        if (status === 200 && data.data) {
             commit('SET_SELLER_FIRM_TAX_RECORDS', data.data)
         } else {
             // Handle error here
