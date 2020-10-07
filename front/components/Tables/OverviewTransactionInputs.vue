@@ -19,7 +19,7 @@
             <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code">
                 <b-card
                     v-if="transactionInputsChannel(account.channel_code).length === 0"
-                    sub-title="No transaction have been registered for this channel."
+                    sub-title="No transactions have been registered for this channel."
                     class="text-center py-5"
                 ></b-card>
                 <lazy-table-transaction-inputs v-else :transactionInputs="transactionInputsChannel(account.channel_code)" />
@@ -43,12 +43,12 @@
 
         async fetch() {
             if (
-                this.transactionInputs.length === 0 || this.transactionInputs[0]['seller_firm_public_id'] !== this.$route.params.public_id
+                this.transactionInputs.length === 0 || this.transactionInputs[0]['seller_firm_public_id'] !== this.sellerFirm.public_id
             ) {
 
                 const { store } = this.$nuxt.context;
                 const params = {
-                    seller_firm_public_id: this.$route.params.public_id,
+                    seller_firm_public_id: this.sellerFirm.public_id,
                     page: 1
                 }
                 await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
@@ -73,7 +73,7 @@
             async refresh() {
                 const { store } = this.$nuxt.context;
                 const params = {
-                    seller_firm_public_id: this.$route.params.public_id,
+                    seller_firm_public_id: this.sellerFirm.public_id,
                     page: this.currentPage + 1
                 }
                 await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
@@ -85,8 +85,8 @@
                     try {
 
                         await this.$store.dispatch("transaction_input/delete_all");
-                        await this.$store.dispatch("seller_firm/get_by_public_id", this.$route.params.public_id);
-                        this.$router.push(`/tax/clients/${this.$route.params.public_id}`)
+                        await this.$store.dispatch("seller_firm/get_by_public_id", this.sellerFirm.public_id);
+                        this.$router.push(`/tax/clients/${this.sellerFirm.public_id}`)
 
                     } catch (error) {
                         this.$toast.error(error, { duration: 5000 });

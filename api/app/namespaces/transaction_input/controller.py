@@ -81,11 +81,10 @@ class TransactionInputBundleIdResource(Resource):
 @ns.route("/seller_firm/") #<string:seller_firm_public_id><int:page>")
 @ns.param("seller_firm_public_id", "TransactionInput database ID")
 class TransactionInputSellerFirmIdResource(Resource):
-    decorators = [limiter.limit("5/second")]
+    # decorators = [limiter.limit("5/second")]
     @login_required
     @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
     def get(self) -> List[TransactionInput]:
         """Get Single TransactionInput"""
         args = parser.parse_args()
-        print('args:', args, flush=True)
         return TransactionInputService.get_by_seller_firm_public_id(args.get('seller_firm_public_id'), paginate=True, page=args.get('page'))

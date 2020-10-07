@@ -173,11 +173,8 @@ class VATINService:
 
     @staticmethod
     def get_vatin_or_None(country_code_temp: str, number_temp: str, date: date) -> VATIN:
-        print('entering get_vatin_or_None', flush=True)
-
         business_vatin = VATINService.get_vatin_if_number(country_code_temp, number_temp, date)
         if isinstance(business_vatin, VATIN):
-            print('in get_vatin_or_None: business_vatin is found vatin', flush=True)
             from app.namespaces.business.service_parent import BusinessService
             from app.namespaces.business import Business
             business = BusinessService.get_by_name_address_or_None(business_vatin.name, business_vatin.address)

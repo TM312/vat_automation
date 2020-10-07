@@ -1,6 +1,50 @@
 <template>
-    <b-container fluid>
-        <dashboard-dashboard />
+    <div>
+        <b-tabs pills card vertical>
+            <b-tab title='Overview' active>
+                <b-row>
+                    <b-col cols="12" md="8" xl="9">
+                        <dashboard-dashboard />
+                        <card-greeting-dashboard v-once class="mx-3" />
+                    </b-col>
+                    <b-col cols="auto">
+                        <card-notification v-for="notification in notifications" :key="notification.public_id" :notification="notification"  class="my-3" />
+                    </b-col>
+                </b-row>
+            </b-tab>
+            <b-tab title='Key Accounts' lazy>
+                <div v-if="$auth.user.key_accounts.length===0">
+                    <b-card title="No key accounts assigned yet.">
+                        <b-card-text>
+                            <p>
+                                <span>You can assign clients as your key accounts by clicking on the</span>
+                                <b-button variant="outline-success" size="sm" class="mx-2" disabled>Follow</b-button>
+                                <span>button on their profile.</span>
+                            </p>
+                            <p>These clients will appear here. Additionally you will receive notifications on any update (e.g. data uploads, etc.) concerning these clients.</p>
+                        </b-card-text>
+
+                        <b-button to="/tax/clients" variant="primary">Go to Clients</b-button>
+
+                    </b-card>
+                </div>
+                <div v-else>
+                    <b-row class="mb-3" cols="1" cols-lg="2" cols-xl="3">
+                        <b-col class="mb-2" v-for="(client, i) in $auth.user.key_accounts" :key="i">
+                            <card-client-short :business="client" class="mb-2" />
+                        </b-col>
+                    </b-row>
+                </div>
+            </b-tab>
+            <b-tab title="Colleagues" v-if="$auth.user.key_accounts">
+                <lazy-table-colleagues-tax />
+            </b-tab>
+        </b-tabs>
+    </div>
+
+
+    <!-- <b-container fluid>
+        <dashboard-dashboard class="mt-2" />
         <card-greeting-dashboard class="mx-3" />
         <br>
 
@@ -26,7 +70,7 @@
         </b-row>
 
 
-    </b-container>
+    </b-container> -->
 </template>
 
 <script>

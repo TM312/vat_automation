@@ -5,6 +5,7 @@
         @click="followSellerFirm"
         :disabled="buttonBusy"
         size="sm"
+        v-b-popover.hover.top="'Following a client company assigns it to your key accounts and you will receive notifications on updates concerning the company.'" title="Follow/Unfollow"
     >{{ buttonText }}</b-button>
 </template>
 
