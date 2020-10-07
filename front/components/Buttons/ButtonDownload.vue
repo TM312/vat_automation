@@ -1,7 +1,7 @@
 <template>
 
     <b-button variant="primary" @click="downloadFile()">
-        <b-icon icon="box-arrow-in-down" /> Download
+        <b-icon icon="download" /> Download
     </b-button>
 
 </template>
@@ -38,12 +38,12 @@ export default {
                 let url = window.URL.createObjectURL(blob)
                 const link = document.createElement('a')
                 link.href = url
-                // const contentDisposition = res.headers['content-disposition']
-                // if (contentDisposition) {
-                //     const fileNameMatch = contentDisposition.match(/this.templateName="(.+)"/)
-                //     if (fileNameMatch.length === 2)
-                //         this.fileName = fileNameMatch[1]
-                // }
+                const contentDisposition = res.headers['content-disposition']
+                if (contentDisposition) {
+                    const fileNameMatch = contentDisposition.match(/this.templateName="(.+)"/)
+                    if (fileNameMatch.length === 2)
+                        this.fileName = fileNameMatch[1]
+                }
                 link.setAttribute('download', this.fileName)
 
                 document.body.appendChild(link)

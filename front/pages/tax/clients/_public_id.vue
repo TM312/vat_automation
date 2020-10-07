@@ -64,8 +64,8 @@
             resetStoreSellerFirm() {
                 const { store } = this.$nuxt.context
                 store.dispatch('status/clear_all')
-                store.dispatch('seller_firm/clear_seller_firm')
-                store.dispatch('transaction_input/clear_transaction_inputs')
+                // store.dispatch('seller_firm/clear_seller_firm')
+                // store.dispatch('transaction_input/clear_transaction_inputs')
                 store.dispatch('tax_record/clear_tax_records')
 
             }

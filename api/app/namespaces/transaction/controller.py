@@ -51,5 +51,4 @@ class TransactionSellerFirmIdResource(Resource):
     def get(self) -> List[Transaction]:
         """Get Single Transaction"""
         args = parser.parse_args()
-        print('args:', args, flush=True)
         return TransactionService.get_by_tax_record_public_id(args.get('tax_record_public_id'), paginate=True, page=args.get('page'))

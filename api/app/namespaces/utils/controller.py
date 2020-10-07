@@ -29,8 +29,6 @@ ns.add_model(seller_firm_notification_dto.name, seller_firm_notification_dto)
 @ns.route("/template/<string:name>")
 class TemplateResource(Resource):
     @login_required
-    # @confirmation_required
-    # @ns.expect(transaction_dto, validate=True)
     def get(self, name):
         """Download A Template"""
         filename = name.split('.')[0] + '.csv'

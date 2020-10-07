@@ -1,5 +1,5 @@
 <template>
-    <b-card no-body>
+    <b-container fluid>
         <b-tabs pills card vertical>
             <b-tab title='Overview' @click="refresh" active>
                 <clients-dashboard />
@@ -9,7 +9,7 @@
                 <lazy-container-add-client/>
             </b-tab>
         </b-tabs>
-    </b-card>
+    </b-container>
 </template>
 
 <script>

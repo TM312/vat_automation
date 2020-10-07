@@ -18,8 +18,10 @@ class TemplateService:
 
     def download_file(filename: str):
         BASE_PATH_TEMPLATES = current_app.config.BASE_PATH_TEMPLATES
-
-        return send_from_directory(directory=BASE_PATH_TEMPLATES, filename=filename, as_attachment=True)
+        try:
+            return send_from_directory(BASE_PATH_TEMPLATES, filename, as_attachment=True, mimetype="text/csv", attachment_filename=filename)
+        except Exception as e:
+            print(e, flush=True)
 
 
 class HelperService:

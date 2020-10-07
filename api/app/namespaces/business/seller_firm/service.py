@@ -42,7 +42,7 @@ class SellerFirmService:
         if not isinstance(seller_firm, SellerFirm):
             seller_firm = SellerFirm.query.filter(
                 SellerFirm.address == address,
-                SellerFirm.establishment_country_code == establishment_country_code,
+                SellerFirm.establishment_country_code == establishment_country_code
                 ).first()
 
         return seller_firm

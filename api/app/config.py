@@ -50,9 +50,10 @@ class Config(object):
 
     BASE_PATH_SEEDS = basepath + '/seeds'
     BASE_PATH_LOGS = basepath + '/logs'
-    BASE_PATH_TEMPLATES = basepath + '/templates'
 
     DATAPATH = datapath = basepath + '/data'
+    BASE_PATH_TEMPLATES = DATAPATH + '/templates'
+
     BASE_PATH_BUSINESS_DATA = datapath + '/business_data'
     BASE_PATH_DATA_SELLER_FIRM = datapath + '/seller_firm_data'
     BASE_PATH_STATIC_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/static'

@@ -14,7 +14,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 # ma = Marshmallow()
 bcrypt = Bcrypt()
-cors = CORS(supports_credentials=True, resources={r"/*": {"origins": "*"}}) #!!!! addd domain later
+cors = CORS(supports_credentials=True, resources={r"/*": {"origins": "*"}}) #!!!! add domain later
 mail = Mail()
 limiter = Limiter(
     key_func=get_remote_address,
@@ -25,6 +25,6 @@ session = Session()
 cache = Cache()
 socket_io = SocketIO(
     manage_session=False,
-    cors_allowed_origins="*",  # !!!! addd domain later
+    cors_allowed_origins="*",  # !!!! add domain later
     logger=True,
     engineio_logger=True)

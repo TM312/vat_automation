@@ -113,25 +113,25 @@ services:
 
         # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
 
-    celery-beat:
-        container_name: celery-beat
-        build:
-            context: ./api
-            dockerfile: Dockerfile
-            args:
-                - PYTHON_VERSION=${PYTHON_VERSION}
-                # - GROUP_ID=${GROUP_ID}
-                # - USER_ID=${USER_ID}
+    # celery-beat:
+    #     container_name: celery-beat
+    #     build:
+    #         context: ./api
+    #         dockerfile: Dockerfile
+    #         args:
+    #             - PYTHON_VERSION=${PYTHON_VERSION}
+    #             # - GROUP_ID=${GROUP_ID}
+    #             # - USER_ID=${USER_ID}
 
-        depends_on:
-            - postgres
-            - rabbitmq
-            - redis
-            - celery-worker
-        networks:
-            - internal
-                                    #The -A option gives Celery the application module and the Celery instance
-        command: bash -c "celery beat -A wsgi:celery --loglevel=info"
+    #     depends_on:
+    #         - postgres
+    #         - rabbitmq
+    #         - redis
+    #         - celery-worker
+    #     networks:
+    #         - internal
+    #                                 #The -A option gives Celery the application module and the Celery instance
+    #     command: bash -c "celery beat -A wsgi:celery --loglevel=info"
 
 
 
@@ -145,7 +145,7 @@ services:
         #     - 8888:8888
         depends_on:
             - celery-worker
-            - celery-beat
+            # - celery-beat
         networks:
             - internal
 
@@ -179,7 +179,7 @@ services:
         networks:
             - internal
             - web
-        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn wsgi:app --bind 0.0.0.0:5000 --timeout 180 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker --worker-connections 1000 --log-level=info" #gunicorn --bind 0.0.0.0:5000 wsgi:app"
+        command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && gunicorn wsgi:app --bind 0.0.0.0:5000 --timeout 180 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 --worker-connections 1000 --log-level=debug" #gunicorn --bind 0.0.0.0:5000 wsgi:app"
 
 
     postgres:

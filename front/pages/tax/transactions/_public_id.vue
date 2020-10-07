@@ -10,7 +10,7 @@
              <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
                 <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transactionInputPublicId="$route.params.public_id"/> </p>
             </b-alert>
-            <b-tabs pills card vertical>
+            <b-tabs pills card>
                 <b-tab title='Input File' active>
                     <overview-base-data-loading v-if="$fetchState.pending || transactionInput.length === 0" />
                     <card-transaction-input v-else id="file"/>
