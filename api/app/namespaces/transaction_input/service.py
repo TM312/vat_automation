@@ -36,12 +36,19 @@ class TransactionInputService:
 
     @staticmethod
     def get_by_public_id(transaction_input_public_id: str) -> TransactionInput:
-        return TransactionInput.query.filter_by(public_id = transaction_input_public_id).first()
+        if transaction_input_public_id == 'undefined':
+            return None
+        else:
+            return TransactionInput.query.filter_by(public_id = transaction_input_public_id).first()
 
 
     @staticmethod
     def get_by_bundle_public_id(bundle_public_id: str) -> List[TransactionInput]:
-        bundle = BundleService.get_by_public_id(bundle_public_id)
+        if bundle_public_id == 'undefined':
+            print('bundle_public_id == undefined')
+            return None
+        else:
+            bundle = BundleService.get_by_public_id(bundle_public_id)
         if isinstance(bundle, Bundle):
             return TransactionInput.query.filter_by(bundle_id=bundle.id).all()
 

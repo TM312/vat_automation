@@ -45,7 +45,6 @@
 
     export default {
         layout: "tax",
-        middleware: "auth-tax",
 
         data() {
             return {
@@ -58,24 +57,7 @@
         async fetch() {
             const { store } = this.$nuxt.context
             await store.dispatch('transaction_input/get_by_public_id', this.$route.params.public_id);
-            // if (this.transactionInput.length == 0) {
-            //     await store.dispatch('seller_firm/get_by_public_id', this.transactionInput.seller_firm_public_id)
-            // }
         },
-
-
-// async fetch() {
-//         if (this.transactionInputsBundle.length === 0) {
-//             const { store } = this.$nuxt.context;
-//             await store.dispatch("transaction_input/get_by_bundle_public_id", this.bundlePublicId);
-//         }
-//     },
-
-    // computed: {
-    //     ...mapState({
-    //         transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle
-    //     })
-    // }
 
 
         computed: {

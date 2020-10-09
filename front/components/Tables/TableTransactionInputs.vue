@@ -2,10 +2,15 @@
     <div>
         <b-table :fields="fieldsBundle" :items="transactionInputs" hover>
             <template v-slot:cell(transaction_type_public_code)="data">
-                <nuxt-link
+                <span
+                    class="text-primary"
+                    v-if="data.item.public_id != $route.params.public_id"
+                    @click="$emit('single-view', data.item.public_id)"
+                >{{ data.value }}</span>
+                <!-- <nuxt-link
                     v-if="data.item.public_id != $route.params.public_id"
                     :to="`/tax/transactions/${data.item.public_id}`"
-                >{{ data.value }}</nuxt-link>
+                >{{ data.value }}</nuxt-link> -->
                 <span v-else>{{ data.value }}</span>
             </template>
 
@@ -34,8 +39,6 @@
                     <b-col class="text-left">{{ data.item.arrival_country_code }}</b-col>
                 </b-row>
             </template>
-
-
         </b-table>
     </div>
 </template>
@@ -107,6 +110,12 @@ export default {
             ]
         }
     },
+    // methods: {
+    //     singleView(publicId) {
+    //         console.log('singleView public_id:', publicId) //!!!s
+    //         this.$emit('single-view', publicId)
+    //     }
+    // }
 
 
 
