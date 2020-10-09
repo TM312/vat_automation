@@ -7,16 +7,27 @@
         <hr>
         <b-container fluid>
             <b-tabs pills card vertical>
-                <b-tab title='Overview' active>
+                <b-tab title='Company' active>
                     <overview-base-data-loading v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)" />
                     <overview-base-data v-else />
                 </b-tab>
 
-                <b-tab title='Tax Records' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0">
+                <b-tab title='Items' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
+                    <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
+                    <lazy-card-items v-else />
+                </b-tab>
+
+                <b-tab title='Transactions' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
+                    <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
+                    <lazy-overview-transaction-inputs v-else />
+                </b-tab>
+
+                <b-tab title='Tax Records' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
                     <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
                     <lazy-overview-tax-records v-else />
                 </b-tab>
-                <b-tab title='Upload Files' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0">
+
+                <b-tab title='Upload Files' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" title-link-class="text-info" lazy>
                     <lazy-add-data-files :seller_firm_public_id="sellerFirm.public_id" />
                 </b-tab>
 
@@ -45,14 +56,6 @@
         computed: {
             ...mapState({
                 sellerFirm: state => state.seller_firm.seller_firm
-            })
-        },
-
-
-        mounted() {
-            this.socket = this.$nuxtSocket({
-                name: 'home',
-                reconnection: false
             })
         },
 

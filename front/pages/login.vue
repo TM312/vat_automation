@@ -1,15 +1,15 @@
 <template>
-  <b-container fluid>
+  <b-container fluid style="height: 900px">
     <b-row class="mt-5" align-h="center">
       <b-col cols="6" md="4">
-        <b-card class="my-5">
-          <b-card-title class="text-center text-primary">
+        <b-card>
+          <b-card-title class="text-center text-dark">
             Sign in
           </b-card-title>
           <client-only placeholder="Loading...">
             <b-card-body>
               <b-form @submit.prevent="login">
-                <b-form-group id="input-group-email" label="Email address:" label-for="input-email">
+                <b-form-group id="input-group-email" label="Email Address" label-for="input-email">
                   <b-form-input
                     id="input-email"
                     v-model="form.email"
@@ -18,7 +18,7 @@
                   />
                 </b-form-group>
 
-                <b-form-group id="input-group-password" label="Password:" label-for="input-password">
+                <b-form-group id="input-group-password" label="Password" label-for="input-password">
                   <b-form-input
                     id="input-password"
                     v-model="form.password"
@@ -42,6 +42,8 @@
 <script>
 export default {
   middleware: 'guest',
+  layout: 'clean',
+
   data() {
     return {
       showPassword: false,
@@ -58,28 +60,26 @@ export default {
         password: this.form.password,
       }
       try {
-        await this.$auth.loginWith('local_seller', {
+        await this.$auth.loginWith('local_tax_auditor', {
           data: payload,
         })
 
-        this.$router.push('/dashboard')
+        this.$router.push('/tax/dashboard')
 
-        this.$toast.success('Successfully signed in!', {
-          duration: 5000,
-        })
       } catch (err) {
         // console.log('ERRRORCODE')
         // console.log(err.response.status)
         const status = err.response.status
         if (status === 401 || status === 404) {
-          this.$toast.error('Invalid password or email.', {
-            duration: 5000,
-          })
+          this.$bvToast.toast('Invalid password or email.', {
+          autoHideDelay: 5000,
+          variant: 'danger'
+        })
         } else {
-          this.$toast.error(
-            'There seems to be a problem. Please try again later.',
-            { duration: 5000 }
-          )
+          this.$bvToast.toast('There seems to be a problem. Please try again later.', {
+            autoHideDelay: 5000,
+            variant: 'danger'
+          })
         }
       }
     },

@@ -1,31 +1,41 @@
 <template>
     <div>
-        <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="align-right" :disabled="buttonRemoveDisabled" @click="removeAll">Delete All</b-button>
-        <b-tabs pills content-class="mt-3">
-            <b-tab title="Total" active>
-                <b-card
-                    v-if="transactionInputs.length === 0"
-                    sub-title="An Overview Of Transactions Will Appear Here Once You Start Uploading Data"
-                    class="text-center py-5"
-                ></b-card>
-                <table-transaction-inputs :transactionInputs="transactionInputsChannel(null)" v-else />
-                <b-button variant="outline-primary" :disabled="buttonFetchDisabled" @click="refresh" block>
-                    <b-spinner v-if="buttonFetchDisabled" small />
-                    <b-icon v-else icon="chevron-down" />
-                    Show More
-                </b-button>
+        <div v-if="transactionInputTable">
+            <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="ml-auto" :disabled="buttonRemoveDisabled" @click="removeAll">Delete All</b-button>
+            <b-tabs pills content-class="mt-3">
+                <b-tab title="Total" active>
+                    <b-card
+                        v-if="transactionInputs.length === 0"
+                        sub-title="An Overview Of Transactions Will Appear Here Once You Start Uploading Data"
+                        class="text-center py-5"
+                    ></b-card>
+                    <div v-else>
+                        <table-transaction-inputs :transactionInputs="transactionInputsChannel(null)" @single-view="getSingleView($event)" />
+                    </div>
+                </b-tab>
+                <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code">
+                    <b-card
+                        v-if="transactionInputsChannel(account.channel_code).length === 0"
+                        sub-title="No transactions have been registered for this channel."
+                        class="text-center py-5"
+                    ></b-card>
+                    <div v-else >
+                        <lazy-table-transaction-inputs :transactionInputs="transactionInputsChannel(account.channel_code)" @single-view="getSingleView($event)" />
+                    </div>
+                </b-tab>
+            </b-tabs>
+            <b-button v-show="buttonFetchMore" variant="outline-primary" :disabled="buttonFetchDisabled" @click="refresh" block>
+                <b-spinner v-if="buttonFetchDisabled" small />
+                <b-icon v-else icon="chevron-down" />
+                Show More
+            </b-button>
+        </div>
 
-            </b-tab>
-            <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code">
-                <b-card
-                    v-if="transactionInputsChannel(account.channel_code).length === 0"
-                    sub-title="No transactions have been registered for this channel."
-                    class="text-center py-5"
-                ></b-card>
-                <lazy-table-transaction-inputs v-else :transactionInputs="transactionInputsChannel(account.channel_code)" />
-                <!-- {{ account.channel_code }} -->
-            </b-tab>
-        </b-tabs>
+        <div v-else>
+            <b-button variant="outline-info" @click="getTableView"><b-icon icon="arrow-left"/> Go Back</b-button>
+            <hr class="my-3">
+            <lazy-container-transaction-input :transactionInputPublicId="transactionInputPublicId" />
+        </div>
     </div>
 </template>
 
@@ -38,14 +48,17 @@
         data() {
             return {
                 buttonRemoveDisabled: false,
+                buttonFetchMore: true,
+                transactionInputTable: true,
+                transactionInputPublicId: ''
             }
         },
 
         async fetch() {
             if (
-                this.transactionInputs.length === 0 || this.transactionInputs[0]['seller_firm_public_id'] !== this.sellerFirm.public_id
-            ) {
+                this.transactionInputs.length === 0 || this.sellerFirm.public_id !== this.$route.params.public_id
 
+            ) {
                 const { store } = this.$nuxt.context;
                 const params = {
                     seller_firm_public_id: this.sellerFirm.public_id,
@@ -70,13 +83,32 @@
         },
 
         methods: {
+            getTableView() {
+                console.log('getTableView')
+                this.transactionInputPublicId = ''
+                this.transactionInputTable = true
+            },
+
+            getSingleView(payload) {
+                console.log('publicId:', payload)
+                this.transactionInputPublicId = payload
+                this.transactionInputTable = false
+            },
+
+
             async refresh() {
                 const { store } = this.$nuxt.context;
+                const tiLengthBefore = this.transactionInputs.length
                 const params = {
                     seller_firm_public_id: this.sellerFirm.public_id,
                     page: this.currentPage + 1
                 }
                 await store.dispatch("transaction_input/get_by_seller_firm_public_id", params);
+                const tiLengthAfter = this.transactionInputs.length
+
+                if (tiLengthBefore === tiLengthAfter) {
+                    this.buttonFetchMore = false
+                }
             },
 
             async removeAll() {

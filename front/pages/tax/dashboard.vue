@@ -1,5 +1,11 @@
 <template>
     <div>
+        channels.length: {{ channels.length }} <br>
+        countries.length: {{ countries.length }} <br>
+        currencies.length: {{ currencies.length }} <br>
+        taxTreatments.length: {{ taxTreatments.length }} <br>
+        taxRateTypes.length: {{ taxRateTypes.length }} <br>
+        notifications.length: {{ notifications.length }} <br>
         <b-tabs pills card vertical>
             <b-tab title='Overview' active>
                 <b-row>
@@ -78,7 +84,6 @@
 
     export default {
         layout: "tax",
-        middleware: "auth-tax",
 
         async fetch() {
             const { store } = this.$nuxt.context;

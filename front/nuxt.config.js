@@ -34,6 +34,11 @@ export default {
         height: '4px',
     },
 
+    // https://damienbeaufils.dev/blog/server-sent-events-with-nuxt-js-vue-js-and-nginx-proxy/
+    render: {
+        gzip: false
+    },
+
     /*
      ** Global CSS
      */
@@ -63,7 +68,6 @@ export default {
     modules: [
         'bootstrap-vue/nuxt',
         '@nuxtjs/axios',
-        '@nuxtjs/proxy',
         '@nuxtjs/auth',
         '@nuxtjs/toast',
         // Doc: https: //github.com/richardeschloss/nuxt-socket-io
