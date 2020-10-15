@@ -24,7 +24,11 @@
       <div v-if="editMode===false">
         <b-table borderless :items="accounts" :fields="fields" hover>
           <template v-slot:cell(platform)>
-            Amazon
+            <img
+              src="@/assets/img/logos/amazon_logo_slim.png"
+              class="d-inline-block align-top"
+              height="20"
+            />
           </template>
         </b-table>
       </div>

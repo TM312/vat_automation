@@ -40,8 +40,28 @@
               </span>
             </template>
 
-            <template v-slot:cell(valid_to)="data">
-              <span v-if="data.item.valid"> {{ data.value }}</span>
+            <template v-slot:head(validity)="data">
+              <span>
+                {{ data.label }}
+                <b-icon id="popover-validity" icon="info-circle" variant="info" class="ml-2" />
+              </span>
+
+              <b-popover
+                target="popover-validity"
+                triggers="hover"
+                variant="info"
+                placement="right"
+              >
+                We regularly check the validity of the vat numbers below to provide up to date information about their status.
+              </b-popover>
+            </template>
+
+            <template v-slot:cell(validity)="data">
+              <span v-if="data.item.valid">
+                {{ data.item.valid_from }}
+                <b-icon icon="arrow-right" variant="primary" class="mx-2" />
+                {{ data.item.valid_to }}
+              </span>
               <span v-else-if="data.item.valid === null"></span>
             </template>
 
@@ -85,10 +105,9 @@
                 fields: [
                     { key: "vatin", label: "VATIN", sortable: false },
                     { key: "valid", sortable: false },
-                    { key: "request_date", sortable: true },
-                    { key: "valid_from", sortable: true },
-                    { key: "valid_to", sortable: true },
-                    { key: "initial_tax_date", sortable: true },
+                    { key: "request_date", sortable: false },
+                    { key: "validity", sortable: false },
+                    { key: "initial_tax_date", sortable: false },
                 ]
             }
         },

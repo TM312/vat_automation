@@ -22,6 +22,21 @@
         No Data Available Yet
       </h5>
       <div v-else>
+        <!-- <b-row cols="1" cols-lg="2">
+          <b-col v-for="distanceSale in distanceSales" :key="distanceSale.arrival_country" class="mb-2">
+            <b-card :title="distanceSale.active" :sub-title="distanceSale.arrival_country">
+              <b-card-text>
+                <b-button size="sm" variant="outline-primary">
+                  Details
+                </b-button>
+              </b-card-text>
+            </b-card>
+          </b-col>
+        </b-row> -->
+
+
+
+
         <div v-if="editMode===false">
           <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover>
             <template v-slot:table-busy>
@@ -32,8 +47,21 @@
             </template>
 
             <template v-slot:cell(active)="data">
-              <b-icon v-if="data.value === true" icon="check-circle" variant="success" />
-              <b-icon v-else icon="x-circle" variant="danger" />
+              <div :id="`popover-target-distance-sale-history-${data.item.arrival_country}`">
+                <b-icon v-if="data.value === true" icon="check-circle" variant="success" />
+                <b-icon v-else icon="x-circle" variant="danger" />
+              </div>
+              <b-popover :target="`popover-target-distance-sale-history-${data.item.arrival_country}`" triggers="hover" placement="top" class="ml-2" title="History">
+                <div>Test {{ data.item.arrival_country }}</div>
+              </b-popover>
+            </template>
+
+            <template v-slot:cell(vat_taxable_turnover_amount_12m)>
+              <b-progress max="12" class="mb-3">
+                <b-progress-bar variant="primary" value="9" />
+                <!-- <b-progress-bar variant="warning" value="1" />
+                <b-progress-bar variant="danger" value="2" /> -->
+              </b-progress>
             </template>
           </b-table>
         </div>
@@ -67,8 +95,9 @@
                 flashCounter: false,
 
                 fields: [
-                    { key: "arrival_country", sortable: true },
-                    { key: "active", sortable: true }
+                    { key: "arrival_country", sortable: false },
+                    { key: "active", sortable: false },
+                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover Amount (past 12 months)' }
                 ]
             }
         },

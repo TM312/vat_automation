@@ -1,41 +1,27 @@
 <template>
   <div>
-    <!-- <b-nav tabs content-class="mt-3">
-            <b-nav-item to="#" :active="$route.hash === '#' || $route.hash === ''">
-                Base Data
-            </b-nav-item>
-            <b-nav-item to="#items" :active="$route.hash === '#items'">
-                Items
-            </b-nav-item>
-            <b-nav-item to="#transactions" :active="$route.hash === '#transactions'">
-                Transactions
-            </b-nav-item>
-        </b-nav> -->
-
-    <!-- <div class="tab-content">
-            <div :class="['tab-pane', { 'active': $route.hash === '#' || $route.hash === '' }]" class="py-3"> -->
-    <b-card-group deck>
-      <lazy-card-client class="mb-5" />
-      <lazy-card-accounts class="mb-5" />
-    </b-card-group>
-    <b-card-group deck>
-      <lazy-card-vat-numbers class="mb-5" />
-      <lazy-card-distance-sales class="mb-5" />
-    </b-card-group>
-    <!-- </div> -->
-    <!-- <div :class="['tab-pane', { 'active': $route.hash === '#items' }]" class="py-3">
-                <lazy-card-items class="mb-5"/>
-            </div>
-            <div :class="['tab-pane', { 'active': $route.hash === '#transactions' }]" class="py-3" lazy>
-                <lazy-overview-transaction-inputs />
-            </div> -->
-    <!-- </div> -->
+    <b-row cols="1" cols-xl="2" class="my-2">
+      <b-col class="my-2 px-2">
+        <lazy-card-client class="mb-5 h-100" />
+      </b-col>
+      <b-col class="my-2 px-2">
+        <lazy-card-accounts class="mb-5 h-100" />
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col class="my-2 px-2">
+        <lazy-card-vat-numbers class="mb-5 h-100" />
+      </b-col>
+      <b-col class="my-2 px-2">
+        <lazy-card-distance-sales class="mb-5 h-100" />
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
     export default {
-        name:'OverviewBaseData'
+        name: "OverviewBaseData"
     }
 </script>
 
