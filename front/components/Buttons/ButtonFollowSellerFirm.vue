@@ -1,12 +1,14 @@
 <template>
-    <b-button
-        variant="outline-success"
-        :pressed="isFollowing"
-        @click="followSellerFirm"
-        :disabled="buttonBusy"
-        size="sm"
-        v-b-popover.hover.top="'Following a client company assigns it to your key accounts and you will receive notifications on updates concerning the company.'" title="Follow/Unfollow"
-    >{{ buttonText }}</b-button>
+  <b-button
+    v-b-popover.hover.top="'Following a client company assigns it to your key accounts and you will receive notifications on updates concerning the company.'"
+    variant="outline-success"
+    :pressed="isFollowing"
+    :disabled="buttonBusy"
+    size="sm"
+    title="Follow/Unfollow" @click="followSellerFirm"
+  >
+    {{ buttonText }}
+  </b-button>
 </template>
 
 <script>
@@ -50,7 +52,7 @@
                 this.buttonBusy = false
             }
         },
-    };
+    }
 </script>
 
 <style>

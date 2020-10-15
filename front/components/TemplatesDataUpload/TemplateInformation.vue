@@ -1,13 +1,19 @@
 <template>
-    <div class="mt-3">
-        <p>Below you find examples and complementary information for each of the fields in the template.</p>
-        <b-table hover :items="items" :fields="fields"></b-table>
-    </div>
+  <div class="mt-3">
+    <p>Below you find examples and complementary information for each of the fields in the template.</p>
+    <b-table hover :items="items" :fields="fields" />
+  </div>
 </template>
 
 <script>
     export default {
         name: "TemplateInformation",
+        props: {
+            items: {
+                type: [Array, Object],
+                required: true
+            }
+        },
         data() {
             return {
                 fields: [
@@ -22,14 +28,8 @@
                     'complementary_information'
                 ],
             }
-        },
-        props: {
-            items: {
-                type: [Array, Object],
-                required: true
-            }
         }
-    };
+    }
 </script>
 
 <style>

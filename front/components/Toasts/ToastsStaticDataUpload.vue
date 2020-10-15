@@ -1,255 +1,271 @@
 <template>
-    <div>
-        <toast-data-upload-invalid-file />
-        <b-toast
-            no-auto-hide
-            :title="titleAccount"
-            :variant="doneStatusAccountTargets ? 'success' : ''"
-            v-model="toastAccount"
-        >
-            <div v-for="(accountTarget, i) in statusAccountTargets" :key="i" class="pt-2">
-                <div v-if="accountTarget.target !== 'errorbox' && accountTarget.target !== 'infobox'">
-                    <div v-if="statusAccountTargets[i].done">
-                        <b-row no-gutters>
-                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
-                            <b-col cols="11"><p lead>{{statusAccountTargets[i].message }}</p></b-col>
-                        </b-row>
+  <div>
+    <toast-data-upload-invalid-file />
+    <b-toast
+      v-model="toastAccount"
+      no-auto-hide
+      :title="titleAccount"
+      :variant="doneStatusAccountTargets ? 'success' : ''"
+    >
+      <div v-for="(accountTarget, i) in statusAccountTargets" :key="i" class="pt-2">
+        <div v-if="accountTarget.target !== 'errorbox' && accountTarget.target !== 'infobox'">
+          <div v-if="statusAccountTargets[i].done">
+            <b-row no-gutters>
+              <b-col cols="1">
+                <b-icon icon="check-circle" variant="success" />
+              </b-col>
+              <b-col cols="11">
+                <p lead>
+                  {{ statusAccountTargets[i].message }}
+                </p>
+              </b-col>
+            </b-row>
+          </div>
 
-                    </div>
+          <div v-else>
+            <b-progress :value="statusAccountTargets[i].current" :max="statusAccountTargets[i].total" animated />
+          </div>
+          <small class="text-muted mt-1">Source: <i>{{ statusAccountTargets[i].target }}</i></small>
+        </div>
 
-                    <div v-else>
-                        <b-progress :value="statusAccountTargets[i].current" :max="statusAccountTargets[i].total" animated></b-progress>
-                    </div>
-                    <small class="text-muted mt-1">Source: <i>{{ statusAccountTargets[i].target }}</i></small>
-                </div>
+        <div v-else-if="accountTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ accountTarget.message }}</b-card-text>
+          </b-card>
+        </div>
 
-                <div v-else-if="accountTarget.target === 'errorbox'">
-                    <b-card border-variant="danger">
-                        <b-card-text>{{ accountTarget.message }}</b-card-text>
-                    </b-card>
-                </div>
+        <div v-else-if="accountTarget.target === 'infobox'">
+          <b-card border-variant="info">
+            <b-card-text>
+              {{ accountTarget.message }}
+              <span v-if="doneStatusAccountTargets && accountTarget.duplicate_list && accountTarget.duplicate_list.length > 2">
+                <b-icon v-b-modal.account-duplicates icon="info-circle" variant="outline-info" class="ml-1" />
+                <b-modal id="account-duplicates" title="Account Duplicates">
+                  <ul>
+                    <li v-for="(duplicate, index) in accountTarget.duplicate_list" :key="index">{{ duplicate }}</li>
+                  </ul>
+                </b-modal>
+              </span>
+            </b-card-text>
+          </b-card>
+        </div>
 
-                <div v-else-if="accountTarget.target === 'infobox'">
-                    <b-card border-variant="info">
-                        <b-card-text>
-                            {{ accountTarget.message }}
-                            <span v-if="doneStatusAccountTargets && accountTarget.duplicate_list && accountTarget.duplicate_list.length > 2">
-                                <b-icon v-b-modal.account-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
-                                <b-modal id="account-duplicates" title="Account Duplicates">
-                                    <ul>
-                                        <li v-for="(duplicate, index) in accountTarget.duplicate_list" :key="index">{{ duplicate}}</li>
-                                    </ul>
-                                </b-modal>
-                            </span>
-                        </b-card-text>
-                    </b-card>
-                </div>
+        <hr v-if="statusAccountTargets.length > 1" />
+      </div>
+    </b-toast>
 
-                <hr v-if="statusAccountTargets.length > 1">
+    <b-toast
+      v-model="toastItem"
+      no-auto-hide
+      :title="titleItem"
+      :variant="doneStatusItemTargets ? 'success' : ''"
+    >
+      <div v-for="(itemTarget, i) in statusItemTargets" :key="i" class="pt-2">
+        <div v-if="itemTarget.target !== 'errorbox' && itemTarget.target !== 'infobox'">
+          <div v-if="statusItemTargets[i].done">
+            <b-row no-gutters>
+              <b-col cols="1">
+                <b-icon icon="check-circle" variant="success" />
+              </b-col>
+              <b-col cols="11">
+                <p lead>
+                  {{ statusItemTargets[i].message }}
+                </p>
+              </b-col>
+            </b-row>
+          </div>
 
-            </div>
-        </b-toast>
+          <div v-else>
+            <b-progress :value="statusItemTargets[i].current" :max="statusItemTargets[i].total" animated />
+          </div>
+          <small class="text-muted mt-1">Source: <i>{{ statusItemTargets[i].target }}</i></small>
+        </div>
 
-        <b-toast
-            no-auto-hide
-            :title="titleItem"
-            :variant="doneStatusItemTargets ? 'success' : ''"
-            v-model="toastItem"
-        >
-            <div v-for="(itemTarget, i) in statusItemTargets" :key="i" class="pt-2">
-                <div v-if="itemTarget.target !== 'errorbox' && itemTarget.target !== 'infobox'">
-                    <div v-if="statusItemTargets[i].done">
-                        <b-row no-gutters>
-                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
-                            <b-col cols="11"><p lead>{{statusItemTargets[i].message }}</p></b-col>
-                        </b-row>
+        <div v-else-if="itemTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ itemTarget.message }}</b-card-text>
+          </b-card>
+        </div>
 
-                    </div>
+        <div v-else-if="itemTarget.target === 'infobox'">
+          <b-card border-variant="info">
+            <b-card-text>
+              {{ itemTarget.message }}
+              <span v-if="doneStatusItemTargets && itemTarget.duplicate_list && itemTarget.duplicate_list.length > 2">
+                <b-icon v-b-modal.item-duplicates icon="info-circle" variant="outline-info" class="ml-1" />
+                <b-modal id="item-duplicates" title="Item Duplicates">
+                  <ul>
+                    <li v-for="(duplicate, index) in itemTarget.duplicate_list" :key="index">{{ duplicate }}</li>
+                  </ul>
+                </b-modal>
+              </span>
+            </b-card-text>
+          </b-card>
+        </div>
 
-                    <div v-else>
-                        <b-progress :value="statusItemTargets[i].current" :max="statusItemTargets[i].total" animated></b-progress>
-                    </div>
-                    <small class="text-muted mt-1">Source: <i>{{ statusItemTargets[i].target }}</i></small>
-                </div>
+        <hr v-if="statusItemTargets.length > 1" />
+      </div>
+    </b-toast>
 
-                <div v-else-if="itemTarget.target === 'errorbox'">
-                    <b-card border-variant="danger">
-                        <b-card-text>{{ itemTarget.message }}</b-card-text>
-                    </b-card>
-                </div>
+    <b-toast
+      v-model="toastVatNumber"
+      no-auto-hide
+      :title="titleVatNumber"
+      :variant="doneStatusVatNumberTargets ? 'success' : ''"
+    >
+      <div v-for="(vatNumberTarget, i) in statusVatNumberTargets" :key="i" class="pt-2">
+        <div v-if="vatNumberTarget.target !== 'errorbox' && vatNumberTarget.target !== 'infobox'">
+          <div v-if="statusVatNumberTargets[i].done">
+            <b-row no-gutters>
+              <b-col cols="1">
+                <b-icon icon="check-circle" variant="success" />
+              </b-col>
+              <b-col cols="11">
+                <p lead>
+                  {{ statusVatNumberTargets[i].message }}
+                </p>
+              </b-col>
+            </b-row>
+          </div>
 
-                <div v-else-if="itemTarget.target === 'infobox'">
-                    <b-card border-variant="info">
-                        <b-card-text>
-                            {{ itemTarget.message }}
-                            <span v-if="doneStatusItemTargets && itemTarget.duplicate_list && itemTarget.duplicate_list.length > 2">
-                                <b-icon v-b-modal.item-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
-                                <b-modal id="item-duplicates" title="Item Duplicates">
-                                    <ul>
-                                        <li v-for="(duplicate, index) in itemTarget.duplicate_list" :key="index">{{ duplicate}}</li>
-                                    </ul>
-                                </b-modal>
-                            </span>
-                        </b-card-text>
-                    </b-card>
-                </div>
+          <div v-else>
+            <b-progress :value="statusVatNumberTargets[i].current" :max="statusVatNumberTargets[i].total" animated />
+          </div>
+          <small class="text-muted mt-1">Source: <i>{{ statusVatNumberTargets[i].target }}</i></small>
+        </div>
 
-                <hr v-if="statusItemTargets.length > 1">
+        <div v-else-if="vatNumberTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ vatNumberTarget.message }}</b-card-text>
+          </b-card>
+        </div>
 
-            </div>
-        </b-toast>
+        <div v-else-if="vatNumberTarget.target === 'infobox'">
+          <b-card border-variant="info">
+            <b-card-text>
+              {{ vatNumberTarget.message }}
+              <span v-if="doneStatusVatNumberTargets && vatNumberTarget.duplicate_list && vatNumberTarget.duplicate_list.length > 2">
+                <b-icon v-b-modal.vat-number-duplicates icon="info-circle" variant="outline-info" class="ml-1" />
+                <b-modal id="vat-number-duplicates" title="Vat Number Duplicates">
+                  <ul>
+                    <li v-for="(duplicate, index) in vatNumberTarget.duplicate_list" :key="index">{{ duplicate }}</li>
+                  </ul>
+                </b-modal>
+              </span>
+            </b-card-text>
+          </b-card>
+        </div>
 
-        <b-toast
-            no-auto-hide
-            :title="titleVatNumber"
-            :variant="doneStatusVatNumberTargets ? 'success' : ''"
-            v-model="toastVatNumber"
-        >
-            <div v-for="(vatNumberTarget, i) in statusVatNumberTargets" :key="i" class="pt-2">
-                <div v-if="vatNumberTarget.target !== 'errorbox' && vatNumberTarget.target !== 'infobox'">
-                    <div v-if="statusVatNumberTargets[i].done">
-                        <b-row no-gutters>
-                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
-                            <b-col cols="11"><p lead>{{statusVatNumberTargets[i].message }}</p></b-col>
-                        </b-row>
+        <hr v-if="statusItemTargets.length > 1" />
+      </div>
+    </b-toast>
 
-                    </div>
+    <b-toast
+      v-model="toastDistanceSale"
+      no-auto-hide
+      :title="titleDistanceSale"
+      :variant="doneStatusDistanceSaleTargets ? 'success' : ''"
+    >
+      <div v-for="(distanceSaleTarget, i) in statusDistanceSaleTargets" :key="i" class="pt-2">
+        <div v-if="distanceSaleTarget.target !== 'errorbox' && distanceSaleTarget.target !== 'infobox'">
+          <div v-if="statusDistanceSaleTargets[i].done">
+            <b-row no-gutters>
+              <b-col cols="1">
+                <b-icon icon="check-circle" variant="success" />
+              </b-col>
+              <b-col cols="11">
+                <p lead>
+                  {{ statusDistanceSaleTargets[i].message }}
+                </p>
+              </b-col>
+            </b-row>
+          </div>
 
-                    <div v-else>
-                        <b-progress :value="statusVatNumberTargets[i].current" :max="statusVatNumberTargets[i].total" animated></b-progress>
-                    </div>
-                    <small class="text-muted mt-1">Source: <i>{{ statusVatNumberTargets[i].target }}</i></small>
-                </div>
+          <div v-else>
+            <b-progress :value="statusDistanceSaleTargets[i].current" :max="statusDistanceSaleTargets[i].total" animated />
+          </div>
+          <small class="text-muted mt-1">Source: <i>{{ statusDistanceSaleTargets[i].target }}</i></small>
+        </div>
 
-                <div v-else-if="vatNumberTarget.target === 'errorbox'">
-                    <b-card border-variant="danger">
-                        <b-card-text>{{ vatNumberTarget.message }}</b-card-text>
-                    </b-card>
-                </div>
+        <div v-else-if="distanceSaleTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ distanceSaleTarget.message }}</b-card-text>
+          </b-card>
+        </div>
 
-                <div v-else-if="vatNumberTarget.target === 'infobox'">
-                    <b-card border-variant="info">
-                        <b-card-text>
-                            {{ vatNumberTarget.message }}
-                            <span v-if="doneStatusVatNumberTargets && vatNumberTarget.duplicate_list && vatNumberTarget.duplicate_list.length > 2">
-                                <b-icon v-b-modal.vat-number-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
-                                <b-modal id="vat-number-duplicates" title="Vat Number Duplicates">
-                                    <ul>
-                                        <li v-for="(duplicate, index) in vatNumberTarget.duplicate_list" :key="index">{{ duplicate}}</li>
-                                    </ul>
-                                </b-modal>
-                            </span>
-                        </b-card-text>
-                    </b-card>
-                </div>
+        <div v-else-if="distanceSaleTarget.target === 'infobox'">
+          <b-card border-variant="info">
+            <b-card-text>
+              {{ distanceSaleTarget.message }}
+              <span v-if="doneStatusDistanceSaleTargets && distanceSaleTarget.duplicate_list && distanceSaleTarget.duplicate_list.length > 2">
+                <b-icon v-b-modal.distance-sale-duplicates icon="info-circle" variant="outline-info" class="ml-1" />
+                <b-modal id="distance-sale-duplicates" title="Distance Sale Duplicates">
+                  <ul>
+                    <li v-for="(duplicate, index) in distanceSaleTarget.duplicate_list" :key="index">{{ duplicate }}</li>
+                  </ul>
+                </b-modal>
+              </span>
+            </b-card-text>
+          </b-card>
+        </div>
 
-                <hr v-if="statusItemTargets.length > 1">
+        <hr v-if="statusItemTargets.length > 1" />
+      </div>
+    </b-toast>
 
-            </div>
-        </b-toast>
+    <b-toast
+      v-model="toastTransactionInput"
+      no-auto-hide
+      :title="titleTransactionInput"
+      :variant="doneStatusTransactionInputTargets ? 'success' : ''"
+    >
+      <div v-for="(transactionInputTarget, i) in statusTransactionInputTargets" :key="i" class="pt-2">
+        <div v-if="transactionInputTarget.target !== 'errorbox' && transactionInputTarget.target !== 'infobox'">
+          <div v-if="statusTransactionInputTargets[i].done">
+            <b-row no-gutters>
+              <b-col cols="1">
+                <b-icon icon="check-circle" variant="success" />
+              </b-col>
+              <b-col cols="11">
+                <p lead>
+                  {{ statusTransactionInputTargets[i].message }}
+                </p>
+              </b-col>
+            </b-row>
+          </div>
 
-        <b-toast
-            no-auto-hide
-            :title="titleDistanceSale"
-            :variant="doneStatusDistanceSaleTargets ? 'success' : ''"
-            v-model="toastDistanceSale"
-        >
-            <div v-for="(distanceSaleTarget, i) in statusDistanceSaleTargets" :key="i" class="pt-2">
-                <div v-if="distanceSaleTarget.target !== 'errorbox' && distanceSaleTarget.target !== 'infobox'">
-                    <div v-if="statusDistanceSaleTargets[i].done">
-                        <b-row no-gutters>
-                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
-                            <b-col cols="11"><p lead>{{statusDistanceSaleTargets[i].message }}</p></b-col>
-                        </b-row>
+          <div v-else>
+            <b-progress :value="statusTransactionInputTargets[i].current" :max="statusTransactionInputTargets[i].total" animated />
+          </div>
+          <small class="text-muted mt-1">Source: <i>{{ statusTransactionInputTargets[i].target }}</i></small>
+        </div>
 
-                    </div>
+        <div v-else-if="transactionInputTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ transactionInputTarget.message }}</b-card-text>
+          </b-card>
+        </div>
 
-                    <div v-else>
-                        <b-progress :value="statusDistanceSaleTargets[i].current" :max="statusDistanceSaleTargets[i].total" animated></b-progress>
-                    </div>
-                    <small class="text-muted mt-1">Source: <i>{{ statusDistanceSaleTargets[i].target }}</i></small>
-                </div>
+        <div v-else-if="transactionInputTarget.target === 'infobox'">
+          <b-card border-variant="info">
+            <b-card-text>
+              {{ transactionInputTarget.message }}
+              <span v-if="doneStatusTransactionInputTargets && transactionInputTarget.duplicate_list && transactionInputTarget.duplicate_list.length > 2">
+                <b-icon v-b-modal.transaction-input-duplicates icon="info-circle" variant="outline-info" class="ml-1" />
+                <b-modal id="transaction-input-duplicates" title="Transaction Duplicates">
+                  <ul>
+                    <li v-for="(duplicate, index) in transactionInputTarget.duplicate_list" :key="index">{{ duplicate }}</li>
+                  </ul>
+                </b-modal>
+              </span>
+            </b-card-text>
+          </b-card>
+        </div>
 
-                <div v-else-if="distanceSaleTarget.target === 'errorbox'">
-                    <b-card border-variant="danger">
-                        <b-card-text>{{ distanceSaleTarget.message }}</b-card-text>
-                    </b-card>
-                </div>
-
-                <div v-else-if="distanceSaleTarget.target === 'infobox'">
-                    <b-card border-variant="info">
-                        <b-card-text>
-                            {{ distanceSaleTarget.message }}
-                            <span v-if="doneStatusDistanceSaleTargets && distanceSaleTarget.duplicate_list && distanceSaleTarget.duplicate_list.length > 2">
-                                <b-icon v-b-modal.distance-sale-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
-                                <b-modal id="distance-sale-duplicates" title="Distance Sale Duplicates">
-                                    <ul>
-                                        <li v-for="(duplicate, index) in distanceSaleTarget.duplicate_list" :key="index">{{ duplicate}}</li>
-                                    </ul>
-                                </b-modal>
-                            </span>
-                        </b-card-text>
-                    </b-card>
-                </div>
-
-                <hr v-if="statusItemTargets.length > 1">
-
-            </div>
-        </b-toast>
-
-        <b-toast
-            no-auto-hide
-            :title="titleTransactionInput"
-            :variant="doneStatusTransactionInputTargets ? 'success' : ''"
-            v-model="toastTransactionInput"
-        >
-            <div v-for="(transactionInputTarget, i) in statusTransactionInputTargets" :key="i" class="pt-2">
-                <div v-if="transactionInputTarget.target !== 'errorbox' && transactionInputTarget.target !== 'infobox'">
-                    <div v-if="statusTransactionInputTargets[i].done">
-                        <b-row no-gutters>
-                            <b-col cols="1"><b-icon icon="check-circle" variant="success" /></b-col>
-                            <b-col cols="11"><p lead>{{statusTransactionInputTargets[i].message }}</p></b-col>
-                        </b-row>
-
-                    </div>
-
-                    <div v-else>
-                        <b-progress :value="statusTransactionInputTargets[i].current" :max="statusTransactionInputTargets[i].total" animated></b-progress>
-                    </div>
-                    <small class="text-muted mt-1">Source: <i>{{ statusTransactionInputTargets[i].target }}</i></small>
-                </div>
-
-                <div v-else-if="transactionInputTarget.target === 'errorbox'">
-                    <b-card border-variant="danger">
-                        <b-card-text>{{ transactionInputTarget.message }}</b-card-text>
-                    </b-card>
-                </div>
-
-                <div v-else-if="transactionInputTarget.target === 'infobox'">
-                    <b-card border-variant="info">
-                        <b-card-text>
-                            {{ transactionInputTarget.message }}
-                            <span v-if="doneStatusTransactionInputTargets && transactionInputTarget.duplicate_list && transactionInputTarget.duplicate_list.length > 2">
-                                <b-icon v-b-modal.transaction-input-duplicates icon="info-circle" variant="outline-info" class="ml-1"/>
-                                <b-modal id="transaction-input-duplicates" title="Transaction Duplicates">
-                                    <ul>
-                                        <li v-for="(duplicate, index) in transactionInputTarget.duplicate_list" :key="index">{{ duplicate}}</li>
-                                    </ul>
-                                </b-modal>
-                            </span>
-                        </b-card-text>
-                    </b-card>
-                </div>
-
-                <hr v-if="statusItemTargets.length > 1">
-
-            </div>
-        </b-toast>
-
-
-
-    </div>
-
+        <hr v-if="statusItemTargets.length > 1" />
+      </div>
+    </b-toast>
+  </div>
 </template>
 
 <script>

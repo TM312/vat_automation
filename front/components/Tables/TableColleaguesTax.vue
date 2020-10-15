@@ -1,20 +1,24 @@
 <template>
-    <b-table :fields="fields" :items="employees" :busy="$fetchState.pending && !accountingFirm" hover>
-        <template v-slot:table-busy>
-            <div class="text-center text-secondary my-2">
-                <b-spinner class="align-middle"></b-spinner>
-                <strong>Loading...</strong>
-            </div>
-        </template>
-    </b-table>
-
+  <b-table :fields="fields" :items="employees" :busy="$fetchState.pending && !accountingFirm" hover>
+    <template v-slot:table-busy>
+      <div class="text-center text-secondary my-2">
+        <b-spinner class="align-middle" />
+        <strong>Loading...</strong>
+      </div>
+    </template>
+  </b-table>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from "vuex"
 
 export default {
     name: 'TableColleaguesTax',
+
+    async fetch() {
+        const { store } = this.$nuxt.context
+        await store.dispatch("accounting_firm/get_by_public_id", this.$auth.user.employer_public_id)
+    },
 
     data() {
         return {
@@ -48,11 +52,6 @@ export default {
                 }
             ],
         }
-    },
-
-    async fetch() {
-        const { store } = this.$nuxt.context
-        await store.dispatch("accounting_firm/get_by_public_id", this.$auth.user.employer_public_id);
     },
 
 

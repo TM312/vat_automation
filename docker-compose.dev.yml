@@ -8,6 +8,8 @@ services:
             dockerfile: Dockerfile.dev
             args:
                 - NODE_VERSION=${NODE_VERSION}
+        volumes:
+              - ./front/:/home/app
         command: "npm run dev"
 
     proxy:

@@ -1,5 +1,6 @@
 <template>
-  <div class="container p-5">500
+  <div class="container p-5">
+    500
     <!-- <b-container class="mt-5">
       <p class="display-2">
         VAT Calculations to support tax auditors in the field of

@@ -27,7 +27,7 @@ export const mutations = {
     },
 
     UPDATE_TRANSACTION_INPUTS(state, payload) {
-        Object.assign(state.transaction_inputs[payload.index], payload.transaction_input);
+        Object.assign(state.transaction_inputs[payload.index], payload.transaction_input)
     },
 
     PUSH_TRANSACTION_INPUTS(state, payload) {

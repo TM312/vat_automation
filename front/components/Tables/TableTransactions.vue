@@ -1,65 +1,75 @@
 <template>
-    <div>
+  <div>
+    <b-tabs v-if="transactions.length === 0">
+      <b-tab
+        v-for="taxTreatment in taxTreatments"
+        :key="taxTreatment.code"
+        :title="taxTreatment.name"
+        :disabled="taxTreatments[0].code !== taxTreatment.code"
+      >
+        <h5 class="text-muted text-center m-5">
+          There are no tax related processes of this tax treatment.
+        </h5>
+      </b-tab>
+    </b-tabs>
 
-        <b-tabs v-if="transactions.length === 0">
-                <b-tab
-                v-for="taxTreatment in taxTreatments"
-                :key="taxTreatment.code"
-                :title="taxTreatment.name"
-                :disabled="taxTreatments[0].code !== taxTreatment.code"
-            ><h5 class="text-muted text-center m-5" > There are no tax related processes of this tax treatment. </h5>
-            </b-tab>
-        </b-tabs>
-
-        <b-tabs v-else active-nav-item-class="text-primary">
-
-            <b-tab
-                v-for="(taxTreatment, index) in taxTreatments"
-                :key="taxTreatment.code"
-                lazy
-                :disabled="filteredTransactions[index].length === 0"
-            >
-                <template v-slot:title>
-                    <!-- <b-spinner v-show="flash" type="grow" small></b-spinner> -->
-                    {{ taxTreatment.name }}
-                </template>
-                <!-- <lazy-card-transaction
+    <b-tabs v-else active-nav-item-class="text-primary">
+      <b-tab
+        v-for="(taxTreatment, index) in taxTreatments"
+        :key="taxTreatment.code"
+        lazy
+        :disabled="filteredTransactions[index].length === 0"
+      >
+        <template v-slot:title>
+          <!-- <b-spinner v-show="flash" type="grow" small></b-spinner> -->
+          {{ taxTreatment.name }}
+        </template>
+        <!-- <lazy-card-transaction
                     v-for="transaction in filteredTransactions[index]"
                     :key="transaction.public_id"
                     :transaction="transaction"
                 /> -->
 
 
-                <b-table :fields="fields" :items="filteredTransactions[index]" hover>
-
-                    <template v-slot:cell(type_code)="data">
-                        <nuxt-link :to="`/tax/transactions/${data.item.transaction_input_public_id}`">{{ data.value }}</nuxt-link>
-                    </template>
-
-
-                    <template v-slot:head(departure_to_arrival)>
-                        <b-row no-gutters class="justify-content-md-center">
-                            <b-col class="text-right">Departure</b-col>
-                            <b-col cols="2" class="text-center"><b-icon icon="arrow-right" /></b-col>
-                            <b-col class="text-left">Arrival</b-col>
-                        </b-row>
-                    </template>
-
-                        <template v-slot:cell(departure_to_arrival)="data">
-                        <b-row no-gutters class="justify-content-md-center">
-                            <b-col class="text-right">{{ data.item.departure_country }}</b-col>
-                            <b-col v-if="data.item.departure_country || data.item.arrival_country" cols="2" class="text-center"><b-icon icon="arrow-right" /></b-col>
-                            <b-col class="text-left">{{ data.item.arrival_country }}</b-col>
-                        </b-row>
-                    </template>
-
-                </b-table>
+        <b-table :fields="fields" :items="filteredTransactions[index]" hover>
+          <template v-slot:cell(type_code)="data">
+            <nuxt-link :to="`/tax/transactions/${data.item.transaction_input_public_id}`">
+              {{ data.value }}
+            </nuxt-link>
+          </template>
 
 
-            </b-tab>
-        </b-tabs>
+          <template v-slot:head(departure_to_arrival)>
+            <b-row no-gutters class="justify-content-md-center">
+              <b-col class="text-right">
+                Departure
+              </b-col>
+              <b-col cols="2" class="text-center">
+                <b-icon icon="arrow-right" />
+              </b-col>
+              <b-col class="text-left">
+                Arrival
+              </b-col>
+            </b-row>
+          </template>
 
-    </div>
+          <template v-slot:cell(departure_to_arrival)="data">
+            <b-row no-gutters class="justify-content-md-center">
+              <b-col class="text-right">
+                {{ data.item.departure_country }}
+              </b-col>
+              <b-col v-if="data.item.departure_country || data.item.arrival_country" cols="2" class="text-center">
+                <b-icon icon="arrow-right" />
+              </b-col>
+              <b-col class="text-left">
+                {{ data.item.arrival_country }}
+              </b-col>
+            </b-row>
+          </template>
+        </b-table>
+      </b-tab>
+    </b-tabs>
+  </div>
 </template>
 
 <script>

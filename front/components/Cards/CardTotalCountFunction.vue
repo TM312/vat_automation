@@ -1,11 +1,9 @@
 <template>
-    <b-card
-        :title="counter"
-        :sub-title="subTitle"
-        border-variant="info"
-
-    >
-    </b-card>
+  <b-card
+    :title="counter"
+    :sub-title="subTitle"
+    border-variant="info"
+  />
 </template>
 
 <script>
@@ -32,7 +30,7 @@
         }
 
 
-    };
+    }
 </script>
 
 <style>

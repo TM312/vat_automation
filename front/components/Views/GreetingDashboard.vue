@@ -1,15 +1,10 @@
 <template>
-    <div class="my-5">
-        <h1>{{ greeting }}</h1>
-    </div>
+  <h1>{{ greeting }}</h1>
 </template>
 
 <script>
 export default {
-    name: 'CardGreetingDashboard',
-    created() {
-        this.nowHours = new Date().getHours()
-    },
+    name: 'GreetingDashboard',
 
     computed: {
         greeting: function() {
@@ -25,6 +20,9 @@ export default {
                 return `Good Evening, ${ this.$auth.user.name } !`
             }
         }
+    },
+    created() {
+        this.nowHours = new Date().getHours()
     },
 
 }

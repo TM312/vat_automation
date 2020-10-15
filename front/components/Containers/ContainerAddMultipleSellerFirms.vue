@@ -1,10 +1,10 @@
 <template>
-    <b-container fluid>
-        <toast-seller-firm-data-upload />
-        <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" />
-        <br>
-        <card-data-upload :urlEndpointUpload="urlEndpointUpload" />
-    </b-container>
+  <b-container fluid>
+    <toast-seller-firm-data-upload />
+    <template-card :title="title" :url-endpoint-template="urlEndpointTemplate" :template-items="templateItems" />
+    <br />
+    <card-data-upload :url-endpoint-upload="urlEndpointUpload" />
+  </b-container>
 </template>
 
 <script>

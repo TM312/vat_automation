@@ -1,34 +1,30 @@
 <template>
-    <div fluid>
-        <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
-            <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transactionInputPublicId="$route.params.public_id"/> </p>
-        </b-alert>
-        <b-tabs pills card>
-            <b-tab title='Input File' active>
-                <overview-base-data-loading v-if="$fetchState.pending || transactionInput.length === 0" />
-                <card-transaction-input v-else id="file"/>
+  <div fluid>
+    <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
+      <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transaction-input-public-id="$route.params.public_id" /> </p>
+    </b-alert>
+    <b-tabs pills card>
+      <b-tab title="Input File" active>
+        <overview-base-data-loading v-if="$fetchState.pending || transactionInput.length === 0" />
+        <card-transaction-input v-else id="file" />
 
-                <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
-                    <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-                    <table-transaction-inputs v-else :transactionInputs="transactionInputsBundle" class="mt-4"/>
-                </b-card>
+        <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
+          <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
+          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" class="mt-4" />
+        </b-card>
+      </b-tab>
 
-            </b-tab>
+      <b-tab title="Tax Processes" lazy :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || transactionInput.length === 0">
+        <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
+        <view-transactions v-else :transactions="transactionInput.transactions" />
 
-            <b-tab title='Tax Processes' lazy :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || transactionInput.length === 0">
-                <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-                <view-transactions v-else :transactions="transactionInput.transactions" />
-
-                <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
-                    <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-                    <table-transaction-inputs v-else :transactionInputs="transactionInputsBundle"/>
-                </b-card>
-
-            </b-tab>
-
-
-        </b-tabs>
-    </div>
+        <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
+          <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
+          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" />
+        </b-card>
+      </b-tab>
+    </b-tabs>
+  </div>
 </template>
 
 <script>
@@ -45,7 +41,7 @@
         async fetch() {
             if (this.transactionInput.public_id !== this.transactionInputPublicId) {
                 const { store } = this.$nuxt.context
-                await store.dispatch('transaction_input/get_by_public_id', this.transactionInputPublicId);
+                await store.dispatch('transaction_input/get_by_public_id', this.transactionInputPublicId)
             }
         },
 
@@ -71,7 +67,7 @@
         // },
 
 
-    };
+    }
 </script>
 
 <style></style>

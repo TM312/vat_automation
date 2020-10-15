@@ -1,9 +1,9 @@
 <template>
-    <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
-        <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
-        <b-spinner v-else small label="Spinning"></b-spinner>
-        Upload
-    </b-button>
+  <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
+    <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
+    <b-spinner v-else small label="Spinning" />
+    Upload
+  </b-button>
 </template>
 
 <script>
@@ -25,7 +25,7 @@
         data() {
             return {
                 uploadInProgress: false
-            };
+            }
         },
         computed: {
             buttonDisabled() {
@@ -53,13 +53,13 @@
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },
-                };
+                }
 
                 // FormData is a standard JS object
                 for (var i = 0; i != this.files.length;) {
-                    let file = this.files[i];
-                    const data = new FormData();
-                    data.append('file', file);
+                    let file = this.files[i]
+                    const data = new FormData()
+                    data.append('file', file)
 
                     // https://github.com/axios/axios/blob/master/examples/upload/index.html
                     try {
@@ -75,7 +75,7 @@
                         )
 
                     } catch(err) {
-                        console.log(err);
+                        console.log(err)
 
                         i = this.files.length
                     }
