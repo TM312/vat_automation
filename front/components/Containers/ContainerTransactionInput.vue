@@ -5,7 +5,7 @@
     </b-alert>
     <b-tabs pills card>
       <b-tab title="Input File" active>
-        <overview-base-data-loading v-if="$fetchState.pending || transactionInput.length === 0" />
+        <div v-if="$fetchState.pending || transactionInput.length === 0"></div>
         <card-transaction-input v-else id="file" />
 
         <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
