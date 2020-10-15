@@ -17,7 +17,6 @@ tax_auditor_sub_dto = Model('tax_auditor_sub', {
 seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'claimed': fields.Boolean(readonly=True),
     'establishment_country_code': fields.String,
-    'establishment_country': fields.String(attribute=lambda x: x.establishment_country.name if x.establishment_country else None),
     'transaction_ready': fields.Boolean(readonly=True),
 })
 

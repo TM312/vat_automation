@@ -1,5 +1,7 @@
 <template>
-    <b-button size="sm" variant="outline-primary" @click="consolelog" >Validate</b-button>
+  <b-button size="sm" variant="outline-primary" @click="consolelog">
+    Validate
+  </b-button>
 </template>
 
 <script>

@@ -64,7 +64,7 @@
                     given_id: this.form.given_id,
                     company_name: this.form.company_name,
                     address: this.form.address,
-                    establishment_country: this.form.establishment_country
+                    establishment_country_code: this.form.establishment_country_code
                 };
                 await this.$axios
                     .post("/seller_firm", payload)

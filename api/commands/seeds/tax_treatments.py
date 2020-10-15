@@ -6,12 +6,12 @@ tax_treatments = [
     {
         'code':'LOCAL_SALE',
         'name': 'Local Sale',
-        'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
+        'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Limited to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'LOCAL_SALE_REVERSE_CHARGE',
         'name': 'Local Sale Reverse Charge',
-        'description': 'Transaction taxable with the Reverse Charge Mechanism. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number), to Transaction Types SALE and REFUND, and to certain Item Types, or to the country of establishment of the Seller and the Customer.'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. Domestic Sale (Departure = Arrival Country). Limited to B2B Transactions (valid Customer VAT Number), to Transaction Types SALE and REFUND, and to certain Item Types, or to the country of establishment of the Seller and the Customer.'
     },
     {
         'code': 'DISTANCE_SALE',

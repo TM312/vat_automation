@@ -1,25 +1,23 @@
 <template>
-
-    <b-button variant="primary" @click="downloadFile()">
-        <b-icon icon="download" /> Download
-    </b-button>
-
+  <b-button variant="primary" @click="downloadFile()">
+    <b-icon icon="download" /> Download
+  </b-button>
 </template>
 
 <script>
-import { BIcon } from "bootstrap-vue";
+import { BIcon } from "bootstrap-vue"
 
 export default {
     name: 'ButtonDownload',
+
+    components: {
+        BIcon
+    },
     props: {
         urlEndpointTemplate: {
             type: String,
             required: true
         }
-    },
-
-    components: {
-        BIcon
     },
 
     methods: {
@@ -54,7 +52,7 @@ export default {
                 })
 
             .catch(err => {
-                console.log(err);
+                console.log(err)
                 this.$bvToast.toast('An error occured. Please try again later or contact one of the admins.', {
                     autoHideDelay: 5000,
                     variant: 'danger'

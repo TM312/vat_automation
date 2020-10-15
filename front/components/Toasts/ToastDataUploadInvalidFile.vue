@@ -1,22 +1,21 @@
 <template>
-    <div>
-        <b-toast
-                no-auto-hide
-                title="Invalid File"
-                variant="danger"
-                v-model="toastFile"
-            >
-                <div v-for="(fileTarget, i) in statusFileTargets" :key="i" class="pt-2">
-
-                    <div v-if="fileTarget.target === 'errorbox'">
-                        <b-card border-variant="danger">
-                            <b-card-text>{{ fileTarget.message }}</b-card-text>
-                        </b-card>
-                    </div>
-                    <hr v-if="statusFileTargets.length > 1">
-                </div>
-            </b-toast>
-    </div>
+  <div>
+    <b-toast
+      v-model="toastFile"
+      no-auto-hide
+      title="Invalid File"
+      variant="danger"
+    >
+      <div v-for="(fileTarget, i) in statusFileTargets" :key="i" class="pt-2">
+        <div v-if="fileTarget.target === 'errorbox'">
+          <b-card border-variant="danger">
+            <b-card-text>{{ fileTarget.message }}</b-card-text>
+          </b-card>
+        </div>
+        <hr v-if="statusFileTargets.length > 1" />
+      </div>
+    </b-toast>
+  </div>
 </template>
 
 <script>

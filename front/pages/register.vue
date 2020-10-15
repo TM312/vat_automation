@@ -1,5 +1,5 @@
 <template>
-   <b-container fluid>
+  <b-container fluid>
     <!--<b-row class="mt-5">
       <b-col lg="6">
         <h2>All the benefits</h2>

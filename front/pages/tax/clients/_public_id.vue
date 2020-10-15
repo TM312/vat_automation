@@ -1,44 +1,48 @@
 <template>
-    <div>
-        <b-row align-h="start">
-            <b-col cols="auto"><container-route-back /></b-col>
-            <b-col><h3 class="text-muted text-center">{{ sellerFirm.name }}</h3></b-col>
-        </b-row>
-        <hr>
-        <b-container fluid>
-            <b-tabs pills card vertical>
-                <b-tab title='Company' active>
-                    <overview-base-data-loading v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)" />
-                    <overview-base-data v-else />
-                </b-tab>
+  <div>
+    <!-- <b-row align-h="start">
+      <b-col cols="auto">
+        <container-route-back />
+      </b-col>
+      <b-col> -->
+    <h3 class="text-muted text-center">
+      {{ sellerFirm.name }}
+    </h3>
+    <!-- </b-col>
+    </b-row> -->
+    <hr />
+    <b-container fluid>
+      <b-tabs pills card vertical>
+        <b-tab title="Company" active>
+          <overview-base-data-loading v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)" />
+          <overview-base-data v-else />
+        </b-tab>
 
-                <b-tab title='Items' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
-                    <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
-                    <lazy-card-items v-else />
-                </b-tab>
+        <b-tab title="Items" :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
+          <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
+          <lazy-card-items v-else />
+        </b-tab>
 
-                <b-tab title='Transactions' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
-                    <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
-                    <lazy-overview-transaction-inputs v-else />
-                </b-tab>
+        <b-tab title="Transactions" :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
+          <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
+          <lazy-overview-transaction-inputs v-else />
+        </b-tab>
 
-                <b-tab title='Tax Records' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
-                    <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
-                    <lazy-overview-tax-records v-else />
-                </b-tab>
+        <b-tab title="Tax Records" :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" lazy>
+          <span v-if="$fetchState.pending && (sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0)"></span>
+          <lazy-overview-tax-records v-else />
+        </b-tab>
 
-                <b-tab title='Upload Files' :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" title-link-class="text-info" lazy>
-                    <lazy-add-data-files :seller_firm_public_id="sellerFirm.public_id" />
-                </b-tab>
+        <b-tab title="Upload Files" :disabled="$fetchState.pending && sellerFirm.public_id != $route.params.public_id || sellerFirm.length === 0" title-link-class="text-info" lazy>
+          <lazy-add-data-files :seller_firm_public_id="sellerFirm.public_id" />
+        </b-tab>
+      </b-tabs>
+    </b-container>
 
-            </b-tabs>
-        </b-container>
+    <toasts-static-data-upload />
 
-        <toasts-static-data-upload />
-
-        <toast-new-tax-record />
-
-    </div>
+    <toast-new-tax-record />
+  </div>
 </template>
 
 <script>
@@ -74,7 +78,7 @@
             }
 
         },
-    };
+    }
 </script>
 
 <style></style>

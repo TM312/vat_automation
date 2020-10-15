@@ -1,11 +1,13 @@
 <template>
-    <div>
-        <b-table :fields="fields" :items="clients" hover>
-            <template v-slot:cell(name)="data">
-                <nuxt-link :to="`clients/${data.item.public_id}`">{{ data.value }}</nuxt-link>
-            </template>
-        </b-table>
-    </div>
+  <div>
+    <b-table :fields="fields" :items="clients" hover>
+      <template v-slot:cell(name)="data">
+        <nuxt-link :to="`clients/${data.item.public_id}`">
+          {{ data.value }}
+        </nuxt-link>
+      </template>
+    </b-table>
+  </div>
 </template>
 
 <script>

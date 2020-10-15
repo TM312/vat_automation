@@ -1,108 +1,104 @@
 <template>
-    <div>
-        <b-row cols="1" cols-lg="2" cols-xl="4" class="my-2">
-            <b-col class="my-2 px-2">
-                <b-card title="File" class="h-100">
-                    <b-table-lite borderless small :items="itemsFile" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== ''">{{ data.value }}</span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
-                </b-card>
-            </b-col>
+  <div>
+    <b-row cols="1" cols-lg="2" cols-xl="4" class="my-2">
+      <b-col class="my-2 px-2">
+        <b-card title="File" class="h-100">
+          <b-table-lite borderless small :items="itemsFile" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== ''">{{ data.value }}</span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
 
-            <b-col class="my-2 px-2">
-                <b-card title="Source" class="h-100">
-                    <b-table-lite borderless small :items="itemsBaseDetails" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== ''">{{ data.value }}</span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
-                </b-card>
-            </b-col>
+      <b-col class="my-2 px-2">
+        <b-card title="Source" class="h-100">
+          <b-table-lite borderless small :items="itemsBaseDetails" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== ''">{{ data.value }}</span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
 
-            <b-col class="my-2 px-2">
-                <b-card title="Dates" class="h-100">
-                    <b-table-lite borderless small :items="itemsDate" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== ''">{{ data.value }}</span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
-                </b-card>
-            </b-col>
+      <b-col class="my-2 px-2">
+        <b-card title="Dates" class="h-100">
+          <b-table-lite borderless small :items="itemsDate" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== ''">{{ data.value }}</span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
 
-            <b-col class="my-2 px-2">
-                <b-card title="Logistics" class="h-100">
-                     <b-table-lite borderless small :items="itemsLogistics" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== '' && Array.isArray(data.value) === false">{{ data.value }}</span>
-                            <span v-else-if="data.value !== '' && Array.isArray(data.value) === true">
-                                {{ data.value[0] }} <br>
-                                {{ data.value[1] }} {{ data.value[2] }}
-                                <span v-if="data.value.length === 3 && data.value[3] !== '' && data.value[3] !== null"><br>{{ data.value[3] }}</span>
-                            </span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
-                </b-card>
-            </b-col>
-        </b-row>
+      <b-col class="my-2 px-2">
+        <b-card title="Logistics" class="h-100">
+          <b-table-lite borderless small :items="itemsLogistics" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== '' && Array.isArray(data.value) === false">{{ data.value }}</span>
+              <span v-else-if="data.value !== '' && Array.isArray(data.value) === true">
+                {{ data.value[0] }} <br />
+                {{ data.value[1] }} {{ data.value[2] }}
+                <span v-if="data.value.length === 3 && data.value[3] !== '' && data.value[3] !== null"><br />{{ data.value[3] }}</span>
+              </span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
+    </b-row>
 
-        <b-row cols="1" cols-lg="2" cols-xl="3" class="my-2">
-            <b-col class="my-2 px-2">
-                <b-card title="Item" class="h-100">
-                    <b-table-lite borderless small :items="itemsItem" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== ''">{{ data.value }} </span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
+    <b-row cols="1" cols-lg="2" cols-xl="3" class="my-2">
+      <b-col class="my-2 px-2">
+        <b-card title="Item" class="h-100">
+          <b-table-lite borderless small :items="itemsItem" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== ''">{{ data.value }} </span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
 
-                </b-card>
-            </b-col>
+      <b-col class="my-2 px-2">
+        <b-card title="Gross Prices" class="h-100">
+          <b-table hover borderless :items="itemsGrossPrices" :fields="fieldsGrossPrices" />
+        </b-card>
+      </b-col>
 
-             <b-col class="my-2 px-2">
-                <b-card title="Gross Prices" class="h-100">
-                    <b-table hover borderless :items="itemsGrossPrices" :fields="fieldsGrossPrices"></b-table>
-                </b-card>
-            </b-col>
-
-            <b-col class="my-2 px-2">
-                <b-card class="h-100">
-                    <b-card-title>
-                        <b-row>
-                            <b-col cols="auto" class="mr-auto">Invoice</b-col>
-                            <b-col cols="auto">
-                                <b-button
-                                    v-if="transactionInput.invoice_url"
-                                    class="ml-2"
-                                    size="sm"
-                                    variant="outline-primary"
-                                    :href="transactionInput.invoice_url"
-                                    ><b-icon icon="box-arrow-in-down" /> Download
-                                </b-button>
-
-                            </b-col>
-                        </b-row>
-                    </b-card-title>
-                    <b-table-lite borderless small :items="itemsInvoice" :fields="fieldsBase" class="mb-4">
-                        <template v-slot:cell(value)="data">
-                            <span v-if="data.value !== ''">{{ data.value }}</span>
-                            <span v-else><text-icon-na /></span>
-                        </template>
-                    </b-table-lite>
-                </b-card>
-            </b-col>
-
-
-        </b-row>
-
-
-    </div>
-
+      <b-col class="my-2 px-2">
+        <b-card class="h-100">
+          <b-card-title>
+            <b-row>
+              <b-col cols="auto" class="mr-auto">
+                Invoice
+              </b-col>
+              <b-col cols="auto">
+                <b-button
+                  v-if="transactionInput.invoice_url"
+                  class="ml-2"
+                  size="sm"
+                  variant="outline-primary"
+                  :href="transactionInput.invoice_url"
+                >
+                  <b-icon icon="box-arrow-in-down" /> Download
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-card-title>
+          <b-table-lite borderless small :items="itemsInvoice" :fields="fieldsBase" class="mb-4">
+            <template v-slot:cell(value)="data">
+              <span v-if="data.value !== ''">{{ data.value }}</span>
+              <span v-else><text-icon-na /></span>
+            </template>
+          </b-table-lite>
+        </b-card>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>

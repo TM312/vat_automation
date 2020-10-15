@@ -1,13 +1,12 @@
 <template>
-    <div>
-        <table-transactions :transactions="transactions"/>
-        <b-button variant="outline-primary" :disabled="buttonFetchDisabled" @click="refresh" block>
-            <b-spinner v-if="buttonFetchDisabled" small />
-            <b-icon v-else icon="chevron-down" />
-            Show More
-        </b-button>
-
-    </div>
+  <div>
+    <table-transactions :transactions="transactions" />
+    <b-button variant="outline-primary" :disabled="buttonFetchDisabled" block @click="refresh">
+      <b-spinner v-if="buttonFetchDisabled" small />
+      <b-icon v-else icon="chevron-down" />
+      Show More
+    </b-button>
+  </div>
 </template>
 
 <script>
@@ -21,12 +20,12 @@
                 this.transactions.length === 0 || this.transactions[0]['tax_record_public_id'] !== this.$route.params.public_id
             ) {
 
-                const { store } = this.$nuxt.context;
+                const { store } = this.$nuxt.context
                 const params = {
                     tax_record_public_id: this.$route.params.public_id,
                     page: 1
                 }
-                await store.dispatch("transaction/get_by_tax_record_public_id", params);
+                await store.dispatch("transaction/get_by_tax_record_public_id", params)
             }
         },
 
@@ -45,12 +44,12 @@
 
         methods: {
             async refresh() {
-                const { store } = this.$nuxt.context;
+                const { store } = this.$nuxt.context
                 const params = {
                     tax_record_public_id: this.$route.params.public_id,
                     page: this.currentPage + 1
                 }
-                await store.dispatch("transaction/get_by_tax_record_public_id", params);
+                await store.dispatch("transaction/get_by_tax_record_public_id", params)
             }
         },
     }

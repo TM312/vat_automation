@@ -1,9 +1,9 @@
 <template>
-    <div>
-        statusTaxRecordTargets: {{ statusTaxRecordTargets }} <br>
-        statusTaxRecordTarget: {{ statusTaxRecordTarget }} <br>
-        lenStatusTaxRecords: {{ lenStatusTaxRecords }} <br>
-    </div>
+  <div>
+    statusTaxRecordTargets: {{ statusTaxRecordTargets }} <br />
+    statusTaxRecordTarget: {{ statusTaxRecordTarget }} <br />
+    lenStatusTaxRecords: {{ lenStatusTaxRecords }} <br />
+  </div>
 </template>
 
 <script>

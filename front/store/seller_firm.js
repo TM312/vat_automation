@@ -4,6 +4,11 @@ export const state = () => ({
 })
 
 
+
+export const getters = {
+    vatNumberByCountryCode: state => countryCode => state.seller_firm.vat_numbers.find(el => el.country_code === countryCode)
+}
+
 export const mutations = {
     CLEAR_SELLER_FIRM(state) {
         state.seller_firm = []
@@ -77,11 +82,6 @@ export const mutations = {
     }
 }
 
-export const getters = {
-    accountTransactionInputs: state => channelCode => {
-        return state.seller_firm.accounts.filter(account => account.channel_code === channelCode).transaction_inputs
-    }
-}
 
 export const actions = {
     async clear_seller_firm({ commit }) {

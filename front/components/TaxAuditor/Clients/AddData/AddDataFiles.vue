@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <!-- <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" /> -->
-        <br />
-        <card-data-upload />
-    </div>
+  <div>
+    <!-- <template-card :title="title" :urlEndpointTemplate="urlEndpointTemplate" :templateItems="templateItems" /> -->
+    <br />
+    <card-data-upload />
+  </div>
 </template>
 
 <script>

@@ -1,115 +1,185 @@
 <template>
-    <b-container>
-        <b-card bg-variant="white" lg="6" xl="4">
-            <b-form-group
-                label-cols-lg="2"
-                label="New Tax Record"
-                label-size="lg"
-                label-class="font-weight-bold pt-0"
-                class="mb-2"
-            >
-
-                <b-form-group
-                    label-cols-sm="3"
-                    label-align-sm="right"
-                    label="Tax Jurisdiction"
-                >
-
-                    <b-form-select
-                        id="tax_jurisdiction_code"
-                        :options="optionsCountryCode"
-                        v-model="payload.tax_jurisdiction_code"
-                        required
-                    ></b-form-select>
-
-                </b-form-group>
+  <b-container>
+    <b-card bg-variant="white" lg="6" xl="4">
+      <b-form-group
+        label-cols-lg="2"
+        label="New Tax Record"
+        label-size="lg"
+        label-class="font-weight-bold pt-0"
+        class="mb-2"
+      >
+        <b-form-group
+          label-cols-sm="3"
+          label-align-sm="right"
+          label="Tax Jurisdiction"
+        >
+          <b-form-select
+            id="tax_jurisdiction_code"
+            v-model="payload.tax_jurisdiction_code"
+            :options="optionsCountryCode"
+            required
+          />
+        </b-form-group>
 
 
-                <b-form-group
-                    label-cols-sm="3"
-                    label-align-sm="right"
-                    label="Validity"
-                >
-                    <b-row class="mt-2" cols="1" cols-md="3" cols-lg="4" cols-xl="6">
-                        <b-col class="mb-2"><b-button @click="setM(0)" :disabled="test(0)" :variant="test(0) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Jan'" block>Jan</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(1)" :disabled="test(1)" :variant="test(1) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Feb'" block>Feb</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(2)" :disabled="test(2)" :variant="test(2) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'March'" block>March</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(3)" :disabled="test(3)" :variant="test(3) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'April'" block>April</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(4)" :disabled="test(4)" :variant="test(4) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'May'" block>May</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(5)" :disabled="test(5)" :variant="test(5) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'June'" block>June</b-button></b-col>
+        <b-form-group
+          label-cols-sm="3"
+          label-align-sm="right"
+          label="Validity"
+        >
+          <b-row class="mt-2" cols="1" cols-md="3" cols-lg="4" cols-xl="6">
+            <b-col class="mb-2">
+              <b-button :disabled="test(0)" :variant="test(0) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Jan'" block @click="setM(0)">
+                Jan
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(1)" :variant="test(1) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Feb'" block @click="setM(1)">
+                Feb
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(2)" :variant="test(2) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'March'" block @click="setM(2)">
+                March
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(3)" :variant="test(3) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'April'" block @click="setM(3)">
+                April
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(4)" :variant="test(4) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'May'" block @click="setM(4)">
+                May
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(5)" :variant="test(5) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'June'" block @click="setM(5)">
+                June
+              </b-button>
+            </b-col>
 
-                        <b-col class="mb-2"><b-button @click="setM(6)" :disabled="test(6)" :variant="test(6) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'July'" block>July</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(7)" :disabled="test(7)" :variant="test(7) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Aug'" block>Aug</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(8)" :disabled="test(8)" :variant="test(8) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Sep'" block>Sep</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(9)" :disabled="test(9)" :variant="test(9) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Oct'" block>Oct</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(10)" :disabled="test(10)" :variant="test(10) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Nov'" block>Nov</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setM(11)" :disabled="test(11)" :variant="test(11) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Dec'" block>Dec</b-button></b-col>
-                    </b-row>
-                    <b-row cols="1" cols-md="2" cols-lg="4">
-                        <b-col class="mb-2"><b-button @click="setQ(1)" :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block>Q1</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setQ(2)" :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block>Q2</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setQ(3)" :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block>Q3</b-button></b-col>
-                        <b-col class="mb-2"><b-button @click="setQ(4)" :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block>Q4</b-button></b-col>
-                    </b-row>
-                    <b-row class="mb-2">
-                        <b-col><b-button @click="setPastYear()" variant="outline-primary" :pressed="selected == 'pastYear'" block>{{ pastYearString }}</b-button></b-col>
-                        <!-- <b-col><b-button @click="setPastMonth()" variant="outline-primary" :pressed="selected == 'pastMonth'" block>{{ $dateFns.format(pastMonthDate, 'MMMM yyyy') }}</b-button></b-col> -->
-                    </b-row>
-                    <b-row class="mt-4" cols="1" cols-lg="2">
-                        <b-col class="mb-2">
-                            <b-form-group
-                                label-align-sm="right"
-                                label-for="start_date"
-                                description="From"
-                            >
+            <b-col class="mb-2">
+              <b-button :disabled="test(6)" :variant="test(6) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'July'" block @click="setM(6)">
+                July
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(7)" :variant="test(7) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Aug'" block @click="setM(7)">
+                Aug
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(8)" :variant="test(8) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Sep'" block @click="setM(8)">
+                Sep
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(9)" :variant="test(9) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Oct'" block @click="setM(9)">
+                Oct
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(10)" :variant="test(10) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Nov'" block @click="setM(10)">
+                Nov
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test(11)" :variant="test(11) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Dec'" block @click="setM(11)">
+                Dec
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-row cols="1" cols-md="2" cols-lg="4">
+            <b-col class="mb-2">
+              <b-button :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block @click="setQ(1)">
+                Q1
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block @click="setQ(2)">
+                Q2
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block @click="setQ(3)">
+                Q3
+              </b-button>
+            </b-col>
+            <b-col class="mb-2">
+              <b-button :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block @click="setQ(4)">
+                Q4
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-row class="mb-2">
+            <b-col>
+              <b-button variant="outline-primary" :pressed="selected == 'pastYear'" block @click="setPastYear()">
+                {{ pastYearString }}
+              </b-button>
+            </b-col>
+            <!-- <b-col><b-button @click="setPastMonth()" variant="outline-primary" :pressed="selected == 'pastMonth'" block>{{ $dateFns.format(pastMonthDate, 'MMMM yyyy') }}</b-button></b-col> -->
+          </b-row>
+          <b-row class="mt-4" cols="1" cols-lg="2">
+            <b-col class="mb-2">
+              <b-form-group
+                label-align-sm="right"
+                label-for="start_date"
+                description="From"
+              >
+                <b-form-datepicker
+                  id="start_date"
+                  v-model="payload.start_date"
+                  cols-sm="3"
+                  description="From"
+                  required
+                />
+              </b-form-group>
+            </b-col>
+            <b-col class="mb-2">
+              <b-form-group
+                label-align-sm="right"
+                label-for="end_date"
+                description="To"
+              >
+                <b-form-datepicker
+                  id="end_date"
+                  v-model="payload.end_date"
+                  cols-sm="3"
+                  required
+                />
+              </b-form-group>
+            </b-col>
+          </b-row>
+        </b-form-group>
+      </b-form-group>
 
-                                <b-form-datepicker
-                                    cols-sm="3"
-                                    id="start_date"
-                                    v-model="payload.start_date"
-                                    description="From"
-                                    required
-                                ></b-form-datepicker>
-                            </b-form-group>
-                        </b-col>
-                        <b-col class="mb-2">
-                            <b-form-group
-                                label-align-sm="right"
-                                label-for="end_date"
-                                description="To"
-                            >
-                                <b-form-datepicker
-                                    cols-sm="3"
-                                    id="end_date"
-                                    v-model="payload.end_date"
-                                    required
-                                ></b-form-datepicker>
-                            </b-form-group>
 
-                        </b-col>
-                    </b-row>
-                </b-form-group>
-            </b-form-group>
-
-
-            <b-button
-                variant="primary"
-                @click="submitPayload()"
-                block
-            ><b-icon icon="box-arrow-in-up" />
-            <!-- <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span> -->
-            <span>Generate New Tax Record</span>
-            </b-button>
-
-        </b-card>
-    </b-container>
+      <b-button
+        variant="primary"
+        block
+        @click="submitPayload()"
+      >
+        <b-icon icon="box-arrow-in-up" />
+        <!-- <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span> -->
+        <span>Generate New Tax Record</span>
+      </b-button>
+    </b-card>
+  </b-container>
 </template>
 
 <script>
-    import { mapState } from "vuex";
+    import { mapState } from "vuex"
 
     export default {
         name: 'FormAddSellerFirmTaxRecord',
+
+        async fetch() {
+            const { store } = this.$nuxt.context
+            if (this.countries.length == 0) {
+                await store.dispatch("country/get_all")
+            }
+        },
 
         data() {
             return {
@@ -118,13 +188,6 @@
                     start_date: null,
                     end_date: null
                 }
-            }
-        },
-
-        async fetch() {
-            const { store } = this.$nuxt.context;
-            if (this.countries.length == 0) {
-                await store.dispatch("country/get_all");
             }
         },
 
@@ -139,7 +202,7 @@
 
             pastYearString() {
                 var d = new Date()
-                var pastYear = d.setFullYear(d.getFullYear() - 1);
+                var pastYear = d.setFullYear(d.getFullYear() - 1)
                 return this.$dateFns.format(pastYear, 'yyyy')
             },
 
@@ -149,12 +212,12 @@
 
             pastMonthDate() {
                 var d = new Date()
-                return d.setMonth(d.getMonth() - 1);
+                return d.setMonth(d.getMonth() - 1)
             },
 
             optionsCountryCode() {
                 const countriesShortTotal = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
-                const countryCodesShortTotal = countriesShortTotal.map(country => country.vat_country_code);
+                const countryCodesShortTotal = countriesShortTotal.map(country => country.vat_country_code)
                 const countryIntersection = this.getCountryIntersection(this.vatCountries, countryCodesShortTotal)
 
                 let options = countryIntersection.map(vat_country_code => {
@@ -162,11 +225,11 @@
                     let formTuple = {
                         value: country.code,
                         text: country.name
-                    };
-                    return formTuple;
+                    }
+                    return formTuple
                     })
 
-                return options;
+                return options
 
             },
 
@@ -269,11 +332,11 @@
         methods: {
 
             getCountryIntersection(countriesVat, countries) {
-                var t;
-                if (countriesVat.length > countries.length) t = countries, countries = countriesVat, countriesVat = t; // indexOf to loop over shorter
+                var t
+                if (countriesVat.length > countries.length) t = countries, countries = countriesVat, countriesVat = t // indexOf to loop over shorter
                 return countriesVat.filter(function (e) {
-                    return countries.indexOf(e) > -1;
-                });
+                    return countries.indexOf(e) > -1
+                })
             },
 
 
@@ -317,19 +380,19 @@
                     case 1:
                         this.payload.start_date = this.currentYearString + '-01-01'
                         this.payload.end_date = this.currentYearString + '-03-31'
-                        break;
+                        break
                     case 2:
                         this.payload.start_date = this.currentYearString + '-04-01'
                         this.payload.end_date = this.currentYearString + '-06-30'
-                        break;
+                        break
                     case 3:
                         this.payload.start_date = this.currentYearString + '-07-01'
                         this.payload.end_date = this.currentYearString + '-09-30'
-                        break;
+                        break
                     case 4:
                         this.payload.start_date = this.currentYearString + '-10-01'
                         this.payload.end_date = this.currentYearString + '-12-31'
-                        break;
+                        break
                 }
 
             },

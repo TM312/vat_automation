@@ -1,92 +1,112 @@
 <template>
-    <b-tabs content-class="mt-3">
-        <b-tab title="Base Data" active>
-            <b-card-group deck>
-                <b-card class="mb-5" header="Static Data" title="">
-                    <b-card-text>
-                        <b>Public ID:</b> <br>
-                        <b>Address:</b> <br>
-                        <b>Establishment Country:</b> <br>
-                        <br>
-                        <b>Created On:</b> <br>
-                        <b>Created By:</b> <br>
-                    </b-card-text>
-                </b-card>
+  <b-tabs content-class="mt-3">
+    <b-tab title="Base Data" active>
+      <b-card-group deck>
+        <b-card class="mb-5" header="Static Data" title="">
+          <b-card-text>
+            <b>Public ID:</b> <br />
+            <b>Address:</b> <br />
+            <b>Establishment Country:</b> <br />
+            <br />
+            <b>Created On:</b> <br />
+            <b>Created By:</b> <br />
+          </b-card-text>
+        </b-card>
 
-                <b-card class="mb-5" >
-                    <template v-slot:header>
-                        <b-row>
-                            <b-col cols="auto" class="mr-auto"><h6 class="mb-0">Accounts</h6></b-col>
-                            <b-col cols="auto"><b-form-checkbox name="check-button" switch>Edit Mode</b-form-checkbox></b-col>
-                        </b-row>
-                    </template>
-                    <b-card-text>
-                        <div >
-                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
-                            <div><b-table borderless busy :fields="fieldsAccounts">
-                                <template v-slot:table-busy>
-                                    <div class="text-center text-secondary my-2">
-                                    <b-spinner class="align-middle"></b-spinner>
-                                    <strong>Loading...</strong>
-                                    </div>
-                                </template>
-                            </b-table></div>
-                        </div>
-                    </b-card-text>
-                </b-card>
+        <b-card class="mb-5">
+          <template v-slot:header>
+            <b-row>
+              <b-col cols="auto" class="mr-auto">
+                <h6 class="mb-0">
+                  Accounts
+                </h6>
+              </b-col>
+              <b-col cols="auto">
+                <b-form-checkbox name="check-button" switch />
+              </b-col>
+            </b-row>
+          </template>
+          <b-card-text>
+            <div>
+              <div>
+                <b-table borderless busy :fields="fieldsAccounts">
+                  <template v-slot:table-busy>
+                    <div class="text-center text-secondary my-2">
+                      <b-spinner class="align-middle" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
+                </b-table>
+              </div>
+            </div>
+          </b-card-text>
+        </b-card>
+      </b-card-group>
+      <b-card-group deck>
+        <b-card class="mb-5">
+          <template v-slot:header>
+            <b-row>
+              <b-col cols="auto" class="mr-auto">
+                <h6 class="mb-0">
+                  Vat Numbers
+                </h6>
+              </b-col>
+              <b-col cols="auto">
+                <b-form-checkbox name="check-button" switch />
+              </b-col>
+            </b-row>
+          </template>
+          <b-card-text>
+            <div>
+              <div>
+                <b-table borderless busy :fields="fieldsVatNumbers">
+                  <template v-slot:table-busy>
+                    <div class="text-center text-secondary my-2">
+                      <b-spinner class="align-middle" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
+                </b-table>
+              </div>
+            </div>
+          </b-card-text>
+        </b-card>
 
-            </b-card-group>
-            <b-card-group deck>
-                <b-card class="mb-5" >
-                    <template v-slot:header>
-                        <b-row>
-                            <b-col cols="auto" class="mr-auto"><h6 class="mb-0">Vat Numbers</h6></b-col>
-                            <b-col cols="auto"><b-form-checkbox name="check-button" switch>Edit Mode</b-form-checkbox></b-col>
-                        </b-row>
-                    </template>
-                    <b-card-text>
-                        <div >
-                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
-                            <div><b-table borderless busy :fields="fieldsVatNumbers">
-                                <template v-slot:table-busy>
-                                    <div class="text-center text-secondary my-2">
-                                    <b-spinner class="align-middle"></b-spinner>
-                                    <strong>Loading...</strong>
-                                    </div>
-                                </template>
-                            </b-table></div>
-                        </div>
-                    </b-card-text>
-                </b-card>
 
 
-
-                <b-card class="mb-5" >
-                    <template v-slot:header>
-                        <b-row>
-                            <b-col cols="auto" class="mr-auto"><h6 class="mb-0">Distance Sales</h6></b-col>
-                            <b-col cols="auto"><b-form-checkbox name="check-button" switch>Edit Mode</b-form-checkbox></b-col>
-                        </b-row>
-                    </template>
-                    <b-card-text>
-                        <div >
-                            <!-- <p class="text-right"><small class="text-muted">TOTAL: </small></p> -->
-                            <div><b-table borderless busy :fields="fieldsDistanceSales">
-                                <template v-slot:table-busy>
-                                    <div class="text-center text-secondary my-2">
-                                    <b-spinner class="align-middle"></b-spinner>
-                                    <strong>Loading...</strong>
-                                    </div>
-                                </template>
-                            </b-table></div>
-                        </div>
-                    </b-card-text>
-                </b-card>
-            </b-card-group>
-        </b-tab>
-        <b-tab title="Items" disabled></b-tab>
-        <b-tab title="Transactions" disabled></b-tab>
-    </b-tabs>
+        <b-card class="mb-5">
+          <template v-slot:header>
+            <b-row>
+              <b-col cols="auto" class="mr-auto">
+                <h6 class="mb-0">
+                  Distance Sales
+                </h6>
+              </b-col>
+              <b-col cols="auto">
+                <b-form-checkbox name="check-button" switch />
+              </b-col>
+            </b-row>
+          </template>
+          <b-card-text>
+            <div>
+              <div>
+                <b-table borderless busy :fields="fieldsDistanceSales">
+                  <template v-slot:table-busy>
+                    <div class="text-center text-secondary my-2">
+                      <b-spinner class="align-middle" />
+                      <strong>Loading...</strong>
+                    </div>
+                  </template>
+                </b-table>
+              </div>
+            </div>
+          </b-card-text>
+        </b-card>
+      </b-card-group>
+    </b-tab>
+    <b-tab title="Items" disabled />
+    <b-tab title="Transactions" disabled />
+  </b-tabs>
 </template>
 
 <script>

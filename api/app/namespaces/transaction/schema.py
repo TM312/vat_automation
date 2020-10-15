@@ -10,7 +10,7 @@ transaction_type_dto = Model('transaction_type', {
 
 transaction_sub_dto = Model('transaction_sub', {
     'public_id': fields.String(readonly=True),
-    'tax_jurisdiction': fields.String(attribute=lambda x: x.tax_jurisdiction.name, readonly=True),
+    'tax_jurisdiction_code': fields.String,
     'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True),
     'departure_country': fields.String(attribute=lambda x: x.departure_country.name, readonly=True),
     'type_code': fields.String,

@@ -1,49 +1,51 @@
 <template>
-    <b-card :border-variant="cardBorder">
-        <b-card-title>
-            <b-row>
-                <b-col cols="auto" class="mr-auto">Accounts</b-col>
-                <b-col cols="auto">
-                    <b-form-checkbox v-model="editMode" name="check-button" switch />
-                </b-col>
-            </b-row>
+  <b-card :border-variant="cardBorder">
+    <b-card-title>
+      <b-row>
+        <b-col cols="auto" class="mr-auto">
+          <div class="text-center">
+            Accounts
+            <b-badge pill :variant="!flashCounter ? 'primary':'success'" class="ml-2">
+              {{ accounts.length }}
+            </b-badge>
+          </div>
+        </b-col>
+        <b-col cols="auto">
+          <b-form-checkbox v-model="editMode" name="check-button" switch />
+        </b-col>
+      </b-row>
+    </b-card-title>
 
-        </b-card-title>
+    <b-card-text>
+      <h5 v-if="accounts.length === 0 && !editMode" class="text-muted text-center m-5">
+        No Data Available Yet
+      </h5>
 
-        <b-card-text>
-            <h5 v-if="accounts.length === 0 && !editMode" class="text-muted text-center m-5" > No Data Available Yet </h5>
-            <div v-else>
-                <p class="text-right">
-                    <small v-if="!flashCounter" class="text-muted">TOTAL: {{ accounts.length }}</small>
-                    <small v-else>TOTAL: <span class="text-primary">{{ accounts.length }}</span></small>
-                </p>
+      <div v-if="editMode===false">
+        <b-table borderless :items="accounts" :fields="fields" hover>
+          <template v-slot:cell(platform)>
+            Amazon
+          </template>
+        </b-table>
+      </div>
 
+      <div v-else>
+        <b-tabs content-class="mt-3">
+          <b-tab title="Create" active>
+            <lazy-form-add-seller-firm-account @flash="flashCount" />
+          </b-tab>
 
-                <div v-if="editMode===false">
-                    <b-table borderless :items="accounts" :fields="fields" hover>
-                        <template v-slot:cell(platform)>Amazon</template>
-                    </b-table>
-                </div>
-
-                <div v-else>
-                    <b-tabs content-class="mt-3">
-                        <b-tab title="Create" active>
-                            <lazy-form-add-seller-firm-account @flash="flashCount"/>
-
-                        </b-tab>
-
-                        <b-tab title="Delete" :disabled="accounts.length === 0">
-                            <lazy-table-delete-seller-firm-account :fields="fieldsEditable" @flash="flashCount"/>
-                        </b-tab>
-                    </b-tabs>
-                </div>
-            </div>
-        </b-card-text>
-    </b-card>
+          <b-tab title="Delete" :disabled="accounts.length === 0">
+            <lazy-table-delete-seller-firm-account :fields="fieldsEditable" @flash="flashCount" />
+          </b-tab>
+        </b-tabs>
+      </div>
+    </b-card-text>
+  </b-card>
 </template>
 
 <script>
-    import { mapState } from "vuex";
+    import { mapState } from "vuex"
 
     export default {
         name: "CardAccounts",
@@ -60,7 +62,7 @@
                     { key: 'channel_code', label: "Channel", sortable: false },
                     { key: 'given_id', label: "Account ID", sortable: false }
                 ],
-            };
+            }
         },
 
         computed: {
@@ -71,7 +73,7 @@
 
 
             cardBorder() {
-                return this.editMode ? "info" : "";
+                return this.editMode ? "info" : ""
             },
 
             fieldsEditable() {
@@ -79,7 +81,7 @@
                     key: "edit",
                     label: "",
                     sortable: false
-                });
+                })
             }
 
 
@@ -94,5 +96,5 @@
 
 
         }
-    };
+    }
 </script>

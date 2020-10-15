@@ -4,6 +4,10 @@ export const state = () => ({
     country: []
 })
 
+export const getters = {
+    countryNameByCode: state => countryCode => state.countries.find(country => country.code === countryCode).name
+}
+
 export const mutations = {
     SET_COUNTRIES(state, countries) {
         state.countries = countries

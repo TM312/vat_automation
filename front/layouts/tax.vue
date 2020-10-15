@@ -1,12 +1,12 @@
 <template>
-    <div>
-        <navbar-tax />
-        <div class="app-body">
-            <!-- <h1>THIS IS THE TAX LAYOUT</h1> -->
-            <nuxt />
-        </div>
-        <Footer />
+  <div>
+    <navbar-tax />
+    <div class="app-body">
+      <!-- <h1>THIS IS THE TAX LAYOUT</h1> -->
+      <nuxt />
     </div>
+    <Footer />
+  </div>
 </template>
 
 <script>
@@ -19,5 +19,5 @@
                 reconnection: true
             })
         }
-    };
+    }
 </script>
