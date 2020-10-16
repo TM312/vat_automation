@@ -47,9 +47,9 @@
             </template>
 
             <template v-slot:cell(active)="data">
-              <div :id="`popover-target-distance-sale-history-${data.item.arrival_country}`">
-                <b-icon v-if="data.value === true" icon="check-circle" variant="success" />
-                <b-icon v-else icon="x-circle" variant="danger" />
+              <div>
+                <b-icon v-if="data.value === true" :id="`popover-target-distance-sale-history-${data.item.arrival_country}`" icon="check-circle" variant="success" />
+                <b-icon v-else :id="`popover-target-distance-sale-history-${data.item.arrival_country}`" icon="x-circle" variant="danger" />
               </div>
               <b-popover :target="`popover-target-distance-sale-history-${data.item.arrival_country}`" triggers="hover" placement="top" class="ml-2" title="History">
                 <div>Test {{ data.item.arrival_country }}</div>
@@ -58,7 +58,7 @@
 
             <template v-slot:cell(vat_taxable_turnover_amount_12m)>
               <b-progress max="12" class="mb-3">
-                <b-progress-bar variant="primary" value="9" />
+                <b-progress-bar variant="primary" value="1" />
                 <!-- <b-progress-bar variant="warning" value="1" />
                 <b-progress-bar variant="danger" value="2" /> -->
               </b-progress>
@@ -97,7 +97,7 @@
                 fields: [
                     { key: "arrival_country", sortable: false },
                     { key: "active", sortable: false },
-                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover Amount (past 12 months)' }
+                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover Amount (past 12 months) **in progress**' }
                 ]
             }
         },

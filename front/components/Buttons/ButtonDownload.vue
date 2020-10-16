@@ -1,5 +1,5 @@
 <template>
-  <b-button variant="primary" @click="downloadFile()">
+  <b-button variant="primary" disabled @click="downloadFile()">
     <b-icon icon="download" /> Download
   </b-button>
 </template>

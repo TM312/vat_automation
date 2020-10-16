@@ -1,11 +1,7 @@
 <template>
   <b-navbar toggleable="lg" type="light" variant="light">
     <b-navbar-brand to="/">
-      <img
-        src="@/assets/img/logos/placeholderlogo.png"
-        class="d-inline-block align-top"
-        height="40"
-      />
+      Tax-Automation
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse" />

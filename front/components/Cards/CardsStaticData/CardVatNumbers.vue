@@ -52,7 +52,7 @@
                 variant="info"
                 placement="right"
               >
-                We regularly check the validity of the vat numbers below to provide up to date information about their status.
+                We regularly check the validity of the vat numbers below to provide up to date information on their status. Once checked the vat numbers are considered valid for 30 days.
               </b-popover>
             </template>
 
