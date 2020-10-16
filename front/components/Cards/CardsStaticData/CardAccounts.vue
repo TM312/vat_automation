@@ -21,7 +21,7 @@
         No Data Available Yet
       </h5>
 
-      <div v-if="editMode===false">
+      <div v-else-if="accounts.length !== 0 && !editMode">
         <b-table borderless :items="accounts" :fields="fields" hover>
           <template v-slot:cell(platform)>
             <img
