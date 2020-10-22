@@ -51,6 +51,7 @@ class Country(db.Model):  # type: ignore
 
     tax_records = db.relationship('TaxRecord', backref='tax_jurisdiction', lazy=True)
     vats = db.relationship('Vat', backref='country', lazy=True)
+    vat_thresholds = db.relationship('VatThreshold', backref='country', lazy=True)
     vatins = db.relationship('VATIN', backref='country', lazy=True)
 
 

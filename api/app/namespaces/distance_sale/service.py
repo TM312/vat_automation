@@ -424,6 +424,7 @@ class DistanceSaleHistoryService:
             valid_from=distance_sale_data.get('valid_from'),
             valid_to=distance_sale_data.get('valid_to'),
 
+            # mirrored attributes (no relationships)
             seller_firm_id=distance_sale_data.get('seller_firm_id'),
             created_by=distance_sale_data.get('created_by'),
             original_filename=distance_sale_data.get('original_filename'),

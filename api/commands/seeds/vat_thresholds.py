@@ -1,6 +1,7 @@
 
 # source: https://ec.europa.eu/taxation_customs/sites/taxation/files/resources/documents/taxation/vat/traders/vat_community/vat_in_ec_annexi.pdf
 from datetime import datetime
+from app.extensions import db
 
 vat_thresholds = [
     {
@@ -87,7 +88,7 @@ vat_thresholds = [
         'valid_from': datetime.strptime('01-07-2019', '%d-%m-%Y').date(),
         'country_code': 'HU',
         'value': 35_000,
-        'currency_code': 'EUR',
+        'currency_code': 'EUR'
     },
     {
         'valid_from': datetime.strptime('01-07-2019', '%d-%m-%Y').date(),
@@ -135,3 +136,22 @@ vat_thresholds = [
         'value': 70_000
     }
 ]
+
+
+class VatThresholdSeedService:
+    @staticmethod
+    def seed_vat_thresholds():
+        from app.namespaces.tax.vat_threshold.service import VatThresholdService
+        for i, vat_threshold_data in enumerate(vat_thresholds):
+            try:
+                VatThresholdService.create(vat_threshold_data)
+            except:
+                db.session.rollback()
+                raise
+
+        response_object = {
+            'status': 'success',
+            'message': 'Successfully created vat thresholds ({} objects)'.format(str(i))
+        }
+
+        return response_object

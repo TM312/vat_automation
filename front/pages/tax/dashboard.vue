@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1>vatThresholds: {{ vatThresholds }}</h1>
     <b-tabs pills card vertical>
       <b-tab title="Overview" active>
         <b-alert :show="$dateFns.format(new Date(), 'MMMM dd, yyyy') !== $dateFns.format($auth.user.last_seen, 'MMMM dd, yyyy')" variant="primary">
@@ -85,6 +86,10 @@
                 await store.dispatch("channel/get_all")
             }
 
+            if (this.vatThresholds.length === 0) {
+                await store.dispatch("vat_threshold/get_all")
+            }
+
             await store.dispatch("utils/get_all_key_account_notifications")
         },
 
@@ -101,6 +106,9 @@
                 currencies: state => state.currency.currencies,
                 taxTreatments: state => state.tax_treatment.tax_treatments,
                 taxRateTypes: state => state.tax_rate_type.tax_rate_types,
+                vatThresholds: state => state.vat_threshold.vat_thresholds,
+
+
                 notifications: state => state.utils.notifications
 
 

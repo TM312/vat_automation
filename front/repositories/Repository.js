@@ -23,6 +23,7 @@ import TransactionInputRepository from './TransactionInputRepository'
 import UserRepository from './UserRepository'
 import UtilsRepository from './UtilsRepository'
 import VatRepository from './VatRepository'
+import VatThresholdRepository from './VatThresholdRepository'
 import VATINRepository from './VATINRepository'
 
 export default ($axios) => ({
@@ -51,5 +52,6 @@ export default ($axios) => ({
     user: UserRepository($axios),
     utils: UtilsRepository($axios),
     vat: VatRepository($axios),
+    vat_threshold: VatThresholdRepository($axios),
     vatin: VATINRepository($axios)
 })

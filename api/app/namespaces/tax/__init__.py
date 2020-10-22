@@ -15,5 +15,5 @@ def attach_tax(api, app):
     api.add_namespace(tax_rate_type_ns, path=f"/{BASE_ROUTE}/tax_rate_type")
     api.add_namespace(tax_treatment_ns, path=f"/{BASE_ROUTE}/tax_treatment")
     api.add_namespace(vat_ns, path=f"/{BASE_ROUTE}/vat")
-    api.add_namespace(vat_ns, path=f"/{BASE_ROUTE}/vat_threshold")
+    api.add_namespace(vat_threshold_ns, path=f"/{BASE_ROUTE}/vat_threshold")
     api.add_namespace(vatin_ns, path=f"/{BASE_ROUTE}/vatin")

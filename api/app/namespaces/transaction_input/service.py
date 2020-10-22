@@ -44,7 +44,7 @@ class TransactionInputService:
 
     @staticmethod
     def get_by_bundle_public_id(bundle_public_id: str) -> List[TransactionInput]:
-        if bundle_public_id == 'undefined':
+        if bundle_public_id == 'undefined' or bundle_public_id is None:
             print('bundle_public_id == undefined')
             return None
         else:

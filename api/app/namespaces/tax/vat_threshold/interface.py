@@ -4,10 +4,12 @@ from typing import List
 
 
 class VatThresholdInterface(TypedDict, total=False):
-    # id: int
-    # valid_from: date
-    # valid_to: date
-    # country_code: str
-    # tax_code_code: str
-    # tax_rate_type_code: str
-    # rate: float
+    valid_from: date
+    valid_to: date
+    vat_threshold_id: int
+
+    # mirrored attributes (no relationships!)
+    created_by: int
+    country_code: str
+    value: int
+    currency_code: str
