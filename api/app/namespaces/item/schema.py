@@ -1,5 +1,5 @@
 from flask_restx import Model, fields
-from ..tag import tag_dto
+from app.namespaces.tag import tag_dto
 
 
 item_history_dto = Model('item_history', {

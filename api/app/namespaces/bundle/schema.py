@@ -1,5 +1,5 @@
 from flask_restx import Model, fields
-from ..transaction_input import transaction_input_sub_dto
+from app.namespaces.transaction_input import transaction_input_sub_dto
 
 
 bundle_sub_dto = Model('bundle_sub', {

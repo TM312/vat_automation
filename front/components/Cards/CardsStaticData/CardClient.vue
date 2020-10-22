@@ -7,14 +7,22 @@
         </b-col>
         <b-col cols="auto">
           <button-follow-seller-firm :seller-firm="sellerFirm" />
-          <b-button v-if="$auth.user.role === 'admin'" size="sm" variant="outline-danger" :disabled="buttonDisabled" @click="remove(sellerFirm.public_id)">
-            Delete
+          <b-button
+            v-if="$auth.user.role === 'admin'"
+            size="sm"
+            variant="outline-danger"
+            :disabled="buttonDisabled"
+            @click="remove(sellerFirm.public_id)"
+          >
+            <span v-if="buttonDisabled"><b-spinner small /> Delete </span>
+            <span v-else>Delete</span>
           </b-button>
         </b-col>
       </b-row>
     </b-card-title>
     <b-card-sub-title class="mb-3">
-      {{ sellerFirm.address }} | Establishment: {{ sellerFirmEstablishmentCountry }}
+      {{ sellerFirm.address }} | Establishment:
+      {{ sellerFirmEstablishmentCountry }}
     </b-card-sub-title>
 
     <b-card-text>
@@ -28,7 +36,9 @@
               v-for="taxAuditor in sellerFirm.tax_auditors"
               :id="`popover-target-${taxAuditor.public_id}`"
               :key="taxAuditor.public_id"
-              :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
+              :variant="
+                taxAuditor.role === 'admin' ? 'success' : 'info'
+              "
               :text="taxAuditor.initials"
             />
           </div>
@@ -38,7 +48,11 @@
                 v-for="taxAuditor in sellerFirm.tax_auditors"
                 :id="`popover-target-${taxAuditor.public_id}`"
                 :key="taxAuditor.public_id"
-                :variant="(taxAuditor.role === 'admin') ? 'success' : 'info'"
+                :variant="
+                  taxAuditor.role === 'admin'
+                    ? 'success'
+                    : 'info'
+                "
                 :text="taxAuditor.initials"
               />
             </b-avatar-group>
@@ -81,50 +95,56 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState } from "vuex"
 
     export default {
-        name: 'CardClient',
+        name: "CardClient",
 
         data() {
             return {
-                buttonDisabled: false
+                buttonDisabled: false,
             }
         },
 
         computed: {
             ...mapState({
-                sellerFirm: state => state.seller_firm.seller_firm
+                sellerFirm: (state) => state.seller_firm.seller_firm,
             }),
             sellerFirmEstablishmentCountry() {
-              return this.$store.getters['country/countryNameByCode'](this.sellerFirm.establishment_country_code)
-            }
+                return this.$store.getters["country/countryNameByCode"](
+                    this.sellerFirm.establishment_country_code
+                )
+            },
         },
 
         methods: {
             async remove(sellerFirmPublicId) {
                 this.buttonDisabled = true
                 try {
-                    await this.$store.dispatch("seller_firm/delete_by_public_id", sellerFirmPublicId)
-                    await this.$store.dispatch("accounting_firm/get_by_public_id", this.$auth.user.employer_public_id)
+                    await this.$store.dispatch(
+                        "seller_firm/delete_by_public_id",
+                        sellerFirmPublicId
+                    )
+                    await this.$store.dispatch(
+                        "accounting_firm/get_by_public_id",
+                        this.$auth.user.employer_public_id
+                    )
                     await this.$auth.fetchUser()
 
-
-                    this.$router.push('/tax/clients')
+                    this.$router.push("/tax/clients")
                 } catch (error) {
                     this.$toast.error(error, { duration: 5000 })
                     this.buttonDisabled = false
                     return []
                 }
             },
-        }
+        },
 
-
-            // function() {
-            //     var taxAuditors = this.seller_firm.tax_auditors
-            //     return taxAuditors.map(function(index) {
-            //         console.log('index:', index, 'index % 2 == 0:', index % 2 == 0)
-            //         return (index % 2 == 0) ? 'success' : 'info'
-            //     })
+        // function() {
+        //     var taxAuditors = this.seller_firm.tax_auditors
+        //     return taxAuditors.map(function(index) {
+        //         console.log('index:', index, 'index % 2 == 0:', index % 2 == 0)
+        //         return (index % 2 == 0) ? 'success' : 'info'
+        //     })
     }
 </script>

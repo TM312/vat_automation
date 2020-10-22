@@ -10,9 +10,9 @@ from app.extensions import db
 from . import Token
 from .interface import TokenInterface
 
-from ..user import User
-from ..user.service_parent import UserService
-from ..user.interface_parent import UserInterface
+from app.namespaces.user import User
+from app.namespaces.user.service_parent import UserService
+from app.namespaces.user.interface_parent import UserInterface
 
 
 class TokenService:

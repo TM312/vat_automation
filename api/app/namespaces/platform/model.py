@@ -1,5 +1,5 @@
 from app.extensions import db
-from ..channel.model import Channel
+from app.namespaces.channel.model import Channel
 
 
 

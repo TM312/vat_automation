@@ -6,13 +6,13 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
 
-from ..transaction import Transaction
+from app.namespaces.transaction import Transaction
 from app.namespaces.utils.ATs import seller_firm_accounting_firm_AT
 
 from app.extensions import db  # noqa
 
-from ..tax.vatin import VATIN
-from ..user import User
+from app.namespaces.tax.vatin import VATIN
+from app.namespaces.user import User
 
 class Business(db.Model):  # type: ignore
     """ Business parent model """

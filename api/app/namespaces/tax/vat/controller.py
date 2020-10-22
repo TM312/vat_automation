@@ -8,7 +8,7 @@ from . import Vat
 from . import vat_dto
 from .service import VatService
 
-from ...utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("Vat", description="Vat Related Operations")  # noqa

@@ -14,9 +14,9 @@ from . import TransactionInput
 from .interface import TransactionInputInterface
 from .schema import TransactionInputSubSchema
 
-from ..account import Account
+from app.namespaces.account import Account
 from app.namespaces.utils.service import InputService, NotificationService
-from ..tag.service import TagService
+from app.namespaces.tag.service import TagService
 from app.namespaces.bundle import Bundle
 from app.namespaces.bundle.service import BundleService
 
@@ -58,7 +58,7 @@ class TransactionInputService:
 
     @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:
-        from ..business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
         seller_firm_id = SellerFirmService.get_by_public_id(seller_firm_public_id).id
         #base_query = TransactionInput.query.join(TransactionInput.account).join(Account.seller_firm, aliased=True).filter_by(public_id=seller_firm_public_id).order_by(TransactionInput.complete_date.desc())
         base_query = TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).order_by(TransactionInput.complete_date.desc())
@@ -249,9 +249,9 @@ class TransactionInputService:
 
     @staticmethod
     def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int) -> List[Dict]:
-        from ..account.service import AccountService
-        from ..bundle.service import BundleService
-        from ..item.service import ItemService
+        from app.namespaces.account.service import AccountService
+        from app.namespaces.bundle.service import BundleService
+        from app.namespaces.item.service import ItemService
 
 
         error_counter = 0
@@ -490,7 +490,7 @@ class TransactionInputService:
 
     @staticmethod
     def process(transaction_input: TransactionInput):
-        from ..transaction.service import TransactionService
+        from app.namespaces.transaction.service import TransactionService
         # transactions are being created
         if not transaction_input.processed:
             try:

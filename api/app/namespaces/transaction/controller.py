@@ -37,6 +37,7 @@ class TransactionResource(Resource):
 @ns.route("/<string:transaction_public_id>")
 @ns.param("transaction_id", "Transaction database ID")
 class TransactionIdResource(Resource):
+    @login_required
     def get(self, transaction_public_id: str) -> Transaction:
         """Get Single Transaction"""
         return TransactionService.get_by_public_id(transaction_public_id)

@@ -12,6 +12,7 @@ from app.namespaces.transaction import TransactionType
 from app.namespaces.tax.tax_code import TaxCode
 from app.namespaces.tax.tax_treatment import TaxTreatment
 from app.namespaces.tax.vat import Vat
+from app.namespaces.tax.vat_threshold import VatThreshold
 from app.namespaces.tax.tax_rate_type import TaxRateType
 from app.namespaces.platform import Platform
 from app.namespaces.channel import Channel
@@ -23,6 +24,7 @@ from .seeds.eu import EUSeedService
 from .seeds.countries import CountrySeedService
 from .seeds.tax_codes import TaxCodesSeedService
 from .seeds.tax_rate_types import tax_rate_types
+from .seeds.vat_thresholds import vat_thresholds
 from .seeds.vats import VatSeedService
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
@@ -48,7 +50,8 @@ things_list = {
     'tax_treatments': [TaxTreatment, tax_treatments],
     'platforms': [Platform, platforms],
     'channels': [Channel, channels],
-    'tags': [Tag, tags]
+    'tags': [Tag, tags],
+    'vat_thresholds': [VatThreshold, vat_thresholds]
 
 }
 

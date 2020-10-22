@@ -20,7 +20,7 @@ from . import Account
 from .schema import AccountSubSchema
 from .interface import AccountInterface
 from app.namespaces.utils.service import InputService
-from ..tag.service import TagService
+from app.namespaces.tag.service import TagService
 from app.namespaces.utils.service import NotificationService
 
 
@@ -108,7 +108,7 @@ class AccountService:
 
     @staticmethod
     def create_by_seller_firm_public_id(seller_firm_public_id: str, account_data: AccountInterface) -> Account:
-        from ..business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:

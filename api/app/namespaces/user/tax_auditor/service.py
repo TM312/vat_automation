@@ -71,7 +71,7 @@ class TaxAuditorService:
 
     @staticmethod
     def append_delete_seller_firm_to_key_accounts(seller_firm_public_id: str) -> TaxAuditor:
-        from ...business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             if seller_firm in g.user.key_accounts:

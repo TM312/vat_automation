@@ -69,7 +69,7 @@ export default {
         '@nuxtjs/axios',
         '@nuxtjs/auth',
         '@nuxtjs/toast',
-        // Doc: https: //github.com/richardeschloss/nuxt-socket-io
+        // Docs: https: //github.com/richardeschloss/nuxt-socket-io
         'nuxt-socket-io'
     ],
 
@@ -224,6 +224,7 @@ export default {
 
                     { clear_vat_numbers: 'seller_firm/CLEAR_VAT_NUMBERS' },
                     { new_vat_number: 'seller_firm/PUSH_VAT_NUMBER' },
+                    { update_vat_number: 'seller_firm/UPDATE_VAT_NUMBER' },
                     { new_vat_numbers: 'seller_firm/PUSH_VAT_NUMBERS' },
 
                     { clear_transaction_inputs: 'transaction_input/CLEAR_TRANSACTION_INPUTS' },

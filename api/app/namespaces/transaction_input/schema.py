@@ -1,6 +1,6 @@
 from flask_restx import Model, fields
 
-from ..transaction import transaction_dto
+from app.namespaces.transaction import transaction_dto
 
 
 transaction_input_sub_dto = Model('transaction_input_sub', {

@@ -16,9 +16,9 @@ from .model import SellerFirm
 from .interface import SellerFirmInterface
 #from .schema import SellerFirmSubSchema
 
-from ...utils.service import InputService, NotificationService
-from ...utils import SellerFirmNotification
-from ...tag.service import TagService
+from app.namespaces.utils.service import InputService, NotificationService
+from app.namespaces.utils import SellerFirmNotification
+from app.namespaces.tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -414,7 +414,7 @@ class SellerFirmService:
     @staticmethod
     # upload only for tax auditors
     def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, claimed: bool, seller_firm_notification_data: Dict) -> List[Dict]:
-        from ...user.service_parent import UserService
+        from app.namespaces.user.service_parent import UserService
 
         total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]

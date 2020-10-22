@@ -2,7 +2,7 @@
 
 from app.extensions import db  # noqa
 from .. import User
-from ...utils.ATs import tax_auditor_seller_firm_AT
+from app.namespaces.utils.ATs import tax_auditor_seller_firm_AT
 
 
 class TaxAuditor(User):

@@ -16,29 +16,16 @@
       </b-row>
     </b-card-title>
 
+    <b-card-text>selected: {{ selected }}</b-card-text>
+
 
     <b-card-text>
       <h5 v-if="distanceSales.length === 0 && !editMode" class="text-muted text-center m-5">
         No Data Available Yet
       </h5>
       <div v-else>
-        <!-- <b-row cols="1" cols-lg="2">
-          <b-col v-for="distanceSale in distanceSales" :key="distanceSale.arrival_country" class="mb-2">
-            <b-card :title="distanceSale.active" :sub-title="distanceSale.arrival_country">
-              <b-card-text>
-                <b-button size="sm" variant="outline-primary">
-                  Details
-                </b-button>
-              </b-card-text>
-            </b-card>
-          </b-col>
-        </b-row> -->
-
-
-
-
         <div v-if="editMode===false">
-          <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover>
+          <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover selectable select-mode="single" @row-selected="displayItem">
             <template v-slot:table-busy>
               <div class="text-center text-secondary my-2">
                 <b-spinner class="align-middle" />
@@ -58,11 +45,16 @@
 
             <template v-slot:cell(vat_taxable_turnover_amount_12m)>
               <b-progress max="12" class="mb-3">
-                <b-progress-bar variant="primary" value="1" />
+                <b-progress-bar variant="primary" value="1" class="self-align-center" />
                 <!-- <b-progress-bar variant="warning" value="1" />
                 <b-progress-bar variant="danger" value="2" /> -->
               </b-progress>
             </template>
+
+            <!-- <template v-slot:cell(details)="data">
+
+              <b-icon :id="`icon-${data.index}`" variant="info" icon="info-circle" @click="toggleIconByIndex(data.index)" />
+            </template> -->
           </b-table>
         </div>
 
@@ -94,10 +86,15 @@
                 editMode: false,
                 flashCounter: false,
 
+                // icon: [],
+                selected: null,
+
                 fields: [
                     { key: "arrival_country", sortable: false },
                     { key: "active", sortable: false },
-                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover Amount (past 12 months) **in progress**' }
+                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
+                    { key: 'details', label: '' }
+
                 ]
             }
         },
@@ -127,7 +124,19 @@
                 this.flashCounter = true
                 setTimeout(() => this.flashCounter = false, 1000)
 
+            },
+
+            displayItem: function(payload) {
+                if (payload.length === 0) {
+                    this.selected = 'Empty payload'
+                } else {
+                this.selected = payload[0]
+                }
             }
+
+            // toggleIconByIndex(index) {
+            //     this.icon[index] = !this.icon[index]
+            // }
 
 
         }

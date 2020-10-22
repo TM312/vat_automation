@@ -19,9 +19,9 @@ from . import VATIN
 from .interface import VATINInterface
 from .schema import VatinSchemaSocket
 
-from ...transaction_input import TransactionInput
-from ...utils.service import InputService, NotificationService
-from ...tag.service import TagService
+from app.namespaces.transaction_input import TransactionInput
+from app.namespaces.utils.service import InputService, NotificationService
+from app.namespaces.tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -523,7 +523,7 @@ class VATINService:
 
     @staticmethod
     def process_single_submit(seller_firm_public_id: str, vatin_data_raw: VATINInterface) -> VATIN:
-        from ...business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
 
         country_code, number = VATINService.vat_precheck(vatin_data_raw.get('country_code'), vatin_data_raw.get('number'))
 

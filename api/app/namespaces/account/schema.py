@@ -3,8 +3,8 @@ from flask_restx import Model, fields
 # from app.extensions import ma
 
 from . import Account
-from ..transaction import transaction_sub_dto
-from ..transaction_input import transaction_input_sub_dto
+from app.namespaces.transaction import transaction_sub_dto
+from app.namespaces.transaction_input import transaction_input_sub_dto
 
 account_sub_dto = Model('account_sub', {
     'public_id': fields.String(readonly=True),

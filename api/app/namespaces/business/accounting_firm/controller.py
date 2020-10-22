@@ -11,7 +11,7 @@ from . import accounting_firm_dto, accounting_firm_sub_dto
 from .service import AccountingFirmService
 from .interface import AccountingFirmInterface
 
-from ...utils.decorators import login_required, accepted_u_types, confirmation_required
+from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("AccountingFirm", description="Accounting Firm Related Operations")  # noqa

@@ -10,8 +10,8 @@ from . import tax_auditor_dto, tax_auditor_dto_admin, tax_auditor_sub_dto
 from .service import TaxAuditorService
 from .interface import TaxAuditorInterface
 
-from ...utils.decorators import login_required, accepted_u_types, confirmation_required
-from ...utils.service import TemplateService
+from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required
+from app.namespaces.utils.service import TemplateService
 
 
 

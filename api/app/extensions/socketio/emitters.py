@@ -24,6 +24,13 @@ class SocketService:
         )
 
     @staticmethod
+    def emit_update_object(meta, object_type):
+        socket_io.emit(
+            'update_{}'.format(object_type),
+            meta
+        )
+
+    @staticmethod
     def emit_new_objects(meta, object_type):
         socket_io.emit(
             'new_{}s'.format(object_type),

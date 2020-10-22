@@ -1,7 +1,7 @@
 from app.extensions import db  # noqa
 from .. import Business
 from ..seller_firm import SellerFirm
-from ...user import User
+from app.namespaces.user import User
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import column_property
 from sqlalchemy import select, func

@@ -28,7 +28,7 @@ vatin_sub_dto = Model('vatin_sub', {
     'address': fields.String,
     'valid_from': fields.Date,
     'valid_to': fields.Date(readonly=True),
-    'initial_tax_date': fields.Date,
+    'initial_tax_date': fields.Date(readonly=True)
 })
 
 vatin_dto = vatin_sub_dto.clone('vatin', {

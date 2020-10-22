@@ -13,7 +13,7 @@ from .interface import DistanceSaleInterface
 from .schema import DistanceSaleSubSchema
 
 from app.namespaces.utils.service import InputService, NotificationService
-from ..tag.service import TagService
+from app.namespaces.tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -64,7 +64,7 @@ class DistanceSaleService:
 
     @staticmethod
     def create_by_seller_firm_public_id(seller_firm_public_id: str, distance_sale_data: DistanceSaleInterface) -> DistanceSale:
-        from ..business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
