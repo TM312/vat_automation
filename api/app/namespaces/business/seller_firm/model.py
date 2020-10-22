@@ -2,17 +2,17 @@ from app.extensions import db  # noqa
 from ..model_parent import Business
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from ...utils.ATs import tax_auditor_seller_firm_AT
-from ...user.seller import Seller
+from app.namespaces.utils.ATs import tax_auditor_seller_firm_AT
+from app.namespaces.user.seller import Seller
 
 from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
 
-# from ...account import Account
-from ...tax_record import TaxRecord
-from ...distance_sale import DistanceSale
-from ...item import Item
-from ...account import Account
+# from app.namespaces.account import Account
+from app.namespaces.tax_record import TaxRecord
+from app.namespaces.distance_sale import DistanceSale
+from app.namespaces.item import Item
+from app.namespaces.account import Account
 
 
 

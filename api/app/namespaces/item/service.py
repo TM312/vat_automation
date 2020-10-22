@@ -13,10 +13,10 @@ from . import Item, ItemHistory
 from .schema import ItemSubSchema
 from .interface import ItemInterface
 
-from ..account import Account
+from app.namespaces.account import Account
 from app.namespaces.utils.service import InputService, NotificationService
-from ..transaction_input import TransactionInput
-from ..tag.service import TagService
+from app.namespaces.transaction_input import TransactionInput
+from app.namespaces.tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -119,7 +119,7 @@ class ItemService:
 
     @staticmethod
     def create_by_seller_firm_public_id(seller_firm_public_id: str, item_data: ItemInterface) -> Item:
-        from ..business.seller_firm.service import SellerFirmService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:

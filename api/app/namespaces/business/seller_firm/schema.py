@@ -10,7 +10,7 @@ import app.namespaces.tax_record as tax_record
 
 
 
-# from ...transaction_input import transaction_input_sub_dto
+# from app.namespaces.transaction_input import transaction_input_sub_dto
 accounting_firm_sub_dto = business_sub_dto.clone('accounting_firm_sub', {
 })
 

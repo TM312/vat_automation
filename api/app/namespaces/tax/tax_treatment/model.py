@@ -1,5 +1,5 @@
 from app.extensions import db
-from ...utils.ATs import tax_treatment_transaction_type_AT
+from app.namespaces.utils.ATs import tax_treatment_transaction_type_AT
 
 
 

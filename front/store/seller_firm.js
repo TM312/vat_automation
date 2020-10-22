@@ -79,6 +79,16 @@ export const mutations = {
 
     PUSH_VAT_NUMBERS(state, vat_numbers) {
         state.seller_firm.vat_numbers.push(...vat_numbers)
+    },
+
+    // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
+    UPDATE_VAT_NUMBER(state, vat_number) {
+        var index = state.seller_firm.vat_numbers.findIndex(el => (el.country_code === vat_number.country_code && el.number === vat_number.number))
+        state.seller_firm.vat_numbers = [
+            ...state.seller_firm.vat_numbers.slice(0, index),
+            vat_number,
+            ...state.seller_firm.vat_numbers.slice(index + 1)
+        ]
     }
 }
 

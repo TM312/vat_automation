@@ -52,8 +52,8 @@ class NotificationService:
     @staticmethod
     def get_all_key_account_notifications() -> List[SellerFirmNotification]:
 
-        from ..user.tax_auditor import TaxAuditor
-        from ..business.seller_firm import SellerFirm
+        from app.namespaces.user.tax_auditor import TaxAuditor
+        from app.namespaces.business.seller_firm import SellerFirm
 
         seller_firm_notifications = SellerFirmNotification.query.join(
             SellerFirm.notifications

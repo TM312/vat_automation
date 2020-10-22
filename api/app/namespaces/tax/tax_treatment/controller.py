@@ -7,7 +7,7 @@ from . import TaxTreatment
 from . import tax_treatment_dto
 from .service import TaxTreatmentService
 
-from ...utils.decorators import login_required, employer_required, accepted_u_types
+from app.namespaces.utils.decorators import login_required, employer_required, accepted_u_types
 
 
 ns = Namespace("TaxTreatment", description="TaxTreatment Related Operations")  # noqa

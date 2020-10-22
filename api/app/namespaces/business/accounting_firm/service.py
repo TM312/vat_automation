@@ -10,7 +10,7 @@ from typing import Dict
 
 from .interface import AccountingFirmInterface
 
-from ...user.tax_auditor.model import TaxAuditor
+from app.namespaces.user.tax_auditor.model import TaxAuditor
 
 
 class AccountingFirmService:

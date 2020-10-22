@@ -8,7 +8,7 @@ from . import TaxCode
 from . import tax_code_dto
 from .service import TaxCodeService
 
-from ...utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("TaxCode", description="TaxCode Related Operations")  # noqa

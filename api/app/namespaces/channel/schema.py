@@ -1,5 +1,5 @@
 from flask_restx import Model, fields
-from ..account import account_sub_dto
+from app.namespaces.account import account_sub_dto
 
 channel_dto = Model('channel', {
     'code': fields.String,

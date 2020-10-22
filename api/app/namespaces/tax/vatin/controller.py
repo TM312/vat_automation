@@ -8,7 +8,7 @@ from . import vatin_dto, vatin_sub_dto, vatin_verify_dto, vatin_validate_dto
 from .service import VATINService
 
 
-from ...utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, employer_required
 
 
 ns = Namespace("VATIN", description="VATIN Related Operations")  # noqa

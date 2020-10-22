@@ -14,23 +14,24 @@ from app.extensions import db
 from . import TransactionType, Transaction
 from .interface import TransactionInterface
 
-from ..account import Account
-from ..distance_sale import DistanceSale, DistanceSaleHistory
-from ..distance_sale.service import DistanceSaleService, DistanceSaleHistoryService
-from ..transaction_input import TransactionInput
-from ..transaction_input.interface import TransactionInputInterface
-from ..bundle import Bundle
-from ..bundle.service import BundleService
-from ..item import Item, ItemHistory
-from ..item.service import ItemService, ItemHistoryService
-from ..country import Country, EU
-from ..country.service import CountryService
-from ..business.service_parent import BusinessService
-from ..tax.vatin import VATIN
-from ..tax.vatin.service import VATINService
-from ..tax.tax_code.service import TaxCodeService
-from ..tax.vat.service import VatService
-from ..business.seller_firm import SellerFirm
+from app.namespaces.account import Account
+from app.namespaces.distance_sale import DistanceSale, DistanceSaleHistory
+from app.namespaces.distance_sale.service import DistanceSaleService, DistanceSaleHistoryService
+from app.namespaces.transaction_input import TransactionInput
+from app.namespaces.transaction_input.interface import TransactionInputInterface
+from app.namespaces.bundle import Bundle
+from app.namespaces.bundle.service import BundleService
+from app.namespaces.item import Item, ItemHistory
+from app.namespaces.item.service import ItemService, ItemHistoryService
+from app.namespaces.country import Country, EU
+from app.namespaces.country.service import CountryService
+from app.namespaces.business.service_parent import BusinessService
+from app.namespaces.tax.vatin import VATIN
+from app.namespaces.tax.vatin.service import VATINService
+from app.namespaces.tax.tax_code.service import TaxCodeService
+from app.namespaces.tax.vat.service import VatService
+from app.namespaces.tax.vatin.schema import VatinSchemaSocket
+from app.namespaces.business.seller_firm import SellerFirm
 from app.namespaces.utils.service import HelperService, NotificationService
 
 from app.extensions.socketio.emitters import SocketService
@@ -57,7 +58,7 @@ class TransactionService:
 
     @staticmethod
     def get_by_tax_record_public_id(tax_record_public_id: str, **kwargs) -> List[Transaction]:
-        from ..tax_record import TaxRecord
+        from app.namespaces.tax_record import TaxRecord
         base_query = Transaction.query.join(TaxRecord.transactions).filter(TaxRecord.public_id == tax_record_public_id).order_by(Transaction.tax_date.desc())
 
         if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
@@ -73,8 +74,8 @@ class TransactionService:
 
     @staticmethod
     def create_transaction_s(transaction_input: TransactionInputInterface) -> Transaction:
-        from ..account.service import AccountService
-        from ..transaction_input.service import TransactionInputService
+        from app.namespaces.account.service import AccountService
+        from app.namespaces.transaction_input.service import TransactionInputService
 
         account_given_id = transaction_input.account_given_id
         channel_code = transaction_input.channel_code
@@ -203,7 +204,7 @@ class TransactionService:
             customer_relationship_checked: bool,
             amazon_vat_calculation_service: bool,
             customer_vat_check_required: bool
-            ):
+        ):
 
 
         seller_firm_id = account.seller_firm_id
@@ -289,26 +290,41 @@ class TransactionService:
             raise
 
         seller_firm = BusinessService.get_by_id(seller_firm_id)
-        if arrival_seller_vatin in seller_firm.vat_numbers and arrival_seller_vatin.initial_tax_date == None:
-            arrival_seller_vatin.initial_tax_date == tax_date
+        if arrival_seller_vatin in seller_firm.vat_numbers and (
+            arrival_seller_vatin.initial_tax_date is None or
+            tax_date < arrival_seller_vatin.initial_tax_date
+        ):
+            arrival_seller_vatin.initial_tax_date = tax_date
             try:
                 db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(arrival_seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
             except:
                 db.session.rollback()
                 raise
 
-        if departure_seller_vatin in seller_firm.vat_numbers and departure_seller_vatin.initial_tax_date == None:
-            departure_seller_vatin.initial_tax_date == tax_date
+        if departure_seller_vatin in seller_firm.vat_numbers and (
+            departure_seller_vatin.initial_tax_date is None or
+            tax_date < departure_seller_vatin.initial_tax_date
+        ):
+            departure_seller_vatin.initial_tax_date = tax_date
             try:
                 db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(departure_seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
             except:
                 db.session.rollback()
                 raise
 
-        if seller_vatin in seller_firm.vat_numbers and seller_vatin.initial_tax_date == None:
-            seller_vatin.initial_tax_date == tax_date
+        if seller_vatin in seller_firm.vat_numbers and (
+            seller_vatin.initial_tax_date is None or
+            tax_date < seller_vatin.initial_tax_date
+        ):
+            seller_vatin.initial_tax_date = tax_date
             try:
                 db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
             except:
                 db.session.rollback()
                 raise
@@ -859,7 +875,7 @@ class TransactionService:
     def get_invoice_exchange_rate(invoice_exchange_rate_date: date, transaction_currency_code: str, invoice_currency_code: str) -> float:
 
         if invoice_exchange_rate_date:
-            from ..exchange_rate.service import ExchangeRateService
+            from app.namespaces.exchange_rate.service import ExchangeRateService
             invoice_exchange_rate = ExchangeRateService.get_by_base_target_date(base=transaction_currency_code, target=invoice_currency_code, date=invoice_exchange_rate_date).rate
 
         else:

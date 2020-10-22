@@ -55,9 +55,9 @@
                   id="popover-vatin"
                   variant="secondary"
                   class="ml-2"
-                >{{ data.value[1] }}-{{
-                  data.value[2]
-                }}</b-badge>
+                >
+                  {{ data.value[1] }}-{{ data.value[2] }}
+                </b-badge>
               </span>
               <span v-else>{{ data.value }}</span>
             </template>

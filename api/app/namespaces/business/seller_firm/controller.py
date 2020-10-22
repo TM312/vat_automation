@@ -12,7 +12,7 @@ from . import seller_firm_dto, seller_firm_sub_dto, seller_firm_admin_dto
 from .service import SellerFirmService
 from .interface import SellerFirmInterface
 
-from ...utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required, accepted_roles
+from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required, accepted_roles
 
 
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa

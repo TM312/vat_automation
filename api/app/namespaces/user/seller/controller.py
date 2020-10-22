@@ -11,7 +11,7 @@ from . import seller_dto, seller_dto_admin
 from .service import SellerService
 from .interface import SellerInterface
 
-from ...utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from app.namespaces.utils.decorators.auth import login_required, accepted_u_types, confirmation_required
 
 
 

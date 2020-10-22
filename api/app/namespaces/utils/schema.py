@@ -1,6 +1,6 @@
 
 from flask_restx import Model, fields
-from ..tag import tag_dto
+from app.namespaces.tag import tag_dto
 
 notification_dto = Model('notification', {
     'public_id': fields.String(readonly=True),

@@ -1,5 +1,5 @@
 from app.extensions import db
-from ...utils.ATs import channel_tax_code_AT
+from app.namespaces.utils.ATs import channel_tax_code_AT
 
 
 class TaxCode(db.Model):  # type: ignore

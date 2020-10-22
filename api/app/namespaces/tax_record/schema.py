@@ -1,6 +1,6 @@
 from flask_restx import Model, fields
 
-from ..transaction import transaction_sub_dto
+from app.namespaces.transaction import transaction_sub_dto
 
 tax_record_sub_dto = Model('tax_record_sub', {
     'public_id': fields.String(readonly=True),

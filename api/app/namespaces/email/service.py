@@ -8,7 +8,7 @@ from itsdangerous import SignatureExpired, BadTimeSignature
 from werkzeug.exceptions import Conflict, Gone, BadRequest
 
 from app.extensions import mail, db
-from ..user.service_parent import UserService
+from app.namespaces.user.service_parent import UserService
 from app.namespaces.utils.decorators.asyncd import asyncd
 
 

@@ -11,7 +11,7 @@ from . import admin_dto
 from .service import AdminService
 from .interface import AdminInterface
 
-from ...utils.decorators import login_required, accepted_u_types, confirmation_required
+from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required
 
 
 ns = Namespace("Admin", description="Accounting Firm Related Operations")  # noqa

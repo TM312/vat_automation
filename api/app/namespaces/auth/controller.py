@@ -10,8 +10,8 @@ from . import auth_dto
 from .service import TokenService
 from .interface import TokenInterface
 
-from ..user.interface_parent import UserInterface
-from ..user import user_dto
+from app.namespaces.user.interface_parent import UserInterface
+from app.namespaces.user import user_dto
 from app.namespaces.utils.decorators import login_required, accepted_u_types
 
 ns = Namespace("Auth", description="Token Related Operations")  # noqa
