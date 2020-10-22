@@ -1,4 +1,5 @@
 from uuid import uuid4
+from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,20 +13,30 @@ class VatThreshold(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
-    #created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), default=1)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
 
     #attribuitess
-    #country_code = db.Column(db.String(4), db.ForeignKey('country.code'))
+    country_code = db.Column(db.String(4), db.ForeignKey('country.code'))
     value = db.Column(db.Integer)
-    #currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
 
-    vat_threshold_history = db.relationship('VatThresholdHistory', backref='item', lazy=True, cascade='all, delete-orphan')
+    vat_threshold_history = db.relationship('VatThresholdHistory', backref='vat_threshold', lazy=True, cascade='all, delete-orphan')
 
 
     def __repr__(self):
         return '<Vat Threshold: valid: {}-{} – country_code: {} - value: {}>'.format(self.valid_from, self.valid_to, self.country_code, self.value)
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+        if kwargs.get('currency_code') is None:
+            from app.namespaces.country.service import CountryService
+            country = CountryService.get_by_code(kwargs.get('country_code'))
+            self.currency_code = country.currency_code
+
+
 
 
     def update(self, data_changes):
@@ -60,13 +71,13 @@ class VatThresholdHistory(db.Model):  # type: ignore
     currency_code = db.Column(db.String(4))
 
 
-
     def __repr__(self):
         return '<Vat Threshold History: valid: {}-{} – country_code: {} - value: {}>'.format(str(self.valid_from), str(self.valid_to), self.country_code, self.value)
 
 
     def attr_as_dict(self):
         return {
+            'valid_from': self.valid_from,
             'created_by': self.created_by,
             'country_code': self.country_code,
             'value': self.value,

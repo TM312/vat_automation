@@ -41,6 +41,7 @@ class User(db.Model):  # type: ignore
     created_items = db.relationship('Item', backref='creator', order_by='desc(Item.created_on)', lazy=True)
     created_distance_sales = db.relationship('DistanceSale', backref='creator', order_by='desc(DistanceSale.created_on)', lazy=True)
     created_tax_records = db.relationship('TaxRecord', backref='creator', order_by='desc(TaxRecord.created_on)', lazy=True)
+    created_vat_thresholds = db.relationship('VatThreshold', backref='creator', order_by='desc(VatThreshold.created_on)', lazy=True)
 
     notifications = db.relationship('SellerFirmNotification', backref='user', lazy='select', primaryjoin='SellerFirmNotification.created_by==User.id')
 

@@ -79,7 +79,7 @@ class ItemService:
 
             response_object = {
                 'status': 'success',
-                'message': 'Item (code: {}) has been successfully deleted.'.format(item_id)
+                'message': 'Item (id: {}) has been successfully deleted.'.format(item_id)
             }
             return response_object
         else:
@@ -94,7 +94,7 @@ class ItemService:
 
             response_object = {
                 'status': 'success',
-                'message': 'Item (code: {}) has been successfully deleted.'.format(item_public_id)
+                'message': 'Item (id: {}) has been successfully deleted.'.format(item_public_id)
             }
             return response_object
         else:
@@ -506,7 +506,7 @@ class ItemHistoryService:
 
     @staticmethod
     def get_current(item_id: int) -> ItemHistory:
-        return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.asc()).first()
+        return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.desc()).first()
 
     @staticmethod
     def get_by_item_id_date(item_id: int, date: date):
