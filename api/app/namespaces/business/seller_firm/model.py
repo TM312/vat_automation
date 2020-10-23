@@ -1,7 +1,6 @@
 from app.extensions import db  # noqa
 from ..model_parent import Business
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
 from app.namespaces.utils.ATs import tax_auditor_seller_firm_AT
 from app.namespaces.user.seller import Seller
 
@@ -45,13 +44,6 @@ class SellerFirm(Business):
     transactions = db.relationship('Transaction', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='Transaction.seller_firm_id==Business.id')
 
     notifications = db.relationship('SellerFirmNotification', backref='seller_firm', lazy='select', cascade='all, delete-orphan', primaryjoin='SellerFirmNotification.seller_firm_id==Business.id')
-
-
-
-    # @hybrid_property
-    # def transaction_ready(self):
-    #     return (self.len_items > 0 and self.len_accounts > 0)
-
 
 
     def __repr__(self):

@@ -97,45 +97,46 @@ class SellerFirmService:
             raise NotFound('This accounting firm does not exist.')
 
 
-    @staticmethod
-    def create_as_client(seller_firm_data_as_client: SellerFirmInterface) -> SellerFirm:
+    # @staticmethod
+    # def create_as_client(seller_firm_data_as_client: SellerFirmInterface) -> SellerFirm:
 
-        name = seller_firm_data_as_client.get('name')
-        establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
+    #     name = seller_firm_data_as_client.get('name')
+    #     establishment_country_code = seller_firm_data_as_client.get('establishment_country_code')
 
-        if (
-            isinstance(name, str) and
-            isinstance(establishment_country_code, str)
-            ):
-            seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
+    #     if (
+    #         isinstance(name, str) and
+    #         isinstance(establishment_country_code, str)
+    #         ):
+    #         seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
 
-            # !!! need to be handled differently
-            if seller_firm:
-                data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None or k != 'name')}
+    #         # !!! need to be handled differently
+    #         if seller_firm:
+    #             data_changes = {k:v for k,v in seller_firm_data_as_client.items() if (v is not None or k != 'name')}
 
-                seller_firm.update(data_changes)
-                db.session.commit()
+    #             seller_firm.update(data_changes)
+    #             db.session.commit()
 
-                return seller_firm
+    #             return seller_firm
 
-        else:
-            seller_firm_data = {
-                'claimed': False,
-                'created_by': g.user.id,
-                'name': name,
-                'address': seller_firm_data_as_client.get('address'),
-                'establishment_country_code': establishment_country_code,
-            }
+    #     else:
+    #         seller_firm_data = {
+    #             'claimed': False,
+    #             'created_by': g.user.id,
+    #             'name': name,
+    #             'address': seller_firm_data_as_client.get('address'),
+    #             'establishment_country_code': establishment_country_code,
+    #         }
 
-            try:
-                new_seller_firm = SellerFirmService.create(seller_firm_data)
-                new_seller_firm.accounting_firms.append(g.user.employer)
-                db.session.commit()
-                return new_seller_firm
+    #         try:
+    #             new_seller_firm = SellerFirmService.create(seller_firm_data)
+    #             new_seller_firm.accounting_firms.append(g.user.employer)
+    #             db.session.commit()
+    #             return new_seller_firm
 
-            except:
-                db.session.rollback()
-                raise
+    #         except:
+    #             db.session.rollback()
+    #             raise
+
 
 
 
@@ -415,6 +416,7 @@ class SellerFirmService:
     # upload only for tax auditors
     def create_seller_firms(df: pd.DataFrame, file_path_in: str, user_id: int, claimed: bool, seller_firm_notification_data: Dict) -> List[Dict]:
         from app.namespaces.user.service_parent import UserService
+        from app.namespaces.distance_sale.service import DistanceSaleService
 
         total = total_number_items = len(df.index)
         original_filename = os.path.basename(file_path_in)[:128]
@@ -490,6 +492,10 @@ class SellerFirmService:
                     message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current+1)
                     SocketService.emit_status_error(object_type, message)
                     return False
+
+                # create deactivated distance sales for seller firm
+                DistanceSaleService.create_inactive_ds_from_thresholds(seller_firm.id)
+
 
 
                 # send status update via socket

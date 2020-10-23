@@ -184,6 +184,26 @@ class DistanceSaleService:
 
 
 
+    @staticmethod
+    def create_inactive_ds_from_thresholds(seller_firm_id: int) -> None:
+        from app.namespaces.tax.vat_threshold.service import VatThresholdService
+        vat_thresholds = VatThresholdService.get_all()
+        vat_threshold_country_codes = [vat_threshold.country_code for vat_threshold in vat_thresholds]
+
+        distance_sale_data = {
+            'valid_from': datetime.strptime('01-01-2000', '%d-%m-%Y').date(),
+            'seller_firm_id': seller_firm_id
+        }
+
+        for vat_threshold in vat_thresholds:
+            distance_sale_data['arrival_country_code'] = vat_threshold.country_code
+            try:
+                DistanceSaleService.create(distance_sale_data)
+            except:
+                db.session.rollback()
+                raise
+
+
 
     @staticmethod
     def create_distance_sales(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
@@ -267,6 +287,7 @@ class DistanceSaleService:
 
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
+
 
 
         # following the succesful processing, the vuex store is being reset

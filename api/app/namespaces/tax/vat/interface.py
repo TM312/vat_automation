@@ -4,7 +4,6 @@ from typing import List
 
 
 class VatInterface(TypedDict, total=False):
-    id: int
     valid_from: date
     valid_to: date
     country_code: str

@@ -24,6 +24,7 @@ from .seeds.eu import EUSeedService
 from .seeds.countries import CountrySeedService
 from .seeds.tax_codes import TaxCodesSeedService
 from .seeds.tax_rate_types import tax_rate_types
+from .seeds.vats import VatSeedService
 from .seeds.vat_thresholds import VatThresholdSeedService
 from .seeds.transaction_types import transaction_types
 from .seeds.tax_treatments import tax_treatments, TaxTreatmentSeedService
@@ -115,14 +116,13 @@ class SeedCommand(Command):
 
             db.session.commit()
 
-            # print('Creating Vat Rates...')
-            # response_object_vat_rates = VatSeedService.seed_tax_rates()
-            # response_objects.append(response_object_vat_rates)
+            print('Creating Vat Rates...')
+            response_object_vat_rates = VatSeedService.seed_tax_rates()
+            response_objects.append(response_object_vat_rates)
 
-            # print('Creating Exchange Rates...')
-            # response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
-
-            # response_objects.append(response_object_exchange_rates)
+            print('Creating Exchange Rates...')
+            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+            response_objects.append(response_object_exchange_rates)
 
             print('Creating Vat Thresholds...')
             response_object_vat_thresholds = VatThresholdSeedService.seed_vat_thresholds()

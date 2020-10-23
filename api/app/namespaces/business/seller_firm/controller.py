@@ -69,17 +69,17 @@ class SellerFirmInformationResource(Resource):
         return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file)
 
 
-@ns.route('/as_client')
-class SellerFirmAsClientResource(Resource):
-    # decorators = [limiter.limit("10/second")]
-    @login_required
-    #@accepted_u_types('admin')
-    @ns.expect(SellerFirmInterface, validate=True)
-    @ns.marshal_with(seller_firm_sub_dto, envelope='data')
-    def post(self) -> SellerFirm:
-        """Create A Single Seller Firm"""
-        seller_firm_data: SellerFirmInterface = request.json
-        return SellerFirmService.create_as_client(seller_firm_data)
+# @ns.route('/as_client')
+# class SellerFirmAsClientResource(Resource):
+#     # decorators = [limiter.limit("10/second")]
+#     @login_required
+#     #@accepted_u_types('admin')
+#     @ns.expect(SellerFirmInterface, validate=True)
+#     @ns.marshal_with(seller_firm_sub_dto, envelope='data')
+#     def post(self) -> SellerFirm:
+#         """Create A Single Seller Firm"""
+#         seller_firm_data: SellerFirmInterface = request.json
+#         return SellerFirmService.create_as_client(seller_firm_data)
 
 
 

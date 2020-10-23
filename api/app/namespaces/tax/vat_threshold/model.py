@@ -22,6 +22,7 @@ class VatThreshold(db.Model):  # type: ignore
     value = db.Column(db.Integer)
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
 
+    # non-mirrored relationships
     vat_threshold_history = db.relationship('VatThresholdHistory', backref='vat_threshold', lazy=True, cascade='all, delete-orphan')
 
 
