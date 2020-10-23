@@ -29,7 +29,7 @@ from app.namespaces.business.service_parent import BusinessService
 from app.namespaces.tax.vatin import VATIN
 from app.namespaces.tax.vatin.service import VATINService
 from app.namespaces.tax.tax_code.service import TaxCodeService
-from app.namespaces.tax.vat.service import VatService
+from app.namespaces.tax.vat.service import VatHistoryService
 from app.namespaces.tax.vatin.schema import VatinSchemaSocket
 from app.namespaces.business.seller_firm import SellerFirm
 from app.namespaces.utils.service import HelperService, NotificationService
@@ -220,13 +220,13 @@ class TransactionService:
         item_history = ItemHistoryService.get_by_item_id_date(item.id, tax_date)
 
         item_tax_code_code, calculated_item_tax_code_code = TransactionService.get_item_tax_code_code(transaction_input, item_history.tax_code_code, platform_code, reference_tax_code=transaction_input.item_tax_code_code)
-        item_vat_temp = VatService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction.code, tax_date)
+        item_vat_temp = VatHistoryService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction.code, tax_date)
         item_tax_rate_type_code=item_vat_temp.tax_rate_type_code
 
         shipment_tax_rate_type_code = current_app.config.STANDARD_SERVICE_TAX_RATE_TYPE
-        shipment_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
+        shipment_vat_temp = VatHistoryService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
         gift_wrap_tax_rate_type_code = current_app.config.STANDARD_SERVICE_TAX_RATE_TYPE
-        gift_wrap_vat_temp = VatService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
+        gift_wrap_vat_temp = VatHistoryService.get_by_tax_rate_type_country_tax_date(tax_jurisdiction.code, shipment_tax_rate_type_code, tax_date)
 
         item_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=item_tax_rate_type_code, reference_vat_rate=item_vat_temp.rate, calculated_vat_rate=item_vat_temp.rate)
         gift_wrap_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=shipment_tax_rate_type_code, calculated_vat_rate=gift_wrap_vat_temp.rate)
@@ -535,7 +535,7 @@ class TransactionService:
         # Notification if Customer or Supplier Vat invalid
         TransactionService.compare_calculation_reference_tax_calculation_date(transaction_id, transaction_input, tax_calculation_date)
         TransactionService.compare_calculation_reference_invoice_currency_code(transaction_id, transaction_input, invoice_currency_code)
-        VatService.compare_reference_calculated_vat_rates(transaction_id, transaction_input, reference_vat_rate=reference_vat_rate, calculated_vat_rate=calculated_vat_rate)
+        VatHistoryService.compare_reference_calculated_vat_rates(transaction_id, transaction_input, reference_vat_rate=reference_vat_rate, calculated_vat_rate=calculated_vat_rate)
         TaxCodeService.compare_calculation_reference(transaction_id, transaction_input.original_filename, calculated_item_tax_code_code, item_tax_code_code)
         VATINService.compare_calculation_reference_old_transaction(transaction_id, transaction_input, customer_vat_check_required, tax_date, transaction_input.customer_vat_number)
 
@@ -825,7 +825,7 @@ class TransactionService:
             reverse_charge_vat_rate=float(0)
         else:
             # tax jurisdiction is arrival country
-            reverse_charge_vat_rate = VatService.get_by_tax_code_country_tax_date(tax_code_code, arrival_country_code, tax_date).rate
+            reverse_charge_vat_rate = VatHistoryService.get_by_tax_code_country_tax_date(tax_code_code, arrival_country_code, tax_date).rate
 
         return reverse_charge_vat_rate
 

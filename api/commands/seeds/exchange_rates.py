@@ -33,8 +33,8 @@ class ExchangeRatesSeedService:
     @staticmethod
     def create_historic_exchange_rates():
         file = 'hist_exchange_rates.csv'
-        SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN'] #'HUF', 'DKK', 'SEK', 'CHF', 'NOK']
-        SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
+        SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN', 'HUF', 'DKK', 'SEK', 'CHF', 'NOK']
+        SERVICE_START_DATE = datetime.strptime('01-05-2019', '%d-%m-%Y').date()
         timespan_as_days = (date.today()-SERVICE_START_DATE).days
 
 
