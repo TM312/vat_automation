@@ -122,13 +122,11 @@ class TaxRecordService:
 
 
     @staticmethod
-    def get_taxable_turnover_amount_365d(seller_firm_id: int, tax_jurisdiction_code: str, end_date: date) -> float:
-        from app.namespaces.transaction.service import TransactionService
+    def get_taxable_turnover_amount_365d(seller_firm_id: int, tax_jurisdiction_code: str, end_date: date, transactions: List[Transaction]) -> float:
 
         #365 days before end
         start_date = end_date - timedelta(days=365)
 
-        transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm_id, tax_jurisdiction_code)
         sales, refunds, _, movements = TaxRecordService.separate_transactions_by_type(transactions)
 
         (

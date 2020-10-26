@@ -46,6 +46,6 @@ class DistanceSaleSubSchema:
             'arrival_country': distance_sale.arrival_country.name, #!!!! change later
             'active': distance_sale.active,
             'taxable_turnover_amount': distance_sale.taxable_turnover_amount,
-            'last_tax_date': distance_sale.last_tax_date
+            'last_tax_date': str(distance_sale.last_tax_date)
         }
         return distance_sale_as_dict

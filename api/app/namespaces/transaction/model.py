@@ -5,26 +5,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db  # noqa
 
-from app.namespaces.utils.ATs import tax_treatment_transaction_type_AT, tax_record_transaction_AT
-# from app.namespaces.utils.ATs import tax_treatment_transaction_type_AT, tax_record_transaction_AT
+from app.namespaces.utils.ATs import tax_record_transaction_AT
 
-
-
-class TransactionType(db.Model):  # type: ignore
-    """ Transaction model, i.e. SALE/REFUND/RETURN/ACQUISITION/MOVEMENT """
-    __tablename__ = "transaction_type"
-
-    code = db.Column(db.String(32), primary_key=True)
-    description = db.Column(db.String(128))
-
-    tax_treatments = db.relationship(
-        "TaxTreatment",
-        secondary=tax_treatment_transaction_type_AT,
-        back_populates="transaction_types"
-     )
-
-    def __repr__(self):
-        return '<TransactionType: {}>'.format(self.code)
 
 
 class Transaction(db.Model):  # type: ignore

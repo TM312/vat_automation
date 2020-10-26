@@ -183,6 +183,58 @@ class DistanceSaleService:
         return valid_from, arrival_country_code, active
 
 
+    @staticmethod
+    def update_taxable_turnover_amount_365d_all_ds(seller_firm_id: int, end_date: date, original_filename: str):
+        distance_sales = DistanceSaleService.get_all_by_seller_firm_id(seller_firm_id)
+        for distance_sale in distance_sales:
+            DistanceSaleService.update_taxable_turnover_amount_365d_single(seller_firm_id, distance_sale.arrival_country_code, end_date, original_filename)
+
+         # first cleared
+        SocketService.emit_clear_objects('distance_sale')
+        # then refilled
+        DistanceSaleService.push_all_by_seller_firm_id(seller_firm_id, 'distance_sale')
+
+
+    @staticmethod
+    def update_taxable_turnover_amount_365d_single(seller_firm_id: int, arrival_country_code: str, end_date: date, original_filename: str):
+        from app.namespaces.tax_record.service import TaxRecordService
+        from app.namespaces.transaction.service import TransactionService
+
+        transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm_id, tax_jurisdiction_code)
+
+        taxable_turnover_amount = TaxRecordService.get_taxable_turnover_amount_365d(seller_firm_id, arrival_country_code, end_date, transactions)
+        last_tax_date = max(transaction.tax_date for transaction in transactions)
+
+        distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country_code, seller_firm_id)
+
+
+        if not isinstance(distance_sale, DistanceSale):
+            raise
+
+        if taxable_turnover_amount == 0 or taxable_turnover_amount == distance_sale.taxable_turnover_amount:
+            return False
+
+        else:
+            data_changes = {
+                'valid_from': end_date,
+                'taxable_turnover_amount': taxable_turnover_amount,
+                'last_tax_date': last_tax_date,
+                'original_filename': original_filename
+            }
+            print("", flush=True)
+            print('distance_sale update:', data_changes, flush=True)
+            print("", flush=True)
+
+            try:
+                distance_sale.update(data_changes)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
+            return True
+
+
 
     @staticmethod
     def create_inactive_ds_from_thresholds(seller_firm_id: int) -> None:
@@ -374,7 +426,7 @@ class DistanceSaleHistoryService:
 
         """
 
-        # Trying to retrieve item history to decide case
+        # Retrieving item history to decide case
         valid_from = data_changes['valid_from']
         distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale_id, valid_from)
 

@@ -3,6 +3,10 @@ export const state = () => ({
     vat_threshold: []
 })
 
+export const getters = {
+    getByCountryCode: state => countryCode => state.vat_thresholds.find(vat_threshold => vat_threshold.country_code === countryCode).name
+}
+
 export const mutations = {
     SET_VAT_THRESHOLDS(state, vat_thresholds) {
         state.vat_thresholds = vat_thresholds

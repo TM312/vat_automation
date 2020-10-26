@@ -7,7 +7,6 @@ from app.namespaces.user.seller import Seller
 from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
 
-# from app.namespaces.account import Account
 from app.namespaces.tax_record import TaxRecord
 from app.namespaces.distance_sale import DistanceSale
 from app.namespaces.item import Item

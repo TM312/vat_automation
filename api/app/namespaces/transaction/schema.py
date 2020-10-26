@@ -3,10 +3,7 @@ from app.namespaces.utils import transaction_notification_dto
 from app.namespaces.tax.vatin import vatin_sub_dto
 
 
-transaction_type_dto = Model('transaction_type', {
-    'code': fields.String,
-    'description': fields.String
-})
+
 
 transaction_sub_dto = Model('transaction_sub', {
     'public_id': fields.String(readonly=True),

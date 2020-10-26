@@ -501,19 +501,6 @@ class SellerFirmService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total, original_filename, object_type)
 
-            # # push new distance sale to vuex via socket
-            # distance_sale_json = S.get_distance_sale_sub(new_distance_sale)
-
-            # if total < 10:
-            #     SocketService.emit_new_object(distance_sale_json, object_type)
-
-            # else:
-            #     distance_sale_socket_list.append(distance_sale_json)
-            #     if current % 10 == 0 or current == total:
-            #         SocketService.emit_new_objects(distance_sale_socket_list, object_type)
-            #         distance_sale_socket_list = []
-
-
 
         # send final status via socket
         SocketService.emit_status_final(total, original_filename, object_type, object_type_human_read, duplicate_list=duplicate_list)
