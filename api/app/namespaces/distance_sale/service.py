@@ -200,7 +200,12 @@ class DistanceSaleService:
         from app.namespaces.tax_record.service import TaxRecordService
         from app.namespaces.transaction.service import TransactionService
 
-        transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm_id, tax_jurisdiction_code)
+
+        start_date = end_date - timedelta(days=365)
+        transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm_id, arrival_country_code)
+
+        if len(transactions) == 0:
+            return False
 
         taxable_turnover_amount = TaxRecordService.get_taxable_turnover_amount_365d(seller_firm_id, arrival_country_code, end_date, transactions)
         last_tax_date = max(transaction.tax_date for transaction in transactions)
