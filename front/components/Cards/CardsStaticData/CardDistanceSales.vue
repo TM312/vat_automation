@@ -18,6 +18,11 @@
 
     <b-card-text>selected: {{ selected }}</b-card-text>
 
+    <b-card-text>distanceSale: {{ distanceSale }}</b-card-text>
+
+    <b-card-text><distance-sale-chart /></b-card-text>
+
+
 
     <b-card-text>
       <h5 v-if="distanceSales.length === 0 && !editMode" class="text-muted text-center m-5">
@@ -25,7 +30,7 @@
       </h5>
       <div v-else>
         <div v-if="editMode===false">
-          <b-table borderless :items="distanceSalesVatThresholdItems" :fields="fields" :busy="!distanceSales" hover selectable select-mode="single" @row-selected="displayItem">
+          <b-table borderless :items="distanceSalesVatThresholdItems" :fields="fields" :busy="!distanceSalesVatThresholdItems" hover selectable select-mode="single" @row-selected="getHistory">
             <template v-slot:table-busy>
               <div class="text-center text-secondary my-2">
                 <b-spinner class="align-middle" />
@@ -50,8 +55,8 @@
                         <b-progress-bar variant="danger" value="2" /> -->
               </b-progress>
               <div class="text-muted">
-                <span>
-                  {{ data.value }} {{ data.item.vat_threshold.currency_code }}
+                <span v-if="data.item.vat_threshold">
+                  {{ data.value }} {{ data.item.vat_threshold.currency_code }} / {{ data.item.vat_threshold.value }} {{ data.item.vat_threshold.currency_code }}
                   <!-- {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code) }} /
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value'] }}
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['currency_code'] }} -->
@@ -61,11 +66,6 @@
                 <span class="ml-2">Further information </span>
               </div>
             </template>
-
-            <!-- <template v-slot:cell(details)="data">
-
-              <b-icon :id="`icon-${data.index}`" variant="info" icon="info-circle" @click="toggleIconByIndex(data.index)" />
-            </template> -->
           </b-table>
         </div>
 
@@ -90,14 +90,12 @@
 
     export default {
         name: "CardDistanceSales",
-        // eslint-disable-next-line
 
         data() {
             return {
                 editMode: false,
                 flashCounter: false,
 
-                // icon: [],
                 selected: null,
 
                 fields: [
@@ -113,13 +111,20 @@
         computed: {
             ...mapState({
                 distanceSales: state => state.seller_firm.seller_firm.distance_sales,
+                distanceSale: state => state.distance_sale.distance_sale,
                 vatThresholds: state => state.vat_threshold.vat_thresholds,
             }),
 
+            // this computed property adds the country specific vat_threshold attribute to the distanceSales Array
             distanceSalesVatThresholdItems() {
-                var news = this.distanceSales.forEach(distanceSale => distanceSale['vat_threshold'] = this.$store.getters["vat_threshold/getByCountryCode"](distanceSale.arrival_country_code))
-                return news
+                var ctx = this.$store.getters["vat_threshold/getByCountryCode"]
+                var extDSArray = this.distanceSales
+                extDSArray.forEach(function(distanceSale) {
+                    distanceSale['vat_threshold'] = ctx(distanceSale.arrival_country_code)
+                })
+                return extDSArray
             },
+
 
 
             cardBorder() {
@@ -144,13 +149,14 @@
 
             },
 
-            displayItem: function(payload) {
-                if (payload.length === 0) {
-                    this.selected = 'Empty payload'
-                } else {
-                this.selected = payload[0]
+            getHistory: async function(payload) {
+                if (payload.length !== 0 && payload[0].public_id !== this.distanceSale.public_id) {
+                    this.selected = payload[0]
+                    const { store } = this.$nuxt.context
+                    await store.dispatch("distance_sale/get_by_public_id", payload[0].public_id)
                 }
-            }
+            },
+
 
             // toggleIconByIndex(index) {
             //     this.icon[index] = !this.icon[index]

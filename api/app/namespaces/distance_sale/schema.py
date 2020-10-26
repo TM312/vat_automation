@@ -24,7 +24,7 @@ distance_sale_sub_dto = Model('distance_sale_sub', {
 
 distance_sale_dto = distance_sale_sub_dto.clone('distance_sale', {
     'created_on': fields.Date,
-    'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
+    'created_by': fields.String(attribute=lambda x: x.creator.name if x.creator else None, readonly=True),
     # 'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'original_filename': fields.String,
     'distance_sale_history': fields.List(fields.Nested(distance_sale_history_dto))
