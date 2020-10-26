@@ -248,6 +248,15 @@ class TransactionInputService:
 
         return account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date
 
+    @staticmethod
+    def verify_transaction_order(df, total) -> bool:
+
+        complete_date_top = InputService.get_date_or_None(df, 0, column='TRANSACTION_COMPLETE_DATE')
+        complete_date_bottom = InputService.get_date_or_None(df, total, column='TRANSACTION_COMPLETE_DATE')
+
+        return complete_date_top >= complete_date_bottom
+
+
 
     @staticmethod
     def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int) -> List[Dict]:
@@ -267,10 +276,17 @@ class TransactionInputService:
         duplicate_list = []
         duplicate_counter = 0
 
-        # send status update via socket
-        SocketService.emit_status_success(0, total, original_filename, object_type)
 
-        for i in range(total_number_transaction_inputs):
+        desc = TransactionInputService.verify_transaction_order(df, total_number_transaction_inputs-1)
+        if desc:
+            start, stop, step = total_number_transaction_inputs-1, 0-1, -1
+        else:
+            start, stop, step = 0, total_number_transaction_inputs, 1
+
+        # send status update via socket
+        SocketService.emit_status_success(0, abs(stop-start), original_filename, object_type)
+
+        for i in range(start, stop, step):
             current = i + 1
 
             try:
@@ -478,7 +494,7 @@ class TransactionInputService:
 
 
                 # send status update via socket
-                SocketService.emit_status_success(current, total_number_transaction_inputs, original_filename, object_type)
+                SocketService.emit_status_success(current, abs(stop-start), original_filename, object_type)
 
         # update distance sale history
         last_transaction = TransactionService.get_latest_by_seller_firm_id(account.seller_firm_id)
