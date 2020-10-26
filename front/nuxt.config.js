@@ -68,7 +68,7 @@ export default {
         'bootstrap-vue/nuxt',
         '@nuxtjs/axios',
         '@nuxtjs/auth',
-        '@nuxtjs/toast',
+        // '@nuxtjs/toast',
         // Docs: https: //github.com/richardeschloss/nuxt-socket-io
         'nuxt-socket-io'
     ],

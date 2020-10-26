@@ -1,3 +1,4 @@
+from app.extensions import db
 
 
 
@@ -60,7 +61,7 @@ class TransactionTypePublicSeedService:
 
         response_object = {
             'status': 'success',
-            'message': 'Successfully created public transaction types ({} objects)'.format(str(i))
+            'message': 'Successfully created public transaction types ({} objects)'.format(str(i+1))
         }
 
         return response_object

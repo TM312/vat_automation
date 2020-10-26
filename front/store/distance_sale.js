@@ -4,11 +4,11 @@ export const state = () => ({
 })
 
 export const mutations = {
-    SET_DISTANCE_SALES(state, distance_sales) {
-        state.distance_sales = distance_sales
+    SET_DISTANCE_SALES(state, payload) {
+        state.distance_sales = payload
     },
-    SET_DISTANCE_SALE(state, distance_sale) {
-        state.distance_sale = distance_sale
+    SET_DISTANCE_SALE(state, payload) {
+        state.distance_sale = payload
     }
 }
 

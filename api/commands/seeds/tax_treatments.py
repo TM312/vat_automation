@@ -1,4 +1,4 @@
-from app.namespaces.transaction.model import TransactionType
+from app.namespaces.transaction_type.model import TransactionType
 from app.namespaces.tax.tax_treatment.model import TaxTreatment
 
 

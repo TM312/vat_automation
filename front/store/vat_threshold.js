@@ -4,7 +4,7 @@ export const state = () => ({
 })
 
 export const getters = {
-    getByCountryCode: state => countryCode => state.vat_thresholds.find(vat_threshold => vat_threshold.country_code === countryCode).name
+    getByCountryCode: state => countryCode => state.vat_thresholds.find(vat_threshold => vat_threshold.country_code === countryCode)
 }
 
 export const mutations = {

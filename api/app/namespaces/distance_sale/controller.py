@@ -9,7 +9,7 @@ from . import distance_sale_dto, distance_sale_sub_dto, distance_sale_admin_dto,
 from .service import DistanceSaleService
 
 
-from app.namespaces.utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, accepted_u_types
 
 
 ns = Namespace("DistanceSale", description="DistanceSale Related Operations")  # noqa
@@ -22,11 +22,13 @@ ns.add_model(distance_sale_history_dto.name, distance_sale_history_dto)
 @ns.route("/")
 class DistanceSaleResource(Resource):
     """DistanceSales"""
+    @login_required
     @ns.marshal_list_with(distance_sale_dto, envelope='data')
     def get(self) -> List[DistanceSale]:
         """Get all DistanceSales"""
         return DistanceSaleService.get_all()
 
+    @login_required
     @ns.expect(distance_sale_dto, validate=True)
     @ns.marshal_with(distance_sale_dto)
     def post(self) -> DistanceSale:
@@ -37,10 +39,14 @@ class DistanceSaleResource(Resource):
 @ns.route("/<string:distance_sale_public_id>")
 @ns.param("distance_sale_public_id", "DistanceSale database ID")
 class DistanceSaleIdResource(Resource):
+    @login_required
+    @ns.marshal_with(distance_sale_dto, envelope='data')
     def get(self, distance_sale_public_id: str) -> DistanceSale:
         """Get Single DistanceSale"""
         return DistanceSaleService.get_by_public_id(distance_sale_public_id)
 
+
+    @login_required
     def delete(self, distance_sale_public_id: str) -> Response:
         """Delete Single DistanceSale"""
         from flask import jsonify
@@ -48,6 +54,7 @@ class DistanceSaleIdResource(Resource):
         public_id = DistanceSaleService.delete_by_public_id(distance_sale_public_id)
         return jsonify(dict(status="Success", public_id=public_id))
 
+    @login_required
     @ns.expect(distance_sale_dto, validate=True)
     @ns.marshal_with(distance_sale_dto)
     def put(self, distance_sale_public_id: str) -> DistanceSale:

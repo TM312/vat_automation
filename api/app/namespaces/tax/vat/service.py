@@ -21,6 +21,18 @@ class VatService:
     def get_by_id(vat_id: int) -> Vat:
         return Vat.query.filter_by(id=vat_id).first()
 
+    @staticmethod
+    def get_by_country_tax_rate_type(country_code: str, tax_rate_type_code: str) -> List[Vat]:
+        return Vat.query.filter(Vat.country_code == country_code, Vat.tax_rate_type_code == tax_rate_type_code).all()
+
+    @staticmethod
+    def get_by_country_code(country_code: str) -> List[Vat]:
+        return Vat.query.filter_by(country_code = country_code).all()
+
+    @staticmethod
+    def get_by_tax_code(tax_code_code: str) -> List[Vat]:
+        return Vat.query.filter_by(tax_code_code=tax_code_code).all()
+
 
     @staticmethod
     def update(vat_id: int, data_changes: VatInterface) -> Vat:
