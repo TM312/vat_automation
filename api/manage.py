@@ -5,7 +5,7 @@ from flask_migrate import MigrateCommand
 from app import create_app
 from app.extensions import db
 
-from commands.seed_command import SeedCommand, SeedCommandTest
+from commands.seed_command import SeedCommand#, SeedCommandTest
 
 from dotenv import load_dotenv
 load_dotenv()

@@ -19,6 +19,8 @@ from app.namespaces.utils.service import InputService, NotificationService
 from app.namespaces.tag.service import TagService
 from app.namespaces.bundle import Bundle
 from app.namespaces.bundle.service import BundleService
+from app.namespaces.transaction.service import TransactionService
+
 
 from app.extensions.socketio.emitters import SocketService
 
@@ -252,6 +254,7 @@ class TransactionInputService:
         from app.namespaces.account.service import AccountService
         from app.namespaces.bundle.service import BundleService
         from app.namespaces.item.service import ItemService
+        from app.namespaces.distance_sale.service import DistanceSaleService
 
 
         error_counter = 0
@@ -477,6 +480,10 @@ class TransactionInputService:
                 # send status update via socket
                 SocketService.emit_status_success(current, total_number_transaction_inputs, original_filename, object_type)
 
+        # update distance sale history
+        last_transaction = TransactionService.get_latest_by_seller_firm_id(account.seller_firm_id)
+        DistanceSaleService.update_taxable_turnover_amount_365d_all_ds(account.seller_firm_id, last_transaction.tax_date, original_filename)
+
         # following the succesful processing, the vuex store is being reset
         # first cleared
         SocketService.emit_clear_objects(object_type)
@@ -490,7 +497,6 @@ class TransactionInputService:
 
     @staticmethod
     def process(transaction_input: TransactionInput):
-        from app.namespaces.transaction.service import TransactionService
         # transactions are being created
         if not transaction_input.processed:
             try:

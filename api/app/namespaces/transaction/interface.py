@@ -2,9 +2,6 @@ from mypy_extensions import TypedDict
 from typing import Union
 from datetime import date
 
-class TransactionTypeInterface(TypedDict, total=False):
-    code: str
-    description: str
 
 class TransactionInterface(TypedDict, total=False):
 

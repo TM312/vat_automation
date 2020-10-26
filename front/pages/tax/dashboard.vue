@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>vatThresholds: {{ vatThresholds }}</h1>
     <b-tabs pills card vertical>
       <b-tab title="Overview" active>
         <b-alert :show="$dateFns.format(new Date(), 'MMMM dd, yyyy') !== $dateFns.format($auth.user.last_seen, 'MMMM dd, yyyy')" variant="primary">

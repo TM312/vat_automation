@@ -9,7 +9,7 @@ from app.extensions import limiter
 
 from . import Transaction
 from .service import TransactionService
-from .schema import transaction_dto, transaction_admin_dto, transaction_sub_dto, transaction_type_dto
+from .schema import transaction_dto, transaction_admin_dto, transaction_sub_dto
 
 from app.namespaces.utils.decorators import login_required
 
@@ -17,7 +17,6 @@ ns = Namespace("Transaction", description="Transaction Related Operations")  # n
 ns.add_model(transaction_dto.name, transaction_dto)
 ns.add_model(transaction_sub_dto.name, transaction_sub_dto)
 ns.add_model(transaction_admin_dto.name, transaction_admin_dto)
-ns.add_model(transaction_type_dto.name, transaction_type_dto)
 
 parser = reqparse.RequestParser()
 parser.add_argument('tax_record_public_id', type=str)

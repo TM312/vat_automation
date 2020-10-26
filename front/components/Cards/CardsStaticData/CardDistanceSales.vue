@@ -25,7 +25,7 @@
       </h5>
       <div v-else>
         <div v-if="editMode===false">
-          <b-table borderless :items="distanceSales" :fields="fields" :busy="!distanceSales" hover selectable select-mode="single" @row-selected="displayItem">
+          <b-table borderless :items="distanceSalesVatThresholdItems" :fields="fields" :busy="!distanceSales" hover selectable select-mode="single" @row-selected="displayItem">
             <template v-slot:table-busy>
               <div class="text-center text-secondary my-2">
                 <b-spinner class="align-middle" />
@@ -43,12 +43,23 @@
               </b-popover>
             </template>
 
-            <template v-slot:cell(vat_taxable_turnover_amount_12m)>
-              <b-progress max="12" class="mb-3">
-                <b-progress-bar variant="primary" value="1" class="self-align-center" />
+            <template v-slot:cell(taxable_turnover_amount)="data">
+              <b-progress :max="vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value']" class="mb-3">
+                <b-progress-bar variant="primary" :value="data.item.taxable_turnover_amount" class="self-align-center" />
                 <!-- <b-progress-bar variant="warning" value="1" />
-                <b-progress-bar variant="danger" value="2" /> -->
+                        <b-progress-bar variant="danger" value="2" /> -->
               </b-progress>
+              <div class="text-muted">
+                <span>
+                  {{ data.value }} {{ data.item.vat_threshold.currency_code }}
+                  <!-- {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code) }} /
+                  {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value'] }}
+                  {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['currency_code'] }} -->
+                </span>
+
+                <span class="ml-2">|</span>
+                <span class="ml-2">Further information </span>
+              </div>
             </template>
 
             <!-- <template v-slot:cell(details)="data">
@@ -92,7 +103,7 @@
                 fields: [
                     { key: "arrival_country", sortable: false },
                     { key: "active", sortable: false },
-                    { key: 'vat_taxable_turnover_amount_12m', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
+                    { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
                     { key: 'details', label: '' }
 
                 ]
@@ -102,7 +113,14 @@
         computed: {
             ...mapState({
                 distanceSales: state => state.seller_firm.seller_firm.distance_sales,
+                vatThresholds: state => state.vat_threshold.vat_thresholds,
             }),
+
+            distanceSalesVatThresholdItems() {
+                var news = this.distanceSales.forEach(distanceSale => distanceSale['vat_threshold'] = this.$store.getters["vat_threshold/getByCountryCode"](distanceSale.arrival_country_code))
+                return news
+            },
+
 
             cardBorder() {
                 return this.editMode ? "info" : ""

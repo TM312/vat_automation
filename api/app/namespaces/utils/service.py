@@ -141,22 +141,6 @@ class NotificationService:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class InputService:
     @staticmethod
     def get_date_or_None(df: pd.DataFrame, i:int, column:str) -> date:

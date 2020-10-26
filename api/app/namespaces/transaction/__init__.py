@@ -1,5 +1,5 @@
-from .model import Transaction, TransactionType
-from .schema import transaction_dto, transaction_sub_dto, transaction_admin_dto, transaction_type_dto
+from .model import Transaction
+from .schema import transaction_dto, transaction_sub_dto, transaction_admin_dto
 
 
 BASE_ROUTE = "transaction"
