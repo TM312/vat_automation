@@ -25,6 +25,7 @@ module.exports = {
     plugins: ["vue"],
     rules: {
         semi: [2, "never"],
+        "indent": ["error", 2],
         "no-console": "off",
         "vue/max-attributes-per-line": "off",
         "vue/html-self-closing": [

@@ -1,20 +1,24 @@
 export const state = () => ({
     transactions: [],
-    transaction: []
+    transaction: [],
 })
 
+export const getters = {
+    getTransactionsByTaxTreatmentCode: state => taxTreatmentCode => state.transactions.filter(transaction => transaction.tax_treatment_code === taxTreatmentCode)
+}
+
 export const mutations = {
-    SET_TRANSACTIONS(state, transactions) {
-        state.transactions = transactions
+    SET_TRANSACTIONS(state, payload) {
+        state.transactions = payload
     },
 
-    SET_TRANSACTION(state, transaction) {
-        state.transaction = transaction
+    SET_TRANSACTION(state, payload) {
+        state.transaction = payload
     },
 
-    PUSH_TRANSACTIONS(state, transactions) {
-        for (let i = 0; i < transactions.length; i++)
-            if (state.transactions.includes(transactions[i]) === false) state.transactions.push(transactions[i])
+    PUSH_TRANSACTIONS(state, payload) {
+        for (let i = 0; i < payload.length; i++)
+            if (state.transactions.includes(payload[i]) === false) state.transactions.push(payload[i])
     }
 }
 
@@ -40,9 +44,24 @@ export const actions = {
         }
     },
 
-    async get_by_tax_record_public_id({ commit }, params) {
+    async get_by_tax_record({ commit }, params) {
 
-        const res = await this.$repositories.transaction.get_by_tax_record_public_id(params)
+        const res = await this.$repositories.transaction.get_by_tax_record(params)
+        const { status, data } = res
+        if (status === 200 && data.data) {
+            if (params['page'] === 1) {
+                commit('SET_TRANSACTIONS', data.data)
+            } else {
+                commit('PUSH_TRANSACTIONS', data.data)
+            }
+        } else {
+            // Handle error here
+        }
+    },
+
+    async get_by_tax_record_tax_treatment({ commit }, params) {
+
+        const res = await this.$repositories.transaction.get_by_tax_record_tax_treatment(params)
         const { status, data } = res
         if (status === 200 && data.data) {
             if (params['page'] === 1) {

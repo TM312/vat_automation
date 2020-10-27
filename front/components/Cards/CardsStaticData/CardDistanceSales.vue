@@ -56,7 +56,7 @@
               </b-progress>
               <div class="text-muted">
                 <span v-if="data.item.vat_threshold">
-                  {{ data.value }} {{ data.item.vat_threshold.currency_code }} / {{ data.item.vat_threshold.value }} {{ data.item.vat_threshold.currency_code }}
+                  {{ Number.parseFloat(data.value).toFixed(2) }} {{ data.item.vat_threshold.currency_code }} / {{ data.item.vat_threshold.value }} {{ data.item.vat_threshold.currency_code }}
                   <!-- {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code) }} /
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value'] }}
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['currency_code'] }} -->

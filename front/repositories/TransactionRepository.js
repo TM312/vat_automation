@@ -8,8 +8,12 @@ export default ($axios) => ({
         return $axios.get(`${resource}/${transaction_id}`)
     },
 
-    get_by_tax_record_public_id(params) {
+    get_by_tax_record_tax_treatment(params) {
         return $axios.get(`${resource}/tax_record/`, { params })
+    },
+
+    get_by_tax_record(params) {
+        return $axios.get(`${resource}/tax_record/init`, { params })
     },
 
 })

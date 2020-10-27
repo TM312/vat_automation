@@ -68,9 +68,23 @@ class TransactionService:
 
 
     @staticmethod
-    def get_by_tax_record_public_id(tax_record_public_id: str, **kwargs) -> List[Transaction]:
+    def get_by_tax_record(tax_record_public_id: str, **kwargs) -> List[Transaction]:
         from app.namespaces.tax_record import TaxRecord
         base_query = Transaction.query.join(TaxRecord.transactions).filter(TaxRecord.public_id == tax_record_public_id).order_by(Transaction.tax_date.desc())
+
+        if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
+            per_page = current_app.config.TRANSACTIONS_PER_QUERY
+            page = kwargs.get('page')
+            transactions = base_query.paginate(page, per_page, False).items
+
+        else:
+            transactions = base_query.all()
+        return transactions
+
+    @staticmethod
+    def get_by_tax_record_tax_treatment(tax_record_public_id: str, tax_treatment_code: str, **kwargs) -> List[Transaction]:
+        from app.namespaces.tax_record import TaxRecord
+        base_query = Transaction.query.join(TaxRecord.transactions).filter(TaxRecord.public_id == tax_record_public_id).filter(Transaction.tax_treatment_code == tax_treatment_code).order_by(Transaction.tax_date.desc())
 
         if kwargs.get('paginate') == True and isinstance(kwargs.get('page'), int):
             per_page = current_app.config.TRANSACTIONS_PER_QUERY

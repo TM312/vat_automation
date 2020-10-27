@@ -31,6 +31,7 @@
     import { mapState } from 'vuex'
 
     export default {
+        name: 'ContainerTransactionInput',
         props: {
             transactionInputPublicId: {
                 type: String,

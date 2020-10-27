@@ -20,6 +20,7 @@ ns.add_model(transaction_admin_dto.name, transaction_admin_dto)
 
 parser = reqparse.RequestParser()
 parser.add_argument('tax_record_public_id', type=str)
+parser.add_argument('tax_treatment_code', type=str)
 parser.add_argument('page', type=int)
 
 
@@ -42,13 +43,26 @@ class TransactionIdResource(Resource):
         return TransactionService.get_by_public_id(transaction_public_id)
 
 
-@ns.route("/tax_record/")  # <string:tax_record_public_id><int:page>")
-@ns.param("tax_record_public_id", "Transaction database ID")
-class TransactionSellerFirmIdResource(Resource):
+@ns.route("/tax_record/init")  # <string:tax_record_public_id><int:page>")
+@ns.param("tax_record_public_id", "Tax Record Public ID")
+class TransactionSellerFirmTaxRecordResource(Resource):
     decorators = [limiter.limit("5/second")]
     @login_required
     @ns.marshal_list_with(transaction_sub_dto, envelope='data')
     def get(self) -> List[Transaction]:
         """Get Single Transaction"""
         args = parser.parse_args()
-        return TransactionService.get_by_tax_record_public_id(args.get('tax_record_public_id'), paginate=True, page=args.get('page'))
+        return TransactionService.get_by_tax_record(args.get('tax_record_public_id'), paginate=True, page=args.get('page'))
+
+
+@ns.route("/tax_record/")  # <string:tax_record_public_id><int:page>")
+@ns.param("tax_record_public_id", "Tax Record Public ID")
+@ns.param("tax_treatment_code", "Tax Treatment Code")
+class TransactionSellerFirmTaxRecordTaxTreamtnetResource(Resource):
+    decorators = [limiter.limit("5/second")]
+    @login_required
+    @ns.marshal_list_with(transaction_sub_dto, envelope='data')
+    def get(self) -> List[Transaction]:
+        """Get Single Transaction"""
+        args = parser.parse_args()
+        return TransactionService.get_by_tax_record_tax_treatment(args.get('tax_record_public_id'), args.get('tax_treatment_code'), paginate=True, page=args.get('page'))

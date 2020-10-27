@@ -494,13 +494,13 @@ class TransactionInputService:
 
 
                 # send status update via socket
-                SocketService.emit_status_success(current, abs(stop-start), original_filename, object_type)
+                SocketService.emit_status_success(abs(stop-current), abs(stop-start), original_filename, object_type)
 
         # update distance sale history
         last_transaction = TransactionService.get_latest_by_seller_firm_id(account.seller_firm_id)
         DistanceSaleService.update_taxable_turnover_amount_365d_all_ds(account.seller_firm_id, last_transaction.tax_date, original_filename)
 
-        # following the succesful processing, the vuex store is being reset
+        # following the successful processing, the vuex store is being reset
         # first cleared
         SocketService.emit_clear_objects(object_type)
         # then refilled
