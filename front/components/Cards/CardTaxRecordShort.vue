@@ -19,9 +19,12 @@
       </b-row>
       <b-row class="mt-2">
         <b-col>
-          <nuxt-link :to="`/tax/tax_records/${taxRecord.public_id}`">
+          <span
+            class="text-primary"
+            @click="$emit('single-view', taxRecord.public_id)"
+          >
             Details
-          </nuxt-link>
+          </span>
         </b-col>
       </b-row>
     </b-card-text>

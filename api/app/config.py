@@ -78,7 +78,7 @@ class Config(object):
 
     SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN', 'HUF', 'DKK', 'SEK', 'CHF', 'NOK'] #besides 'EUR'
 
-    TRANSACTIONS_PER_QUERY = NOTIFICATIONS_PER_QUERY = 25
+    TRANSACTIONS_PER_QUERY = NOTIFICATIONS_PER_QUERY = 50
 
     TIMESPAN_SIMILARITY = 60 #in min (used for Notifications to decide if creating a new one or updating an existing one)
 

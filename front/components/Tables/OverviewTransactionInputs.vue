@@ -32,8 +32,8 @@
         </b-tab>
       </b-tabs>
       <div v-if="transactionInputs.length !== 0">
-        <b-button v-show="buttonFetchMore" variant="outline-primary" :disabled="buttonFetchDisabled" block @click="refresh">
-          <b-spinner v-if="buttonFetchDisabled" small />
+        <b-button v-show="buttonFetchMore" variant="outline-primary" :disabled="$fetchState.pending" block @click="refresh">
+          <b-spinner v-if="$fetchState.pending" small />
           <b-icon v-else icon="chevron-down" />
           Show More
         </b-button>
@@ -89,11 +89,8 @@
                     state.transaction_input.transaction_inputs,
             }),
 
-            buttonFetchDisabled() {
-                return this.$fetchState.pending ? true : false
-            },
             currentPage() {
-                return Math.trunc(this.transactionInputs.length / 25)
+                return Math.trunc(this.transactionInputs.length / 50)
             },
         },
 
