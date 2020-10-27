@@ -272,113 +272,113 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'ToastsStaticDataUpload',
+  name: 'ToastsStaticDataUpload',
 
-    data() {
-        return {
-            toastAccount: false,
-            toastItem: false,
-            toastVatNumber: false,
-            toastDistanceSale: false,
-            toastTransactionInput: false,
-            toastSellerFirm: false
-        }
+  data() {
+    return {
+      toastAccount: false,
+      toastItem: false,
+      toastVatNumber: false,
+      toastDistanceSale: false,
+      toastTransactionInput: false,
+      toastSellerFirm: false
+    }
+  },
+
+  computed: {
+    ...mapState({
+      // sellerFirm: state => state.seller_firm.seller_firm,
+
+      statusAccountTargets: state => state.status.account_targets,
+      lenStatusAccount: state => state.status.account_targets.length,
+
+      statusItemTargets: state => state.status.item_targets,
+      lenStatusItem: state => state.status.item_targets.length,
+
+      statusVatNumberTargets: state => state.status.vat_number_targets,
+      lenStatusVatNumber: state => state.status.vat_number_targets.length,
+
+      statusDistanceSaleTargets: state => state.status.distance_sale_targets,
+      lenStatusDistanceSale: state => state.status.distance_sale_targets.length,
+
+      statusTransactionInputTargets: state => state.status.transaction_input_targets,
+      lenStatusTransactionInput: state => state.status.transaction_input_targets.length,
+
+    }),
+
+    doneStatusAccountTargets() {
+      return this.$store.getters['status/doneStatusAccountTargets']
+    },
+    doneStatusItemTargets() {
+      return this.$store.getters['status/doneStatusItemTargets']
+    },
+    doneStatusVatNumberTargets() {
+      return this.$store.getters['status/doneStatusVatNumberTargets']
+    },
+    doneStatusDistanceSaleTargets() {
+      return this.$store.getters['status/doneStatusDistanceSaleTargets']
+    },
+    doneStatusTransactionInputTargets() {
+      return this.$store.getters['status/doneStatusTransactionInputTargets']
     },
 
-    computed: {
-        ...mapState({
-            // sellerFirm: state => state.seller_firm.seller_firm,
-
-            statusAccountTargets: state => state.status.account_targets,
-            lenStatusAccount: state => state.status.account_targets.length,
-
-            statusItemTargets: state => state.status.item_targets,
-            lenStatusItem: state => state.status.item_targets.length,
-
-            statusVatNumberTargets: state => state.status.vat_number_targets,
-            lenStatusVatNumber: state => state.status.vat_number_targets.length,
-
-            statusDistanceSaleTargets: state => state.status.distance_sale_targets,
-            lenStatusDistanceSale: state => state.status.distance_sale_targets.length,
-
-            statusTransactionInputTargets: state => state.status.transaction_input_targets,
-            lenStatusTransactionInput: state => state.status.transaction_input_targets.length,
-
-        }),
-
-        doneStatusAccountTargets() {
-            return this.$store.getters['status/doneStatusAccountTargets']
-        },
-        doneStatusItemTargets() {
-            return this.$store.getters['status/doneStatusItemTargets']
-        },
-        doneStatusVatNumberTargets() {
-            return this.$store.getters['status/doneStatusVatNumberTargets']
-        },
-        doneStatusDistanceSaleTargets() {
-            return this.$store.getters['status/doneStatusDistanceSaleTargets']
-        },
-        doneStatusTransactionInputTargets() {
-            return this.$store.getters['status/doneStatusTransactionInputTargets']
-        },
-
-        totalStatusAccountTargets() {
-            return this.$store.getters['status/totalStatusAccountTargets']
-        },
-        totalStatusItemTargets() {
-            return this.$store.getters['status/totalStatusItemTargets']
-        },
-        totalStatusVatNumberTargets() {
-            return this.$store.getters['status/totalStatusVatNumberTargets']
-        },
-        totalStatusDistanceSaleTargets() {
-            return this.$store.getters['status/totalStatusDistanceSaleTargets']
-        },
-        totalStatusTransactionInputTargets() {
-            return this.$store.getters['status/totalStatusTransactionInputTargets']
-        },
-
-        titleAccount() {
-            if (this.doneStatusAccountTargets) {
-                return (this.lenStatusAccount === 1) ? 'Uploaded accounts processed' : `${this.totalStatusAccountTargets} uploaded accounts processed`
-            } else {
-                return 'New accounts are being registered...'
-            }
-        },
-        titleItem() {
-            if (this.doneStatusItemTargets) {
-                return (this.lenStatusItem === 1) ? 'Uploaded items processed' : `${this.totalStatusItemTargets} uploaded items processed`
-            } else {
-                return 'New items are being registered...'
-            }
-        },
-        titleVatNumber() {
-            if (this.doneStatusVatNumberTargets) {
-                return (this.lenStatusVatNumber === 1) ? 'Uploaded vat numbers processed' : `${this.totalStatusVatNumberTargets} uploaded vat numbers processed`
-            } else {
-                return 'New vat numbers are being registered...'
-            }
-        },
-        titleDistanceSale() {
-            if (this.doneStatusDistanceSaleTargets) {
-                return (this.lenStatusDistanceSale === 1) ? 'Uploaded distance sales processed' : `${this.totalStatusDistanceSaleTargets} uploaded distance sales processed`
-            } else {
-                return 'New distance sales are being registered...'
-            }
-        },
-        titleTransactionInput() {
-            if (this.doneStatusTransactionInputTargets) {
-                return (this.lenStatusTransactionInput === 1) ? 'Uploaded transactions processed' : `${this.totalStatusTransactionInputTargets} uploaded transactions processed`
-            } else {
-                return 'New transactions are being registered...'
-            }
-        }
-
+    totalStatusAccountTargets() {
+      return this.$store.getters['status/totalStatusAccountTargets']
+    },
+    totalStatusItemTargets() {
+      return this.$store.getters['status/totalStatusItemTargets']
+    },
+    totalStatusVatNumberTargets() {
+      return this.$store.getters['status/totalStatusVatNumberTargets']
+    },
+    totalStatusDistanceSaleTargets() {
+      return this.$store.getters['status/totalStatusDistanceSaleTargets']
+    },
+    totalStatusTransactionInputTargets() {
+      return this.$store.getters['status/totalStatusTransactionInputTargets']
     },
 
-    watch: {
-        // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
-        /*eslint-disable */
+    titleAccount() {
+      if (this.doneStatusAccountTargets) {
+        return (this.lenStatusAccount === 1) ? 'Uploaded accounts processed' : `${this.totalStatusAccountTargets} uploaded accounts processed`
+      } else {
+        return 'New accounts are being registered...'
+      }
+    },
+    titleItem() {
+      if (this.doneStatusItemTargets) {
+        return (this.lenStatusItem === 1) ? 'Uploaded items processed' : `${this.totalStatusItemTargets} uploaded items processed`
+      } else {
+        return 'New items are being registered...'
+      }
+    },
+    titleVatNumber() {
+      if (this.doneStatusVatNumberTargets) {
+        return (this.lenStatusVatNumber === 1) ? 'Uploaded vat numbers processed' : `${this.totalStatusVatNumberTargets} uploaded vat numbers processed`
+      } else {
+        return 'New vat numbers are being registered...'
+      }
+    },
+    titleDistanceSale() {
+      if (this.doneStatusDistanceSaleTargets) {
+        return (this.lenStatusDistanceSale === 1) ? 'Uploaded distance sales processed' : `${this.totalStatusDistanceSaleTargets} uploaded distance sales processed`
+      } else {
+        return 'New distance sales are being registered...'
+      }
+    },
+    titleTransactionInput() {
+      if (this.doneStatusTransactionInputTargets) {
+        return (this.lenStatusTransactionInput === 1) ? 'Uploaded transactions processed' : `${this.totalStatusTransactionInputTargets} uploaded transactions processed`
+      } else {
+        return 'New transactions are being registered...'
+      }
+    }
+
+  },
+
+  watch: {
+    // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
+    /*eslint-disable */
 
         lenStatusAccount (newLength, oldLength) {
             if (oldLength === 0) {

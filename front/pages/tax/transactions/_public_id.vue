@@ -41,57 +41,57 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-    export default {
-        layout: "tax",
+export default {
+  layout: "tax",
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            await store.dispatch('transaction_input/get_by_public_id', this.$route.params.public_id)
-        },
+  async fetch() {
+    const { store } = this.$nuxt.context
+    await store.dispatch('transaction_input/get_by_public_id', this.$route.params.public_id)
+  },
 
-        data() {
-            return {
-                fileCollapse: true,
-                bundleCollapse: true,
-                taxCollapse: true
-            }
-        },
-
-
-        computed: {
-            ...mapState({
-                transactionInput: state => state.transaction_input.transaction_input,
-                transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle,
-                sellerFirm: state => state.seller_firm.seller_firm
-            }),
-
-            iconCollapseFile() {
-                return this.fileCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
-            },
-            iconCollapseBundle() {
-                return this.bundleCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
-            },
-            iconCollapseTax() {
-                return this.taxCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
-            }
-        },
-
-        beforeDestroy() {
-            this.clearStoreTransactionInputs()
-        },
-
-        methods: {
-            clearStoreTransactionInputs() {
-                const { store } = this.$nuxt.context
-                store.dispatch('transaction_input/clear_transaction_inputs_bundle')
-            }
-
-        },
-
-
+  data() {
+    return {
+      fileCollapse: true,
+      bundleCollapse: true,
+      taxCollapse: true
     }
+  },
+
+
+  computed: {
+    ...mapState({
+      transactionInput: state => state.transaction_input.transaction_input,
+      transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle,
+      sellerFirm: state => state.seller_firm.seller_firm
+    }),
+
+    iconCollapseFile() {
+      return this.fileCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
+    },
+    iconCollapseBundle() {
+      return this.bundleCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
+    },
+    iconCollapseTax() {
+      return this.taxCollapse ? 'arrows-angle-contract' : 'arrows-angle-expand'
+    }
+  },
+
+  beforeDestroy() {
+    this.clearStoreTransactionInputs()
+  },
+
+  methods: {
+    clearStoreTransactionInputs() {
+      const { store } = this.$nuxt.context
+      store.dispatch('transaction_input/clear_transaction_inputs_bundle')
+    }
+
+  },
+
+
+}
 </script>
 
 <style></style>

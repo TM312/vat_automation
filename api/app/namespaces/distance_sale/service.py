@@ -201,7 +201,7 @@ class DistanceSaleService:
         from app.namespaces.transaction.service import TransactionService
 
 
-        start_date = end_date - timedelta(days=365)
+        start_date = end_date - timedelta(days=365) #check if 365 or beginning of year
         transactions = TransactionService.get_by_validity_tax_jurisdiction_seller_firm(start_date, end_date, seller_firm_id, arrival_country_code)
 
         if len(transactions) == 0:

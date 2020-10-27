@@ -6,18 +6,18 @@
 
 <script>
 export default {
-    name: 'ButtonValidateTransactionInput',
-    props: {
-        transactionInputPublicId: {
-            type: String,
-            required: true
-        }
-    },
-    methods: {
-        consolelog() {
-            console.log(this.transactionInputPublicId)
-        }
-    },
+  name: 'ButtonValidateTransactionInput',
+  props: {
+    transactionInputPublicId: {
+      type: String,
+      required: true
+    }
+  },
+  methods: {
+    consolelog() {
+      console.log(this.transactionInputPublicId)
+    }
+  },
 
 }
 </script>

@@ -2,11 +2,13 @@
   <div>
     <b-table :fields="fieldsBundle" :items="transactionInputs" hover>
       <template v-slot:cell(transaction_type_public_code)="data">
-        <span
+        <b-button
           v-if="data.item.public_id != $route.params.public_id"
-          class="text-primary"
+          variant="link"
           @click="$emit('single-view', data.item.public_id)"
-        >{{ data.value }}</span>
+        >
+          {{ data.value }}
+        </b-button>
         <!-- <nuxt-link
                     v-if="data.item.public_id != $route.params.public_id"
                     :to="`/tax/transactions/${data.item.public_id}`"
@@ -58,86 +60,86 @@
 <script>
 
 export default {
-    name: 'TableTransactionInputs',
+  name: 'TableTransactionInputs',
 
-    props: {
+  props: {
 
-        transactionInputs: {
-            type: [Array, Object],
-            required: true
-        }
+    transactionInputs: {
+      type: [Array, Object],
+      required: true
+    }
 
-    },
+  },
 
-    data() {
-        return {
-            fieldsBundle: [
-                 {
-                    key: 'complete_date',
-                    sortable: false,
-                },
-                {
-                    key: 'transaction_type_public_code',
-                    label: 'Public Type',
-                    sortable: false,
-                    formatter: value => {return this.capitalize(value)},
-                },
-                {
-                    key: 'item_sku',
-                    label: 'SKU',
-                    sortable: false,
-                },
-                {
-                    key:'given_id',
-                    label: 'Transaction ID',
-                    sortable: false
-                },
-                {
-                    key: 'marketplace',
-                    sortable: false,
-                },
-                {
-                    key: 'item_quantity',
-                    label: 'Quantity',
-                    sortable: false,
-                },
-                 {
-                    key: 'sale_total_value_gross',
-                    label: 'Total Value Gross',
-                    formatter: value => {
-                            return value ? Number.parseFloat(value).toFixed(2) : null
-                    },
-                    sortable: false,
-                },
-                {
-                    key: 'departure_to_arrival',
-                    sortable: false,
-                },
+  data() {
+    return {
+      fieldsBundle: [
+        {
+          key: 'complete_date',
+          sortable: false,
+        },
+        {
+          key: 'transaction_type_public_code',
+          label: 'Public Type',
+          sortable: false,
+          formatter: value => {return this.capitalize(value)},
+        },
+        {
+          key: 'item_sku',
+          label: 'SKU',
+          sortable: false,
+        },
+        {
+          key:'given_id',
+          label: 'Transaction ID',
+          sortable: false
+        },
+        {
+          key: 'marketplace',
+          sortable: false,
+        },
+        {
+          key: 'item_quantity',
+          label: 'Quantity',
+          sortable: false,
+        },
+        {
+          key: 'sale_total_value_gross',
+          label: 'Total Value Gross',
+          formatter: value => {
+            return value ? Number.parseFloat(value).toFixed(2) : null
+          },
+          sortable: false,
+        },
+        {
+          key: 'departure_to_arrival',
+          sortable: false,
+        },
 
-                {
-                    key: 'processed',
-                    sortable: false,
-                },
+        {
+          key: 'processed',
+          sortable: false,
+        },
 
-            ]
-        }
-    },
-    // methods: {
-    //     singleView(publicId) {
-    //         console.log('singleView public_id:', publicId) //!!!s
-    //         this.$emit('single-view', publicId)
-    //     }
-    // }
+      ]
+    }
+  },
+  // methods: {
+  //     singleView(publicId) {
+  //         console.log('singleView public_id:', publicId) //!!!s
+  //         this.$emit('single-view', publicId)
+  //     }
+  // }
 
 
 
-    // },
-    // methods: {
-    //     codeToName(countryCode) {
-    //         return this.countries.find(country => country.code == countryCode).name
-    //     },
+  // },
+  // methods: {
+  //     codeToName(countryCode) {
+  //         return this.countries.find(country => country.code == countryCode).name
+  //     },
 
-    // },
+  // },
 
 }
 </script>

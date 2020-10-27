@@ -17,19 +17,19 @@
 </template>
 
 <script>
-    export default {
-        name: "Settings",
-        layout: 'tax',
-        data() {
-            return {
-                user: ""
-            }
-        },
-
-        created() {
-            this.user = this.$auth.user
-        }
+export default {
+  name: "Settings",
+  layout: 'tax',
+  data() {
+    return {
+      user: ""
     }
+  },
+
+  created() {
+    this.user = this.$auth.user
+  }
+}
 </script>
 
 <style></style>

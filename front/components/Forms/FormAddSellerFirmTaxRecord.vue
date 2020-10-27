@@ -169,288 +169,288 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'FormAddSellerFirmTaxRecord',
+export default {
+  name: 'FormAddSellerFirmTaxRecord',
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            if (this.countries.length == 0) {
-                await store.dispatch("country/get_all")
-            }
-        },
-
-        data() {
-            return {
-                payload: {
-                    tax_jurisdiction_code: null,
-                    start_date: null,
-                    end_date: null
-                }
-            }
-        },
-
-        computed: {
-            ...mapState({
-                countries: state => state.country.countries,
-                sellerFirm: state => state.seller_firm.seller_firm,
-                vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(vatin => vatin.country_code)
-            }),
-
-
-
-            pastYearString() {
-                var d = new Date()
-                var pastYear = d.setFullYear(d.getFullYear() - 1)
-                return this.$dateFns.format(pastYear, 'yyyy')
-            },
-
-            currentYearString() {
-                return this.$dateFns.format(new Date(), 'yyyy')
-            },
-
-            pastMonthDate() {
-                var d = new Date()
-                return d.setMonth(d.getMonth() - 1)
-            },
-
-            optionsCountryCode() {
-                const countriesShortTotal = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
-                const countryCodesShortTotal = countriesShortTotal.map(country => country.vat_country_code)
-                const countryIntersection = this.getCountryIntersection(this.vatCountries, countryCodesShortTotal)
-
-                let options = countryIntersection.map(vat_country_code => {
-                    let country = countriesShortTotal.find(country => country.vat_country_code === vat_country_code)
-                    let formTuple = {
-                        value: country.code,
-                        text: country.name
-                    }
-                    return formTuple
-                    })
-
-                return options
-
-            },
-
-            selected() {
-                var selected = null
-
-                if (
-                    this.payload.start_date == this.currentYearString + '-01-01' &&
-                    this.payload.end_date == this.currentYearString + '-03-31'
-                    ) {
-                        selected = 'Q1'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-04-01' &&
-                    this.payload.end_date == this.currentYearString + '-06-30'
-                    ) {
-                        selected = 'Q2'
-                } else if (
-                        this.payload.start_date == this.currentYearString + '-07-01' &&
-                        this.payload.end_date == this.currentYearString + '-09-30'
-                    ) {
-                        selected = 'Q3'
-                } else if (
-                        this.payload.start_date == this.currentYearString + '-10-01' &&
-                        this.payload.end_date == this.currentYearString + '-12-31'
-                    ) {
-                        selected = 'Q4'
-                } else if(
-                    this.payload.start_date == this.pastYearString + '-01-01' &&
-                    this.payload.end_date == this.pastYearString + '-12-31'
-                ) {
-                    selected = 'pastYear'
-
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-01-01' &&
-                    this.payload.end_date == this.currentYearString + '-01-31'
-                    ) {
-                        selected = 'Jan'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-02-01' &&
-                    this.payload.end_date == this.currentYearString + ('-02-28' || '-02-29')
-                    ) {
-                        selected = 'Feb'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-03-01' &&
-                    this.payload.end_date == this.currentYearString + '-03-31'
-                    ) {
-                        selected = 'March'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-04-01' &&
-                    this.payload.end_date == this.currentYearString + '-04-30'
-                    ) {
-                        selected = 'April'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-05-01' &&
-                    this.payload.end_date == this.currentYearString + '-05-31'
-                    ) {
-                        selected = 'May'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-06-01' &&
-                    this.payload.end_date == this.currentYearString + '-06-30'
-                    ) {
-                        selected = 'June'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-07-01' &&
-                    this.payload.end_date == this.currentYearString + '-07-31'
-                    ) {
-                        selected = 'July'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-08-01' &&
-                    this.payload.end_date == this.currentYearString + '-08-31'
-                    ) {
-                        selected = 'Aug'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-09-01' &&
-                    this.payload.end_date == this.currentYearString + '-09-30'
-                    ) {
-                        selected = 'Sep'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-10-01' &&
-                    this.payload.end_date == this.currentYearString + '-10-31'
-                    ) {
-                        selected = 'Oct'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-11-01' &&
-                    this.payload.end_date == this.currentYearString + '-11-30'
-                    ) {
-                        selected = 'Nov'
-                } else if (
-                    this.payload.start_date == this.currentYearString + '-12-01' &&
-                    this.payload.end_date == this.currentYearString + '-12-31'
-                    ) {
-                        selected = 'Dec'
-                }
-
-                return selected
-
-            },
-        },
-
-        methods: {
-
-            getCountryIntersection(countriesVat, countries) {
-                var t
-                if (countriesVat.length > countries.length) t = countries, countries = countriesVat, countriesVat = t // indexOf to loop over shorter
-                return countriesVat.filter(function (e) {
-                    return countries.indexOf(e) > -1
-                })
-            },
-
-
-            test(timespan) {
-                if (typeof(timespan) === 'string') {
-                    if (timespan === 'Q1') {
-                        return new Date() < new Date(this.currentYearString, 2, 31)
-                    } else if (timespan === 'Q2') {
-                        return new Date() < new Date(this.currentYearString, 5, 30)
-                    } else if (timespan === 'Q3') {
-                        return new Date() < new Date(this.currentYearString, 8, 30)
-                    } else if (timespan === 'Q4') {
-                        return new Date() < new Date(this.currentYearString, 11, 31)
-                    }
-                } else if (typeof(timespan) === 'number') {
-                    return new Date() < new Date(this.currentYearString, timespan, 0)
-                }
-
-            },
-
-            setPastYear() {
-                this.payload.start_date = this.pastYearString + '-01-01'
-                this.payload.end_date = this.pastYearString + '-12-31'
-            },
-
-            // setPastMonth() {
-            //     var pastMonthString = this.$dateFns.format(this.pastMonthDate, 'yyyy-MM')
-
-            //     this.payload.start_date = pastMonthString + '-01'
-            //     this.payload.end_date = pastMonthString + '-31'
-            // },
-
-            setQ(quarter) {
-                // https://en.wikipedia.org/wiki/Calendar_year
-                // First quarter, Q1: 1 January – 31 March (90 days or 91 days in leap years)
-                // Second quarter, Q2: 1 April – 30 June (91 days)
-                // Third quarter, Q3: 1 July – 30 September (92 days)
-                // Fourth quarter, Q4: 1 October – 31 December (92 days)
-
-                switch (quarter) {
-                    case 1:
-                        this.payload.start_date = this.currentYearString + '-01-01'
-                        this.payload.end_date = this.currentYearString + '-03-31'
-                        break
-                    case 2:
-                        this.payload.start_date = this.currentYearString + '-04-01'
-                        this.payload.end_date = this.currentYearString + '-06-30'
-                        break
-                    case 3:
-                        this.payload.start_date = this.currentYearString + '-07-01'
-                        this.payload.end_date = this.currentYearString + '-09-30'
-                        break
-                    case 4:
-                        this.payload.start_date = this.currentYearString + '-10-01'
-                        this.payload.end_date = this.currentYearString + '-12-31'
-                        break
-                }
-
-            },
-
-            dateStringEndMonth(month) {
-                var d = new Date()
-                var dateEndMonth = new Date(d.getFullYear(), month+1, 0 )
-                return this.$dateFns.format(dateEndMonth, 'yyyy-MM-dd')
-            },
-
-            dateStringBeginningMonth(month) {
-                var d = new Date()
-                var dateBeginningMonth = new Date(d.getFullYear(), month, 1 )
-                return this.$dateFns.format(dateBeginningMonth, 'yyyy-MM-dd')
-            },
-
-            setM(month) {
-                this.payload.start_date = this.dateStringBeginningMonth(month)
-                this.payload.end_date = this.dateStringEndMonth(month)
-            },
-
-            reset() {
-                this.payload = {
-                    tax_jurisdiction_code: null,
-                    start_date: null,
-                    end_date: null
-                }
-            },
-
-            async submitPayload() {
-                // try {
-                // await this.create_by_seller_firm_public_id();
-                const seller_firm_public_id = this.$route.params.public_id
-                var tax_record_data = this.payload
-                await this.$repositories.tax_record.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
-                //     await this.$store.dispatch(
-                //         "seller_firm/get_by_public_id",
-                //         this.$route.params.public_id
-                //     );
-                //     this.$emit('flash')
-                //     await this.$toast.success('New tax record succesfully added.', {
-                //         duration: 5000
-                //     });
-                // } catch (error) {
-                //     this.$toast.error(error, { duration: 5000 });
-                // }
-            },
-
-            // async create_by_seller_firm_public_id() {
-            //     const data_array = [this.$route.params.public_id, this.payload]
-
-            //     await this.$store.dispatch(
-            //         "tax_record/create_by_seller_firm_public_id",
-            //         data_array
-            //     );
-            // },
-        }
+  async fetch() {
+    const { store } = this.$nuxt.context
+    if (this.countries.length == 0) {
+      await store.dispatch("country/get_all")
     }
+  },
+
+  data() {
+    return {
+      payload: {
+        tax_jurisdiction_code: null,
+        start_date: null,
+        end_date: null
+      }
+    }
+  },
+
+  computed: {
+    ...mapState({
+      countries: state => state.country.countries,
+      sellerFirm: state => state.seller_firm.seller_firm,
+      vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(vatin => vatin.country_code)
+    }),
+
+
+
+    pastYearString() {
+      var d = new Date()
+      var pastYear = d.setFullYear(d.getFullYear() - 1)
+      return this.$dateFns.format(pastYear, 'yyyy')
+    },
+
+    currentYearString() {
+      return this.$dateFns.format(new Date(), 'yyyy')
+    },
+
+    pastMonthDate() {
+      var d = new Date()
+      return d.setMonth(d.getMonth() - 1)
+    },
+
+    optionsCountryCode() {
+      const countriesShortTotal = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
+      const countryCodesShortTotal = countriesShortTotal.map(country => country.vat_country_code)
+      const countryIntersection = this.getCountryIntersection(this.vatCountries, countryCodesShortTotal)
+
+      let options = countryIntersection.map(vat_country_code => {
+        let country = countriesShortTotal.find(country => country.vat_country_code === vat_country_code)
+        let formTuple = {
+          value: country.code,
+          text: country.name
+        }
+        return formTuple
+      })
+
+      return options
+
+    },
+
+    selected() {
+      var selected = null
+
+      if (
+        this.payload.start_date == this.currentYearString + '-01-01' &&
+                    this.payload.end_date == this.currentYearString + '-03-31'
+      ) {
+        selected = 'Q1'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-04-01' &&
+                    this.payload.end_date == this.currentYearString + '-06-30'
+      ) {
+        selected = 'Q2'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-07-01' &&
+                        this.payload.end_date == this.currentYearString + '-09-30'
+      ) {
+        selected = 'Q3'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-10-01' &&
+                        this.payload.end_date == this.currentYearString + '-12-31'
+      ) {
+        selected = 'Q4'
+      } else if(
+        this.payload.start_date == this.pastYearString + '-01-01' &&
+                    this.payload.end_date == this.pastYearString + '-12-31'
+      ) {
+        selected = 'pastYear'
+
+      } else if (
+        this.payload.start_date == this.currentYearString + '-01-01' &&
+                    this.payload.end_date == this.currentYearString + '-01-31'
+      ) {
+        selected = 'Jan'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-02-01' &&
+                    this.payload.end_date == this.currentYearString + ('-02-28' || '-02-29')
+      ) {
+        selected = 'Feb'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-03-01' &&
+                    this.payload.end_date == this.currentYearString + '-03-31'
+      ) {
+        selected = 'March'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-04-01' &&
+                    this.payload.end_date == this.currentYearString + '-04-30'
+      ) {
+        selected = 'April'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-05-01' &&
+                    this.payload.end_date == this.currentYearString + '-05-31'
+      ) {
+        selected = 'May'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-06-01' &&
+                    this.payload.end_date == this.currentYearString + '-06-30'
+      ) {
+        selected = 'June'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-07-01' &&
+                    this.payload.end_date == this.currentYearString + '-07-31'
+      ) {
+        selected = 'July'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-08-01' &&
+                    this.payload.end_date == this.currentYearString + '-08-31'
+      ) {
+        selected = 'Aug'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-09-01' &&
+                    this.payload.end_date == this.currentYearString + '-09-30'
+      ) {
+        selected = 'Sep'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-10-01' &&
+                    this.payload.end_date == this.currentYearString + '-10-31'
+      ) {
+        selected = 'Oct'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-11-01' &&
+                    this.payload.end_date == this.currentYearString + '-11-30'
+      ) {
+        selected = 'Nov'
+      } else if (
+        this.payload.start_date == this.currentYearString + '-12-01' &&
+                    this.payload.end_date == this.currentYearString + '-12-31'
+      ) {
+        selected = 'Dec'
+      }
+
+      return selected
+
+    },
+  },
+
+  methods: {
+
+    getCountryIntersection(countriesVat, countries) {
+      var t
+      if (countriesVat.length > countries.length) t = countries, countries = countriesVat, countriesVat = t // indexOf to loop over shorter
+      return countriesVat.filter(function (e) {
+        return countries.indexOf(e) > -1
+      })
+    },
+
+
+    test(timespan) {
+      if (typeof(timespan) === 'string') {
+        if (timespan === 'Q1') {
+          return new Date() < new Date(this.currentYearString, 2, 31)
+        } else if (timespan === 'Q2') {
+          return new Date() < new Date(this.currentYearString, 5, 30)
+        } else if (timespan === 'Q3') {
+          return new Date() < new Date(this.currentYearString, 8, 30)
+        } else if (timespan === 'Q4') {
+          return new Date() < new Date(this.currentYearString, 11, 31)
+        }
+      } else if (typeof(timespan) === 'number') {
+        return new Date() < new Date(this.currentYearString, timespan, 0)
+      }
+
+    },
+
+    setPastYear() {
+      this.payload.start_date = this.pastYearString + '-01-01'
+      this.payload.end_date = this.pastYearString + '-12-31'
+    },
+
+    // setPastMonth() {
+    //     var pastMonthString = this.$dateFns.format(this.pastMonthDate, 'yyyy-MM')
+
+    //     this.payload.start_date = pastMonthString + '-01'
+    //     this.payload.end_date = pastMonthString + '-31'
+    // },
+
+    setQ(quarter) {
+      // https://en.wikipedia.org/wiki/Calendar_year
+      // First quarter, Q1: 1 January – 31 March (90 days or 91 days in leap years)
+      // Second quarter, Q2: 1 April – 30 June (91 days)
+      // Third quarter, Q3: 1 July – 30 September (92 days)
+      // Fourth quarter, Q4: 1 October – 31 December (92 days)
+
+      switch (quarter) {
+      case 1:
+        this.payload.start_date = this.currentYearString + '-01-01'
+        this.payload.end_date = this.currentYearString + '-03-31'
+        break
+      case 2:
+        this.payload.start_date = this.currentYearString + '-04-01'
+        this.payload.end_date = this.currentYearString + '-06-30'
+        break
+      case 3:
+        this.payload.start_date = this.currentYearString + '-07-01'
+        this.payload.end_date = this.currentYearString + '-09-30'
+        break
+      case 4:
+        this.payload.start_date = this.currentYearString + '-10-01'
+        this.payload.end_date = this.currentYearString + '-12-31'
+        break
+      }
+
+    },
+
+    dateStringEndMonth(month) {
+      var d = new Date()
+      var dateEndMonth = new Date(d.getFullYear(), month+1, 0 )
+      return this.$dateFns.format(dateEndMonth, 'yyyy-MM-dd')
+    },
+
+    dateStringBeginningMonth(month) {
+      var d = new Date()
+      var dateBeginningMonth = new Date(d.getFullYear(), month, 1 )
+      return this.$dateFns.format(dateBeginningMonth, 'yyyy-MM-dd')
+    },
+
+    setM(month) {
+      this.payload.start_date = this.dateStringBeginningMonth(month)
+      this.payload.end_date = this.dateStringEndMonth(month)
+    },
+
+    reset() {
+      this.payload = {
+        tax_jurisdiction_code: null,
+        start_date: null,
+        end_date: null
+      }
+    },
+
+    async submitPayload() {
+      // try {
+      // await this.create_by_seller_firm_public_id();
+      const seller_firm_public_id = this.$route.params.public_id
+      var tax_record_data = this.payload
+      await this.$repositories.tax_record.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
+      //     await this.$store.dispatch(
+      //         "seller_firm/get_by_public_id",
+      //         this.$route.params.public_id
+      //     );
+      //     this.$emit('flash')
+      //     await this.$toast.success('New tax record succesfully added.', {
+      //         duration: 5000
+      //     });
+      // } catch (error) {
+      //     this.$toast.error(error, { duration: 5000 });
+      // }
+    },
+
+    // async create_by_seller_firm_public_id() {
+    //     const data_array = [this.$route.params.public_id, this.payload]
+
+    //     await this.$store.dispatch(
+    //         "tax_record/create_by_seller_firm_public_id",
+    //         data_array
+    //     );
+    // },
+  }
+}
 </script>
 
 <style>

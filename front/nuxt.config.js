@@ -128,6 +128,7 @@ export default {
             'BProgress',
             'BProgressBar',
             'BRow',
+            'BSidebar',
             'BSkeleton',
             'BSpinner',
             'BTable',

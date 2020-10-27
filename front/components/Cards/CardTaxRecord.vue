@@ -39,46 +39,46 @@
 import { mapState } from "vuex"
 
 export default {
-    name: 'CardTaxRecord',
+  name: 'CardTaxRecord',
 
-    data() {
-        return {
-            buttonDisabled: false,
-
-
-        }
-    },
-
-    computed: {
-        ...mapState({
-            taxRecord: state => state.tax_record.tax_record,
-            countries: state => state.country.countries,
-            currencies: state => state.currency.currencies
-        }),
+  data() {
+    return {
+      buttonDisabled: false,
 
 
-        taxJurisdiction() {
-            return this.countries.find(country => country.code == this.taxRecord.tax_jurisdiction_code)
-        },
-
-
-    },
-
-    methods: {
-        async remove(taxRecordPublicId) {
-            this.buttonDisabled = true
-            try {
-                await this.$store.dispatch("tax_record/delete_by_public_id", taxRecordPublicId)
-                await this.$store.dispatch("seller_firm/get_by_public_id", this.taxRecord.seller_firm_public_id)
-                this.$router.push(`/tax/clients/${this.taxRecord.seller_firm_public_id}`)
-
-            } catch (error) {
-                this.$toast.error(error, { duration: 5000 })
-                this.buttonDisabled = false
-                return []
-            }
-        }
     }
+  },
+
+  computed: {
+    ...mapState({
+      taxRecord: state => state.tax_record.tax_record,
+      countries: state => state.country.countries,
+      currencies: state => state.currency.currencies
+    }),
+
+
+    taxJurisdiction() {
+      return this.countries.find(country => country.code == this.taxRecord.tax_jurisdiction_code)
+    },
+
+
+  },
+
+  methods: {
+    async remove(taxRecordPublicId) {
+      this.buttonDisabled = true
+      try {
+        await this.$store.dispatch("tax_record/delete_by_public_id", taxRecordPublicId)
+        await this.$store.dispatch("seller_firm/get_by_public_id", this.taxRecord.seller_firm_public_id)
+        this.$router.push(`/tax/clients/${this.taxRecord.seller_firm_public_id}`)
+
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+        this.buttonDisabled = false
+        return []
+      }
+    }
+  }
 
 
 }

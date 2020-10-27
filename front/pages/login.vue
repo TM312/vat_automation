@@ -9,7 +9,7 @@
           <client-only placeholder="Loading...">
             <b-card-body>
               <b-form @submit.prevent="login">
-                <b-form-group id="input-group-email" label="Email Address" label-for="input-email">
+                <b-form-group id="input-group-email" label="Email" label-for="input-email">
                   <b-form-input
                     id="input-email"
                     v-model="form.email"
@@ -72,9 +72,9 @@ export default {
         const status = err.response.status
         if (status === 401 || status === 404) {
           this.$bvToast.toast('Invalid password or email.', {
-          autoHideDelay: 5000,
-          variant: 'danger'
-        })
+            autoHideDelay: 5000,
+            variant: 'danger'
+          })
         } else {
           this.$bvToast.toast('There seems to be a problem. Please try again later.', {
             autoHideDelay: 5000,

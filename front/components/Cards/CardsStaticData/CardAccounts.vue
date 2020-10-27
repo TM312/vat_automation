@@ -49,56 +49,56 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "CardAccounts",
-        // eslint-disable-next-line
+export default {
+  name: "CardAccounts",
+  // eslint-disable-next-line
 
-        data() {
-            return {
-                message: '',
-                editMode: false,
-                flashCounter: false,
+  data() {
+    return {
+      message: '',
+      editMode: false,
+      flashCounter: false,
 
-                fields: [
-                    { key: 'platform', sortable: false },
-                    { key: 'channel_code', label: "Channel", sortable: false },
-                    { key: 'given_id', label: "Account ID", sortable: false }
-                ],
-            }
-        },
-
-        computed: {
-            ...mapState({
-                accounts: state => state.seller_firm.seller_firm.accounts,
-                seller_firm: state => state.seller_firm.seller_firm,
-            }),
-
-
-            cardBorder() {
-                return this.editMode ? "info" : ""
-            },
-
-            fieldsEditable() {
-                return this.fields.concat({
-                    key: "edit",
-                    label: "",
-                    sortable: false
-                })
-            }
-
-
-        },
-
-        methods: {
-            flashCount() {
-                this.flashCounter = true
-                setTimeout(() => this.flashCounter = false, 1000)
-
-            }
-
-
-        }
+      fields: [
+        { key: 'platform', sortable: false },
+        { key: 'channel_code', label: "Channel", sortable: false },
+        { key: 'given_id', label: "Account ID", sortable: false }
+      ],
     }
+  },
+
+  computed: {
+    ...mapState({
+      accounts: state => state.seller_firm.seller_firm.accounts,
+      seller_firm: state => state.seller_firm.seller_firm,
+    }),
+
+
+    cardBorder() {
+      return this.editMode ? "info" : ""
+    },
+
+    fieldsEditable() {
+      return this.fields.concat({
+        key: "edit",
+        label: "",
+        sortable: false
+      })
+    }
+
+
+  },
+
+  methods: {
+    flashCount() {
+      this.flashCounter = true
+      setTimeout(() => this.flashCounter = false, 1000)
+
+    }
+
+
+  }
+}
 </script>

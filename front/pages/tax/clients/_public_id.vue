@@ -45,47 +45,47 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
-    export default {
-        layout: "tax",
+import { mapState } from 'vuex'
+export default {
+  layout: "tax",
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            if (this.sellerFirm.length == 0 || this.sellerFirm.public_id !== this.$route.params.public_id) {
-                await store.dispatch('seller_firm/get_by_public_id', this.$route.params.public_id)
-            }
-        },
-
-        computed: {
-            ...mapState({
-                sellerFirm: state => state.seller_firm.seller_firm
-            })
-        },
-
-        beforeDestroy() {
-            this.resetStoreSellerFirm()
-        },
-
-        methods: {
-            resetStoreSellerFirm() {
-                const { store } = this.$nuxt.context
-                store.dispatch('status/clear_all')
-                // store.dispatch('seller_firm/clear_seller_firm')
-                // store.dispatch('transaction_input/clear_transaction_inputs')
-                store.dispatch('tax_record/clear_tax_records')
-
-            },
-
-            linkClass(idx) {
-                if (this.tabIndex === idx) {
-                    return ['bg-info', 'text-info']
-                } else {
-                    return ['bg-light', 'text-info']
-                }
-            }
-
-        },
+  async fetch() {
+    const { store } = this.$nuxt.context
+    if (this.sellerFirm.length == 0 || this.sellerFirm.public_id !== this.$route.params.public_id) {
+      await store.dispatch('seller_firm/get_by_public_id', this.$route.params.public_id)
     }
+  },
+
+  computed: {
+    ...mapState({
+      sellerFirm: state => state.seller_firm.seller_firm
+    })
+  },
+
+  beforeDestroy() {
+    this.resetStoreSellerFirm()
+  },
+
+  methods: {
+    resetStoreSellerFirm() {
+      const { store } = this.$nuxt.context
+      store.dispatch('status/clear_all')
+      // store.dispatch('seller_firm/clear_seller_firm')
+      // store.dispatch('transaction_input/clear_transaction_inputs')
+      store.dispatch('tax_record/clear_tax_records')
+
+    },
+
+    linkClass(idx) {
+      if (this.tabIndex === idx) {
+        return ['bg-info', 'text-info']
+      } else {
+        return ['bg-light', 'text-info']
+      }
+    }
+
+  },
+}
 </script>
 
 <style></style>

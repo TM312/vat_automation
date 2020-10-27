@@ -21,20 +21,20 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'ViewClients',
+export default {
+  name: 'ViewClients',
 
-        computed: {
-            ...mapState({
-                clients: state => state.accounting_firm.accounting_firm.clients,
-            }),
-            countClients() {
-                return this.$store.getters['accounting_firm/countClients']
-            },
-        },
-    }
+  computed: {
+    ...mapState({
+      clients: state => state.accounting_firm.accounting_firm.clients,
+    }),
+    countClients() {
+      return this.$store.getters['accounting_firm/countClients']
+    },
+  },
+}
 </script>
 
 <style>

@@ -20,9 +20,9 @@
 </template>
 
 <script>
-    export default {
-        name: "OverviewBaseData"
-    }
+export default {
+  name: "OverviewBaseData"
+}
 </script>
 
 <style>

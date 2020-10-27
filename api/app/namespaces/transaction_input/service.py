@@ -500,7 +500,7 @@ class TransactionInputService:
         last_transaction = TransactionService.get_latest_by_seller_firm_id(account.seller_firm_id)
         DistanceSaleService.update_taxable_turnover_amount_365d_all_ds(account.seller_firm_id, last_transaction.tax_date, original_filename)
 
-        # following the successful processing, the vuex store is being reset
+        # following the successful processing, the vuex store is being reset !!! should be updated individually soon
         # first cleared
         SocketService.emit_clear_objects(object_type)
         # then refilled

@@ -34,23 +34,23 @@
 import { mapState } from 'vuex'
 
 export default {
-    layout: 'tax',
+  layout: 'tax',
 
-    async fetch() {
-        const { store } = this.$nuxt.context
-        await store.dispatch('tax_record/get_by_public_id', this.$route.params.public_id)
-        if (this.sellerFirm.length == 0 || this.taxRecord.seller_firm_public_id !== this.sellerFirm.public_id) {
-            await store.dispatch('seller_firm/get_by_public_id', this.taxRecord.seller_firm_public_id)
-        }
-
-    },
-
-    computed: {
-        ...mapState({
-            taxRecord: state => state.tax_record.tax_record,
-            sellerFirm: state => state.seller_firm.seller_firm
-        }),
+  async fetch() {
+    const { store } = this.$nuxt.context
+    await store.dispatch('tax_record/get_by_public_id', this.$route.params.public_id)
+    if (this.sellerFirm.length == 0 || this.taxRecord.seller_firm_public_id !== this.sellerFirm.public_id) {
+      await store.dispatch('seller_firm/get_by_public_id', this.taxRecord.seller_firm_public_id)
     }
+
+  },
+
+  computed: {
+    ...mapState({
+      taxRecord: state => state.tax_record.tax_record,
+      sellerFirm: state => state.seller_firm.seller_firm
+    }),
+  }
 
 }
 </script>

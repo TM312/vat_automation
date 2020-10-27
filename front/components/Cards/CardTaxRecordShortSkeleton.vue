@@ -30,7 +30,7 @@
 </template>
 
 <script>
-    export default {
-        name: 'CardTaxRecordShortSkeleton'
-    }
+export default {
+  name: 'CardTaxRecordShortSkeleton'
+}
 </script>

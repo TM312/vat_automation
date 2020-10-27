@@ -197,130 +197,130 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'FormAddSellerFirmItem',
+export default {
+  name: 'FormAddSellerFirmItem',
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            await store.dispatch("currency/get_all")
-            await store.dispatch("tax_code/get_all")
-        },
+  async fetch() {
+    const { store } = this.$nuxt.context
+    await store.dispatch("currency/get_all")
+    await store.dispatch("tax_code/get_all")
+  },
 
-        data() {
-            return {
-                payload: {
-                        brand_name: null,
-                        name: null,
-                        sku: null,
-                        ean: null,
-                        asin: null,
-                        fnsku: null,
-                        weight_kg: null,
-                        unit_cost_price_currency_code: null,
-                        unit_cost_price_net: null,
-                        valid_from: null,
-                        valid_to: null,
-                        tax_code_code: null
-                    },
-            }
-        },
+  data() {
+    return {
+      payload: {
+        brand_name: null,
+        name: null,
+        sku: null,
+        ean: null,
+        asin: null,
+        fnsku: null,
+        weight_kg: null,
+        unit_cost_price_currency_code: null,
+        unit_cost_price_net: null,
+        valid_from: null,
+        valid_to: null,
+        tax_code_code: null
+      },
+    }
+  },
 
-        computed: {
-            ...mapState({
-                currencies: state => state.currency.currencies,
-                tax_code_codes: state => state.tax_code.tax_codes
-            }),
+  computed: {
+    ...mapState({
+      currencies: state => state.currency.currencies,
+      tax_code_codes: state => state.tax_code.tax_codes
+    }),
 
-            optionsUnitCostPriceCurrencyCodes() {
-                let options = this.currencies.map(currency => {
-                    let properties = {
-                        value: currency.code,
-                        text: currency.name
-                    }
-                    return properties
-                })
-                return options
-            },
+    optionsUnitCostPriceCurrencyCodes() {
+      let options = this.currencies.map(currency => {
+        let properties = {
+          value: currency.code,
+          text: currency.name
+        }
+        return properties
+      })
+      return options
+    },
 
-            optionsTaxCodes() {
-                let options = this.tax_code_codes.map(tax_code => {
-                    let properties = {
-                        value: tax_code.code,
-                        text: tax_code.code
-                    }
-                    return properties
-                })
-                return options
-            },
+    optionsTaxCodes() {
+      let options = this.tax_code_codes.map(tax_code => {
+        let properties = {
+          value: tax_code.code,
+          text: tax_code.code
+        }
+        return properties
+      })
+      return options
+    },
 
-            validation_valid_to() {
-                if (this.payload.valid_to !== null) {
-                    return this.payload.valid_from <= this.payload.valid_to
-                } else {
-                    return null
-                }
-            },
+    validation_valid_to() {
+      if (this.payload.valid_to !== null) {
+        return this.payload.valid_from <= this.payload.valid_to
+      } else {
+        return null
+      }
+    },
 
-            validation_submit() {
-                if (
-                    this.payload.sku !== null &&
+    validation_submit() {
+      if (
+        this.payload.sku !== null &&
                     this.payload.tax_code_code !== null &&
                     this.payload.tax_code_code !== '' &&
                     this.payload.unit_cost_price_currency_code !== null &&
                     this.payload.unit_cost_price_currency_code !== '' &&
                     this.payload.valid_from !== null &&
                     this.validation_valid_to !== false
-                ) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        },
-
-        methods: {
-
-
-            async submitPayload() {
-                try {
-                    // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
-                    Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
-
-                    await this.create_by_seller_firm_public_id()
-
-                    this.payload.ean = null
-                    this.payload.asin = null
-                    this.payload.fnsku = null
-                    this.payload.weight_kg = null
-                    this.payload.unit_cost_price_net = null
-
-                    console.log('this.payload after reset: ', this.payload)
-
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    )
-                    this.$emit('flash')
-                    await this.$toast.success('New item successfully added.', {
-                        duration: 5000
-                    })
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                }
-            },
-
-            async create_by_seller_firm_public_id() {
-                const data_array = [this.$route.params.public_id, this.payload]
-
-                await this.$store.dispatch(
-                    "item/create_by_seller_firm_public_id",
-                    data_array
-                )
-            },
-        }
+      ) {
+        return false
+      } else {
+        return true
+      }
     }
+  },
+
+  methods: {
+
+
+    async submitPayload() {
+      try {
+        // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
+        Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
+
+        await this.create_by_seller_firm_public_id()
+
+        this.payload.ean = null
+        this.payload.asin = null
+        this.payload.fnsku = null
+        this.payload.weight_kg = null
+        this.payload.unit_cost_price_net = null
+
+        console.log('this.payload after reset: ', this.payload)
+
+        await this.$store.dispatch(
+          "seller_firm/get_by_public_id",
+          this.$route.params.public_id
+        )
+        this.$emit('flash')
+        await this.$toast.success('New item successfully added.', {
+          duration: 5000
+        })
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+      }
+    },
+
+    async create_by_seller_firm_public_id() {
+      const data_array = [this.$route.params.public_id, this.payload]
+
+      await this.$store.dispatch(
+        "item/create_by_seller_firm_public_id",
+        data_array
+      )
+    },
+  }
+}
 </script>
 
 <style>

@@ -163,224 +163,224 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
-    import { BIcon } from "bootstrap-vue"
+import { mapState } from "vuex"
+import { BIcon } from "bootstrap-vue"
 
-    export default {
-        name: 'FormAddSellerFirmVatNumber',
+export default {
+  name: 'FormAddSellerFirmVatNumber',
 
-        components: {
-            BIcon
-        },
+  components: {
+    BIcon
+  },
 
-        data() {
-            return {
-                payload: {
-                    country_code: null,
-                    number: null,
-                    valid: null,
-                    request_date: null,
-                    name: null,
-                    address: null,
-                    valid_from: null,
-                    valid_to: null
-                },
+  data() {
+    return {
+      payload: {
+        country_code: null,
+        number: null,
+        valid: null,
+        request_date: null,
+        name: null,
+        address: null,
+        valid_from: null,
+        valid_to: null
+      },
 
-                vatinVerified: null,
-                vatinValidated: null,
+      vatinVerified: null,
+      vatinValidated: null,
 
-                buttonVerifyDisabled: false,
-                buttonVerifyBusy: false,
+      buttonVerifyDisabled: false,
+      buttonVerifyBusy: false,
 
-                buttonValidateDisabled : false,
-                buttonValidateBusy : false
-            }
-        },
+      buttonValidateDisabled : false,
+      buttonValidateBusy : false
+    }
+  },
 
-        computed: {
-            ...mapState({
-                countries: state => state.country.countries,
-                vatin: state => state.vatin.vatin
-            }),
+  computed: {
+    ...mapState({
+      countries: state => state.country.countries,
+      vatin: state => state.vatin.vatin
+    }),
 
-            payloadValidString() {
-                if (this.payload.request_date) {
-                    if (this.payload.valid === true) {
-                        return 'Valid'
-                    } else if (this.payload.valid === false) {
-                        return 'Invalid'
-                    } else {
-                        return 'Validation Failed'
-                    }
-                } else {
-                    return ''
-                }
-            },
-
-
-            vatinInvalidFeedback() {
-                if (this.payload.country_code && this.payload.number) {
-                    return `${this.payload.country_code} - ${this.payload.number} does not match any country's vat number specification. Please recheck the input.`
-
-                } else if (this.payload.country_code === null && this.payload.number) {
-                    return `${this.payload.number} does not match any country's vat number specification. Please recheck the input.`
-
-                } else if (this.payload.country_code && this.payload.number === null) {
-                    return `${this.payload.country_code} does not match any country's vat number specification. Please recheck the input.`
-
-                } else {
-                    return "The provided input does not match any country's vat number specification. Please recheck the input."
-                }
-            },
+    payloadValidString() {
+      if (this.payload.request_date) {
+        if (this.payload.valid === true) {
+          return 'Valid'
+        } else if (this.payload.valid === false) {
+          return 'Invalid'
+        } else {
+          return 'Validation Failed'
+        }
+      } else {
+        return ''
+      }
+    },
 
 
-            optionsCountryCode() {
-                const countriesShort = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
+    vatinInvalidFeedback() {
+      if (this.payload.country_code && this.payload.number) {
+        return `${this.payload.country_code} - ${this.payload.number} does not match any country's vat number specification. Please recheck the input.`
 
-                let options = countriesShort.map(country => {
-                    let properties = {
-                        value: country.vat_country_code,
-                        text: country.vat_country_code
-                    }
-                    return properties
+      } else if (this.payload.country_code === null && this.payload.number) {
+        return `${this.payload.number} does not match any country's vat number specification. Please recheck the input.`
 
-                    })
-                return options
-            },
+      } else if (this.payload.country_code && this.payload.number === null) {
+        return `${this.payload.country_code} does not match any country's vat number specification. Please recheck the input.`
 
-            submitDisabled() {
-                if (
-                    (this.payload.valid === true || this.payload.valid === null) &&
+      } else {
+        return "The provided input does not match any country's vat number specification. Please recheck the input."
+      }
+    },
+
+
+    optionsCountryCode() {
+      const countriesShort = this.countries.filter(country => (country.vat_country_code !== undefined && country.vat_country_code !== null))
+
+      let options = countriesShort.map(country => {
+        let properties = {
+          value: country.vat_country_code,
+          text: country.vat_country_code
+        }
+        return properties
+
+      })
+      return options
+    },
+
+    submitDisabled() {
+      if (
+        (this.payload.valid === true || this.payload.valid === null) &&
                     this.vatinVerified === true &&
                     this.vatinValidated === true
-                ) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        },
-
-        methods: {
-            async verify() {
-                this.buttonVerifyDisabled = true
-                this.buttonVerifyBusy = true
-
-                // const res = await this.$axios.post('/tax/vatin/verify', this.payload)
-
-                await this.$store.dispatch(
-                    "vatin/verify",
-                    this.payload
-                )
-
-                if (this.vatin.valid === null) {
-                    // this.reset()
-                    this.buttonVerifyDisabled = false
-                    this.vatinVerified = false
-
-                } else {
-                    this.vatinVerified = this.vatin.verified
-                    this.buttonVerifyDisabled = this.vatin.verified
-                    this.payload.country_code = this.vatin.country_code
-                    this.payload.number = this.vatin.number
-                }
-
-
-                this.buttonVerifyBusy = false
-                this.payload.valid_from = null
-            },
-
-            reset() {
-                this.payload = {
-                    country_code: null,
-                    number: null,
-                    valid: null,
-                    request_date: null,
-                    name: null,
-                    address: null,
-                    valid_from: null,
-                },
-
-                this.vatinVerified = null,
-                this.vatinValidated = null,
-
-                this.buttonVerifyDisabled = false,
-                this.buttonVerifyBusy = false,
-
-                this.buttonValidateDisabled = false,
-                this.buttonValidateBusy = false
-            },
-
-            async validate() {
-                this.buttonValidateDisabled = true
-                this.buttonValidateBusy = true
-
-                this.payload.request_date = null
-
-                await this.$store.dispatch( "vatin/validate", this.payload)
-
-
-                if (this.vatin) {
-                    this.payload = {
-                        country_code: this.vatin.country_code,
-                        number: this.vatin.number,
-                        valid: this.vatin.valid,
-                        request_date: this.vatin.request_date,
-                        name: this.vatin.name,
-                        address: this.vatin.address,
-                        valid_from: this.$dateFns.format(new Date(), 'yyyy-MM-dd')
-                    }
-
-                    this.vatinValidated = (this.vatin.valid || this.vatin.valid === null) ? true : false
-
-                } else {
-                    await this.$toast.error('Oops, an error occured.', {
-                        duration: 1000
-                    })
-                }
-                if (!this.vatinValidated || this.vatin.valid === null) {
-                    this.buttonValidateDisabled = false
-                }
-
-                this.buttonValidateBusy = false
-            },
-
-            async submitPayload() {
-                try {
-                    // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
-                    Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
-
-                    await this.create_by_seller_firm_public_id()
-
-                    this.payload.number = null
-
-
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    )
-                    this.$emit('flash')
-                    await this.$toast.success('New vat number succesfully added.', {
-                        duration: 5000
-                    })
-
-                    this.reset()
-
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                }
-            },
-
-            async create_by_seller_firm_public_id() {
-                const data_array = [this.$route.params.public_id, this.payload]
-
-                await this.$store.dispatch(
-                    "vatin/create_by_seller_firm_public_id",
-                    data_array
-                )
-            },
-        }
+      ) {
+        return false
+      } else {
+        return true
+      }
     }
+  },
+
+  methods: {
+    async verify() {
+      this.buttonVerifyDisabled = true
+      this.buttonVerifyBusy = true
+
+      // const res = await this.$axios.post('/tax/vatin/verify', this.payload)
+
+      await this.$store.dispatch(
+        "vatin/verify",
+        this.payload
+      )
+
+      if (this.vatin.valid === null) {
+        // this.reset()
+        this.buttonVerifyDisabled = false
+        this.vatinVerified = false
+
+      } else {
+        this.vatinVerified = this.vatin.verified
+        this.buttonVerifyDisabled = this.vatin.verified
+        this.payload.country_code = this.vatin.country_code
+        this.payload.number = this.vatin.number
+      }
+
+
+      this.buttonVerifyBusy = false
+      this.payload.valid_from = null
+    },
+
+    reset() {
+      this.payload = {
+        country_code: null,
+        number: null,
+        valid: null,
+        request_date: null,
+        name: null,
+        address: null,
+        valid_from: null,
+      },
+
+      this.vatinVerified = null,
+      this.vatinValidated = null,
+
+      this.buttonVerifyDisabled = false,
+      this.buttonVerifyBusy = false,
+
+      this.buttonValidateDisabled = false,
+      this.buttonValidateBusy = false
+    },
+
+    async validate() {
+      this.buttonValidateDisabled = true
+      this.buttonValidateBusy = true
+
+      this.payload.request_date = null
+
+      await this.$store.dispatch( "vatin/validate", this.payload)
+
+
+      if (this.vatin) {
+        this.payload = {
+          country_code: this.vatin.country_code,
+          number: this.vatin.number,
+          valid: this.vatin.valid,
+          request_date: this.vatin.request_date,
+          name: this.vatin.name,
+          address: this.vatin.address,
+          valid_from: this.$dateFns.format(new Date(), 'yyyy-MM-dd')
+        }
+
+        this.vatinValidated = (this.vatin.valid || this.vatin.valid === null) ? true : false
+
+      } else {
+        await this.$toast.error('Oops, an error occured.', {
+          duration: 1000
+        })
+      }
+      if (!this.vatinValidated || this.vatin.valid === null) {
+        this.buttonValidateDisabled = false
+      }
+
+      this.buttonValidateBusy = false
+    },
+
+    async submitPayload() {
+      try {
+        // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
+        Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
+
+        await this.create_by_seller_firm_public_id()
+
+        this.payload.number = null
+
+
+        await this.$store.dispatch(
+          "seller_firm/get_by_public_id",
+          this.$route.params.public_id
+        )
+        this.$emit('flash')
+        await this.$toast.success('New vat number succesfully added.', {
+          duration: 5000
+        })
+
+        this.reset()
+
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+      }
+    },
+
+    async create_by_seller_firm_public_id() {
+      const data_array = [this.$route.params.public_id, this.payload]
+
+      await this.$store.dispatch(
+        "vatin/create_by_seller_firm_public_id",
+        data_array
+      )
+    },
+  }
+}
 </script>
 
 <style>

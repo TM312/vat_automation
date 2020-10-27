@@ -57,26 +57,26 @@
 </template>
 
 <script>
-    export default {
-        name: "DivNotification",
-        props: {
-            notification: {
-                type: [Array, Object],
-                required: true,
-            },
-        },
+export default {
+  name: "DivNotification",
+  props: {
+    notification: {
+      type: [Array, Object],
+      required: true,
+    },
+  },
 
-        computed: {
-            cardBorderVariant() {
-                if (this.notification.subject === 'New Seller Firm' || this.notification.subject === 'New Seller Firms') {
-                    return 'primary'
-                } else {
-                    return ''
-                }
-            }
-
-        }
+  computed: {
+    cardBorderVariant() {
+      if (this.notification.subject === 'New Seller Firm' || this.notification.subject === 'New Seller Firms') {
+        return 'primary'
+      } else {
+        return ''
+      }
     }
+
+  }
+}
 </script>
 
 <style>

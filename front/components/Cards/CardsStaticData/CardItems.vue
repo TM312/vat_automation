@@ -47,70 +47,70 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "CardItems",
+export default {
+  name: "CardItems",
 
-        data() {
-            return {
-                editMode: false,
-                flashCounter: false,
+  data() {
+    return {
+      editMode: false,
+      flashCounter: false,
 
-                fields: [
-                    { key: "brand_name", sortable: false },
-                    { key: "sku", label:"SKU", sortable: false },
-                    { key: "name", sortable: false },
-                    { key: "tax_code_code", label:"Tax Code", sortable: false },
-                    {
-                        key: "weight_kg",
-                        label: "Weight",
-                        formatter: value => {
-                            return Number.parseFloat(value).toFixed(3)
-                        },
-                        sortable: false
-                    },
-                    {
-                        key: "unit_cost_price_net",
-                        sortable: false,
-                        formatter: value => {
-                            return Number.parseFloat(value).toFixed(2)
-                        },
-                    }
-                ]
-            }
+      fields: [
+        { key: "brand_name", sortable: false },
+        { key: "sku", label:"SKU", sortable: false },
+        { key: "name", sortable: false },
+        { key: "tax_code_code", label:"Tax Code", sortable: false },
+        {
+          key: "weight_kg",
+          label: "Weight",
+          formatter: value => {
+            return Number.parseFloat(value).toFixed(3)
+          },
+          sortable: false
         },
-
-        computed: {
-            ...mapState({
-                items: state => state.seller_firm.seller_firm.items,
-                seller_firm: state => state.seller_firm.seller_firm,
-            }),
-
-
-            cardBorder() {
-                return this.editMode ? "info" : ""
-            },
-
-            fieldsEditable() {
-                return this.fields.concat({
-                    key: "edit",
-                    label: "",
-                    sortable: false
-                })
-            }
-
-
-        },
-
-        methods: {
-            flashCount() {
-                this.flashCounter = true
-                setTimeout(() => this.flashCounter = false, 1000)
-
-            }
-
-
+        {
+          key: "unit_cost_price_net",
+          sortable: false,
+          formatter: value => {
+            return Number.parseFloat(value).toFixed(2)
+          },
         }
+      ]
     }
+  },
+
+  computed: {
+    ...mapState({
+      items: state => state.seller_firm.seller_firm.items,
+      seller_firm: state => state.seller_firm.seller_firm,
+    }),
+
+
+    cardBorder() {
+      return this.editMode ? "info" : ""
+    },
+
+    fieldsEditable() {
+      return this.fields.concat({
+        key: "edit",
+        label: "",
+        sortable: false
+      })
+    }
+
+
+  },
+
+  methods: {
+    flashCount() {
+      this.flashCounter = true
+      setTimeout(() => this.flashCounter = false, 1000)
+
+    }
+
+
+  }
+}
 </script>

@@ -13,28 +13,28 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        layout: 'tax',
+export default {
+  layout: 'tax',
 
-        computed: {
-            ...mapState({
-                accountingFirm: state => state.accounting_firm.accounting_firm
-            }),
+  computed: {
+    ...mapState({
+      accountingFirm: state => state.accounting_firm.accounting_firm
+    }),
 
-            countClients() {
-                return this.$store.getters['accounting_firm/countClients']
-            },
-        },
+    countClients() {
+      return this.$store.getters['accounting_firm/countClients']
+    },
+  },
 
-        methods: {
-            async refresh() {
-                const { store } = this.$nuxt.context
-                await store.dispatch("accounting_firm/get_by_public_id", this.accountingFirm.public_id)
-            }
-        },
+  methods: {
+    async refresh() {
+      const { store } = this.$nuxt.context
+      await store.dispatch("accounting_firm/get_by_public_id", this.accountingFirm.public_id)
     }
+  },
+}
 </script>
 
 <style></style>

@@ -19,16 +19,16 @@
 
 <script>
 export default {
-    name: 'ClientsDashboard',
+  name: 'ClientsDashboard',
 
-    methods: {
-        countClients() {
-            return this.$store.getters['accounting_firm/countClients']
-        },
-        countEmployees() {
-            return this.$store.getters['accounting_firm/countEmployees']
-        },
-    }
+  methods: {
+    countClients() {
+      return this.$store.getters['accounting_firm/countClients']
+    },
+    countEmployees() {
+      return this.$store.getters['accounting_firm/countEmployees']
+    },
+  }
 }
 </script>
 

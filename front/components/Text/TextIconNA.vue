@@ -6,7 +6,7 @@
 
 <script>
 export default {
-    name: 'TextIconNA'
+  name: 'TextIconNA'
 }
 </script>
 

@@ -21,15 +21,15 @@
 </template>
 
 <script>
-    export default {
-        name: 'CardClientShort',
-        // eslint-disable-next-line
+export default {
+  name: 'CardClientShort',
+  // eslint-disable-next-line
         props: { business: { type: [Array, Object] } },
 
-        computed: {
-            getCardColor() {
-                return '' //this.business.transaction_ready ? //'' : 'danger'
-            }
-        },
+  computed: {
+    getCardColor() {
+      return '' //this.business.transaction_ready ? //'' : 'danger'
     }
+  },
+}
 </script>

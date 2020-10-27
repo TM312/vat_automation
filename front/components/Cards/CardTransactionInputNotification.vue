@@ -26,29 +26,29 @@
 
 <script>
 export default {
-    name: 'CardTransactionNotification',
-    props: {
-        notification: {
-            type: [Array, Object],
-            required: true
-        }
+  name: 'CardTransactionNotification',
+  props: {
+    notification: {
+      type: [Array, Object],
+      required: true
+    }
+  },
+
+  computed: {
+    fields() {
+      return [
+        { key: 'key', label:'' },
+        { key: 'value', label:'' }
+      ]
+    },
+    items() {
+      return [
+        { key: 'Calculated Value', value: this.notification.calculated_value },
+        { key: 'Reference Value', value: this.notification.reference_value }
+      ]
     },
 
-    computed: {
-        fields() {
-            return [
-                { key: 'key', label:'' },
-                { key: 'value', label:'' }
-            ]
-        },
-        items() {
-            return [
-                { key: 'Calculated Value', value: this.notification.calculated_value },
-                { key: 'Reference Value', value: this.notification.reference_value }
-            ]
-        },
-
-    },
+  },
 
 }
 </script>

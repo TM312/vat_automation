@@ -1,0 +1,47 @@
+<template>
+  <b-sidebar id="sidebar-transaction" title="Transaction Details" right shadow width="500px">
+    <div class="px-3 py-2">
+      <p>
+        Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
+        in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+      </p>
+    </div>
+    <div class="mt-3">
+      {{ transaction }}
+    </div>
+  </b-sidebar>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  name: 'SidebarTransaction',
+  props: {
+    transactionPublicId: {
+      type: String,
+      required: true
+    }
+
+  },
+
+  async fetch() {
+    if (this.transaction.length === 0 || this.transaction.public_id !== this.transactionPublicId) {
+      const { store } = this.$nuxt.context
+      await store.dispatch("transaction/get_by_public_id", this.transactionPublicId)
+    }
+  },
+
+  computed: {
+    ...mapState({
+      transaction: (state) => state.transaction.transaction,
+    }),
+
+  },
+
+}
+</script>
+
+<style>
+
+</style>

@@ -79,101 +79,101 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'FormAddSellerFirmDistanceSale',
+export default {
+  name: 'FormAddSellerFirmDistanceSale',
 
-        async fetch() {
-            const { store } = this.$nuxt.context
-            // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
-            var todayDate = new Date().toISOString().slice(0,10)
-            await store.dispatch("country/get_eu_by_date", todayDate)
-        },
+  async fetch() {
+    const { store } = this.$nuxt.context
+    // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
+    var todayDate = new Date().toISOString().slice(0,10)
+    await store.dispatch("country/get_eu_by_date", todayDate)
+  },
 
-        data() {
-            return {
-                payload: {
-                        arrival_country_code: null,
-                        valid_from: null,
-                        valid_to: null,
-                        active: false
-                    }
-            }
-        },
+  data() {
+    return {
+      payload: {
+        arrival_country_code: null,
+        valid_from: null,
+        valid_to: null,
+        active: false
+      }
+    }
+  },
 
-        computed: {
-            ...mapState({
-                eu: state => state.country.eu
-            }),
+  computed: {
+    ...mapState({
+      eu: state => state.country.eu
+    }),
 
-            optionsArrivalCountry() {
-                let options = this.eu.countries.map(country => {
-                    let properties = {
-                        value: country.code,
-                        text: country.name
-                    }
-                    return properties
-                })
-                return options
-            },
+    optionsArrivalCountry() {
+      let options = this.eu.countries.map(country => {
+        let properties = {
+          value: country.code,
+          text: country.name
+        }
+        return properties
+      })
+      return options
+    },
 
-            validation_valid_to() {
-                if (this.payload.valid_to !== null) {
+    validation_valid_to() {
+      if (this.payload.valid_to !== null) {
 
-                    return this.payload.valid_from <= this.payload.valid_to
+        return this.payload.valid_from <= this.payload.valid_to
 
-                } else {
-                    return null
-                }
-            },
+      } else {
+        return null
+      }
+    },
 
-            validation_submit() {
-                if (
-                    this.payload.arrival_country_code !== null &&
+    validation_submit() {
+      if (
+        this.payload.arrival_country_code !== null &&
                     this.payload.valid_from !== null &&
                     this.validation_valid_to !== false
-                ) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        },
-
-        methods: {
-            async submitPayload() {
-                try {
-                    // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
-                    Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
-
-                    await this.create_by_seller_firm_public_id()
-
-                    this.payload.arrival_country_code = null
-
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    )
-                    this.$emit('flash')
-                    await this.$toast.success('New distance sale succesfully added.', {
-                        duration: 5000
-                    })
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                }
-            },
-
-            async create_by_seller_firm_public_id() {
-                const data_array = [this.$route.params.public_id, this.payload]
-
-                await this.$store.dispatch(
-                    "distance_sale/create_by_seller_firm_public_id",
-                    data_array
-                )
-            },
-        }
+      ) {
+        return false
+      } else {
+        return true
+      }
     }
+  },
+
+  methods: {
+    async submitPayload() {
+      try {
+        // removes all empty values from object : https://stackoverflow.com/questions/23774231/how-do-i-remove-all-null-and-empty-string-values-from-a-json-object
+        Object.keys(this.payload).forEach(k => (!this.payload[k] && this.payload[k] !== undefined) && delete this.payload[k])
+
+        await this.create_by_seller_firm_public_id()
+
+        this.payload.arrival_country_code = null
+
+        await this.$store.dispatch(
+          "seller_firm/get_by_public_id",
+          this.$route.params.public_id
+        )
+        this.$emit('flash')
+        await this.$toast.success('New distance sale succesfully added.', {
+          duration: 5000
+        })
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+      }
+    },
+
+    async create_by_seller_firm_public_id() {
+      const data_array = [this.$route.params.public_id, this.payload]
+
+      await this.$store.dispatch(
+        "distance_sale/create_by_seller_firm_public_id",
+        data_array
+      )
+    },
+  }
+}
 </script>
 
 <style>
