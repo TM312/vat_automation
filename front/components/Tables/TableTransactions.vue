@@ -1,6 +1,11 @@
 <template>
   <div>
-    <sidebar-transaction :transaction-public-id="transactionPublicId" />
+    <h6>transactionPublicId: {{ transactionPublicId }}</h6>
+    <h6>fetchTransaction: {{ fetchTransaction }}</h6>
+    <h5>transationsFull: {{ transationsFull.length }}</h5>
+    <h4>fetched: {{ fetched }}</h4>
+    <br />
+    <sidebar-transaction :transaction-public-id="transactionPublicId" :fetch-transaction="fetchTransaction" />
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
     </h5>
@@ -26,7 +31,11 @@
       </template>
 
       <template #cell(type_code)="data">
-        <b-button v-b-toggle.sidebar-transaction variant="link" @click="transactionPublicId=data.item.public_id">
+        <b-button
+          v-b-toggle.sidebar-transaction
+          variant="link"
+          @click="setSidebar(data.item.public_id)"
+        >
           {{ capitalize(data.value) }}
         </b-button>
       </template>
@@ -104,7 +113,7 @@ export default {
   },
 
   async fetch() {
-    if (this.transactions.length === 0) {
+    if (this.transactions.length === 0 && !this.fetched) {
       console.log(
         "this.transactions.length === 0:",
         this.transactions.length === 0
@@ -119,13 +128,16 @@ export default {
         "transaction/get_by_tax_record_tax_treatment",
         params
       )
+    //   this.fetched = true
     }
   },
 
   data() {
     return {
       buttonShow: true,
-      transactionPublicId: '',
+      transactionPublicId: "",
+      fetchTransaction: false,
+      //   fetched: false,
 
       fields: [
         {
@@ -199,6 +211,10 @@ export default {
                     "transaction/get_by_tax_record_tax_treatment",
                     params
                 );
+            },
+            setSidebar(transactionPublicId) {
+                (this.transactionPublicId = transactionPublicId),
+                    (this.fetchTransaction = !this.fetchTransaction);
             },
         },
     };

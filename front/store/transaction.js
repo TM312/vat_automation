@@ -76,9 +76,9 @@ export const actions = {
     const { status, data } = res
     if (status === 200 && data.data) {
       if (params['page'] === 1) {
-        commit('SET_TRANSACTIONS', data.data)
-      } else {
         commit('PUSH_TRANSACTIONS', data.data)
+      } else {
+        // commit('PUSH_TRANSACTIONS', data.data)
       }
     } else {
       // Handle error here

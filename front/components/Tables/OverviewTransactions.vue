@@ -10,7 +10,7 @@
           {{ taxTreatment.name }}s
         </template>
 
-        <table-transactions :tax-treatment-code="taxTreatment.code" />
+        <table-transactions v-once :tax-treatment-code="taxTreatment.code" />
       </b-tab>
     </b-tabs>
   </div>
