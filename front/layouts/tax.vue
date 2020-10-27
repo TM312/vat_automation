@@ -10,14 +10,14 @@
 </template>
 
 <script>
-    export default {
-        middleware: 'auth',
+export default {
+  middleware: 'auth',
 
-        mounted() {
-            this.socket = this.$nuxtSocket({
-                name: 'home',
-                reconnection: true
-            })
-        }
-    }
+  mounted() {
+    this.socket = this.$nuxtSocket({
+      name: 'home',
+      reconnection: true
+    })
+  }
+}
 </script>

@@ -27,15 +27,15 @@
 </template>
 
 <script>
-    // import { mapState } from 'vuex'
-    export default {
-        name: "NavbarTaxAuth",
-        // computed: {
-        //     ...mapState({
-        //         accounting_firm: state => state.accounting_firm.accounting_firm
-        //     })
+// import { mapState } from 'vuex'
+export default {
+  name: "NavbarTaxAuth",
+  // computed: {
+  //     ...mapState({
+  //         accounting_firm: state => state.accounting_firm.accounting_firm
+  //     })
 
-        // }
-    }
+  // }
+}
 
 </script>

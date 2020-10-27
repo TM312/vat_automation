@@ -12,9 +12,9 @@
 
 import { BIcon } from "bootstrap-vue"
 export default {
-    name: 'ContainerRouteBack',
-    components: {
-        BIcon
-    }
+  name: 'ContainerRouteBack',
+  components: {
+    BIcon
+  }
 }
 </script>

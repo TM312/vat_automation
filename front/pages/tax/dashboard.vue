@@ -57,64 +57,64 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-    export default {
-        layout: "tax",
+export default {
+  layout: "tax",
 
-        async fetch() {
-            const { store } = this.$nuxt.context
+  async fetch() {
+    const { store } = this.$nuxt.context
 
-            if (this.countries.length === 0) {
-                await store.dispatch("country/get_all")
-            }
-
-            if (this.currencies.length === 0) {
-                await store.dispatch("currency/get_all")
-            }
-
-            if (this.taxTreatments.length === 0) {
-                await store.dispatch("tax_treatment/get_all")
-            }
-
-            if (this.taxRateTypes.length === 0) {
-                await store.dispatch("tax_rate_type/get_all")
-            }
-
-            if (this.channels.length === 0) {
-                await store.dispatch("channel/get_all")
-            }
-
-            if (this.vatThresholds.length === 0) {
-                await store.dispatch("vat_threshold/get_all")
-            }
-
-            await store.dispatch("utils/get_all_key_account_notifications")
-        },
-
-        data() {
-            return {
-                checked: false
-            }
-        },
-
-         computed: {
-            ...mapState({
-                channels: state => state.channel.channels,
-                countries: state => state.country.countries,
-                currencies: state => state.currency.currencies,
-                taxTreatments: state => state.tax_treatment.tax_treatments,
-                taxRateTypes: state => state.tax_rate_type.tax_rate_types,
-                vatThresholds: state => state.vat_threshold.vat_thresholds,
-
-
-                notifications: state => state.utils.notifications
-
-
-            }),
-         }
-
+    if (this.countries.length === 0) {
+      await store.dispatch("country/get_all")
     }
+
+    if (this.currencies.length === 0) {
+      await store.dispatch("currency/get_all")
+    }
+
+    if (this.taxTreatments.length === 0) {
+      await store.dispatch("tax_treatment/get_all")
+    }
+
+    if (this.taxRateTypes.length === 0) {
+      await store.dispatch("tax_rate_type/get_all")
+    }
+
+    if (this.channels.length === 0) {
+      await store.dispatch("channel/get_all")
+    }
+
+    if (this.vatThresholds.length === 0) {
+      await store.dispatch("vat_threshold/get_all")
+    }
+
+    await store.dispatch("utils/get_all_key_account_notifications")
+  },
+
+  data() {
+    return {
+      checked: false
+    }
+  },
+
+  computed: {
+    ...mapState({
+      channels: state => state.channel.channels,
+      countries: state => state.country.countries,
+      currencies: state => state.currency.currencies,
+      taxTreatments: state => state.tax_treatment.tax_treatments,
+      taxRateTypes: state => state.tax_rate_type.tax_rate_types,
+      vatThresholds: state => state.vat_threshold.vat_thresholds,
+
+
+      notifications: state => state.utils.notifications
+
+
+    }),
+  }
+
+}
 </script>
 
 <style>

@@ -10,23 +10,23 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'ToastNewTaxRecord',
+  name: 'ToastNewTaxRecord',
 
 
-    computed: {
-        ...mapState({
-            statusTaxRecordTargets: state => state.status.tax_record_targets,
-            statusTaxRecordTarget: state => state.status.tax_record_target
-        }),
-        lenStatusTaxRecords() {
-            return this.statusTaxRecordTargets.length
-        }
+  computed: {
+    ...mapState({
+      statusTaxRecordTargets: state => state.status.tax_record_targets,
+      statusTaxRecordTarget: state => state.status.tax_record_target
+    }),
+    lenStatusTaxRecords() {
+      return this.statusTaxRecordTargets.length
+    }
 
-    },
+  },
 
-    watch: {
-        // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
-        /*eslint-disable */
+  watch: {
+    // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
+    /*eslint-disable */
 
         lenStatusFile (newLength, oldLength) {
             if (oldLength === 0) {

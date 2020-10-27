@@ -25,29 +25,29 @@
 import { BIcon } from "bootstrap-vue"
 
 export default {
-    name:'TemplateCard',
-    components: {
-        BIcon
+  name:'TemplateCard',
+  components: {
+    BIcon
+  },
+  props: {
+    title: {
+      type: String,
+      required: true
     },
-    props: {
-        title: {
-            type: String,
-            required: true
-        },
-        urlEndpointTemplate: {
-            type: String,
-            required: true
-        },
-        templateItems: {
-                type: [Array, Object],
-                required: true
-            }
+    urlEndpointTemplate: {
+      type: String,
+      required: true
     },
-    data() {
-        return {
-            titleJoined: 'collapse-'+ this.title.replace(/\s+/g, '')
-        }
+    templateItems: {
+      type: [Array, Object],
+      required: true
     }
+  },
+  data() {
+    return {
+      titleJoined: 'collapse-'+ this.title.replace(/\s+/g, '')
+    }
+  }
 }
 </script>
 

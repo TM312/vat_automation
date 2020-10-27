@@ -50,89 +50,89 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'FormAddSellerFirmAccount',
+export default {
+  name: 'FormAddSellerFirmAccount',
 
-        async fetch() {
-            if (this.channels.length == 0) {
-                const { store } = this.$nuxt.context
-                await store.dispatch("channel/get_all")
-            }
-        },
+  async fetch() {
+    if (this.channels.length == 0) {
+      const { store } = this.$nuxt.context
+      await store.dispatch("channel/get_all")
+    }
+  },
 
-        data() {
-            return {
-                payload: {
-                    channel_code: null,
-                    given_id: null,
-                },
-            }
-        },
+  data() {
+    return {
+      payload: {
+        channel_code: null,
+        given_id: null,
+      },
+    }
+  },
 
-        computed: {
-            ...mapState({
-                channels: state => state.channel.channels
-            }),
+  computed: {
+    ...mapState({
+      channels: state => state.channel.channels
+    }),
 
-            optionsChannelCode() {
-                let options = this.channels.map(channel => {
-                    let properties = {
-                        value: channel.code,
-                        text: channel.code
-                    }
-                    return properties
-                })
-                return options
-            },
+    optionsChannelCode() {
+      let options = this.channels.map(channel => {
+        let properties = {
+          value: channel.code,
+          text: channel.code
+        }
+        return properties
+      })
+      return options
+    },
 
-            validation_submit() {
-                if (
-                    this.payload.channel_code !== null &&
+    validation_submit() {
+      if (
+        this.payload.channel_code !== null &&
                     this.payload.channel_code !== '' &&
                     this.payload.given_id !== null &&
                     this.payload.given_id !== ''
 
-                ) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        },
-
-        methods: {
-            async submitPayload() {
-                try {
-                    await this.create_by_seller_firm_public_id()
-
-                    this.payload.channel_code = null
-                    this.payload.given_id = null
-
-                    await this.$store.dispatch(
-                        "seller_firm/get_by_public_id",
-                        this.$route.params.public_id
-                    )
-                    this.$emit('flash')
-                    await this.$toast.success('New account succesfully added.', {
-                        duration: 5000
-                    })
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                }
-            },
-
-            async create_by_seller_firm_public_id() {
-                const data_array = [this.$route.params.public_id, this.payload]
-
-                await this.$store.dispatch(
-                    "account/create_by_seller_firm_public_id",
-                    data_array
-                )
-            },
-        }
+      ) {
+        return false
+      } else {
+        return true
+      }
     }
+  },
+
+  methods: {
+    async submitPayload() {
+      try {
+        await this.create_by_seller_firm_public_id()
+
+        this.payload.channel_code = null
+        this.payload.given_id = null
+
+        await this.$store.dispatch(
+          "seller_firm/get_by_public_id",
+          this.$route.params.public_id
+        )
+        this.$emit('flash')
+        await this.$toast.success('New account succesfully added.', {
+          duration: 5000
+        })
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+      }
+    },
+
+    async create_by_seller_firm_public_id() {
+      const data_array = [this.$route.params.public_id, this.payload]
+
+      await this.$store.dispatch(
+        "account/create_by_seller_firm_public_id",
+        data_array
+      )
+    },
+  }
+}
 </script>
 
 <style>

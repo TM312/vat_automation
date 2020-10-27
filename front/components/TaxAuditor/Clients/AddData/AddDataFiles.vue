@@ -8,13 +8,13 @@
 
 <script>
 export default {
-    name: 'AddDataFiles',
+  name: 'AddDataFiles',
 
-    data() {
-        return {
-            title: 'Templates',
-        }
+  data() {
+    return {
+      title: 'Templates',
     }
+  }
 }
 </script>
 

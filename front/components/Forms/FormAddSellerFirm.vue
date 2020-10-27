@@ -64,74 +64,74 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: 'FormAddSellerFirm',
+export default {
+  name: 'FormAddSellerFirm',
 
-        data() {
-            return {
-                payload: {
-                    name: null,
-                    address: null,
-                    establishment_country_code: null
-                }
-            }
-        },
-
-        computed: {
-            ...mapState({
-                countries: state => state.country.countries
-            }),
-
-            optionsCountryCode() {
-                let options = this.countries.map(country => {
-                    let properties = {
-                        value: country.code,
-                        text: country.name
-                    }
-                    return properties
-                })
-                return options
-            },
-
-            validation_submit() {
-                if (
-                    this.payload.establishment_country_code !== null &&
-                    this.payload.establishment_country_code !== null
-                    ) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        },
-
-        methods: {
-            async submitPayload() {
-                try {
-                    await this.create_as_client()
-
-                    this.payload.establishment_country_code = null
-
-
-                    this.$emit('flash')
-                    await this.$toast.success('New client succesfully added.', {
-                        duration: 5000
-                    })
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                }
-            },
-
-            async create_as_client() {
-                await this.$store.dispatch(
-                    "seller_firm/create_as_client",
-                     this.payload
-                )
-            },
-        }
+  data() {
+    return {
+      payload: {
+        name: null,
+        address: null,
+        establishment_country_code: null
+      }
     }
+  },
+
+  computed: {
+    ...mapState({
+      countries: state => state.country.countries
+    }),
+
+    optionsCountryCode() {
+      let options = this.countries.map(country => {
+        let properties = {
+          value: country.code,
+          text: country.name
+        }
+        return properties
+      })
+      return options
+    },
+
+    validation_submit() {
+      if (
+        this.payload.establishment_country_code !== null &&
+                    this.payload.establishment_country_code !== null
+      ) {
+        return false
+      } else {
+        return true
+      }
+    }
+  },
+
+  methods: {
+    async submitPayload() {
+      try {
+        await this.create_as_client()
+
+        this.payload.establishment_country_code = null
+
+
+        this.$emit('flash')
+        await this.$toast.success('New client succesfully added.', {
+          duration: 5000
+        })
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+      }
+    },
+
+    async create_as_client() {
+      await this.$store.dispatch(
+        "seller_firm/create_as_client",
+        this.payload
+      )
+    },
+  }
+}
 </script>
 
 <style>

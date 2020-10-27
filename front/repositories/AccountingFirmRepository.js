@@ -1,26 +1,26 @@
 const resource = '/business/accounting_firm'
 export default ($axios) => ({
-    get_all() {
-        return $axios.get(`${resource}/`)
-    },
+  get_all() {
+    return $axios.get(`${resource}/`)
+  },
 
-    create(payload) {
-        return $axios.post(`${resource}/`, payload)
-    },
+  create(payload) {
+    return $axios.post(`${resource}/`, payload)
+  },
 
-    get_by_public_id(accounting_firm_public_id) {
-        return $axios.get(`${resource}/${accounting_firm_public_id}`)
-    },
+  get_by_public_id(accounting_firm_public_id) {
+    return $axios.get(`${resource}/${accounting_firm_public_id}`)
+  },
 
-    get_by_id(accounting_firm_id) {
-        return $axios.get(`${resource}/${accounting_firm_id}`)
-    },
+  get_by_id(accounting_firm_id) {
+    return $axios.get(`${resource}/${accounting_firm_id}`)
+  },
 
-    // update(accounting_firm_id, payload) {
-    //     return $axios.put(`${resource}/${accounting_firm_id}`, payload)
-    // },
+  // update(accounting_firm_id, payload) {
+  //     return $axios.put(`${resource}/${accounting_firm_id}`, payload)
+  // },
 
-    delete_by_public_id(accounting_firm_public_id) {
-        return $axios.delete(`${resource}/${accounting_firm_public_id}`)
-    }
+  delete_by_public_id(accounting_firm_public_id) {
+    return $axios.delete(`${resource}/${accounting_firm_public_id}`)
+  }
 })

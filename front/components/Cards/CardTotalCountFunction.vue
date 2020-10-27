@@ -7,30 +7,30 @@
 </template>
 
 <script>
-    export default {
-        name: "CardTotalCountFunction",
-        props: {
-            counterFunction: {
-                type: Function,
-                required: true,
-            },
+export default {
+  name: "CardTotalCountFunction",
+  props: {
+    counterFunction: {
+      type: Function,
+      required: true,
+    },
 
-            subTitle: {
-                type: String,
-                required: false,
-                default: ''
-            }
-        },
-
-        computed: {
-            counter() {
-                return this.counterFunction().toString()
-            }
-
-        }
-
-
+    subTitle: {
+      type: String,
+      required: false,
+      default: ''
     }
+  },
+
+  computed: {
+    counter() {
+      return this.counterFunction().toString()
+    }
+
+  }
+
+
+}
 </script>
 
 <style>

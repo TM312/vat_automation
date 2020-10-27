@@ -22,35 +22,35 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'ToastDataUploadInvalidFile',
+  name: 'ToastDataUploadInvalidFile',
 
-    data() {
-        return {
-            toastFile: false
-        }
+  data() {
+    return {
+      toastFile: false
+    }
+  },
+
+  computed: {
+    ...mapState({
+      statusFileTargets: state => state.status.file_targets,
+      lenStatusFile: state => state.status.file_targets.length,
+
+
+    }),
+
+    doneStatusFileTargets() {
+      return this.$store.getters['status/doneStatusFileTargets']
     },
 
-    computed: {
-        ...mapState({
-            statusFileTargets: state => state.status.file_targets,
-            lenStatusFile: state => state.status.file_targets.length,
-
-
-        }),
-
-        doneStatusFileTargets() {
-            return this.$store.getters['status/doneStatusFileTargets']
-        },
-
-        totalStatusFileTargets() {
-            return this.$store.getters['status/totalStatusFileTargets']
-        },
-
+    totalStatusFileTargets() {
+      return this.$store.getters['status/totalStatusFileTargets']
     },
 
-    watch: {
-        // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
-        /*eslint-disable */
+  },
+
+  watch: {
+    // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
+    /*eslint-disable */
 
         lenStatusFile (newLength, oldLength) {
             if (oldLength === 0) {

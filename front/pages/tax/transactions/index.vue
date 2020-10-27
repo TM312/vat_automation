@@ -3,9 +3,9 @@
 </template>
 
 <script>
-    export default {
-        layout: "tax",
-    }
+export default {
+  layout: "tax",
+}
 </script>
 
 <style>

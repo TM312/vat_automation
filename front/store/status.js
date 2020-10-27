@@ -1,63 +1,63 @@
 export const state = () => ({
-    account_targets: [],
-    item_targets: [],
-    vat_number_targets: [],
-    distance_sale_targets: [],
-    transaction_input_targets: [],
-    seller_firm_targets: [],
-    file_targets: [],
+  account_targets: [],
+  item_targets: [],
+  vat_number_targets: [],
+  distance_sale_targets: [],
+  transaction_input_targets: [],
+  seller_firm_targets: [],
+  file_targets: [],
 
-    tax_record_target: [],
-    tax_record_targets: [],
+  tax_record_target: [],
+  tax_record_targets: [],
 
-    account_target_index: [],
-    item_target_index: [],
-    vat_number_target_index: [],
-    distance_sale_target_index: [],
-    transaction_input_target_index: [],
-    seller_firm_target_index: [],
-    file_target_index: [],
+  account_target_index: [],
+  item_target_index: [],
+  vat_number_target_index: [],
+  distance_sale_target_index: [],
+  transaction_input_target_index: [],
+  seller_firm_target_index: [],
+  file_target_index: [],
 
-    account_targets_done: [],
-    item_targets_done: [],
-    vat_number_targets_done: [],
-    distance_sale_targets_done: [],
-    transaction_input_targets_done: [],
-    seller_firm_targets_done: [],
-    file_targets_done: [],
+  account_targets_done: [],
+  item_targets_done: [],
+  vat_number_targets_done: [],
+  distance_sale_targets_done: [],
+  transaction_input_targets_done: [],
+  seller_firm_targets_done: [],
+  file_targets_done: [],
 
-    account_totals: [],
-    item_totals: [],
-    vat_number_totals: [],
-    distance_sale_totals: [],
-    transaction_input_totals: [],
-    seller_firm_totals: [],
-    file_totals: [],
+  account_totals: [],
+  item_totals: [],
+  vat_number_totals: [],
+  distance_sale_totals: [],
+  transaction_input_totals: [],
+  seller_firm_totals: [],
+  file_totals: [],
 
 })
 
 
 export const getters = {
 
-    doneStatusAccountTargets: state => state.account_targets_done.length > 0 ? state.account_targets_done.every(value => value.done === true) : false,
-    doneStatusItemTargets: state => state.item_targets_done.length > 0 ? state.item_targets_done.every(value => value.done === true): false,
-    doneStatusVatNumberTargets: state => state.vat_number_targets_done.length > 0 ? state.vat_number_targets_done.every(value => value.done === true) : false,
-    doneStatusDistanceSaleTargets: state => state.distance_sale_targets_done.length > 0 ? state.distance_sale_targets_done.every(value => value.done === true) : false,
-    doneStatusTransactionInputTargets: state => state.transaction_input_targets_done.length > 0 ? state.transaction_input_targets_done.every(value => value.done === true) : false,
-    doneStatusSellerFirmTargets: state => state.seller_firm_targets_done.length > 0 ? state.seller_firm_targets_done.every(value => value.done === true) : false,
-    doneStatusFileTargets: state => state.file_targets_done.length > 0 ? state.file_targets_done.every(value => value.done === true) : false,
+  doneStatusAccountTargets: state => state.account_targets_done.length > 0 ? state.account_targets_done.every(value => value.done === true) : false,
+  doneStatusItemTargets: state => state.item_targets_done.length > 0 ? state.item_targets_done.every(value => value.done === true): false,
+  doneStatusVatNumberTargets: state => state.vat_number_targets_done.length > 0 ? state.vat_number_targets_done.every(value => value.done === true) : false,
+  doneStatusDistanceSaleTargets: state => state.distance_sale_targets_done.length > 0 ? state.distance_sale_targets_done.every(value => value.done === true) : false,
+  doneStatusTransactionInputTargets: state => state.transaction_input_targets_done.length > 0 ? state.transaction_input_targets_done.every(value => value.done === true) : false,
+  doneStatusSellerFirmTargets: state => state.seller_firm_targets_done.length > 0 ? state.seller_firm_targets_done.every(value => value.done === true) : false,
+  doneStatusFileTargets: state => state.file_targets_done.length > 0 ? state.file_targets_done.every(value => value.done === true) : false,
 
-    totalStatusAccountTargets: state  => state.account_totals.length === 0 ? 0 : state.account_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusItemTargets: state  => state.item_totals.length === 0 ? 0 : state.item_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusVatNumberTargets: state  => state.vat_number_totals.length === 0 ? 0 : state.vat_number_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusDistanceSaleTargets: state  => state.distance_sale_totals.length === 0 ? 0 : state.distance_sale_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusTransactionInputTargets: state  => state.transaction_input_totals.length === 0 ? 0 : state.transaction_input_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusSellerFirmTargets: state  => state.seller_firm_totals.length === 0 ? 0 : state.seller_firm_totals.reduce((a, b) => a + b.total, 0),
-    totalStatusFileTargets: state  => state.file_totals.length === 0 ? 0 : state.file_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusAccountTargets: state  => state.account_totals.length === 0 ? 0 : state.account_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusItemTargets: state  => state.item_totals.length === 0 ? 0 : state.item_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusVatNumberTargets: state  => state.vat_number_totals.length === 0 ? 0 : state.vat_number_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusDistanceSaleTargets: state  => state.distance_sale_totals.length === 0 ? 0 : state.distance_sale_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusTransactionInputTargets: state  => state.transaction_input_totals.length === 0 ? 0 : state.transaction_input_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusSellerFirmTargets: state  => state.seller_firm_totals.length === 0 ? 0 : state.seller_firm_totals.reduce((a, b) => a + b.total, 0),
+  totalStatusFileTargets: state  => state.file_totals.length === 0 ? 0 : state.file_totals.reduce((a, b) => a + b.total, 0),
 
 
 
-    /*eslint-disable */
+  /*eslint-disable */
 }
 // mutations: receive the state as the first argumen, you can pass an additional argument to store.commit, which is called the payload for the mutation
 export const mutations = {

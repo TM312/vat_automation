@@ -95,56 +95,56 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "CardClient",
+export default {
+  name: "CardClient",
 
-        data() {
-            return {
-                buttonDisabled: false,
-            }
-        },
-
-        computed: {
-            ...mapState({
-                sellerFirm: (state) => state.seller_firm.seller_firm,
-            }),
-            sellerFirmEstablishmentCountry() {
-                return this.$store.getters["country/countryNameByCode"](
-                    this.sellerFirm.establishment_country_code
-                )
-            },
-        },
-
-        methods: {
-            async remove(sellerFirmPublicId) {
-                this.buttonDisabled = true
-                try {
-                    await this.$store.dispatch(
-                        "seller_firm/delete_by_public_id",
-                        sellerFirmPublicId
-                    )
-                    await this.$store.dispatch(
-                        "accounting_firm/get_by_public_id",
-                        this.$auth.user.employer_public_id
-                    )
-                    await this.$auth.fetchUser()
-
-                    this.$router.push("/tax/clients")
-                } catch (error) {
-                    this.$toast.error(error, { duration: 5000 })
-                    this.buttonDisabled = false
-                    return []
-                }
-            },
-        },
-
-        // function() {
-        //     var taxAuditors = this.seller_firm.tax_auditors
-        //     return taxAuditors.map(function(index) {
-        //         console.log('index:', index, 'index % 2 == 0:', index % 2 == 0)
-        //         return (index % 2 == 0) ? 'success' : 'info'
-        //     })
+  data() {
+    return {
+      buttonDisabled: false,
     }
+  },
+
+  computed: {
+    ...mapState({
+      sellerFirm: (state) => state.seller_firm.seller_firm,
+    }),
+    sellerFirmEstablishmentCountry() {
+      return this.$store.getters["country/countryNameByCode"](
+        this.sellerFirm.establishment_country_code
+      )
+    },
+  },
+
+  methods: {
+    async remove(sellerFirmPublicId) {
+      this.buttonDisabled = true
+      try {
+        await this.$store.dispatch(
+          "seller_firm/delete_by_public_id",
+          sellerFirmPublicId
+        )
+        await this.$store.dispatch(
+          "accounting_firm/get_by_public_id",
+          this.$auth.user.employer_public_id
+        )
+        await this.$auth.fetchUser()
+
+        this.$router.push("/tax/clients")
+      } catch (error) {
+        this.$toast.error(error, { duration: 5000 })
+        this.buttonDisabled = false
+        return []
+      }
+    },
+  },
+
+  // function() {
+  //     var taxAuditors = this.seller_firm.tax_auditors
+  //     return taxAuditors.map(function(index) {
+  //         console.log('index:', index, 'index % 2 == 0:', index % 2 == 0)
+  //         return (index % 2 == 0) ? 'success' : 'info'
+  //     })
+}
 </script>

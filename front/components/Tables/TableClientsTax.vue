@@ -12,24 +12,24 @@
 
 <script>
 export default {
-    name: 'TableClientsTax',
+  name: 'TableClientsTax',
 
-    props: {
-        clients: {
-            type: [Array],
-            required: true
+  props: {
+    clients: {
+      type: [Array],
+      required: true
 
-        }
-    },
-
-    data() {
-        return {
-            fields: [
-                { key: 'name', sortable: false },
-                { key: 'address', sortable: false }
-            ],
-        }
     }
+  },
+
+  data() {
+    return {
+      fields: [
+        { key: 'name', sortable: false },
+        { key: 'address', sortable: false }
+      ],
+    }
+  }
 }
 </script>
 

@@ -110,33 +110,33 @@
 </template>
 
 <script>
-    export default {
-        name:'OverviewBaseDataLoading',
-        data() {
-            return {
-                fieldsVatNumbers: [
-                    { key: "vatin", label: "VATIN", sortable: false },
-                    { key: "valid", sortable: false },
-                    { key: "request_date", sortable: true },
-                    { key: "valid_from", sortable: true },
-                    { key: "valid_to", sortable: true },
-                    { key: "initial_tax_date", sortable: true }
+export default {
+  name:'OverviewBaseDataLoading',
+  data() {
+    return {
+      fieldsVatNumbers: [
+        { key: "vatin", label: "VATIN", sortable: false },
+        { key: "valid", sortable: false },
+        { key: "request_date", sortable: true },
+        { key: "valid_from", sortable: true },
+        { key: "valid_to", sortable: true },
+        { key: "initial_tax_date", sortable: true }
 
-                ],
+      ],
 
-                fieldsAccounts: [
-                    { key: 'channel_code', label: 'Channel', sortable: true },
-                    { key: 'given_id', label: "Account ID", sortable: false },
-                ],
+      fieldsAccounts: [
+        { key: 'channel_code', label: 'Channel', sortable: true },
+        { key: 'given_id', label: "Account ID", sortable: false },
+      ],
 
-                fieldsDistanceSales: [
-                    { key: "platform", sortable: false },
-                    { key: "arrival_country", sortable: true },
-                    { key: "active", sortable: true },
-                ]
-            }
-        },
+      fieldsDistanceSales: [
+        { key: "platform", sortable: false },
+        { key: "arrival_country", sortable: true },
+        { key: "active", sortable: true },
+      ]
     }
+  },
+}
 </script>
 
 <style>

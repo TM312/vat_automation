@@ -1,5 +1,6 @@
 <template>
   <div>
+    <sidebar-transaction :transaction-public-id="transactionPublicId" />
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
     </h5>
@@ -25,7 +26,9 @@
       </template>
 
       <template #cell(type_code)="data">
-        {{ capitalize(data.value) }}
+        <b-button v-b-toggle.sidebar-transaction variant="link" @click="transactionPublicId=data.item.public_id">
+          {{ capitalize(data.value) }}
+        </b-button>
       </template>
 
       <template #cell(departure_to_arrival)="data">
@@ -49,22 +52,28 @@
         </b-row>
       </template>
 
-      <template #cell(details)="row">
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? "Hide" : "Show" }} Details
-        </b-button>
+      <template #cell(tax_jurisdiction_code)="data">
+        {{ $store.getters["country/countryNameByCode"](data.value) }}
       </template>
 
-      <template #row-details>
-        <p>hello</p>
-        <!-- <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">
-              {{ key }}: {{ value }}
-            </li>
-          </ul>
-        </b-card> -->
-      </template>
+      <!-- <template #cell(details)="row">
+                <b-button size="sm" @click="row.toggleDetails">
+                Details
+                </b-button>
+            </template>
+
+            <template #row-details>
+                <p>hello</p>
+                <b-card>
+                <ul>
+                    <li v-for="(value, key) in row.item" :key="key">
+                    {{ key }}: {{ value }}
+                    </li>
+                </ul>
+                </b-card>
+            </b-table>
+        </div>
+        </template> -->
     </b-table>
 
     <b-button
@@ -82,91 +91,95 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "TableTransactions",
+export default {
+  name: "TableTransactions",
 
-        props: {
-            taxTreatmentCode: {
-                type: String,
-                required: true,
-            },
+  props: {
+    taxTreatmentCode: {
+      type: String,
+      required: true,
+    },
+  },
+
+  async fetch() {
+    if (this.transactions.length === 0) {
+      console.log(
+        "this.transactions.length === 0:",
+        this.transactions.length === 0
+      )
+      const { store } = this.$nuxt.context
+      const params = {
+        tax_record_public_id: this.taxRecord.public_id,
+        tax_treatment_code: this.taxTreatmentCode,
+        page: 1,
+      }
+      await store.dispatch(
+        "transaction/get_by_tax_record_tax_treatment",
+        params
+      )
+    }
+  },
+
+  data() {
+    return {
+      buttonShow: true,
+      transactionPublicId: '',
+
+      fields: [
+        {
+          key: "tax_date",
+          sortable: false,
         },
-
-        async fetch() {
-            if (this.transactions.length === 0) {
-                console.log(
-                    "this.transactions.length === 0:",
-                    this.transactions.length === 0
-                )
-                const { store } = this.$nuxt.context
-                const params = {
-                    tax_record_public_id: this.taxRecord.public_id,
-                    tax_treatment_code: this.taxTreatmentCode,
-                    page: 1,
-                }
-                await store.dispatch(
-                    "transaction/get_by_tax_record_tax_treatment",
-                    params
-                )
-            }
+        // {
+        //   key: "transaction_input_given_id",
+        //   label: "Given ID",
+        //   sortable: false,
+        // },
+        // {
+        //   key: "transaction_input_activity_id",
+        //   label: "Activity ID",
+        //   sortable: false,
+        // },
+        {
+          key: "type_code",
+          sortable: false,
         },
-
-        data() {
-            return {
-                buttonShow: true,
-
-                fields: [
-                    {
-                        key: "tax_date",
-                        sortable: false,
-                    },
-                    {
-                        key: "transaction_input_given_id",
-                        label: "Given ID",
-                        sortable: false,
-                        variant: 'danger'
-                    },
-                    {
-                        key: "transaction_input_activity_id",
-                        label: "Activity ID",
-                        sortable: false,
-                    },
-                    {
-                        key: "type_code",
-                        sortable: false,
-                    },
-                    {
-                        key: "departure_to_arrival",
-                        sortable: false,
-                    },
-                    {
-                        key: "details",
-                        sortable: false,
-                    },
-                ],
-            }
+        {
+          key: "departure_to_arrival",
+          sortable: false,
         },
-
-        computed: {
-            ...mapState({
-                taxRecord: (state) => state.tax_record.tax_record,
-                transationsFull: (state) => state.transaction.transactions,
-            }),
-            transactions() {
-                return this.$store.getters[
-                    "transaction/getTransactionsByTaxTreatmentCode"
-                ](this.taxTreatmentCode).map(mta => mta)
-            },
-
-            currentPage() {
-                return Math.trunc(this.transactions.length / 50) //needs to match with api config transactions_per_page
-            },
+        {
+          key: "tax_jurisdiction_code",
+          sortable: false,
         },
+        // {
+        //     key: "details",
+        //     sortable: false,
+        // }
+      ],
+    }
+  },
 
-        watch: {
-            /*eslint-disable */
+  computed: {
+    ...mapState({
+      taxRecord: (state) => state.tax_record.tax_record,
+      transationsFull: (state) => state.transaction.transactions,
+    }),
+    transactions() {
+      return this.$store.getters[
+        "transaction/getTransactionsByTaxTreatmentCode"
+      ](this.taxTreatmentCode)
+    },
+
+    currentPage() {
+      return Math.trunc(this.transactions.length / 50) //needs to match with api config transactions_per_page
+    },
+  },
+
+  watch: {
+    /*eslint-disable */
             transactions(newVal, oldVal) {
                 if (newVal.length < oldVal.length + 50) {
                     this.buttonShow = false;

@@ -12,7 +12,7 @@
 <script>
 
 export default {
-    name: 'ContainerAddClient'
+  name: 'ContainerAddClient'
 
 }
 </script>

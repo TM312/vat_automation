@@ -90,75 +90,75 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "CardVatNumbers",
-        // eslint-disable-next-line
+export default {
+  name: "CardVatNumbers",
+  // eslint-disable-next-line
 
-        data() {
-            return {
-                editMode: false,
-                flashCounter: false,
-                buttonValidateBusy: false,
+  data() {
+    return {
+      editMode: false,
+      flashCounter: false,
+      buttonValidateBusy: false,
 
-                fields: [
-                    { key: "vatin", label: "VATIN", sortable: false },
-                    { key: "valid", sortable: false },
-                    { key: "request_date", sortable: false },
-                    { key: "validity", sortable: false },
-                    { key: "initial_tax_date", sortable: false },
-                ]
-            }
-        },
-
-        computed: {
-            ...mapState({
-                vatNumbers: state => state.seller_firm.seller_firm.vat_numbers,
-            }),
-
-            cardBorder() {
-                return this.editMode ? "info" : ""
-            },
-
-            fieldsEditable() {
-                return this.fields.concat({
-                    key: "edit",
-                    label: "",
-                    sortable: false
-                })
-            }
-
-
-        },
-
-        methods: {
-            flashCount() {
-                this.flashCounter = true
-                setTimeout(() => this.flashCounter = false, 1000)
-
-            },
-
-            async evaluateRefresh() {
-                await this.$store.dispatch("seller_firm/get_by_public_id", this.$route.params.public_id)
-            },
-
-            async validate(item) {
-                this.buttonValidateBusy = true
-
-                const payload = {
-                    country_code: item.country_code,
-                    number: item.number
-                }
-
-                await this.$store.dispatch("vatin/validate", payload)
-
-                await this.evaluateRefresh()
-
-                this.buttonValidateBusy = false
-            },
-
-
-        }
+      fields: [
+        { key: "vatin", label: "VATIN", sortable: false },
+        { key: "valid", sortable: false },
+        { key: "request_date", sortable: false },
+        { key: "validity", sortable: false },
+        { key: "initial_tax_date", sortable: false },
+      ]
     }
+  },
+
+  computed: {
+    ...mapState({
+      vatNumbers: state => state.seller_firm.seller_firm.vat_numbers,
+    }),
+
+    cardBorder() {
+      return this.editMode ? "info" : ""
+    },
+
+    fieldsEditable() {
+      return this.fields.concat({
+        key: "edit",
+        label: "",
+        sortable: false
+      })
+    }
+
+
+  },
+
+  methods: {
+    flashCount() {
+      this.flashCounter = true
+      setTimeout(() => this.flashCounter = false, 1000)
+
+    },
+
+    async evaluateRefresh() {
+      await this.$store.dispatch("seller_firm/get_by_public_id", this.$route.params.public_id)
+    },
+
+    async validate(item) {
+      this.buttonValidateBusy = true
+
+      const payload = {
+        country_code: item.country_code,
+        number: item.number
+      }
+
+      await this.$store.dispatch("vatin/validate", payload)
+
+      await this.evaluateRefresh()
+
+      this.buttonValidateBusy = false
+    },
+
+
+  }
+}
 </script>

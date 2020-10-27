@@ -59,52 +59,52 @@
 </template>
 
 <script>
-    // Validation1: not uploading the same file multiple times.
-    // Validation2: not uploading no file at all
+// Validation1: not uploading the same file multiple times.
+// Validation2: not uploading no file at all
 
-    export default {
-        name: "CardDataUpload",
+export default {
+  name: "CardDataUpload",
 
-        props: {
-            // eslint-disable-next-line
+  props: {
+    // eslint-disable-next-line
             urlEndpointUpload: {
-                type: String,
-                required: false
-            }
-        },
-        data() {
-            return {
-                files: [],
-                fields: [
-                    "#",
-                    "name",
-                    {
-                        key: "lastModified",
-                        label: "Last Modified",
-                        formatter: (value, key, item) => {
-                            return new Date(item.lastModified).toLocaleString()
-                        }
-                    },
-                     {
-                        key: "button",
-                        label: ""
-                    },
-                ]
-            }
-        },
-
-        methods: {
-            onFilesSelected() {
-                let selectedFiles = this.$refs.files.files
-
-                for (var i = 0; i < selectedFiles.length; i++) {
-                    this.files.push(selectedFiles[i])
-                }
-            },
-
-            removeFile(key) {
-                this.files.splice(key, 1)
-            }
-        }
+      type: String,
+      required: false
     }
+  },
+  data() {
+    return {
+      files: [],
+      fields: [
+        "#",
+        "name",
+        {
+          key: "lastModified",
+          label: "Last Modified",
+          formatter: (value, key, item) => {
+            return new Date(item.lastModified).toLocaleString()
+          }
+        },
+        {
+          key: "button",
+          label: ""
+        },
+      ]
+    }
+  },
+
+  methods: {
+    onFilesSelected() {
+      let selectedFiles = this.$refs.files.files
+
+      for (var i = 0; i < selectedFiles.length; i++) {
+        this.files.push(selectedFiles[i])
+      }
+    },
+
+    removeFile(key) {
+      this.files.splice(key, 1)
+    }
+  }
+}
 </script>

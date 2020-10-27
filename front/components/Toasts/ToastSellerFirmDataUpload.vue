@@ -60,43 +60,43 @@
 import { mapState } from 'vuex'
 
 export default {
-    name: 'ToastSellerFirmDataUpload',
+  name: 'ToastSellerFirmDataUpload',
 
-    data() {
-        return {
-            toastSellerFirm: false
-        }
+  data() {
+    return {
+      toastSellerFirm: false
+    }
+  },
+
+  computed: {
+    ...mapState({
+      statusSellerFirmTargets: state => state.status.seller_firm_targets,
+      lenStatusSellerFirm: state => state.status.seller_firm_targets.length,
+
+
+    }),
+
+    doneStatusSellerFirmTargets() {
+      return this.$store.getters['status/doneStatusSellerFirmTargets']
     },
 
-    computed: {
-        ...mapState({
-            statusSellerFirmTargets: state => state.status.seller_firm_targets,
-            lenStatusSellerFirm: state => state.status.seller_firm_targets.length,
-
-
-        }),
-
-        doneStatusSellerFirmTargets() {
-            return this.$store.getters['status/doneStatusSellerFirmTargets']
-        },
-
-        totalStatusSellerFirmTargets() {
-            return this.$store.getters['status/totalStatusSellerFirmTargets']
-        },
-
-        titleSellerFirm() {
-            if (this.doneStatusSellerFirmTargets) {
-                return (this.lenStatusSellerFirm === 1) ? 'Uploaded seller firm data processed' : `${this.totalStatusSellerFirmTargets} uploaded seller firms processed`
-            } else {
-                return 'New seller firms are being registered...'
-            }
-        },
-
+    totalStatusSellerFirmTargets() {
+      return this.$store.getters['status/totalStatusSellerFirmTargets']
     },
 
-    watch: {
-        // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
-        /*eslint-disable */
+    titleSellerFirm() {
+      if (this.doneStatusSellerFirmTargets) {
+        return (this.lenStatusSellerFirm === 1) ? 'Uploaded seller firm data processed' : `${this.totalStatusSellerFirmTargets} uploaded seller firms processed`
+      } else {
+        return 'New seller firms are being registered...'
+      }
+    },
+
+  },
+
+  watch: {
+    // https://stackoverflow.com/questions/43270159/vue-js-2-how-to-watch-store-values-from-vuex
+    /*eslint-disable */
 
         lenStatusSellerFirm (newLength, oldLength) {
             if (oldLength === 0) {

@@ -17,40 +17,34 @@
           {{ Number.parseFloat(taxRecord.payable_vat_amount).toFixed(2) }} {{ taxRecord.currency_code }}
         </b-col>
       </b-row>
-      <b-row class="mt-2">
-        <b-col>
-          <span
-            class="text-primary"
-            @click="$emit('single-view', taxRecord.public_id)"
-          >
-            Details
-          </span>
-        </b-col>
-      </b-row>
+
+      <b-button variant="link" class="mt-2 pl-0" @click="$emit('single-view', taxRecord.public_id)">
+        Details
+      </b-button>
     </b-card-text>
   </b-card>
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-    export default {
-        name: 'CardTaxRecordShort',
-        // eslint-disable-next-line
+export default {
+  name: 'CardTaxRecordShort',
+  // eslint-disable-next-line
         props: { taxRecord: { type: [Array, Object] } },
 
-        computed: {
-            ...mapState({
-                countries: state => state.country.countries
-            }),
+  computed: {
+    ...mapState({
+      countries: state => state.country.countries
+    }),
 
-            taxJurisdictionName() {
-                if (this.countries.length !== 0) {
-                    return this.countries.find(country => country.code == this.taxRecord.tax_jurisdiction_code).name
-                } else {
-                    return null
-                }
-            }
-        },
+    taxJurisdictionName() {
+      if (this.countries.length !== 0) {
+        return this.countries.find(country => country.code == this.taxRecord.tax_jurisdiction_code).name
+      } else {
+        return null
+      }
     }
+  },
+}
 </script>

@@ -86,83 +86,83 @@
 </template>
 
 <script>
-    import { mapState } from "vuex"
+import { mapState } from "vuex"
 
-    export default {
-        name: "CardDistanceSales",
+export default {
+  name: "CardDistanceSales",
 
-        data() {
-            return {
-                editMode: false,
-                flashCounter: false,
+  data() {
+    return {
+      editMode: false,
+      flashCounter: false,
 
-                selected: null,
+      selected: null,
 
-                fields: [
-                    { key: "arrival_country", sortable: false },
-                    { key: "active", sortable: false },
-                    { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
-                    { key: 'details', label: '' }
+      fields: [
+        { key: "arrival_country", sortable: false },
+        { key: "active", sortable: false },
+        { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
+        { key: 'details', label: '' }
 
-                ]
-            }
-        },
-
-        computed: {
-            ...mapState({
-                distanceSales: state => state.seller_firm.seller_firm.distance_sales,
-                distanceSale: state => state.distance_sale.distance_sale,
-                vatThresholds: state => state.vat_threshold.vat_thresholds,
-            }),
-
-            // this computed property adds the country specific vat_threshold attribute to the distanceSales Array
-            distanceSalesVatThresholdItems() {
-                var ctx = this.$store.getters["vat_threshold/getByCountryCode"]
-                var extDSArray = this.distanceSales
-                extDSArray.forEach(function(distanceSale) {
-                    distanceSale['vat_threshold'] = ctx(distanceSale.arrival_country_code)
-                })
-                return extDSArray
-            },
-
-
-
-            cardBorder() {
-                return this.editMode ? "info" : ""
-            },
-
-            fieldsEditable() {
-                return this.fields.concat({
-                    key: "edit",
-                    label: "",
-                    sortable: false
-                })
-            }
-
-
-        },
-
-        methods: {
-            flashCount() {
-                this.flashCounter = true
-                setTimeout(() => this.flashCounter = false, 1000)
-
-            },
-
-            getHistory: async function(payload) {
-                if (payload.length !== 0 && payload[0].public_id !== this.distanceSale.public_id) {
-                    this.selected = payload[0]
-                    const { store } = this.$nuxt.context
-                    await store.dispatch("distance_sale/get_by_public_id", payload[0].public_id)
-                }
-            },
-
-
-            // toggleIconByIndex(index) {
-            //     this.icon[index] = !this.icon[index]
-            // }
-
-
-        }
+      ]
     }
+  },
+
+  computed: {
+    ...mapState({
+      distanceSales: state => state.seller_firm.seller_firm.distance_sales,
+      distanceSale: state => state.distance_sale.distance_sale,
+      vatThresholds: state => state.vat_threshold.vat_thresholds,
+    }),
+
+    // this computed property adds the country specific vat_threshold attribute to the distanceSales Array
+    distanceSalesVatThresholdItems() {
+      var ctx = this.$store.getters["vat_threshold/getByCountryCode"]
+      var extDSArray = this.distanceSales
+      extDSArray.forEach(function(distanceSale) {
+        distanceSale['vat_threshold'] = ctx(distanceSale.arrival_country_code)
+      })
+      return extDSArray
+    },
+
+
+
+    cardBorder() {
+      return this.editMode ? "info" : ""
+    },
+
+    fieldsEditable() {
+      return this.fields.concat({
+        key: "edit",
+        label: "",
+        sortable: false
+      })
+    }
+
+
+  },
+
+  methods: {
+    flashCount() {
+      this.flashCounter = true
+      setTimeout(() => this.flashCounter = false, 1000)
+
+    },
+
+    getHistory: async function(payload) {
+      if (payload.length !== 0 && payload[0].public_id !== this.distanceSale.public_id) {
+        this.selected = payload[0]
+        const { store } = this.$nuxt.context
+        await store.dispatch("distance_sale/get_by_public_id", payload[0].public_id)
+      }
+    },
+
+
+    // toggleIconByIndex(index) {
+    //     this.icon[index] = !this.icon[index]
+    // }
+
+
+  }
+}
 </script>

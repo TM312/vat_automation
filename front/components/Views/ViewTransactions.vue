@@ -24,14 +24,14 @@
 <script>
 
 export default {
-    name: "ViewTransactions",
+  name: "ViewTransactions",
 
-    props: {
-        transactions: {
-            type: [Array, Object],
-            required: true
-        }
-    },
+  props: {
+    transactions: {
+      type: [Array, Object],
+      required: true
+    }
+  },
 
 }
 </script>

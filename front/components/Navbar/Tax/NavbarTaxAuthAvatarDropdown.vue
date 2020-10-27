@@ -23,29 +23,29 @@
 </template>
 
 <script>
-    import { BIcon } from "bootstrap-vue"
-    export default {
-        name: "NavbarTaxAuthAvatarDropdown",
-        components: {
-            BIcon
-        },
-        data() {
-            return {
-                payments: true
-            }
-        },
-        computed: {
-            initials() {
-                return this.$auth.user.initials
-            }
-        },
-        methods: {
-            async logout() {
-                await this.$auth.logout()
-                this.$router.push("/logout")
-            }
-        },
+import { BIcon } from "bootstrap-vue"
+export default {
+  name: "NavbarTaxAuthAvatarDropdown",
+  components: {
+    BIcon
+  },
+  data() {
+    return {
+      payments: true
     }
+  },
+  computed: {
+    initials() {
+      return this.$auth.user.initials
+    }
+  },
+  methods: {
+    async logout() {
+      await this.$auth.logout()
+      this.$router.push("/logout")
+    }
+  },
+}
 </script>
 
 <style></style>
