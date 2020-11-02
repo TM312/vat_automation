@@ -1,6 +1,7 @@
 <template>
-  <div fluid>
-    <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
+  <div>
+    deactivated
+    <!-- <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
       <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transaction-input-public-id="$route.params.public_id" /> </p>
     </b-alert>
     <b-tabs pills card>
@@ -23,52 +24,52 @@
           <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" />
         </b-card>
       </b-tab>
-    </b-tabs>
+    </b-tabs> -->
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 
-export default {
-  name: 'ContainerTransactionInput',
-  props: {
-    transactionInputPublicId: {
-      type: String,
-      required: true
-    },
-  },
+// export default {
+//   name: 'ContainerTransactionInput',
+//   props: {
+//     transactionInputPublicId: {
+//       type: String,
+//       required: true
+//     },
+//   },
 
-  async fetch() {
-    if (this.transactionInput.public_id !== this.transactionInputPublicId) {
-      const { store } = this.$nuxt.context
-      await store.dispatch('transaction_input/get_by_public_id', this.transactionInputPublicId)
-    }
-  },
-
-
-  computed: {
-    ...mapState({
-      transactionInput: state => state.transaction_input.transaction_input,
-      transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle,
-      sellerFirm: state => state.seller_firm.seller_firm
-    }),
-  },
-
-  // beforeDestroy() {
-  //     this.clearStoreTransactionInputs()
-  // },
-
-  // methods: {
-  //     clearStoreTransactionInputs() {
-  //         const { store } = this.$nuxt.context
-  //         store.dispatch('transaction_input/clear_transaction_inputs_bundle')
-  //     }
-
-  // },
+//   async fetch() {
+//     if (this.transactionInput.public_id !== this.transactionInputPublicId) {
+//       const { store } = this.$nuxt.context
+//       await store.dispatch('transaction_input/get_by_public_id', this.transactionInputPublicId)
+//     }
+//   },
 
 
-}
-</script>
+//   computed: {
+//     ...mapState({
+//       transactionInput: state => state.transaction_input.transaction_input,
+//       transactionInputsBundle: state => state.transaction_input.transaction_inputs_bundle,
+//       sellerFirm: state => state.seller_firm.seller_firm
+//     }),
+//   },
+
+//   // beforeDestroy() {
+//   //     this.clearStoreTransactionInputs()
+//   // },
+
+//   // methods: {
+//   //     clearStoreTransactionInputs() {
+//   //         const { store } = this.$nuxt.context
+//   //         store.dispatch('transaction_input/clear_transaction_inputs_bundle')
+//   //     }
+
+//   // },
+
+
+// }
+// </script>
 
 <style></style>

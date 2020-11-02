@@ -1,10 +1,10 @@
 <template>
-  <div>
-    <div v-if="transactionInputTable">
+  <div>deactive
+    <!-- <div v-if="transactionInputTable"> -->
       <!-- <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="ml-auto" :disabled="buttonRemoveDisabled" @click="removeAll">
         Delete All
       </b-button> -->
-      <b-tabs pills content-class="mt-3">
+      <!--<b-tabs pills content-class="mt-3">
         <b-tab title="Total" active>
           <b-card
             v-if="transactionInputs.length === 0"
@@ -46,114 +46,114 @@
       </b-button>
       <hr class="my-3" />
       <lazy-container-transaction-input :transaction-input-public-id="transactionInputPublicId" />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
+// import { mapState } from "vuex"
 
-export default {
-  name: "OverviewTransactionInputs",
+// export default {
+//   name: "OverviewTransactionInputs",
 
-  async fetch() {
-    if (
-      this.transactionInputs.length === 0 ||
-                this.sellerFirm.public_id !== this.$route.params.public_id
-    ) {
-      const { store } = this.$nuxt.context
-      const params = {
-        seller_firm_public_id: this.sellerFirm.public_id,
-        page: 1,
-      }
-      await store.dispatch(
-        "transaction_input/get_by_seller_firm_public_id",
-        params
-      )
-    }
-  },
+//   async fetch() {
+//     if (
+//       this.transactionInputs.length === 0 ||
+//                 this.sellerFirm.public_id !== this.$route.params.public_id
+//     ) {
+//       const { store } = this.$nuxt.context
+//       const params = {
+//         seller_firm_public_id: this.sellerFirm.public_id,
+//         page: 1,
+//       }
+//       await store.dispatch(
+//         "transaction_input/get_by_seller_firm_public_id",
+//         params
+//       )
+//     }
+//   },
 
-  data() {
-    return {
-      buttonRemoveDisabled: false,
-      buttonFetchMore: true,
-      transactionInputTable: true,
-      transactionInputPublicId: "",
-    }
-  },
+//   data() {
+//     return {
+//       buttonRemoveDisabled: false,
+//       buttonFetchMore: true,
+//       transactionInputTable: true,
+//       transactionInputPublicId: "",
+//     }
+//   },
 
-  computed: {
-    ...mapState({
-      sellerFirm: (state) => state.seller_firm.seller_firm,
-      transactionInputs: (state) =>
-        state.transaction_input.transaction_inputs,
-    }),
+//   computed: {
+//     ...mapState({
+//       sellerFirm: (state) => state.seller_firm.seller_firm,
+//       transactionInputs: (state) =>
+//         state.transaction_input.transaction_inputs,
+//     }),
 
-    currentPage() {
-      return Math.trunc(this.transactionInputs.length / 50)
-    },
-  },
+//     currentPage() {
+//       return Math.trunc(this.transactionInputs.length / 50)
+//     },
+//   },
 
-  methods: {
-    getTableView() {
-      console.log("getTableView")
-      this.transactionInputPublicId = ""
-      this.transactionInputTable = true
-    },
+//   methods: {
+//     getTableView() {
+//       console.log("getTableView")
+//       this.transactionInputPublicId = ""
+//       this.transactionInputTable = true
+//     },
 
-    getSingleView(payload) {
-      console.log("publicId:", payload)
-      this.transactionInputPublicId = payload
-      this.transactionInputTable = false
-    },
+//     getSingleView(payload) {
+//       console.log("publicId:", payload)
+//       this.transactionInputPublicId = payload
+//       this.transactionInputTable = false
+//     },
 
-    async refresh() {
-      const { store } = this.$nuxt.context
-      const tiLengthBefore = this.transactionInputs.length
-      const params = {
-        seller_firm_public_id: this.sellerFirm.public_id,
-        page: this.currentPage + 1,
-      }
-      await store.dispatch(
-        "transaction_input/get_by_seller_firm_public_id",
-        params
-      )
-      const tiLengthAfter = this.transactionInputs.length
+//     async refresh() {
+//       const { store } = this.$nuxt.context
+//       const tiLengthBefore = this.transactionInputs.length
+//       const params = {
+//         seller_firm_public_id: this.sellerFirm.public_id,
+//         page: this.currentPage + 1,
+//       }
+//       await store.dispatch(
+//         "transaction_input/get_by_seller_firm_public_id",
+//         params
+//       )
+//       const tiLengthAfter = this.transactionInputs.length
 
-      if (tiLengthBefore === tiLengthAfter) {
-        this.buttonFetchMore = false
-      }
-    },
+//       if (tiLengthBefore === tiLengthAfter) {
+//         this.buttonFetchMore = false
+//       }
+//     },
 
-    async removeAll() {
-      this.buttonRemoveDisabled = true
-      if (this.transactionInputs.length > 0) {
-        try {
-          await this.$store.dispatch("transaction_input/delete_all")
-          await this.$store.dispatch(
-            "seller_firm/get_by_public_id",
-            this.sellerFirm.public_id
-          )
-          this.$router.push(
-            `/clients/${this.sellerFirm.public_id}`
-          )
-        } catch (error) {
-          this.$toast.error(error, { duration: 5000 })
-          this.buttonRemoveDisabled = false
-          return []
-        }
-      }
-    },
+//     async removeAll() {
+//       this.buttonRemoveDisabled = true
+//       if (this.transactionInputs.length > 0) {
+//         try {
+//           await this.$store.dispatch("transaction_input/delete_all")
+//           await this.$store.dispatch(
+//             "seller_firm/get_by_public_id",
+//             this.sellerFirm.public_id
+//           )
+//           this.$router.push(
+//             `/clients/${this.sellerFirm.public_id}`
+//           )
+//         } catch (error) {
+//           this.$toast.error(error, { duration: 5000 })
+//           this.buttonRemoveDisabled = false
+//           return []
+//         }
+//       }
+//     },
 
-    transactionInputsChannel(channelCode) {
-      return this.transactionInputs.filter(
-        (transaction_input) =>
-          transaction_input.channel_code === channelCode
-      )
-    },
-  },
-}
-</script>
+//     transactionInputsChannel(channelCode) {
+//       return this.transactionInputs.filter(
+//         (transaction_input) =>
+//           transaction_input.channel_code === channelCode
+//       )
+//     },
+//   },
+// }
+// </script>
 
 <style>
 </style>
