@@ -64,7 +64,7 @@ export default {
           data: payload,
         })
 
-        this.$router.push('/tax/dashboard')
+        this.$router.push('/dashboard')
 
       } catch (err) {
         // console.log('ERRRORCODE')

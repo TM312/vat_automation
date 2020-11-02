@@ -14,7 +14,7 @@
     </h5>
     <b-table v-else :fields="fields" :items="transactions" hover>
       <!-- <template v-slot:cell(type_code)="data">
-        <nuxt-link :to="`/tax/transactions/${data.item.transaction_input_public_id}`">
+        <nuxt-link :to="`/transactions/${data.item.transaction_input_public_id}`">
             {{ data.value }}
         </nuxt-link>
         </template> -->

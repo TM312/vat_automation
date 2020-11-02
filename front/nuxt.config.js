@@ -191,7 +191,7 @@ export default {
             },
         },
         redirect: {
-            logout: '/tax/login',
+            logout: '/login',
         },
         auth: {
             cookie: {

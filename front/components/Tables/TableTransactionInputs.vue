@@ -11,7 +11,7 @@
         </b-button>
         <!-- <nuxt-link
                     v-if="data.item.public_id != $route.params.public_id"
-                    :to="`/tax/transactions/${data.item.public_id}`"
+                    :to="`/transactions/${data.item.public_id}`"
                 >{{ data.value }}</nuxt-link> -->
         <span v-else>{{ data.value }}</span>
       </template>
