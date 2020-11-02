@@ -5,7 +5,10 @@
     <h5>transationsFull: {{ transationsFull.length }}</h5>
     <h4>fetched: {{ fetched }}</h4>
     <br />
-    <sidebar-transaction :transaction-public-id="transactionPublicId" :fetch-transaction="fetchTransaction" />
+    <sidebar-transaction
+      :transaction-public-id="transactionPublicId"
+      :fetch-transaction="fetchTransaction"
+    />
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
     </h5>
@@ -128,7 +131,7 @@ export default {
         "transaction/get_by_tax_record_tax_treatment",
         params
       )
-    //   this.fetched = true
+      this.fetched = true
     }
   },
 
@@ -137,7 +140,7 @@ export default {
       buttonShow: true,
       transactionPublicId: "",
       fetchTransaction: false,
-      //   fetched: false,
+      fetched: false,
 
       fields: [
         {

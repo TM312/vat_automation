@@ -14,8 +14,11 @@
       </p>
     </div>
     <div class="mt-3">
-      {{ transaction }}
+      <sidebar-transaction-details :transaction="transaction" />
     </div>
+    <b-button variant="primary">
+      Details
+    </b-button>
   </b-sidebar>
 </template>
 
