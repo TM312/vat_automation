@@ -24,7 +24,7 @@ class DistanceSale(db.Model):  # type: ignore
     _taxable_turnover_amount = db.Column(db.Integer, default=0)
     last_tax_date = db.Column(db.Date)
 
-    #non-mirrored relationships
+    #non-mirrored relationships here
     distance_sale_history = db.relationship('DistanceSaleHistory', backref='distance_sale', lazy=True, cascade='all, delete-orphan')
 
     @hybrid_property

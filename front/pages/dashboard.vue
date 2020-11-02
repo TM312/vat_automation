@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <b-tabs pills card vertical>
+  <b-container fluid class="my-3">
+    <b-tabs pills vertical>
       <b-tab title="Overview" active>
         <b-alert :show="$dateFns.format(new Date(), 'MMMM dd, yyyy') !== $dateFns.format($auth.user.last_seen, 'MMMM dd, yyyy')" variant="primary">
           <greeting-dashboard />
@@ -53,7 +53,7 @@
         <lazy-table-colleagues-tax />
       </b-tab>
     </b-tabs>
-  </div>
+  </b-container>
 </template>
 
 <script>

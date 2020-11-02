@@ -1,6 +1,6 @@
 <template>
-  <div>hi
-    <!-- <div v-if="taxRecordOverview">
+  <div>
+    <div v-if="taxRecordOverview">
       <b-tabs content-class="mt-3">
         <b-tab title="Overview" active>
           <div v-if="$fetchState.pending">
@@ -51,50 +51,53 @@
         :tax-record-public-id="taxRecordPublicId"
         @overview="getOverview"
       />
-    </div> -->
+    </div>
   </div>
 </template>
 
-// <script>
-// import { mapState } from "vuex"
+<script>
+import { mapState } from "vuex"
 
-// export default {
-//   name: "OverviewTaxRecords",
+export default {
+  layout: 'tax-client',
 
-//   async fetch() {
-//     const { store } = this.$nuxt.context
-//     if (this.taxRecords.length == 0) {
-//       await store.dispatch(
-//         "tax_record/get_all_by_seller_firm_public_id",
-//         this.sellerFirm.public_id
-//       )
-//     }
-//   },
+  async fetch() {
+    const { store } = this.$nuxt.context
+    if (this.taxRecords.length == 0) {
+      await store.dispatch(
+        "tax_record/get_all_by_seller_firm_public_id",
+        this.sellerFirm.public_id
+      )
+    }
+  },
 
-//   data() {
-//     return {
-//       taxRecordPublicId: "",
-//       taxRecordOverview: true,
-//     }
-//   },
+  data() {
+    return {
+      taxRecordPublicId: "",
+      taxRecordOverview: true,
+    }
+  },
 
-//   computed: {
-//     ...mapState({
-//       sellerFirm: (state) => state.seller_firm.seller_firm,
-//       taxRecords: (state) => state.tax_record.tax_records,
-//     }),
-//   },
+  computed: {
+    ...mapState({
+      sellerFirm: (state) => state.seller_firm.seller_firm,
+      taxRecords: (state) => state.tax_record.tax_records
+    }),
+  },
 
-//   methods: {
-//     getSingleView(payload) {
-//       this.taxRecordPublicId = payload
-//       this.taxRecordOverview = false
-//     },
+  methods: {
+    getSingleView(payload) {
+      this.taxRecordPublicId = payload
+      this.taxRecordOverview = false
+    },
 
-//     getOverview() {
-//       this.taxRecordPublicId = ""
-//       this.taxRecordOverview = true
-//     },
-//   },
-// }
+    getOverview() {
+      this.taxRecordPublicId = ""
+      this.taxRecordOverview = true
+    },
+  },
+}
 </script>
+
+<style>
+</style>

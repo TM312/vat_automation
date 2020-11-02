@@ -1,6 +1,6 @@
 <template>
-  <b-container fluid>
-    <b-tabs pills card vertical>
+  <b-container fluid class="my-3">
+    <b-tabs pills vertical>
       <b-tab title="Overview" active @click="refresh">
         <clients-dashboard />
         <view-clients class="mt-5" />

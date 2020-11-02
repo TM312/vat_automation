@@ -2,8 +2,6 @@
   <div>
     <h2>hi</h2>
     <card-transaction-base-data :transaction="transaction" />
-    <!-- <card-transaction :transaction="transaction" /> -->
-    <!-- {{ transaction }} -->
   </div>
 </template>
 
