@@ -2,7 +2,8 @@
   <div>
     <b-row>
       <b-col cols="12" lg="6" xl="4">
-        <b-card title="Base Data">
+        <card-transaction-base-data :transaction="transaction" />
+        <!-- <b-card title="Base Data">
           <b-table-lite
             borderless
             fixed
@@ -135,7 +136,7 @@
               </b-badge>
             </template>
           </b-table-lite>
-        </b-card>
+        </b-card> -->
 
         <div class="mt-5">
           <b-card
@@ -367,7 +368,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+// import { mapState } from "vuex"
 
 export default {
   name: "CardTransaction",
@@ -378,121 +379,121 @@ export default {
     },
   },
   computed: {
-    ...mapState({
-      taxRateTypes: (state) => state.tax_rate_type.tax_rate_types,
-    }),
+    // ...mapState({
+    //   taxRateTypes: (state) => state.tax_rate_type.tax_rate_types,
+    // }),
 
-    vatNumberByCountryCode() {
-      return this.$store.getters["seller_firm/vatNumberByCountryCode"](
-        this.transaction.tax_jurisdiction_code
-      )
-    },
+    // vatNumberByCountryCode() {
+    //   return this.$store.getters["seller_firm/vatNumberByCountryCode"](
+    //     this.transaction.tax_jurisdiction_code
+    //   )
+    // },
 
-    taxJurisdiction() {
-      return this.$store.getters["country/countryNameByCode"](
-        this.transaction.tax_jurisdiction_code
-      )
-    },
+    // taxJurisdiction() {
+    //   return this.$store.getters["country/countryNameByCode"](
+    //     this.transaction.tax_jurisdiction_code
+    //   )
+    // },
 
-    itemsDates() {
-      return [
-        {
-          date: "Tax Date",
-          value: this.$dateFns.format(
-            this.transaction.tax_date,
-            "MMMM dd, yyyy"
-          ),
-        },
-        {
-          date: "Tax Calculation Date",
-          value: this.$dateFns.format(
-            this.transaction.tax_calculation_date,
-            "MMMM dd, yyyy"
-          ),
-        },
-      ]
-    },
+    // itemsDates() {
+    //   return [
+    //     {
+    //       date: "Tax Date",
+    //       value: this.$dateFns.format(
+    //         this.transaction.tax_date,
+    //         "MMMM, dd, yyyy"
+    //       ),
+    //     },
+    //     {
+    //       date: "Tax Calculation Date",
+    //       value: this.$dateFns.format(
+    //         this.transaction.tax_calculation_date,
+    //         "MMMM, dd, yyyy"
+    //       ),
+    //     },
+    //   ]
+    // },
 
-    fieldsDates() {
-      return [
-        { key: "date", label: "Dates" },
-        { key: "value", label: "" },
-      ]
-    },
+    // fieldsDates() {
+    //   return [
+    //     { key: "date", label: "Dates" },
+    //     { key: "value", label: "" },
+    //   ]
+    // },
 
-    itemsCategory() {
-      return [
-        {
-          category: "Transaction Type",
-          value: this.capitalize(this.transaction.type_code),
-        },
-        {
-          category: "Tax Treatment",
-          value: this.capitalize(this.transaction.tax_treatment_code),
-        },
-        {
-          category: "Tax Jurisdiction",
-          value: [
-            this.taxJurisdiction,
-            this.vatNumberByCountryCode.country_code,
-            this.vatNumberByCountryCode.number,
-          ],
-        },
-      ]
-    },
+    // itemsCategory() {
+    //   return [
+    //     {
+    //       category: "Transaction Type",
+    //       value: this.capitalize(this.transaction.type_code),
+    //     },
+    //     {
+    //       category: "Tax Treatment",
+    //       value: this.capitalize(this.transaction.tax_treatment_code),
+    //     },
+    //     {
+    //       category: "Tax Jurisdiction",
+    //       value: [
+    //         this.taxJurisdiction,
+    //         this.vatNumberByCountryCode.country_code,
+    //         this.vatNumberByCountryCode.number,
+    //       ],
+    //     },
+    //   ]
+    // },
 
-    fieldsCategory() {
-      return [
-        { key: "category", label: "Categories" },
-        { key: "value", label: "" },
-      ]
-    },
+    // fieldsCategory() {
+    //   return [
+    //     { key: "category", label: "Categories" },
+    //     { key: "value", label: "" },
+    //   ]
+    // },
 
-    itemsLogistics() {
-      return [
-        {
-          category: ["Departure", "Arrival"],
-          value: [ this.transaction.departure_country_code, this.transaction.arrival_country_code],
-        },
-      ]
-    },
+    // itemsLogistics() {
+    //   return [
+    //     {
+    //       category: ["Departure", "Arrival"],
+    //       value: [ this.transaction.departure_country_code, this.transaction.arrival_country_code],
+    //     },
+    //   ]
+    // },
 
-    fieldsLogistics() {
-      return [{ key: "logistics" }, { key: "value", label: "" }]
-    },
+    // fieldsLogistics() {
+    //   return [{ key: "logistics" }, { key: "value", label: "" }]
+    // },
 
-    itemsTaxRates() {
-      return [
-        {
-          tax_rate: "Item",
-          value: [
-            this.transaction.item_price_vat_rate,
-            this.transaction.item_tax_rate_type_code,
-          ],
-        },
-        {
-          tax_rate: "Shipment",
-          value: [
-            this.transaction.shipment_price_vat_rate,
-            this.transaction.shipment_tax_rate_type_code,
-          ],
-        },
-        {
-          tax_rate: "Gift Wrap",
-          value: [
-            this.transaction.gift_wrap_price_vat_rate,
-            this.transaction.gift_wrap_tax_rate_type_code,
-          ],
-        },
-      ]
-    },
+    // itemsTaxRates() {
+    //   return [
+    //     {
+    //       tax_rate: "Item",
+    //       value: [
+    //         this.transaction.item_price_vat_rate,
+    //         this.transaction.item_tax_rate_type_code,
+    //       ],
+    //     },
+    //     {
+    //       tax_rate: "Shipment",
+    //       value: [
+    //         this.transaction.shipment_price_vat_rate,
+    //         this.transaction.shipment_tax_rate_type_code,
+    //       ],
+    //     },
+    //     {
+    //       tax_rate: "Gift Wrap",
+    //       value: [
+    //         this.transaction.gift_wrap_price_vat_rate,
+    //         this.transaction.gift_wrap_tax_rate_type_code,
+    //       ],
+    //     },
+    //   ]
+    // },
 
-    fieldsTaxRates() {
-      return [
-        { key: "tax_rate", label: "Tax Rates" },
-        { key: "value", label: "" },
-      ]
-    },
+    // fieldsTaxRates() {
+    //   return [
+    //     { key: "tax_rate", label: "Tax Rates" },
+    //     { key: "value", label: "" },
+    //   ]
+    // },
 
     itemsItem() {
       return [
@@ -760,9 +761,9 @@ export default {
     getVatInfo() {
       console.log("test")
     },
-    getPopupDetail(code, position) {
-      return this.taxRateTypes.find((el) => el.code === code)[position]
-    },
+    // getPopupDetail(code, position) {
+    //   return this.taxRateTypes.find((el) => el.code === code)[position]
+    // },
   },
 }
 </script>
