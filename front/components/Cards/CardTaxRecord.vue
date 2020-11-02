@@ -70,7 +70,7 @@ export default {
       try {
         await this.$store.dispatch("tax_record/delete_by_public_id", taxRecordPublicId)
         await this.$store.dispatch("seller_firm/get_by_public_id", this.taxRecord.seller_firm_public_id)
-        this.$router.push(`/tax/clients/${this.taxRecord.seller_firm_public_id}`)
+        this.$router.push(`/clients/${this.taxRecord.seller_firm_public_id}`)
 
       } catch (error) {
         this.$toast.error(error, { duration: 5000 })

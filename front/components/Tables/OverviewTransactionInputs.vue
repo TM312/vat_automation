@@ -135,7 +135,7 @@ export default {
             this.sellerFirm.public_id
           )
           this.$router.push(
-            `/tax/clients/${this.sellerFirm.public_id}`
+            `/clients/${this.sellerFirm.public_id}`
           )
         } catch (error) {
           this.$toast.error(error, { duration: 5000 })

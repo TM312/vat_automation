@@ -7,7 +7,7 @@
       <strong>Account</strong>
     </b-dropdown-header>
 
-    <b-dropdown-item to="/tax/settings">
+    <b-dropdown-item to="/settings">
       <b-icon icon="gear" /> Settings
     </b-dropdown-item>
     <!-- <b-dropdown-item to="/payments">

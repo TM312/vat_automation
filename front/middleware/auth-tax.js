@@ -9,6 +9,6 @@ export default function ({ $auth, redirect }) {
     redirect('/dashboard')
 
   } else {
-    redirect('/tax/login')
+    redirect('/login')
   }
 }

@@ -131,7 +131,7 @@ export default {
         )
         await this.$auth.fetchUser()
 
-        this.$router.push("/tax/clients")
+        this.$router.push("/clients")
       } catch (error) {
         this.$toast.error(error, { duration: 5000 })
         this.buttonDisabled = false

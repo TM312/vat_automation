@@ -8,14 +8,14 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item to="/tax/dashboard">
+        <b-nav-item to="/dashboard">
           Dashboard
         </b-nav-item>
         <!-- ^integrate v-if for multiple user roles -->
-        <b-nav-item to="/tax/clients">
+        <b-nav-item to="/clients">
           Clients
         </b-nav-item>
-        <!-- <b-nav-item to="/tax/tax_records" :disabled="accounting_firm.length === 0">Tax Records</b-nav-item> -->
+        <!-- <b-nav-item to="/tax_records" :disabled="accounting_firm.length === 0">Tax Records</b-nav-item> -->
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
