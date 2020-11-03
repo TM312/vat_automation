@@ -1,7 +1,7 @@
 from datetime import datetime
-from uuid import uuid4
+# from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import UUID
+# from sqlalchemy.dialects.postgresql import UUID
 # from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
 from sqlalchemy import select, func
@@ -19,7 +19,7 @@ class Business(db.Model):  # type: ignore
     __tablename__ = 'business'
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid4)
+    public_id = db.Column(db.String(128), unique=True) #UUID(as_uuid=True), unique=True, default=uuid4)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_business_created_by_user'))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
@@ -41,9 +41,19 @@ class Business(db.Model):  # type: ignore
 
 
 
+    def __init__(self, **kwargs):
+        from .service_parent import BusinessService
+        super().__init__(**kwargs)
+        self.public_id = BusinessService.create_public_id(kwargs.get('name'))
+
+
     def update(self, data_changes):
         for k, v in data_changes.items():
             setattr(self, k, v)
+            if k == 'name':
+                from .service_parent import BusinessService
+                self.public_id=BusinessService.create_public_id(v)
+
         self.modified_at = datetime.utcnow()
         self.times_modified += 1
         return self

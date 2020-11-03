@@ -12,11 +12,5 @@
 export default {
   middleware: 'auth',
 
-  mounted() {
-    this.socket = this.$nuxtSocket({
-      name: 'home',
-      reconnection: true
-    })
-  }
 }
 </script>

@@ -17,7 +17,7 @@
             </b-card-text>
           </b-card>
           <div v-else>
-            <table-transaction-inputs :transaction-inputs="transactionInputs" @single-view="getSingleView($event)" />
+            <table-transaction-inputs :transaction-inputs="transactionInputs" :client-public-id="sellerFirm.public_id" @single-view="getSingleView($event)" />
           </div>
         </b-tab>
         <b-tab v-for="account in sellerFirm.accounts" :key="account.public_id" :title="account.channel_code" :disabled="transactionInputs.length === 0">
@@ -27,7 +27,7 @@
             class="text-center py-5"
           />
           <div v-else>
-            <lazy-table-transaction-inputs :transaction-inputs="transactionInputsChannel(account.channel_code)" @single-view="getSingleView($event)" />
+            <lazy-table-transaction-inputs :transaction-inputs="transactionInputsChannel(account.channel_code)" :client-public-id="sellerFirm.public_id" @single-view="getSingleView($event)" />
           </div>
         </b-tab>
       </b-tabs>

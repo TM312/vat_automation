@@ -143,6 +143,16 @@ class NotificationService:
 
 class InputService:
     @staticmethod
+    def stringify(string_raw: str) -> str:
+        import re
+        pattern = re.compile(r'-{2,}')
+        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
+        string = string_raw.lower().translate({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"}).replace(" ", "-").strip("-")
+        return re.sub(pattern, "-", string)
+
+
+
+    @staticmethod
     def get_date_or_None(df: pd.DataFrame, i:int, column:str) -> date:
         if pd.isnull(df.iloc[i][column]):
             return None

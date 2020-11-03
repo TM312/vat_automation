@@ -28,7 +28,7 @@
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}/tax_records`"
+        :to="`/clients/${clientPublicId}/tax-records`"
         exact
         prefetch
         :disabled="!clientPublicId"

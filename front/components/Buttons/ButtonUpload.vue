@@ -38,12 +38,6 @@ export default {
     },
   },
 
-  mounted() {
-    this.socket = this.$nuxtSocket({
-      name: 'home',
-      reconnection: false
-    })
-  },
 
   methods: {
 
