@@ -1,32 +1,76 @@
 <template>
   <b-row cols="2" cols-md="3" cols-lg="4">
-    <b-col v-for="(transactionInput, index) in transactionInputsBundle" :key="transactionInput.public_id">
+    <b-col
+      v-for="(transactionInput, index) in transactionInputsBundle"
+      :key="transactionInput.public_id"
+    >
       <b-card
-        :title="transactionInput.transaction_type_public_code"
         :border-variant="borderVariant(transactionInput.public_id)"
+        class="h-100"
       >
+        <b-card-title>
+          <b-row>
+            <b-col cols="auto">
+              {{ transactionInput.transaction_type_public_code }}
+            </b-col>
+            <b-col cols="auto" class="ml-auto">
+              <b-button
+                v-if="
+                  transactionInputPublicId !==
+                    transactionInput.public_id
+                "
+                size="sm"
+                variant="outline-primary"
+                :to="`/clients/${clientPublicId}/transactions/${transactionInput.public_id}`"
+              >
+                Details
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-card-title>
         <b-card-sub-title class="mb-3">
           <span>{{ transactionInput.complete_date }}</span>
-          <!-- <span>{{ $dateFns.formatDistance(transactionInput.complete_date, transactionInput.complete_date) }}</span> -->
+          <span>{{ index }}</span>
+          <!-- <span v-if="index > 0">{{ $dateFns.formatDistance(new Date(transactionInput.complete_date), new Date(transactionInput.complete_date)) }}</span> -->
 
-          <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date - transactionInput.complete_date) }}</span>
+          <!-- <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date - transactionInput.complete_date) }}</span> -->
+          <span v-if="index > 0" class="px-2">{{
+            transactionInputsBundle[index - 1].complete_date
+          }}</span>
         </b-card-sub-title>
-        <b-card-text class="text-primary">
-          <span v-if="transactionInput.arrival_country_code">
-            {{ transactionInput.departure_country_code }}
-            <span class="px-1"><b-icon icon="arrow-right" /></span>
-            {{ transactionInput.arrival_country_code }}
-          </span>
+        <b-card-text class="font-weight-bold">
+          <b-row>
+            <b-col>
+              <span
+                v-if="transactionInput.arrival_country_code"
+                class="pr-5"
+              >
+                {{ transactionInput.departure_country_code }}
+                <span class="px-1"><b-icon icon="arrow-right" /></span>
+                {{ transactionInput.arrival_country_code }}
+              </span>
+            </b-col>
+            <b-col>
+              <span class="pr-5">QTY: {{ transactionInput.item_quantity }}</span>
+            </b-col>
+            <b-col>
+              <span>{{ transactionInput.sale_total_value_gross }}
+                {{ transactionInput.currency_code }}</span>
+            </b-col>
+          </b-row>
         </b-card-text>
-        <b-card-text class="text-muted">
-          <span>
+
+        <b-card-text>
+          <span class="text-muted">
             <small>{{ transactionInput.channel_code }}</small>
             <small class="mx-1">|</small>
             <span v-if="transactionInput.marketplace">
               <small>{{ transactionInput.marketplace }}</small>
               <small class="mx-1">|</small>
             </span>
-            <small class="ml">{{ transactionInput.item_sku }}</small>
+            <small class="ml">{{
+              transactionInput.item_sku
+            }}</small>
           </span>
         </b-card-text>
       </b-card>
@@ -41,10 +85,15 @@ export default {
   name: "CardTransactionInputBundle",
 
   props: {
+    clientPublicId: {
+      type: String,
+      required: true,
+    },
+
     transactionInputPublicId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {
@@ -55,8 +104,10 @@ export default {
   },
   methods: {
     borderVariant(publicId) {
-      return publicId === this.transactionInputPublicId ? 'primary' : 'secondary'
-    }
+      return publicId === this.transactionInputPublicId
+        ? "primary"
+        : "secondary"
+    },
   },
 }
 </script>

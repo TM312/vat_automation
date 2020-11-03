@@ -3,149 +3,12 @@
     <b-row>
       <b-col cols="12" lg="6" xl="4">
         <card-transaction-base-data :transaction="transaction" />
-        <!-- <b-card title="Base Data">
-          <b-table-lite
-            borderless
-            fixed
-            small
-            :items="itemsDates"
-            :fields="fieldsDates"
-            class="mb-4"
-          />
-          <b-table-lite
-            borderless
-            fixed
-            small
-            :items="itemsCategory"
-            :fields="fieldsCategory"
-            class="mb-4"
-          >
-            <template v-slot:cell(value)="data">
-              <span v-if="Array.isArray(data.value) === true">
-                <span>{{ data.value[0] }} </span>
-                <b-popover
-                  target="popover-vatin"
-                  triggers="hover"
-                  placement="top"
-                  class="ml-2"
-                  :title="`${vatNumberByCountryCode.country_code}-${vatNumberByCountryCode.number}`"
-                >
-                  <div>
-                    Valid:
-                    <b-icon
-                      :variant="
-                        vatNumberByCountryCode.valid
-                          ? 'success'
-                          : 'danger'
-                      "
-                      :icon="
-                        vatNumberByCountryCode.valid
-                          ? 'check-circle'
-                          : 'x-circle'
-                      "
-                    />
-                  </div>
-                  <div>
-                    Request Date:
-                    {{
-                      vatNumberByCountryCode.request_date
-                    }}
-                  </div>
-                </b-popover>
-                <b-badge
-                  id="popover-vatin"
-                  variant="secondary"
-                  class="ml-2"
-                >
-                  {{ data.value[1] }}-{{ data.value[2] }}
-                </b-badge>
-              </span>
-              <span v-else>{{ data.value }}</span>
-            </template>
-          </b-table-lite>
 
-          <b-table-lite
-            borderless
-            fixed
-            small
-            :items="itemsLogistics"
-            :fields="fieldsLogistics"
-            class="mb-4"
-          >
-            <template v-slot:cell(category)="data">
-              <span>
-                {{ data.value[0] }}
-                <b-icon
-                  icon="arrow-right"
-                  class="mx-2"
-                  variant="primary"
-                />
-                {{ data.value[1] }}
-              </span>
-            </template>
-            <template v-slot:cell(value)="data">
-              <span>
-                {{ data.value[0] }}
-                <b-icon
-                  icon="arrow-right"
-                  class="mx-2"
-                  variant="primary"
-                />
-                {{ data.value[1] }}
-              </span>
-            </template>
-          </b-table-lite>
-
-          <b-table-lite
-            borderless
-            fixed
-            small
-            :items="itemsTaxRates"
-            :fields="fieldsTaxRates"
-            class="mb-4"
-          >
-            <template v-slot:cell(value)="data">
-              <span>{{
-                Number.parseFloat(
-                  data.value[0] * 100
-                ).toFixed(1)
-              }}%</span>
-              <b-badge
-                v-b-popover.hover.top="
-                  taxRateTypes.find(
-                    (el) => el.code === data.value[1]
-                  )['description']
-                "
-                class="ml-2"
-                :title="
-                  taxRateTypes.find(
-                    (el) => el.code === data.value[1]
-                  )['name']
-                "
-                :variant="
-                  data.value[1] === 'S'
-                    ? 'primary'
-                    : 'success'
-                "
-              >
-                {{
-                  taxRateTypes.find(
-                    (el) => el.code === data.value[1]
-                  )["name"]
-                }}
-              </b-badge>
-            </template>
-          </b-table-lite>
-        </b-card> -->
 
         <div class="mt-5">
           <b-card
-            v-if="
-              transaction.tax_treatment_code ===
-                'INTRA_COMMUNITY_ACQUISITION' ||
-                transaction.tax_treatment_code ===
-                'LOCAL_ACQUISITION'
-            "
+            v-if="transaction.tax_treatment_code === 'INTRA_COMMUNITY_ACQUISITION' ||
+              transaction.tax_treatment_code === 'LOCAL_ACQUISITION'"
             title="Supplier"
           >
             <b-row>
@@ -160,22 +23,13 @@
               >
                 <b-button-group size="sm" class="ml-2">
                   <b-button
-                    :variant="
-                      transaction.supplier_relationship ===
-                        'B2B'
-                        ? 'success'
-                        : 'outline-secondary'
-                    "
+                    :variant="transaction.supplier_relationship === 'B2B' ? 'success' : 'outline-secondary' "
                   >
                     B2B
                   </b-button>
                   <b-button
                     :variant="
-                      transaction.supplier_relationship ===
-                        'B2C'
-                        ? 'success'
-                        : 'outline-secondary'
-                    "
+                      transaction.supplier_relationship === 'B2C' ? 'success' : 'outline-secondary' "
                   >
                     B2C
                   </b-button>
@@ -311,7 +165,9 @@
         </div>
       </b-col>
       <b-col cols="12" lg="6" xl="8">
-        <b-card title="Prices">
+        <card-transaction-prices :transaction="transaction" />
+
+        <!-- <b-card title="Prices">
           <div class="mt-3">
             <b-table
               hover
@@ -348,7 +204,7 @@
               class="mb-4"
             />
           </div>
-        </b-card>
+        </b-card> -->
       </b-col>
     </b-row>
 
@@ -368,8 +224,6 @@
 </template>
 
 <script>
-// import { mapState } from "vuex"
-
 export default {
   name: "CardTransaction",
   props: {
@@ -378,385 +232,7 @@ export default {
       required: true,
     },
   },
-  computed: {
-    // ...mapState({
-    //   taxRateTypes: (state) => state.tax_rate_type.tax_rate_types,
-    // }),
 
-    // vatNumberByCountryCode() {
-    //   return this.$store.getters["seller_firm/vatNumberByCountryCode"](
-    //     this.transaction.tax_jurisdiction_code
-    //   )
-    // },
-
-    // taxJurisdiction() {
-    //   return this.$store.getters["country/countryNameByCode"](
-    //     this.transaction.tax_jurisdiction_code
-    //   )
-    // },
-
-    // itemsDates() {
-    //   return [
-    //     {
-    //       date: "Tax Date",
-    //       value: this.$dateFns.format(
-    //         this.transaction.tax_date,
-    //         "MMMM, dd, yyyy"
-    //       ),
-    //     },
-    //     {
-    //       date: "Tax Calculation Date",
-    //       value: this.$dateFns.format(
-    //         this.transaction.tax_calculation_date,
-    //         "MMMM, dd, yyyy"
-    //       ),
-    //     },
-    //   ]
-    // },
-
-    // fieldsDates() {
-    //   return [
-    //     { key: "date", label: "Dates" },
-    //     { key: "value", label: "" },
-    //   ]
-    // },
-
-    // itemsCategory() {
-    //   return [
-    //     {
-    //       category: "Transaction Type",
-    //       value: this.capitalize(this.transaction.type_code),
-    //     },
-    //     {
-    //       category: "Tax Treatment",
-    //       value: this.capitalize(this.transaction.tax_treatment_code),
-    //     },
-    //     {
-    //       category: "Tax Jurisdiction",
-    //       value: [
-    //         this.taxJurisdiction,
-    //         this.vatNumberByCountryCode.country_code,
-    //         this.vatNumberByCountryCode.number,
-    //       ],
-    //     },
-    //   ]
-    // },
-
-    // fieldsCategory() {
-    //   return [
-    //     { key: "category", label: "Categories" },
-    //     { key: "value", label: "" },
-    //   ]
-    // },
-
-    // itemsLogistics() {
-    //   return [
-    //     {
-    //       category: ["Departure", "Arrival"],
-    //       value: [ this.transaction.departure_country_code, this.transaction.arrival_country_code],
-    //     },
-    //   ]
-    // },
-
-    // fieldsLogistics() {
-    //   return [{ key: "logistics" }, { key: "value", label: "" }]
-    // },
-
-    // itemsTaxRates() {
-    //   return [
-    //     {
-    //       tax_rate: "Item",
-    //       value: [
-    //         this.transaction.item_price_vat_rate,
-    //         this.transaction.item_tax_rate_type_code,
-    //       ],
-    //     },
-    //     {
-    //       tax_rate: "Shipment",
-    //       value: [
-    //         this.transaction.shipment_price_vat_rate,
-    //         this.transaction.shipment_tax_rate_type_code,
-    //       ],
-    //     },
-    //     {
-    //       tax_rate: "Gift Wrap",
-    //       value: [
-    //         this.transaction.gift_wrap_price_vat_rate,
-    //         this.transaction.gift_wrap_tax_rate_type_code,
-    //       ],
-    //     },
-    //   ]
-    // },
-
-    // fieldsTaxRates() {
-    //   return [
-    //     { key: "tax_rate", label: "Tax Rates" },
-    //     { key: "value", label: "" },
-    //   ]
-    // },
-
-    itemsItem() {
-      return [
-        {
-          x: "Price",
-          net: `${Number.parseFloat(
-            this.transaction.item_price_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.item_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.item_price_net +
-                                this.transaction.item_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Discount",
-          net: `${Number.parseFloat(
-            this.transaction.item_price_discount_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.item_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.item_price_discount_net +
-                                this.transaction.item_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Total",
-          net: `${Number.parseFloat(
-            this.transaction.item_price_total_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.item_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.item_price_total_net +
-                                this.transaction.item_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-      ]
-    },
-
-    itemsShipment() {
-      return [
-        {
-          x: "Price",
-          net: `${Number.parseFloat(
-            this.transaction.shipment_price_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.shipment_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.shipment_price_net +
-                                this.transaction.shipment_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Discount",
-          net: `${Number.parseFloat(
-            this.transaction.shipment_price_discount_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.shipment_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.shipment_price_discount_net +
-                                this.transaction.shipment_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Total",
-          net: `${Number.parseFloat(
-            this.transaction.shipment_price_total_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.shipment_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.shipment_price_total_net +
-                                this.transaction.shipment_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-      ]
-    },
-
-    itemsGiftWrap() {
-      return [
-        {
-          x: "Price",
-          net: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_net +
-                                this.transaction.gift_wrap_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Discount",
-          net: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_discount_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_discount_net +
-                                this.transaction.gift_wrap_price_discount_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: "Total",
-          net: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_total_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.gift_wrap_price_total_net +
-                                this.transaction.gift_wrap_price_total_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-      ]
-    },
-
-    itemsTotal() {
-      return [
-        {
-          x: "Total",
-          net: `${Number.parseFloat(
-            this.transaction.total_value_net
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          vat: `${Number.parseFloat(
-            this.transaction.total_value_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: `${Number.parseFloat(
-            this.transaction.total_value_gross +
-                                this.transaction.gift_wrap_price_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-        },
-        {
-          x: `Reverse Charge (Rate: ${Number.parseFloat(
-            this.transaction.reverse_charge_vat_rate * 100
-          ).toFixed(2)}%)`,
-          net: "-",
-          vat: `${Number.parseFloat(
-            this.transaction.invoice_amount_reverse_charge_vat
-          ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
-          }`,
-          gross: "-",
-        },
-      ]
-    },
-
-    fieldsPrices() {
-      return [
-        {
-          key: "net",
-          sortable: false,
-        },
-        {
-          key: "vat",
-          sortable: false,
-        },
-        {
-          key: "gross",
-          sortable: false,
-        },
-      ]
-    },
-
-    // https://stackoverflow.com/questions/8073673/how-can-i-add-new-array-elements-at-the-beginning-of-an-array-in-javascript
-
-    fieldsItemPrices() {
-      return [{ key: "x", label: "Item", sortable: false }].concat(
-        this.fieldsPrices
-      )
-    },
-    fieldsShipmentPrices() {
-      return [{ key: "x", label: "Shipment", sortable: false }].concat(
-        this.fieldsPrices
-      )
-    },
-    fieldsGiftWrapPrices() {
-      return [{ key: "x", label: "Gift Wrap", sortable: false }].concat(
-        this.fieldsPrices
-      )
-    },
-    fieldsTotalPrices() {
-      return [{ key: "x", label: "Total", sortable: false }].concat(
-        this.fieldsPrices
-      )
-    },
-  },
   methods: {
     getVatInfo() {
       console.log("test")

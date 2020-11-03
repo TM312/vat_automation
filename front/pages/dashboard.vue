@@ -15,8 +15,10 @@
                 <div>Once you or your colleagues start inserting client data you will get notified about updates here.</div>
               </b-card-text>
               <b-card-text v-else>
-                <div-notification v-for="notification in notifications" :key="notification.public_id" :notification="notification" class="my-3" />
-                <hr />
+                <b-container v-for="(notification, index) in notifications" :key="notification.public_id" fluid>
+                  <div-notification :notification="notification" class="my-3" />
+                  <hr v-if="index<notifications.length-1 && notifications.length > 1" class="my-3" />
+                </b-container>
               </b-card-text>
             </b-card>
           </b-col>
