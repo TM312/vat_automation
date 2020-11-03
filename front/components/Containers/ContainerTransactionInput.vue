@@ -1,14 +1,14 @@
 <template>
-  <div>
+  <div v-if="clientPublicId.length > 0 && transactionInputPublicId.length > 0">
     <!-- <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
       <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
       <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" :client-public-id="clientPublicId" />
     </b-card> -->
-    <card-transaction-input-bundle :transaction-input-public-id="transactionInput.public_id" />
+    <card-transaction-input-bundle :transaction-input-public-id="transactionInput.public_id" :client-public-id="clientPublicId" />
     <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
       <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transaction-input-public-id="transactionInputPublicId" /> </p>
     </b-alert>
-    <b-tabs pills card>
+    <b-tabs class="mt-3">
       <b-tab title="Input File" active>
         <div v-if="$fetchState.pending || transactionInput.length === 0"></div>
         <card-transaction-input v-else id="file" />
@@ -35,16 +35,18 @@ export default {
   props: {
     clientPublicId: {
       type: String,
-      required: true
+      required: false,
+      default: ''
     },
     transactionInputPublicId: {
       type: String,
-      required: true
+      required: false,
+      default: ''
     }
   },
 
   async fetch() {
-    if (this.transactionInput.public_id !== this.transactionInputPublicId) {
+    if (this.transactionInputPublicId && this.transactionInput.public_id !== this.transactionInputPublicId) {
       const { store } = this.$nuxt.context
       await store.dispatch('transaction_input/get_by_public_id', this.transactionInputPublicId)
     }
