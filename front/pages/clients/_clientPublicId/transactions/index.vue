@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-card title="Transactions">
     <div v-if="transactionInputTable">
       <!-- <b-button v-if="transactionInputs.length > 0" variant="outline-danger" class="ml-auto" :disabled="buttonRemoveDisabled" @click="removeAll">
         Delete All
@@ -47,7 +47,7 @@
       <hr class="my-3" />
       <lazy-container-transaction-input :transaction-input-public-id="transactionInputPublicId" />
     </div>
-  </div>
+  </b-card>
 </template>
 
 <script>

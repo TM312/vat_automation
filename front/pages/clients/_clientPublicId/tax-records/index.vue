@@ -34,7 +34,7 @@
                 >
                   <card-tax-record-short
                     :tax-record="taxRecord"
-                    @single-view="getSingleView($event)"
+                    :client-public-id="sellerFirm.public_id"
                   />
                 </b-col>
               </b-row>
@@ -45,12 +45,6 @@
           <lazy-form-add-seller-firm-tax-record />
         </b-tab>
       </b-tabs>
-    </div>
-    <div v-else>
-      <lazy-container-tax-record
-        :tax-record-public-id="taxRecordPublicId"
-        @overview="getOverview"
-      />
     </div>
   </div>
 </template>
@@ -83,18 +77,6 @@ export default {
       sellerFirm: (state) => state.seller_firm.seller_firm,
       taxRecords: (state) => state.tax_record.tax_records
     }),
-  },
-
-  methods: {
-    getSingleView(payload) {
-      this.taxRecordPublicId = payload
-      this.taxRecordOverview = false
-    },
-
-    getOverview() {
-      this.taxRecordPublicId = ""
-      this.taxRecordOverview = true
-    },
   },
 }
 </script>

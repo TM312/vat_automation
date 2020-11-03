@@ -1,13 +1,9 @@
 <template>
   <div>
     <h6>transactionPublicId: {{ transactionPublicId }}</h6>
-    <h6>fetchTransaction: {{ fetchTransaction }}</h6>
-    <h5>transationsFull: {{ transationsFull.length }}</h5>
-    <h4>fetched: {{ fetched }}</h4>
     <br />
     <sidebar-transaction
       :transaction-public-id="transactionPublicId"
-      :fetch-transaction="fetchTransaction"
     />
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
@@ -131,7 +127,6 @@ export default {
         "transaction/get_by_tax_record_tax_treatment",
         params
       )
-      this.fetched = true
     }
   },
 
@@ -139,8 +134,6 @@ export default {
     return {
       buttonShow: true,
       transactionPublicId: "",
-      fetchTransaction: false,
-      fetched: false,
 
       fields: [
         {
@@ -167,12 +160,9 @@ export default {
         },
         {
           key: "tax_jurisdiction_code",
+          label: "Tax Jurisdiction",
           sortable: false,
-        },
-        // {
-        //     key: "details",
-        //     sortable: false,
-        // }
+        }
       ],
     }
   },
@@ -180,7 +170,6 @@ export default {
   computed: {
     ...mapState({
       taxRecord: (state) => state.tax_record.tax_record,
-      transationsFull: (state) => state.transaction.transactions,
     }),
     transactions() {
       return this.$store.getters[
@@ -216,8 +205,7 @@ export default {
                 );
             },
             setSidebar(transactionPublicId) {
-                (this.transactionPublicId = transactionPublicId),
-                    (this.fetchTransaction = !this.fetchTransaction);
+                (this.transactionPublicId = transactionPublicId)
             },
         },
     };

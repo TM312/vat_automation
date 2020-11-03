@@ -4,7 +4,9 @@ export const state = () => ({
 })
 
 export const getters = {
-  getTransactionsByTaxTreatmentCode: state => taxTreatmentCode => state.transactions.filter(transaction => transaction.tax_treatment_code === taxTreatmentCode)
+  getTransactionsByTaxTreatmentCode: state => taxTreatmentCode => state.transactions.filter(transaction => transaction.tax_treatment_code === taxTreatmentCode),
+  getByPublicId: state => publicId => state.transactions.find(transaction => transaction.public_id === publicId)
+
 }
 
 export const mutations = {
@@ -19,7 +21,16 @@ export const mutations = {
   PUSH_TRANSACTIONS(state, payload) {
     for (let i = 0; i < payload.length; i++)
       if (state.transactions.includes(payload[i]) === false) state.transactions.push(payload[i])
-  }
+  },
+
+  CLEAR_TRANSACTIONS(state) {
+    state.transactions = []
+  },
+
+  CLEAR_STATE(state) {
+    state.transaction = []
+    state.transactions = []
+  },
 }
 
 export const actions = {
@@ -83,5 +94,13 @@ export const actions = {
     } else {
       // Handle error here
     }
+  },
+
+  async clear_transactions({ commit }) {
+    commit('CLEAR_TRANSACTIONS')
+  },
+
+  async clear_state({ commit }) {
+    commit('CLEAR_STATE')
   },
 }

@@ -5,14 +5,10 @@
 </template>
 
 <script>
-import { BIcon } from "bootstrap-vue"
 
 export default {
   name: 'ButtonDownload',
 
-  components: {
-    BIcon
-  },
   props: {
     urlEndpointTemplate: {
       type: String,

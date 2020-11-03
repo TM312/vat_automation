@@ -9,7 +9,7 @@ class Bundle(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
-    transaction_inputs = db.relationship('TransactionInput', backref='bundle', lazy=True)
+    transaction_inputs = db.relationship('TransactionInput', backref='bundle', order_by='TransactionInput.complete_date', lazy=True)
 
 
     def __repr__(self):
