@@ -12,8 +12,13 @@
 </template>
 
 <script>
-
 export default {
-  name: 'NavbarTax',
+  name: "NavbarTax",
+  mounted() {
+    this.socket = this.$nuxtSocket({
+      name: "home",
+      reconnection: true,
+    })
+  },
 }
 </script>

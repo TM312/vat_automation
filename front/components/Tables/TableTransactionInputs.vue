@@ -11,7 +11,7 @@
         </b-button> -->
         <nuxt-link
           v-if="data.item.public_id != $route.params.public_id"
-          :to="`/clients/${clientPublicId}/upload/transactions/${data.item.public_id}`"
+          :to="`/clients/${clientPublicId}/transactions/${data.item.public_id}`"
           exact
         >
           {{ data.value }}
@@ -78,16 +78,17 @@ export default {
   name: "TableTransactionInputs",
 
   props: {
+    clientPublicId: {
+      type: String,
+      required: true,
+    },
+
     transactionInputs: {
       type: [Array, Object],
       required: true,
     },
   },
 
-  async asyncData({ params }) {
-    const clientPublicId = params.clientPublicId
-    return { clientPublicId }
-  },
 
   data() {
     return {

@@ -1,3 +1,4 @@
+import random
 from typing import Union, List
 from . import Business
 from .accounting_firm import AccountingFirm
@@ -7,6 +8,11 @@ from .interface_parent import BusinessInterface
 
 
 class BusinessService:
+
+    @staticmethod
+    def get_by_public_id(public_id: str) -> Business:
+        return Business.query.filter_by(public_id = public_id).first()
+
 
     @staticmethod
     def get_by_name_address_or_None(name: str, address: str) -> Union[AccountingFirm, SellerFirm]:
@@ -32,6 +38,32 @@ class BusinessService:
     @staticmethod
     def get_by_id(business_id: int) -> Business:
         return Business.query.get(business_id)
+
+    @staticmethod
+    def create_public_id(name_pre: str) -> str:
+        from app.namespaces.utils.service import InputService
+        name = InputService.stringify(name_pre)
+        # vars for while loop
+        business_exist = True
+        i = 0
+        while business_exist:
+
+            business = BusinessService.get_by_public_id(name)
+            if isinstance(business, Business):
+                i += 1
+                if i < 32:
+                    j = random.randint(1, 32)
+                elif i >= 32 and i < 99:
+                    j = random.randint(32, 99)
+                else:
+                    j = random.randint(99, 999)
+
+                name = name + str(j)
+            else:
+                business_exist = False
+
+        return name
+
 
     @staticmethod
     def update(business: Business, data_changes: BusinessInterface) -> Business:

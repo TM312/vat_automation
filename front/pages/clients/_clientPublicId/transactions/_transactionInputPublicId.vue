@@ -10,7 +10,7 @@
 
         <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
           <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" class="mt-4" />
+          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" :client-public-id="clientPublicId" class="mt-4" />
         </b-card>
       </b-tab>
 
@@ -20,7 +20,7 @@
 
         <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
           <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" />
+          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" :client-public-id="clientPublicId" />
         </b-card>
       </b-tab>
     </b-tabs>
