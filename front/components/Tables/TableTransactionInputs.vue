@@ -1,6 +1,21 @@
 <template>
   <div>
-    <b-table :fields="fieldsBundle" :items="transactionInputs" hover>
+    <b-pagination
+      v-model="currentPage"
+      :total-rows="transactionInputs.length"
+      :per-page="perPage"
+      aria-controls="table-transaction-inputs"
+      pills
+      class="my-3"
+    />
+    <b-table
+      id="table-transaction-inputs"
+      :fields="fieldsBundle"
+      :items="transactionInputs"
+      :per-page="perPage"
+      :current-page="currentPage"
+      hover
+    >
       <template v-slot:cell(transaction_type_public_code)="data">
         <!-- <b-button
           v-if="data.item.public_id != $route.params.public_id"
@@ -89,9 +104,10 @@ export default {
     },
   },
 
-
   data() {
     return {
+      perPage: 25,
+      currentPage: 1,
       fieldsBundle: [
         {
           key: "complete_date",

@@ -49,7 +49,7 @@ class TransactionIdResource(Resource):
 class TransactionSellerFirmTaxRecordResource(Resource):
     decorators = [limiter.limit("5/second")]
     @login_required
-    @ns.marshal_list_with(transaction_sub_dto, envelope='data')
+    @ns.marshal_list_with(transaction_dto, envelope='data')
     def get(self) -> List[Transaction]:
         """Get Single Transaction"""
         args = parser.parse_args()
@@ -62,7 +62,7 @@ class TransactionSellerFirmTaxRecordResource(Resource):
 class TransactionSellerFirmTaxRecordTaxTreamtnetResource(Resource):
     decorators = [limiter.limit("5/second")]
     @login_required
-    @ns.marshal_list_with(transaction_sub_dto, envelope='data')
+    @ns.marshal_list_with(transaction_dto, envelope='data')
     def get(self) -> List[Transaction]:
         """Get Single Transaction"""
         args = parser.parse_args()

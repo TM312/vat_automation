@@ -425,7 +425,7 @@ export default {
     async submitPayload() {
       // try {
       // await this.create_by_seller_firm_public_id();
-      const seller_firm_public_id = this.$route.params.public_id
+      const seller_firm_public_id = this.sellerFirm.public_id
       var tax_record_data = this.payload
       await this.$repositories.tax_record.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
       //     await this.$store.dispatch(

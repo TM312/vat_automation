@@ -124,6 +124,7 @@ export default {
             'BNavbarBrand',
             'BNavbarNav',
             'BNavbarToggle',
+            'BPagination',
             'BPopover',
             'BProgress',
             'BProgressBar',

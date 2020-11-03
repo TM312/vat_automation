@@ -1,7 +1,14 @@
 <template>
-  <b-card :title="taxJurisdictionName">
+  <b-card
+    :title="
+      $store.getters['country/countryNameByCode'](
+        taxRecord.tax_jurisdiction_code
+      )
+    "
+  >
     <b-card-sub-title class="mb-2">
-      {{ $dateFns.format(taxRecord.start_date, 'MMMM dd, yyyy') }} – {{ $dateFns.format(taxRecord.end_date, 'MMMM dd, yyyy') }}
+      {{ $dateFns.format(taxRecord.start_date, "MMMM dd, yyyy") }} –
+      {{ $dateFns.format(taxRecord.end_date, "MMMM dd, yyyy") }}
     </b-card-sub-title>
 
     <b-card-text>
@@ -12,39 +19,50 @@
           <b>Payable Vat Amount:</b>
         </b-col>
         <b-col>
-          {{ Number.parseFloat(taxRecord.taxable_turnover_amount).toFixed(2) }} {{ taxRecord.currency_code }}
+          {{
+            Number.parseFloat(
+              taxRecord.taxable_turnover_amount
+            ).toFixed(2)
+          }}
+          {{ taxRecord.currency_code }}
           <br />
-          {{ Number.parseFloat(taxRecord.payable_vat_amount).toFixed(2) }} {{ taxRecord.currency_code }}
+          {{
+            Number.parseFloat(taxRecord.payable_vat_amount).toFixed(
+              2
+            )
+          }}
+          {{ taxRecord.currency_code }}
         </b-col>
       </b-row>
 
-      <b-button variant="link" class="mt-2 pl-0" @click="$emit('single-view', taxRecord.public_id)">
+      <!-- <b-button variant="link" class="mt-2 pl-0" @click="$emit('single-view', taxRecord.public_id)">
         Details
-      </b-button>
+      </b-button> -->
+    </b-card-text>
+    <b-card-text class="mt-3">
+      <nuxt-link
+        :to="`/clients/${clientPublicId}/tax-records/${taxRecord.public_id}`"
+        exact
+      >
+        Details
+      </nuxt-link>
     </b-card-text>
   </b-card>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
-  name: 'CardTaxRecordShort',
-  // eslint-disable-next-line
-        props: { taxRecord: { type: [Array, Object] } },
+  name: "CardTaxRecordShort",
 
-  computed: {
-    ...mapState({
-      countries: state => state.country.countries
-    }),
-
-    taxJurisdictionName() {
-      if (this.countries.length !== 0) {
-        return this.countries.find(country => country.code == this.taxRecord.tax_jurisdiction_code).name
-      } else {
-        return null
-      }
-    }
+  props: {
+    taxRecord: {
+      type: [Array, Object],
+      required: true,
+    },
+    clientPublicId: {
+      type: String,
+      required: true,
+    },
   },
 }
 </script>

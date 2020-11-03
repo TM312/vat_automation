@@ -4,24 +4,53 @@
       <b-row>
         <b-col cols="auto" class="mr-auto">
           Items
-          <b-badge pill :variant="!flashCounter ? 'primary':'success'" class="ml-2">
+          <b-badge
+            pill
+            :variant="!flashCounter ? 'primary' : 'success'"
+            class="ml-2"
+          >
             {{ items.length }}
           </b-badge>
         </b-col>
         <b-col cols="auto">
-          <b-form-checkbox v-model="editMode" name="check-button" switch />
+          <b-form-checkbox
+            v-model="editMode"
+            name="check-button"
+            switch
+          />
         </b-col>
       </b-row>
     </b-card-title>
     <b-card-text>
-      <h5 v-if="items.length === 0 && !editMode" class="text-muted text-center m-5">
+      <h5
+        v-if="items.length === 0 && !editMode"
+        class="text-muted text-center m-5"
+      >
         No Data Available Yet
       </h5>
       <div v-else>
-        <div v-if="editMode===false">
-          <b-table borderless :items="items" :fields="fields" hover>
+        <div v-if="editMode === false">
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="items.length"
+            :per-page="perPage"
+            aria-controls="table-items"
+            pills
+            class="my-3"
+          />
+
+          <b-table
+            id="table-items"
+            borderless
+            :items="items"
+            :fields="fields"
+            hover
+            :per-page="perPage"
+            :current-page="currentPage"
+          >
             <template v-slot:cell(unit_cost_price_net)="data">
-              {{ data.value }} {{ data.item.unit_cost_price_currency_code }}
+              {{ data.value }}
+              {{ data.item.unit_cost_price_currency_code }}
             </template>
 
             <template v-slot:cell(weight_kg)="data">
@@ -33,11 +62,16 @@
         <div v-else>
           <b-tabs content-class="mt-3">
             <b-tab title="Create" active>
-              <lazy-form-add-seller-firm-item @flash="flashCount" />
+              <lazy-form-add-seller-firm-item
+                @flash="flashCount"
+              />
             </b-tab>
 
             <b-tab title="Delete" :disabled="items.length === 0">
-              <lazy-table-delete-seller-firm-item :fields="fieldsEditable" @flash="flashCount" />
+              <lazy-table-delete-seller-firm-item
+                :fields="fieldsEditable"
+                @flash="flashCount"
+              />
             </b-tab>
           </b-tabs>
         </div>
@@ -56,37 +90,38 @@ export default {
     return {
       editMode: false,
       flashCounter: false,
+      currentPage: 1,
+      perPage: 25,
 
       fields: [
         { key: "brand_name", sortable: false },
-        { key: "sku", label:"SKU", sortable: false },
+        { key: "sku", label: "SKU", sortable: false },
         { key: "name", sortable: false },
-        { key: "tax_code_code", label:"Tax Code", sortable: false },
+        { key: "tax_code_code", label: "Tax Code", sortable: false },
         {
           key: "weight_kg",
           label: "Weight",
-          formatter: value => {
+          formatter: (value) => {
             return Number.parseFloat(value).toFixed(3)
           },
-          sortable: false
+          sortable: false,
         },
         {
           key: "unit_cost_price_net",
           sortable: false,
-          formatter: value => {
+          formatter: (value) => {
             return Number.parseFloat(value).toFixed(2)
           },
-        }
-      ]
+        },
+      ],
     }
   },
 
   computed: {
     ...mapState({
-      items: state => state.seller_firm.seller_firm.items,
-      seller_firm: state => state.seller_firm.seller_firm,
+      items: (state) => state.seller_firm.seller_firm.items,
+      seller_firm: (state) => state.seller_firm.seller_firm,
     }),
-
 
     cardBorder() {
       return this.editMode ? "info" : ""
@@ -96,21 +131,16 @@ export default {
       return this.fields.concat({
         key: "edit",
         label: "",
-        sortable: false
+        sortable: false,
       })
-    }
-
-
+    },
   },
 
   methods: {
     flashCount() {
       this.flashCounter = true
-      setTimeout(() => this.flashCounter = false, 1000)
-
-    }
-
-
-  }
+      setTimeout(() => (this.flashCounter = false), 1000)
+    },
+  },
 }
 </script>

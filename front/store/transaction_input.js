@@ -10,6 +10,12 @@ export const mutations = {
     state.transaction_inputs = []
   },
 
+  CLEAR_STATE(state) {
+    state.transaction_inputs = [],
+    state.transaction_inputs_bundle = [],
+    state.transaction_input = []
+  },
+
   CLEAR_TRANSACTION_INPUTS_BUNDLE(state) {
     state.transaction_inputs_bundle = []
   },
@@ -55,6 +61,10 @@ export const actions = {
 
   async clear_transaction_inputs({ commit }) {
     commit('CLEAR_TRANSACTION_INPUTS')
+  },
+
+  async clear_state({ commit }) {
+    commit('CLEAR_STATE')
   },
 
   async clear_transaction_inputs_bundle({ commit }) {

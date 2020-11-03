@@ -1,23 +1,25 @@
 <template>
   <div>
-    <h2>hi</h2>
-    <card-transaction-base-data :transaction="transaction" />
+    <h2>
+      disabled
+    </h2>
+    <!-- <card-transaction-base-data v-else :transaction="transaction" /> -->
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SidebarTransactionDetails',
-  props: {
-    transaction: {
-      type: [Object, Array],
-      required: true
-    }
-  }
+// <script>
+// export default {
+//   name: 'SidebarTransactionDetails',
+//   props: {
+//     transaction: {
+//       type: [Object, Array, null],
+//       required: true
+//     }
+//   }
 
-}
-</script>
+// }
+// </script>
 
-<style>
+// <style>
 
-</style>
+// </style>

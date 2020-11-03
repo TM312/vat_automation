@@ -4,9 +4,6 @@ export const state = () => ({
 })
 
 export const mutations = {
-  CLEAR_TAX_RECORDS(state) {
-    state.tax_records = []
-  },
 
   PUSH_TAX_RECORD(state, payload) {
     state.tax_records.push(payload)
@@ -24,14 +21,20 @@ export const mutations = {
   // !!!! NOT SURE IF WORKING maybe position of tax_record in array required
   SPLICE_TAX_RECORDS(state, payload) {
     state.tax_records.splice(payload, 1)
-  }
+  },
+
+  CLEAR_TAX_RECORDS(state) {
+    state.tax_records = []
+  },
+
+  CLEAR_STATE(state) {
+    state.tax_record = []
+    state.tax_records = []
+  },
 }
 
 export const actions = {
 
-  async clear_tax_records({ commit }) {
-    commit('CLEAR_TAX_RECORDS')
-  },
 
   async get_all({ commit }) {
     const res = await this.$repositories.tax_record.get_all()
@@ -85,6 +88,15 @@ export const actions = {
     } else {
       // Handle error here
     }
+  },
+
+  async clear_tax_records({ commit }) {
+    commit('CLEAR_TAX_RECORDS')
+  },
+
+
+  async clear_state({ commit }) {
+    commit('CLEAR_STATE')
   },
 
   // async create_by_seller_firm_public_id({ commit }, data_array) {

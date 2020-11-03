@@ -13,8 +13,8 @@
         risus, porta ac consectetur ac, vestibulum at eros.
       </p>
     </div>
-    <div class="mt-3">
-      <sidebar-transaction-details :transaction="transaction" />
+    <div v-if="transactionPublicId !== ''" class="mt-3">
+      <card-transaction-base-data :transaction="transaction" />
     </div>
     <b-button variant="primary">
       Details
@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
 
 export default {
   name: "SidebarTransaction",
@@ -31,38 +30,16 @@ export default {
     transactionPublicId: {
       type: String,
       required: true,
-    },
-    fetchTransaction: {
-      type: Boolean,
-      required: true,
-    },
+    }
   },
 
   computed: {
-    ...mapState({
-      transaction: (state) => state.transaction.transaction,
-    }),
+    transaction(){
+      return this.$store.getters['transaction/getByPublicId'](this.transactionPublicId)
+    }
   },
 
-  watch: {
-    /*eslint-disable */
-            async fetchTransaction(newVal) {
-                if (newVal) {
-                    if (
-                        this.transaction.length === 0 ||
-                        this.transaction.public_id !== this.transactionPublicId
-                    ) {
-                        const { store } = this.$nuxt.context;
-                        await store.dispatch(
-                            "transaction/get_by_public_id",
-                            this.transactionPublicId
-                        );
-                    }
-                }
-            },
-            /*eslint-disable */
-        },
-    };
+}
 </script>
 
 <style>

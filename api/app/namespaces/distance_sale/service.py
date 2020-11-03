@@ -226,9 +226,6 @@ class DistanceSaleService:
                 'last_tax_date': last_tax_date,
                 'original_filename': original_filename
             }
-            print("", flush=True)
-            print('distance_sale update:', data_changes, flush=True)
-            print("", flush=True)
 
             try:
                 distance_sale.update(data_changes)
