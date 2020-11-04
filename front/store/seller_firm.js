@@ -4,9 +4,9 @@ export const state = () => ({
 })
 
 
-
 export const getters = {
-  vatNumberByCountryCode: state => countryCode => state.seller_firm.vat_numbers.find(el => el.country_code === countryCode)
+  vatNumberByCountryCode: state => countryCode => state.seller_firm.vat_numbers.find(el => el.country_code === countryCode),
+  getPANEUDistanceSales: state => state.seller_firm.distance_sales.filter(distance_sale => ['DE', 'FR', 'PL', 'CZ', 'GB', 'IT', 'ES'].includes(distance_sale.arrival_country_code))
 }
 
 export const mutations = {

@@ -16,11 +16,11 @@
       </b-row>
     </b-card-title>
 
-    <b-card-text>selected: {{ selected }}</b-card-text>
+    <!-- <b-card-text>selected: {{ selected }}</b-card-text>
 
     <b-card-text>distanceSale: {{ distanceSale }}</b-card-text>
 
-    <b-card-text><distance-sale-chart /></b-card-text>
+    <b-card-text><distance-sale-chart /></b-card-text> -->
 
 
 
@@ -38,13 +38,17 @@
               </div>
             </template>
 
+            <template v-slot:cell(arrival_country_code)="data">
+              {{ $store.getters['country/countryNameByCode'](data.value) }}
+            </template>
+
             <template v-slot:cell(active)="data">
               <div>
-                <b-icon v-if="data.value === true" :id="`popover-target-distance-sale-history-${data.item.arrival_country}`" icon="check-circle" variant="success" />
-                <b-icon v-else :id="`popover-target-distance-sale-history-${data.item.arrival_country}`" icon="x-circle" variant="danger" />
+                <b-icon v-if="data.value === true" :id="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" icon="check-circle" variant="success" />
+                <b-icon v-else :id="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" icon="x-circle" variant="danger" />
               </div>
-              <b-popover :target="`popover-target-distance-sale-history-${data.item.arrival_country}`" triggers="hover" placement="top" class="ml-2" title="History">
-                <div>Test {{ data.item.arrival_country }}</div>
+              <b-popover :target="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" triggers="hover" placement="top" class="ml-2" title="History">
+                <div>Test {{ data.item.arrival_country_code }}</div>
               </b-popover>
             </template>
 
@@ -62,8 +66,8 @@
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['currency_code'] }} -->
                 </span>
 
-                <span class="ml-2">|</span>
-                <span class="ml-2">Further information </span>
+                <!-- <span class="ml-2">|</span>
+                <span class="ml-2">Further information </span> -->
               </div>
             </template>
           </b-table>
@@ -99,21 +103,22 @@ export default {
       selected: null,
 
       fields: [
-        { key: "arrival_country", sortable: false },
-        { key: "active", sortable: false },
-        { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months) **in progress**', sortable: false },
-        { key: 'details', label: '' }
-
+        { key: 'arrival_country_code', label: 'Arrival Country', sortable: false },
+        { key: 'active', sortable: false },
+        { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months)', sortable: true }
       ]
     }
   },
 
   computed: {
     ...mapState({
-      distanceSales: state => state.seller_firm.seller_firm.distance_sales,
       distanceSale: state => state.distance_sale.distance_sale,
       vatThresholds: state => state.vat_threshold.vat_thresholds,
     }),
+
+    distanceSales() {
+      return this.$store.getters["seller_firm/getPANEUDistanceSales"]
+    },
 
     // this computed property adds the country specific vat_threshold attribute to the distanceSales Array
     distanceSalesVatThresholdItems() {

@@ -8,12 +8,10 @@
   >
     <div class="px-3 py-2">
       <p>
-        Cras mattis consectetur purus sit amet fermentum. Cras justo
-        odio, dapibus ac facilisis in, egestas eget quam. Morbi leo
-        risus, porta ac consectetur ac, vestibulum at eros.
+        Here you find a summary of the tax related key figures. By clicking on the button below you are being directed to the original transaction that provides more details.
       </p>
-      <b-button size="sm" variant="outline-primary" class="mt-3">
-        Details
+      <b-button size="sm" variant="outline-primary" class="mt-3" :to="`/clients/${clientPublicId}/transactions/${transaction.transaction_input_public_id}`" exact>
+        <b-icon icon="arrow-right" /> Go to Transaction
       </b-button>
     </div>
     <div v-if="transactionPublicId !== ''" class="mt-3">
@@ -24,6 +22,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: "SidebarTransaction",
   props: {
@@ -34,11 +34,13 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      clientPublicId: state => state.seller_firm.seller_firm.public_id
+    }),
     transaction() {
-      return this.$store.getters["transaction/getByPublicId"](
-        this.transactionPublicId
-      )
-    },
+      return this.$store.getters["transaction/getByPublicId"](this.transactionPublicId)
+    }
+
   },
 }
 </script>

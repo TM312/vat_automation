@@ -1,9 +1,7 @@
 <template>
   <div>
-    <h6>transactionPublicId: {{ transactionPublicId }}</h6>
-    <br />
-    <sidebar-transaction
-      :transaction-public-id="transactionPublicId"
+    <sidebar-transaction v-if="transactionPublicId !== ''"
+                         :transaction-public-id="transactionPublicId"
     />
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
@@ -63,25 +61,6 @@
       <template #cell(tax_jurisdiction_code)="data">
         {{ $store.getters["country/countryNameByCode"](data.value) }}
       </template>
-
-      <!-- <template #cell(details)="row">
-                <b-button size="sm" @click="row.toggleDetails">
-                Details
-                </b-button>
-            </template>
-
-            <template #row-details>
-                <p>hello</p>
-                <b-card>
-                <ul>
-                    <li v-for="(value, key) in row.item" :key="key">
-                    {{ key }}: {{ value }}
-                    </li>
-                </ul>
-                </b-card>
-            </b-table>
-        </div>
-        </template> -->
     </b-table>
 
     <b-button
@@ -112,11 +91,7 @@ export default {
   },
 
   async fetch() {
-    if (this.transactions.length === 0 && !this.fetched) {
-      console.log(
-        "this.transactions.length === 0:",
-        this.transactions.length === 0
-      )
+    if (this.transactions.length === 0) {
       const { store } = this.$nuxt.context
       const params = {
         tax_record_public_id: this.taxRecord.public_id,
