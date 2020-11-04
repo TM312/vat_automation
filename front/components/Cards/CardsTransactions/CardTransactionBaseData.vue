@@ -129,7 +129,7 @@ export default {
   name: "CardTransactionBaseData",
   props: {
     transaction: {
-      type: [Object, Array],
+      type: [Array, Object],
       required: true,
     },
   },

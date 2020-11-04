@@ -16,7 +16,7 @@ distance_sale_history_dto = Model('distance_sale_history', {
 distance_sale_sub_dto = Model('distance_sale_sub', {
     'public_id': fields.String(readonly=True),
     'arrival_country_code': fields.String,
-    'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True), #!!!change later
+    # 'arrival_country': fields.String(attribute=lambda x: x.arrival_country.name, readonly=True), #!!!change later
     'active': fields.Boolean,
     'taxable_turnover_amount': fields.Float,
     'last_tax_date': fields.Date

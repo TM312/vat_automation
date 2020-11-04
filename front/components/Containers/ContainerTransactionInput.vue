@@ -1,10 +1,6 @@
 <template>
   <div v-if="clientPublicId.length > 0 && transactionInputPublicId.length > 0">
-    <!-- <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
-      <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-      <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" :client-public-id="clientPublicId" />
-    </b-card> -->
-    <card-transaction-input-bundle :transaction-input-public-id="transactionInput.public_id" :client-public-id="clientPublicId" />
+    <card-transaction-input-bundle :transaction-input-public-id="transactionInputPublicId" :client-public-id="clientPublicId" />
     <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
       <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transaction-input-public-id="transactionInputPublicId" /> </p>
     </b-alert>
@@ -12,11 +8,6 @@
       <b-tab title="Input File" active>
         <div v-if="$fetchState.pending || transactionInput.length === 0"></div>
         <card-transaction-input v-else id="file" />
-
-        <!-- <b-card title="Transaction Bundle" sub-title="A list of all related transactions" class="mt-4">
-          <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
-          <table-transaction-inputs v-else :transaction-inputs="transactionInputsBundle" :client-public-id="clientPublicId" class="mt-4" />
-        </b-card> -->
       </b-tab>
 
       <b-tab title="Tax Processes" lazy :disabled="$fetchState.pending && sellerFirm.public_id != clientPublicId || transactionInput.length === 0">

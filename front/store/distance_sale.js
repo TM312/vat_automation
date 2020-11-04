@@ -3,6 +3,11 @@ export const state = () => ({
   distance_sale: []
 })
 
+
+export const getters = {
+  getPANEU: state => state.distance_sales.filter(distance_sale => ['DE', 'FR', 'PL', 'CZ', 'GB', 'IT', 'ES'].includes(distance_sale.arrival_country_code))
+}
+
 export const mutations = {
   SET_DISTANCE_SALES(state, payload) {
     state.distance_sales = payload

@@ -39,11 +39,10 @@
           }}</span>
         </b-card-sub-title>
         <b-card-text class="font-weight-bold">
-          <b-row>
+          <b-row class="text-center">
             <b-col>
               <span
                 v-if="transactionInput.arrival_country_code"
-                class="pr-5"
               >
                 {{ transactionInput.departure_country_code }}
                 <span class="px-1"><b-icon icon="arrow-right" /></span>
@@ -51,7 +50,7 @@
               </span>
             </b-col>
             <b-col>
-              <span class="pr-5">QTY: {{ transactionInput.item_quantity }}</span>
+              <span>QTY: {{ transactionInput.item_quantity }}</span>
             </b-col>
             <b-col>
               <span>{{ transactionInput.sale_total_value_gross }}
