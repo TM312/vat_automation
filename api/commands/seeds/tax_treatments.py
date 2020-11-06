@@ -26,7 +26,7 @@ tax_treatments = [
     {
         'code': 'INTRA_COMMUNITY_SALE',
         'name': 'Intra Community Sale',
-        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Sale (Departure != Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number).'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Sale (Departure != Arrival Country). Tax Treatment limited to B2B Transactions.'
     },
     {
         'code': 'EXPORT',
@@ -35,13 +35,13 @@ tax_treatments = [
     },
     {
         'code': 'LOCAL_ACQUISITION',
-        'name': 'Domestic Acquisition',
-        'description': 'Transaction taxable in the country of departure. Domestic Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
+        'name': 'Local Acquisition',
+        'description': 'Transaction taxable in the country of departure. Local Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'INTRA_COMMUNITY_ACQUISITION',
         'name': 'Intra Community Acquisition',
-        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Acquisition (Departure != Arrival Country). Tax Treatment limited to B2B Transactions (valid Customer VAT Number).'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Acquisition (Departure != Arrival Country). Tax Treatment limited to B2B Transactions.'
     }#  ,
     # {
     #     'code': 'IMPORT',
@@ -61,7 +61,11 @@ class TaxTreatmentSeedService:
             {'SALE': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
             {'REFUND': ['LOCAL_SALE', 'LOCAL_SALE_REVERSE_CHARGE', 'DISTANCE_SALE', 'INTRA_COMMUNITY_SALE', 'EXPORT']},
             {'ACQUISITION': ['LOCAL_ACQUISITION']},
-            {'MOVEMENT': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']}
+            {'MOVEMENT': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']},
+            # !!! recheck if the two cases below are correct
+            {'RETURN': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']},
+            {'INBOUND': ['INTRA_COMMUNITY_SALE', 'INTRA_COMMUNITY_ACQUISITION']}
+
         ]
 
         try:

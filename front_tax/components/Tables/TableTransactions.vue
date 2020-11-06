@@ -1,18 +1,31 @@
 <template>
   <div>
-    <sidebar-transaction v-if="transactionPublicId !== ''"
-                         :transaction-public-id="transactionPublicId"
+    <sidebar-transaction
+      v-if="transactionPublicId !== ''"
+      :transaction-public-id="transactionPublicId"
     />
+
+    <b-pagination
+      v-model="currentPage"
+      :total-rows="transactions.length"
+      :per-page="perPage"
+      aria-controls="table-transactions"
+      pills
+      hide-goto-end-buttons
+      :disabled="transactions.length===0"
+    />
+
     <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
     </h5>
-    <b-table v-else :fields="fields" :items="transactions" hover>
-      <!-- <template v-slot:cell(type_code)="data">
-        <nuxt-link :to="`/transactions/${data.item.transaction_input_public_id}`">
-            {{ data.value }}
-        </nuxt-link>
-        </template> -->
 
+    <b-table
+      v-else
+      id="table-transactions"
+      :fields="fields"
+      :items="transactions"
+      hover
+    >
       <template v-slot:head(departure_to_arrival)>
         <b-row no-gutters class="justify-content-md-center">
           <b-col class="text-right">
@@ -62,18 +75,6 @@
         {{ $store.getters["country/countryNameByCode"](data.value) }}
       </template>
     </b-table>
-
-    <b-button
-      v-if="buttonShow"
-      variant="outline-primary"
-      :disabled="$fetchState.pending"
-      block
-      @click="refresh"
-    >
-      <b-spinner v-if="$fetchState.pending" small />
-      <b-icon v-else icon="chevron-down" />
-      Show More
-    </b-button>
   </div>
 </template>
 
@@ -107,7 +108,9 @@ export default {
 
   data() {
     return {
-      buttonShow: true,
+      perPage: 25,
+      currentPage: 1,
+
       transactionPublicId: "",
 
       fields: [
@@ -137,7 +140,7 @@ export default {
           key: "tax_jurisdiction_code",
           label: "Tax Jurisdiction",
           sortable: false,
-        }
+        },
       ],
     }
   },
@@ -152,16 +155,21 @@ export default {
       ](this.taxTreatmentCode)
     },
 
-    currentPage() {
-      return Math.trunc(this.transactions.length / 50) //needs to match with api config transactions_per_page
+    fetchMore() {
+      if (!this.channelCodeFilter) {
+        return (
+          this.currentPage >= this.transactions.length / this.perPage)
+      } else {
+        return false
+      }
     },
   },
 
   watch: {
     /*eslint-disable */
-            transactions(newVal, oldVal) {
-                if (newVal.length < oldVal.length + 50) {
-                    this.buttonShow = false;
+            fetchMore(newVal) {
+                if (newVal) {
+                    this.refresh();
                 }
             },
         },
@@ -172,7 +180,7 @@ export default {
                 const params = {
                     tax_record_public_id: this.taxRecord.public_id,
                     tax_treatment_code: this.taxTreatmentCode,
-                    page: this.currentPage + 1,
+                    page: this.currentPage/2 + 1,
                 };
                 await store.dispatch(
                     "transaction/get_by_tax_record_tax_treatment",
@@ -180,7 +188,7 @@ export default {
                 );
             },
             setSidebar(transactionPublicId) {
-                (this.transactionPublicId = transactionPublicId)
+                this.transactionPublicId = transactionPublicId;
             },
         },
     };

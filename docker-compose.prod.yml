@@ -52,7 +52,7 @@ services:
         env_file:
             - .prod.env
 
-    front:
+    front_tax:
         env_file:
             - .prod.env
 

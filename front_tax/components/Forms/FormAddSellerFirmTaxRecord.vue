@@ -1,5 +1,4 @@
 <template>
-  <!-- <b-container> -->
   <b-card bg-variant="white" lg="6" xl="4" style="max-width: 80rem">
     <b-form-group
       label-cols-lg="2"
@@ -23,11 +22,51 @@
 
 
       <b-form-group
+        v-show="!!payload.tax_jurisdiction_code"
         label-cols-sm="3"
         label-align-sm="right"
         label="Validity"
       >
-        <b-row class="mt-2" cols="1" cols-md="3" cols-lg="4" cols-xl="6">
+        <!-- year selection -->
+        <b-row class="mb-2">
+          <b-col>
+            <b-button variant="outline-primary" :pressed="yearString === currentYearString" block @click="setYear('current')">
+              {{ currentYearString }}
+            </b-button>
+          </b-col>
+          <b-col>
+            <b-button variant="outline-primary" :pressed="yearString === currentYearString - 1" block @click="setYear('past')">
+              {{ currentYearString - 1 }}
+            </b-button>
+          </b-col>
+        </b-row>
+
+        <!-- in-year selection by quarters -->
+        <b-row v-show="!!yearString" cols="1" cols-md="2" cols-lg="4">
+          <b-col class="mb-2">
+            <b-button :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block @click="setQ(1)">
+              Q1
+            </b-button>
+          </b-col>
+          <b-col class="mb-2">
+            <b-button :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block @click="setQ(2)">
+              Q2
+            </b-button>
+          </b-col>
+          <b-col class="mb-2">
+            <b-button :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block @click="setQ(3)">
+              Q3
+            </b-button>
+          </b-col>
+          <b-col class="mb-2">
+            <b-button :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block @click="setQ(4)">
+              Q4
+            </b-button>
+          </b-col>
+        </b-row>
+
+        <!-- in-year selection by months -->
+        <b-row v-show="!!yearString" class="mt-2" cols="1" cols-md="3" cols-lg="4" cols-xl="6">
           <b-col class="mb-2">
             <b-button :disabled="test(0)" :variant="test(0) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Jan'" block @click="setM(0)">
               Jan
@@ -90,36 +129,8 @@
             </b-button>
           </b-col>
         </b-row>
-        <b-row cols="1" cols-md="2" cols-lg="4">
-          <b-col class="mb-2">
-            <b-button :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block @click="setQ(1)">
-              Q1
-            </b-button>
-          </b-col>
-          <b-col class="mb-2">
-            <b-button :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block @click="setQ(2)">
-              Q2
-            </b-button>
-          </b-col>
-          <b-col class="mb-2">
-            <b-button :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block @click="setQ(3)">
-              Q3
-            </b-button>
-          </b-col>
-          <b-col class="mb-2">
-            <b-button :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block @click="setQ(4)">
-              Q4
-            </b-button>
-          </b-col>
-        </b-row>
-        <b-row class="mb-2">
-          <b-col>
-            <b-button variant="outline-primary" :pressed="selected == 'pastYear'" block @click="setPastYear()">
-              {{ pastYearString }}
-            </b-button>
-          </b-col>
-          <!-- <b-col><b-button @click="setPastMonth()" variant="outline-primary" :pressed="selected == 'pastMonth'" block>{{ $dateFns.format(pastMonthDate, 'MMMM yyyy') }}</b-button></b-col> -->
-        </b-row>
+
+
         <b-row class="mt-4" cols="1" cols-lg="2">
           <b-col class="mb-2">
             <b-form-group
@@ -158,6 +169,7 @@
     <b-button
       variant="primary"
       block
+      :disabled="payload.tax_jurisdiction_code == null || payload.start_date == null || payload.end_date == null"
       @click="submitPayload()"
     >
       <b-icon icon="box-arrow-in-up" />
@@ -165,7 +177,6 @@
       <span>Generate New Tax Record</span>
     </b-button>
   </b-card>
-  <!-- </b-container> -->
 </template>
 
 <script>
@@ -187,7 +198,8 @@ export default {
         tax_jurisdiction_code: null,
         start_date: null,
         end_date: null
-      }
+      },
+      yearString: null
     }
   },
 
@@ -198,13 +210,6 @@ export default {
       vatCountries: state => state.seller_firm.seller_firm.vat_numbers.map(vatin => vatin.country_code)
     }),
 
-
-
-    pastYearString() {
-      var d = new Date()
-      var pastYear = d.setFullYear(d.getFullYear() - 1)
-      return this.$dateFns.format(pastYear, 'yyyy')
-    },
 
     currentYearString() {
       return this.$dateFns.format(new Date(), 'yyyy')
@@ -237,89 +242,83 @@ export default {
       var selected = null
 
       if (
-        this.payload.start_date == this.currentYearString + '-01-01' &&
-                    this.payload.end_date == this.currentYearString + '-03-31'
+        this.payload.start_date == this.yearString + '-01-01' &&
+                    this.payload.end_date == this.yearString + '-03-31'
       ) {
         selected = 'Q1'
       } else if (
-        this.payload.start_date == this.currentYearString + '-04-01' &&
-                    this.payload.end_date == this.currentYearString + '-06-30'
+        this.payload.start_date == this.yearString + '-04-01' &&
+                    this.payload.end_date == this.yearString + '-06-30'
       ) {
         selected = 'Q2'
       } else if (
-        this.payload.start_date == this.currentYearString + '-07-01' &&
-                        this.payload.end_date == this.currentYearString + '-09-30'
+        this.payload.start_date == this.yearString + '-07-01' &&
+                        this.payload.end_date == this.yearString + '-09-30'
       ) {
         selected = 'Q3'
       } else if (
-        this.payload.start_date == this.currentYearString + '-10-01' &&
-                        this.payload.end_date == this.currentYearString + '-12-31'
+        this.payload.start_date == this.yearString + '-10-01' &&
+                        this.payload.end_date == this.yearString + '-12-31'
       ) {
         selected = 'Q4'
-      } else if(
-        this.payload.start_date == this.pastYearString + '-01-01' &&
-                    this.payload.end_date == this.pastYearString + '-12-31'
-      ) {
-        selected = 'pastYear'
-
       } else if (
-        this.payload.start_date == this.currentYearString + '-01-01' &&
-                    this.payload.end_date == this.currentYearString + '-01-31'
+        this.payload.start_date == this.yearString + '-01-01' &&
+                    this.payload.end_date == this.yearString + '-01-31'
       ) {
         selected = 'Jan'
       } else if (
-        this.payload.start_date == this.currentYearString + '-02-01' &&
-                    this.payload.end_date == this.currentYearString + ('-02-28' || '-02-29')
+        this.payload.start_date == this.yearString + '-02-01' &&
+                    this.payload.end_date == this.yearString + ('-02-28' || '-02-29')
       ) {
         selected = 'Feb'
       } else if (
-        this.payload.start_date == this.currentYearString + '-03-01' &&
-                    this.payload.end_date == this.currentYearString + '-03-31'
+        this.payload.start_date == this.yearString + '-03-01' &&
+                    this.payload.end_date == this.yearString + '-03-31'
       ) {
         selected = 'March'
       } else if (
-        this.payload.start_date == this.currentYearString + '-04-01' &&
-                    this.payload.end_date == this.currentYearString + '-04-30'
+        this.payload.start_date == this.yearString + '-04-01' &&
+                    this.payload.end_date == this.yearString + '-04-30'
       ) {
         selected = 'April'
       } else if (
-        this.payload.start_date == this.currentYearString + '-05-01' &&
-                    this.payload.end_date == this.currentYearString + '-05-31'
+        this.payload.start_date == this.yearString + '-05-01' &&
+                    this.payload.end_date == this.yearString + '-05-31'
       ) {
         selected = 'May'
       } else if (
-        this.payload.start_date == this.currentYearString + '-06-01' &&
-                    this.payload.end_date == this.currentYearString + '-06-30'
+        this.payload.start_date == this.yearString + '-06-01' &&
+                    this.payload.end_date == this.yearString + '-06-30'
       ) {
         selected = 'June'
       } else if (
-        this.payload.start_date == this.currentYearString + '-07-01' &&
-                    this.payload.end_date == this.currentYearString + '-07-31'
+        this.payload.start_date == this.yearString + '-07-01' &&
+                    this.payload.end_date == this.yearString + '-07-31'
       ) {
         selected = 'July'
       } else if (
-        this.payload.start_date == this.currentYearString + '-08-01' &&
-                    this.payload.end_date == this.currentYearString + '-08-31'
+        this.payload.start_date == this.yearString + '-08-01' &&
+                    this.payload.end_date == this.yearString + '-08-31'
       ) {
         selected = 'Aug'
       } else if (
-        this.payload.start_date == this.currentYearString + '-09-01' &&
-                    this.payload.end_date == this.currentYearString + '-09-30'
+        this.payload.start_date == this.yearString + '-09-01' &&
+                    this.payload.end_date == this.yearString + '-09-30'
       ) {
         selected = 'Sep'
       } else if (
-        this.payload.start_date == this.currentYearString + '-10-01' &&
-                    this.payload.end_date == this.currentYearString + '-10-31'
+        this.payload.start_date == this.yearString + '-10-01' &&
+                    this.payload.end_date == this.yearString + '-10-31'
       ) {
         selected = 'Oct'
       } else if (
-        this.payload.start_date == this.currentYearString + '-11-01' &&
-                    this.payload.end_date == this.currentYearString + '-11-30'
+        this.payload.start_date == this.yearString + '-11-01' &&
+                    this.payload.end_date == this.yearString + '-11-30'
       ) {
         selected = 'Nov'
       } else if (
-        this.payload.start_date == this.currentYearString + '-12-01' &&
-                    this.payload.end_date == this.currentYearString + '-12-31'
+        this.payload.start_date == this.yearString + '-12-01' &&
+                    this.payload.end_date == this.yearString + '-12-31'
       ) {
         selected = 'Dec'
       }
@@ -343,23 +342,31 @@ export default {
     test(timespan) {
       if (typeof(timespan) === 'string') {
         if (timespan === 'Q1') {
-          return new Date() < new Date(this.currentYearString, 2, 31)
+          return new Date() < new Date(this.yearString, 2, 31)
         } else if (timespan === 'Q2') {
-          return new Date() < new Date(this.currentYearString, 5, 30)
+          return new Date() < new Date(this.yearString, 5, 30)
         } else if (timespan === 'Q3') {
-          return new Date() < new Date(this.currentYearString, 8, 30)
+          return new Date() < new Date(this.yearString, 8, 30)
         } else if (timespan === 'Q4') {
-          return new Date() < new Date(this.currentYearString, 11, 31)
+          return new Date() < new Date(this.yearString, 11, 31)
         }
       } else if (typeof(timespan) === 'number') {
-        return new Date() < new Date(this.currentYearString, timespan, 0)
+        return new Date() < new Date(this.yearString, timespan, 0)
       }
 
     },
 
-    setPastYear() {
-      this.payload.start_date = this.pastYearString + '-01-01'
-      this.payload.end_date = this.pastYearString + '-12-31'
+    setYear(year) {
+      if (year === 'current') {
+        this.yearString = this.$dateFns.format(new Date(), 'yyyy')
+        this.payload.start_date = this.yearString + '-01-01'
+        this.payload.end_date = this.yearString + '-12-31'
+      } else if(year === 'past') {
+        this.yearString = this.$dateFns.format(new Date(), 'yyyy') - 1
+        this.payload.start_date = this.yearString + '-01-01'
+        this.payload.end_date = this.yearString + '-12-31'
+      }
+
     },
 
     // setPastMonth() {
@@ -378,34 +385,32 @@ export default {
 
       switch (quarter) {
       case 1:
-        this.payload.start_date = this.currentYearString + '-01-01'
-        this.payload.end_date = this.currentYearString + '-03-31'
+        this.payload.start_date = this.yearString + '-01-01'
+        this.payload.end_date = this.yearString + '-03-31'
         break
       case 2:
-        this.payload.start_date = this.currentYearString + '-04-01'
-        this.payload.end_date = this.currentYearString + '-06-30'
+        this.payload.start_date = this.yearString + '-04-01'
+        this.payload.end_date = this.yearString + '-06-30'
         break
       case 3:
-        this.payload.start_date = this.currentYearString + '-07-01'
-        this.payload.end_date = this.currentYearString + '-09-30'
+        this.payload.start_date = this.yearString + '-07-01'
+        this.payload.end_date = this.yearString + '-09-30'
         break
       case 4:
-        this.payload.start_date = this.currentYearString + '-10-01'
-        this.payload.end_date = this.currentYearString + '-12-31'
+        this.payload.start_date = this.yearString + '-10-01'
+        this.payload.end_date = this.yearString + '-12-31'
         break
       }
 
     },
 
     dateStringEndMonth(month) {
-      var d = new Date()
-      var dateEndMonth = new Date(d.getFullYear(), month+1, 0 )
+      var dateEndMonth = new Date(this.yearString, month+1, 0 )
       return this.$dateFns.format(dateEndMonth, 'yyyy-MM-dd')
     },
 
     dateStringBeginningMonth(month) {
-      var d = new Date()
-      var dateBeginningMonth = new Date(d.getFullYear(), month, 1 )
+      var dateBeginningMonth = new Date(this.yearString, month, 1 )
       return this.$dateFns.format(dateBeginningMonth, 'yyyy-MM-dd')
     },
 

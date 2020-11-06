@@ -16,7 +16,6 @@ from .decorators import login_required
 parser = reqparse.RequestParser()
 parser.add_argument('page', type=int)
 
-#
 
 ns = Namespace("utils", description="Utilities Related Operations")  # noqa
 ns.add_model(notification_dto.name, notification_dto)

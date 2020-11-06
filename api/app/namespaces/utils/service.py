@@ -51,6 +51,7 @@ class NotificationService:
 
     @staticmethod
     def get_all_key_account_notifications() -> List[SellerFirmNotification]:
+        notifications_per_query = current_app.config.NOTIFICATIONS_PER_QUERY
 
         from app.namespaces.user.tax_auditor import TaxAuditor
         from app.namespaces.business.seller_firm import SellerFirm
@@ -59,7 +60,7 @@ class NotificationService:
             SellerFirm.notifications
             ).join(
                 SellerFirm.tax_auditors, aliased=True
-            ).filter_by(id=g.user.id).order_by(SellerFirmNotification.created_on.desc()).limit(30).all()
+        ).filter_by(id=g.user.id).order_by(SellerFirmNotification.created_on.desc()).limit(notifications_per_query).all()
 
         return seller_firm_notifications
 

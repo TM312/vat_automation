@@ -22,23 +22,16 @@
                 class="mr-auto"
               >
                 <b-button-group size="sm" class="ml-2">
-                  <b-button
-                    :variant="transaction.supplier_relationship === 'B2B' ? 'success' : 'outline-secondary' "
-                  >
+                  <b-button :variant="transaction.supplier_relationship === 'B2B' ? 'primary' : 'outline-secondary' ">
                     B2B
                   </b-button>
-                  <b-button
-                    :variant="
-                      transaction.supplier_relationship === 'B2C' ? 'success' : 'outline-secondary' "
-                  >
+                  <b-button :variant=" transaction.supplier_relationship === 'B2C' ? 'primary' : 'outline-secondary' ">
                     B2C
                   </b-button>
                 </b-button-group>
               </b-col>
             </b-row>
-            <b-row
-              v-if="transaction.supplier_relationship === 'B2B'"
-            >
+            <b-row v-if="transaction.supplier_relationship === 'B2B'" class="mt-3">
               <b-col cols="5" xl="4">
                 <b>Vat Number:</b>
               </b-col>
@@ -48,13 +41,7 @@
                 style="white-space: pre-wrap"
                 class="mr-auto"
               >
-                <span>{{
-                  transaction.supplier_vatin.country_code
-                }}
-                  -
-                  {{
-                    transaction.supplier_vatin.number
-                  }}</span>
+                <span>{{ transaction.supplier_vatin.country_code }}-{{ transaction.supplier_vatin.number }}</span>
                 <!-- <span v-if="transaction.supplier_vatin.name"><b-icon icon="info-circle" @hover="getVatInfo()"/></span> -->
               </b-col>
             </b-row>
@@ -89,7 +76,7 @@
                     :variant="
                       transaction.customer_relationship ===
                         'B2B'
-                        ? 'success'
+                        ? 'primary'
                         : 'outline-secondary'
                     "
                   >
@@ -99,7 +86,7 @@
                     :variant="
                       transaction.customer_relationship ===
                         'B2C'
-                        ? 'success'
+                        ? 'primary'
                         : 'outline-secondary'
                     "
                   >
@@ -108,9 +95,7 @@
                 </b-button-group>
               </b-col>
             </b-row>
-            <b-row
-              v-if="transaction.customer_relationship === 'B2B'"
-            >
+            <b-row v-if="transaction.customer_relationship === 'B2B'" class="mt-3">
               <b-col cols="5" xl="4">
                 <b>Vat Number:</b>
               </b-col>
@@ -120,13 +105,7 @@
                 style="white-space: pre-wrap"
                 class="mr-auto"
               >
-                <span>{{
-                  transaction.customer_vatin.country_code
-                }}
-                  -
-                  {{
-                    transaction.customer_vatin.number
-                  }}</span>
+                <span>{{ transaction.customer_vatin.country_code }} - {{ transaction.customer_vatin.number }}</span>
                 <span v-if="transaction.customer_vatin.number"><b-icon
                   icon="info-circle"
                   @hover="getVatInfo()"
@@ -166,45 +145,6 @@
       </b-col>
       <b-col cols="12" lg="6" xl="8">
         <card-transaction-prices :transaction="transaction" />
-
-        <!-- <b-card title="Prices">
-          <div class="mt-3">
-            <b-table
-              hover
-              fixed
-              :items="itemsItem"
-              :fields="fieldsItemPrices"
-              class="mb-4"
-            />
-          </div>
-          <div class="my-3">
-            <b-table
-              hover
-              fixed
-              :items="itemsShipment"
-              :fields="fieldsShipmentPrices"
-              class="mb-4"
-            />
-          </div>
-          <div>
-            <b-table
-              hover
-              fixed
-              :items="itemsGiftWrap"
-              :fields="fieldsGiftWrapPrices"
-              class="mb-4"
-            />
-          </div>
-          <div class="mt-2">
-            <b-table
-              hover
-              fixed
-              :items="itemsTotal"
-              :fields="fieldsTotalPrices"
-              class="mb-4"
-            />
-          </div>
-        </b-card> -->
       </b-col>
     </b-row>
 

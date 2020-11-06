@@ -67,7 +67,7 @@ export default {
 
   props: {
     // eslint-disable-next-line
-            urlEndpointUpload: {
+    urlEndpointUpload: {
       type: String,
       required: false
     }

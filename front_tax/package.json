@@ -1,7 +1,7 @@
 {
-  "name": "front",
+  "name": "front_tax",
   "version": "1.0.0",
-  "description": "Frontend for the NT project",
+  "description": "Frontend Tax Auditors",
   "author": "Thomas Moellers",
   "private": true,
   "scripts": {
