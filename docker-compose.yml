@@ -18,17 +18,17 @@ version: '3'
 
 services:
 
-    front:
-        container_name: front
+    front_tax:
+        container_name: front_tax
         build:
-            context: ./front
+            context: ./front_tax
             dockerfile: Dockerfile
             args:
                 - NODE_VERSION=${NODE_VERSION}
-        image: ${OWNER_NAME}/front:${VERSION_NUMBER}
+        image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-            - "3000"
+            - "14000"
         depends_on:
             - api
         networks:

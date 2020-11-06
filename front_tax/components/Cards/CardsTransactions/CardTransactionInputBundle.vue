@@ -1,7 +1,8 @@
 <template>
   <b-row cols="2" cols-md="3" cols-lg="4">
+    <!-- <h1>orderedBundle: {{ orderedBundle }}</h1> -->
     <b-col
-      v-for="(transactionInput, index) in transactionInputsBundle"
+      v-for="(transactionInput, index) in orderedBundle"
       :key="transactionInput.public_id"
     >
       <b-card
@@ -33,7 +34,7 @@
           <span>{{ index }}</span>
           <!-- <span v-if="index > 0">{{ $dateFns.formatDistance(new Date(transactionInput.complete_date), new Date(transactionInput.complete_date)) }}</span> -->
 
-          <!-- <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date - transactionInput.complete_date) }}</span> -->
+          <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date > transactionInput.complete_date) }}</span>
           <span v-if="index > 0" class="px-2">{{
             transactionInputsBundle[index - 1].complete_date
           }}</span>
@@ -97,9 +98,12 @@ export default {
 
   computed: {
     ...mapState({
-      transactionInputsBundle: (state) =>
-        state.transaction_input.transaction_inputs_bundle,
+      transactionInputsBundle: (state) => state.transaction_input.transaction_inputs_bundle
     }),
+    orderedBundle() {
+      var orderedTransactionInputsBundle = this.transactionInputsBundle
+      return orderedTransactionInputsBundle.sort((a,b) => b.complete_date - a.complete_date)
+    }
   },
   methods: {
     borderVariant(publicId) {

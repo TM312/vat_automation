@@ -117,9 +117,6 @@
       </template>
     </b-table-lite>
   </b-card>
-  <!-- <div>
-    {{ transaction }}
-  </div> -->
 </template>
 
 <script>

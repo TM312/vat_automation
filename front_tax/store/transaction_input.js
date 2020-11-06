@@ -4,6 +4,10 @@ export const state = () => ({
   transaction_input: []
 })
 
+export const getters = {
+  filterByChannelCode: state => channelCode => channelCode ? state.transaction_inputs.filter(transaction_input => transaction_input.channel_code === channelCode) : state.transaction_inputs
+}
+
 export const mutations = {
 
   CLEAR_TRANSACTION_INPUTS(state) {

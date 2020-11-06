@@ -3,6 +3,10 @@ export const state = () => ({
   tax_treatment: []
 })
 
+export const getters = {
+  getByCode: state => taxTreatmentCode => state.tax_treatments.find(taxTreatment => taxTreatment.code === taxTreatmentCode)
+}
+
 export const mutations = {
   SET_TAX_TREATMENTS(state, tax_treatments) {
     state.tax_treatments = tax_treatments

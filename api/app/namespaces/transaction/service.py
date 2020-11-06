@@ -162,7 +162,7 @@ class TransactionService:
 
         amazon_vat_calculation_service: bool = TransactionService.check_amazon_vat_calculation_service(transaction_input.tax_calculation_date)
 
-        if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'RETURN':
+        if transaction_type.code == 'MOVEMENT' or transaction_type.code == 'RETURN' or transaction_type.code == 'INBOUND': #!!! recheck if INBOUND here is correct
             customer_vatin = VATINService.get_by_country_code_seller_firm_id(arrival_country.code, account.seller_firm_id)
             customer_relationship = 'B2B'
             customer_relationship_checked = False
@@ -631,7 +631,7 @@ class TransactionService:
                     else False
                 )
 
-                if departure_country_code != arrival_country.code and distance_sale_history_active:
+                if departure_country_code != arrival_country.code and distance_sale_history_active: #or threshold surpassed
                     tax_treatment_code = 'DISTANCE_SALE'
 
                 else:

@@ -2,9 +2,9 @@ version: '3'
 
 services:
 
-    front:
+    front_tax:
         build:
-            context: ./front
+            context: ./front_tax
             dockerfile: Dockerfile
             args:
                 - NODE_VERSION=${NODE_VERSION}
