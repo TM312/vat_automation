@@ -2,7 +2,7 @@
   <b-row cols="2" cols-md="3" cols-lg="4">
     <!-- <h1>orderedBundle: {{ orderedBundle }}</h1> -->
     <b-col
-      v-for="(transactionInput, index) in orderedBundle"
+      v-for="(transactionInput, index) in transactionInputsBundle"
       :key="transactionInput.public_id"
     >
       <b-card
@@ -100,16 +100,14 @@ export default {
     ...mapState({
       transactionInputsBundle: (state) => state.transaction_input.transaction_inputs_bundle
     }),
-    orderedBundle() {
-      var orderedTransactionInputsBundle = this.transactionInputsBundle
-      return orderedTransactionInputsBundle.sort((a,b) => b.complete_date - a.complete_date)
-    }
+    // orderedBundle() {
+    //   var orderedTransactionInputsBundle = this.transactionInputsBundle
+    //   return orderedTransactionInputsBundle.sort((a,b) => b.complete_date - a.complete_date)
+    // }
   },
   methods: {
     borderVariant(publicId) {
-      return publicId === this.transactionInputPublicId
-        ? "primary"
-        : "secondary"
+      return publicId === this.transactionInputPublicId ? "primary" : "secondary"
     },
   },
 }

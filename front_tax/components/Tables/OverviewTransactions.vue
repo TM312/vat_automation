@@ -22,8 +22,6 @@ import { mapState } from 'vuex'
 export default {
   name:'OverviewTransactions',
 
-
-
   computed: {
     ...mapState({
       taxRecord: (state) => state.tax_record.tax_record,
