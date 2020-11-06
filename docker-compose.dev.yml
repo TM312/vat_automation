@@ -2,6 +2,26 @@ version: '3'
 
 services:
 
+    front:
+        build:
+            context: ./front
+            dockerfile: Dockerfile.dev
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        volumes:
+              - ./front/:/home/app
+        command: "npm run dev"
+
+    front_admin:
+        build:
+            context: ./front_admin
+            dockerfile: Dockerfile.dev
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        volumes:
+              - ./front_admin/:/home/app
+        command: "npm run dev"
+
     front_tax:
         build:
             context: ./front_tax
@@ -26,6 +46,8 @@ services:
         #       - media_data:/var/lib/media_data:ro
         ports:
             - 5000:5000
+            - 22406:22406
+            - 31729:31729
             - 80:80
         networks:
             - web
