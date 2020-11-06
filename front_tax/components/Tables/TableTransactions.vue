@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <h1>fetchedPages: {{ fetchedPages }}</h1> -->
     <sidebar-transaction
       v-if="transactionPublicId !== ''"
       :transaction-public-id="transactionPublicId"
@@ -12,10 +13,10 @@
       aria-controls="table-transactions"
       pills
       hide-goto-end-buttons
-      :disabled="transactions.length===0"
+      :disabled="transactions.length===0 || $fetchState.pending"
     />
 
-    <h5 v-if="transactions.length === 0" class="text-muted text-center m-5">
+    <h5 v-if="transactions.length === 0 && !$fetchState.pending" class="text-muted text-center m-5">
       There are no tax related processes of this tax treatment.
     </h5>
 
@@ -25,7 +26,15 @@
       :fields="fields"
       :items="transactions"
       hover
+      :busy="$fetchState.pending"
     >
+      <template v-slot:table-busy>
+        <div class="text-center text-secondary my-2">
+          <b-spinner class="align-middle" />
+          <strong>Loading...</strong>
+        </div>
+      </template>
+
       <template v-slot:head(departure_to_arrival)>
         <b-row no-gutters class="justify-content-md-center">
           <b-col class="text-right">
@@ -56,10 +65,7 @@
             {{ data.item.departure_country_code }}
           </b-col>
           <b-col
-            v-if="
-              data.item.departure_country_code ||
-                data.item.arrival_country_code
-            "
+            v-if=" data.item.departure_country_code || data.item.arrival_country_code "
             cols="2"
             class="text-center"
           >
@@ -103,6 +109,7 @@ export default {
         "transaction/get_by_tax_record_tax_treatment",
         params
       )
+      this.fetchedPages.push(1)
     }
   },
 
@@ -110,6 +117,7 @@ export default {
     return {
       perPage: 25,
       currentPage: 1,
+      fetchedPages: [],
 
       transactionPublicId: "",
 
@@ -156,7 +164,7 @@ export default {
     },
 
     fetchMore() {
-      if (!this.channelCodeFilter) {
+      if (!this.channelCodeFilter && !this.fetchedPages.includes(this.currentPage)) {
         return (
           this.currentPage >= this.transactions.length / this.perPage)
       } else {
@@ -180,12 +188,13 @@ export default {
                 const params = {
                     tax_record_public_id: this.taxRecord.public_id,
                     tax_treatment_code: this.taxTreatmentCode,
-                    page: this.currentPage/2 + 1,
+                    page: Math.round(this.currentPage/2) + 1,
                 };
                 await store.dispatch(
                     "transaction/get_by_tax_record_tax_treatment",
                     params
                 );
+                this.fetchedPages.push(this.currentPage)
             },
             setSidebar(transactionPublicId) {
                 this.transactionPublicId = transactionPublicId;
