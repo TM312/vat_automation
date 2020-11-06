@@ -7,7 +7,7 @@ export default {
      ** Headers of the page
      */
     head: {
-        title: 'Tax-Automation.com',
+        title: 'Tax-Automation.com For Tax Auditors',
         meta: [
             { charset: 'utf-8' },
             {
