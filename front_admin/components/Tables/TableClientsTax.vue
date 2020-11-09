@@ -2,7 +2,7 @@
   <div>
     <b-table :fields="fields" :items="clients" hover>
       <template v-slot:cell(name)="data">
-        <nuxt-link :to="`clients/${data.item.public_id}`">
+        <nuxt-link :to="`/seller-firms/${data.item.public_id}`">
           {{ data.value }}
         </nuxt-link>
       </template>

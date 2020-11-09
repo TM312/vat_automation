@@ -4,7 +4,7 @@
       <p v-if="notification.subject === 'Data Upload'">
         <b>{{ notification.created_by }}</b> added new data for
         <nuxt-link
-          :to="`/clients/${notification.seller_firm_public_id}`"
+          :to="`/seller-firms/${notification.seller_firm_public_id}`"
           class="mt-2"
         >
           {{ notification.seller_firm }}
@@ -14,7 +14,7 @@
       <p v-else-if="notification.subject === 'New Seller Firm'">
         <b>{{ notification.created_by }}</b> added
         <nuxt-link
-          :to="`/clients/${notification.seller_firm_public_id}`"
+          :to="`/seller-firms/${notification.seller_firm_public_id}`"
           class="mt-2"
         >
           {{ notification.seller_firm }}
@@ -23,7 +23,7 @@
 
       <p v-else-if="notification.subject === 'New Seller Firms'">
         <b>{{ notification.created_by }}</b> added
-        <nuxt-link to="/clients" class="mt-2">
+        <nuxt-link to="/seller-firms" class="mt-2">
           {{ notification.message }}
         </nuxt-link>
       </p>

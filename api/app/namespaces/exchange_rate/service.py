@@ -9,6 +9,8 @@ from werkzeug.exceptions import InternalServerError, NotFound
 from datetime import datetime, date
 from app.extensions import db
 
+
+
 class ExchangeRateService:
     @staticmethod
     def get_all() -> List[ExchangeRate]:
@@ -87,32 +89,9 @@ class ExchangeRateService:
             'date': date,
             'base': base,
             'target': target,
-            'rate': rate_base_target
+            'rate': round(float(rate_base_target), 5)
         }
         ExchangeRateService.create(exchange_rate_data)
-
-
-    @staticmethod
-    def create_exchange_rates() -> List[ExchangeRate]:
-        SUPPORTED_CURRENCIES = current_app.config.SUPPORTED_CURRENCIES
-
-        date = date.today()
-
-        exchange_rates_eur = ExchangeRateService.get_list_by_base_date('EUR', date)
-
-        if len(exchange_rates_eur) == 0:
-            #api call to ECB
-            exchange_rate_dict = ExchangeRateService.retrieve_ecb_exchange_rates()
-
-            ExchangeRateService.process_ecb_rates(date, exchange_rate_dict, SUPPORTED_CURRENCIES)
-
-
-        else:
-            response_object = {
-                'status': 'error',
-                'message': 'The exchange rates already exist.'
-            }
-            raise InternalServerError(response_object)
 
 
 
@@ -122,19 +101,21 @@ class ExchangeRateService:
 
         for currency_code in supported_currencies:
             value = exchange_rate_dict[currency_code]
+
             exchange_rate_data = {
                 'source': 'ECB',
                 'date': date,
                 'base': 'EUR',
                 'target': currency_code,
-                'rate': value
+                'rate': round(float(value), 5)
             }
+
             ExchangeRateService.create(exchange_rate_data)
 
             # creating reverse rates
             exchange_rate_data['base'] = currency_code
             exchange_rate_data['target'] = 'EUR'
-            exchange_rate_data['rate'] = 1/value
+            exchange_rate_data['rate'] = round(1/float(value), 5)
 
             ExchangeRateService.create(exchange_rate_data)
 

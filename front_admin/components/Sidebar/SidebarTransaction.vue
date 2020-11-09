@@ -10,7 +10,7 @@
       <p>
         Here you find a summary of the tax related key figures. By clicking on the button below you are being directed to the original transaction that provides more details.
       </p>
-      <b-button size="sm" variant="outline-primary" class="mt-3" :to="`/clients/${clientPublicId}/transactions/${transaction.transaction_input_public_id}`" exact>
+      <b-button size="sm" variant="outline-primary" class="mt-3" :to="`/seller-firms/${clientPublicId}/transactions/${transaction.transaction_input_public_id}`" exact>
         <b-icon icon="arrow-right" /> Go to Transaction
       </b-button>
     </div>

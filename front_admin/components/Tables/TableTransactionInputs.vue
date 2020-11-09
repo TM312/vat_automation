@@ -10,7 +10,7 @@
     <template v-slot:cell(transaction_type_public_code)="data">
       <nuxt-link
         v-if="data.item.public_id != $route.params.public_id"
-        :to="`/clients/${clientPublicId}/transactions/${data.item.public_id}`"
+        :to="`/seller-firms/${clientPublicId}/transactions/${data.item.public_id}`"
         exact
       >
         {{ data.value }}

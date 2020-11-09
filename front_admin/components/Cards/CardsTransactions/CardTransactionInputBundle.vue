@@ -22,7 +22,7 @@
                 "
                 size="sm"
                 variant="outline-primary"
-                :to="`/clients/${clientPublicId}/transactions/${transactionInput.public_id}`"
+                :to="`/seller-firms/${clientPublicId}/transactions/${transactionInput.public_id}`"
               >
                 Details
               </b-button>

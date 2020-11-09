@@ -28,6 +28,24 @@ services:
         image: ${OWNER_NAME}/front:${VERSION_NUMBER}
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+            - "14000"
+        depends_on:
+            - api
+        networks:
+            - web
+        command: "npm run start"
+
+
+    front_tax:
+        container_name: front_tax
+        build:
+            context: ./front_tax
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
+        restart: always
+        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
             - "22406"
         depends_on:
             - api
@@ -52,25 +70,6 @@ services:
         networks:
             - web
         command: "npm run start"
-
-    front_tax:
-        container_name: front_tax
-        build:
-            context: ./front_tax
-            dockerfile: Dockerfile
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
-        restart: always
-        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-            - "14000"
-        depends_on:
-            - api
-        networks:
-            - web
-        command: "npm run start"
-
-
 
 
 
@@ -149,25 +148,25 @@ services:
 
         # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
 
-    # celery-beat:
-    #     container_name: celery-beat
-    #     build:
-    #         context: ./api
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - PYTHON_VERSION=${PYTHON_VERSION}
-    #             # - GROUP_ID=${GROUP_ID}
-    #             # - USER_ID=${USER_ID}
+    celery-beat:
+        container_name: celery-beat
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+                # - GROUP_ID=${GROUP_ID}
+                # - USER_ID=${USER_ID}
 
-    #     depends_on:
-    #         - postgres
-    #         - rabbitmq
-    #         - redis
-    #         - celery-worker
-    #     networks:
-    #         - internal
-    #                                 #The -A option gives Celery the application module and the Celery instance
-    #     command: bash -c "celery beat -A wsgi:celery --loglevel=info"
+        depends_on:
+            - postgres
+            - rabbitmq
+            - redis
+            - celery-worker
+        networks:
+            - internal
+                                    #The -A option gives Celery the application module and the Celery instance
+        command: bash -c "celery beat -A wsgi:celery --loglevel=info"
 
 
 

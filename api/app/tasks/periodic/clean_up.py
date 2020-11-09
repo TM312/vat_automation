@@ -17,8 +17,8 @@ def periodic_vatin_validation():
     with app.app_context():
         from app.namespaces.tax.vatin.service import VATINService
         from ..asyncr import async_process_validation_request
-        vatin_list = VATINService.get_unvalidated(limit=50)
-        app.logger.info('Unvalidated vatins: {}'.format(len(vatin_list)))
+        vatin_list = VATINService.get_expiring(limit=50)
+        app.logger.info('Expiring vatins: {}'.format(len(vatin_list)))
 
         for i, vatin in enumerate(vatin_list):
             vatin_data = {

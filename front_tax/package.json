@@ -9,8 +9,8 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "clean": "rm -rf node_modules",
-    "reinstall": "npm run clean && npm install",
+    "clean": "rm -rf node_modules && rm package-lock.json && npm cache clean --force",
+    "reinstall": "npm run clean && npm install --force",
     "lint": "eslint --ext .js,.vue .",
     "lintfix": "eslint --fix --ext .js,.vue .",
     "precommit": "npm run lint"

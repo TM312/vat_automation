@@ -13,7 +13,7 @@
     </b-card-sub-title>
 
     <b-card-text class="pt-3">
-      <nuxt-link :to="`clients/${business.public_id}`">
+      <nuxt-link :to="`/seller-firms/${business.public_id}`">
         Details
       </nuxt-link>
     </b-card-text>

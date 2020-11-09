@@ -7,7 +7,7 @@
       </h3>
       <b-row class="my-3">
         <b-col cols="auto">
-          <navbar-tax-side :client-public-id="sellerFirm.public_id" />
+          <navbar-tax-side :seller-firm-public-id="sellerFirm.public_id" />
         </b-col>
         <b-col>
           <nuxt />

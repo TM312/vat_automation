@@ -3,7 +3,7 @@
     <b-row>
       <b-col v-if="detailsOn" cols="auto">
         <b-button variant="outline-info" @click="toggleView">
-          <!-- #//:to="`/clients/${clientPublicId}/tax-records`" exact -->
+          <!-- #//:to="`/seller-firms/${clientPublicId}/tax-records`" exact -->
           <b-icon icon="arrow-left" /> Back
         </b-button>
       </b-col>
@@ -45,7 +45,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: "tax-client",
+  layout: "admin-seller-firm",
 
   async fetch() {
     const { store } = this.$nuxt.context

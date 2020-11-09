@@ -3,7 +3,7 @@ import os
 from datetime import date
 
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
+from logging.handlers import RotatingFileHandler, SMTPHandler
 from app.config import basedir
 
 
@@ -30,14 +30,14 @@ class LogService:
         if MAIL_USE_TLS:
             secure = ()
 
-        mail_handler = SMTPHandler(
-            mailhost=(MAIL_SERVER, MAIL_PORT),
-            fromaddr='no-reply@' + MAIL_SERVER,
-            toaddrs=ADMINS,
-            subject=COMPANY_NAME + ' failure',
-            credentials=credentials
-        )
-        mail_handler.setLevel(logging.ERROR)
+        # mail_handler = SMTPHandler(
+        #     mailhost=(MAIL_SERVER, MAIL_PORT),
+        #     fromaddr='no-reply@' + MAIL_SERVER,
+        #     toaddrs=ADMINS,
+        #     subject=COMPANY_NAME + ' failure',
+        #     credentials=credentials
+        # )
+        # mail_handler.setLevel(logging.ERROR)
         file_handler.setLevel(logging.INFO)
 
         app.logger.setLevel(logging.INFO)
@@ -51,6 +51,6 @@ class LogService:
                 '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
 
 
-        if not app.debug:
-            app.logger.addHandler(mail_handler)
-            app.logger.addHandler(file_handler)
+        # if not app.debug:
+            # app.logger.addHandler(mail_handler)
+        app.logger.addHandler(file_handler)

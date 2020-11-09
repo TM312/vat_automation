@@ -53,7 +53,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: 'tax-client',
+  layout: 'admin-seller-firm',
 
   async fetch() {
     const { store } = this.$nuxt.context

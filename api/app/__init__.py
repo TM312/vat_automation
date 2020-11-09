@@ -10,7 +10,7 @@ from app.extensions import (
     cache,
     session,
     socket_io)
-#from app.logs.service import LogService
+from app.logs.service import LogService
 from flask import Flask, jsonify
 from werkzeug.contrib.fixers import ProxyFix
 from dynaconf.contrib import FlaskDynaconf
@@ -31,7 +31,7 @@ def create_app(env):
 
     register_extensions(app)
     register_api(app)
-    # !!! LogService.setup_logging(app)
+    # LogService.setup_logging(app)
 
     # for testing purposes of the client (--> '.__init__test.py')
     @app.route("/ping_3f5ca2711e72a507")

@@ -6,7 +6,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: 'tax-client',
+  layout: 'admin-seller-firm',
 
   async asyncData({ params }) {
     const clientPublicId = params.clientPublicId

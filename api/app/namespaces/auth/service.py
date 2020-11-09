@@ -45,7 +45,7 @@ class TokenService:
     def login_user(user_data: UserInterface) -> Dict:
         # fetch the user data
         user = UserService.get_by_email(user_data.get('email'))
-        if user and user.check_password(user_data.get('password')):
+        if user and user.check_password(user_data.get('password')) and user.u_type == user_data.get('u_type'):
             token_lifespan = current_app.config.TOKEN_LIFESPAN_REGISTRATION
             auth_token = TokenService.encode_auth_token(public_id=str(user.public_id), token_lifespan=token_lifespan)
             if auth_token:

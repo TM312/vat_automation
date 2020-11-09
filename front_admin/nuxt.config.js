@@ -164,7 +164,7 @@ export default {
 
   auth: {
     strategies: {
-      local_tax_auditor: {
+      local: {
         _scheme: 'local',
         endpoints: {
           login: {
