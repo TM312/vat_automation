@@ -45,7 +45,7 @@ class ExchangeRatesSeedService:
         counter = 0
 
 
-        for i in range(timespan_as_days):
+        for i in range(timespan_as_days+1):
             exchange_rate_date = SERVICE_START_DATE + timedelta(days=i)
             calc_exchange_rate_date = exchange_rate_date
             date_string = exchange_rate_date.strftime('%Y-%m-%d')

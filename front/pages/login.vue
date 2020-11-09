@@ -6,33 +6,31 @@
           <b-card-title class="text-center text-dark">
             Sign in
           </b-card-title>
-          <client-only placeholder="Loading...">
-            <b-card-body>
-              <b-form @submit.prevent="login">
-                <b-form-group id="input-group-email" label="Email" label-for="input-email">
-                  <b-form-input
-                    id="input-email"
-                    v-model="form.email"
-                    type="email"
-                    required
-                  />
-                </b-form-group>
+          <b-card-body>
+            <b-form @submit.prevent="login">
+              <b-form-group id="input-group-email" label="Email" label-for="input-email">
+                <b-form-input
+                  id="input-email"
+                  v-model="form.email"
+                  type="email"
+                  required
+                />
+              </b-form-group>
 
-                <b-form-group id="input-group-password" label="Password" label-for="input-password">
-                  <b-form-input
-                    id="input-password"
-                    v-model="form.password"
-                    type="password"
-                    required
-                  />
-                </b-form-group>
+              <b-form-group id="input-group-password" label="Password" label-for="input-password">
+                <b-form-input
+                  id="input-password"
+                  v-model="form.password"
+                  type="password"
+                  required
+                />
+              </b-form-group>
 
-                <b-button block variant="primary" class="mt-5" type="submit">
-                  Continue
-                </b-button>
-              </b-form>
-            </b-card-body>
-          </client-only>
+              <b-button block variant="primary" class="mt-5" type="submit">
+                Continue
+              </b-button>
+            </b-form>
+          </b-card-body>
         </b-card>
       </b-col>
     </b-row>
@@ -49,7 +47,7 @@ export default {
       showPassword: false,
       form: {
         email: '',
-        password: '',
+        password: ''
       },
     }
   },
@@ -58,9 +56,10 @@ export default {
       const payload = {
         email: this.form.email,
         password: this.form.password,
+        u_type: 'seller'
       }
       try {
-        await this.$auth.loginWith('local_tax_auditor', {
+        await this.$auth.loginWith('local', {
           data: payload,
         })
 

@@ -71,9 +71,9 @@ services:
         env_file:
             - .dev.env
 
-    # celery-beat:
-    #     env_file:
-    #         - .dev.env
+    celery-beat:
+        env_file:
+            - .dev.env
 
     flower:
         ports:
@@ -89,6 +89,7 @@ services:
     api:
         volumes:
               - ./api/migrations/:/home/api/migrations
+              - ./api/logs/:/home/logs
         env_file:
             - .dev.env
         #command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && flask run --host 0.0.0.0 --port 5000"

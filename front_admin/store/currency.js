@@ -3,6 +3,10 @@ export const state = () => ({
   currency: []
 })
 
+export const getters = {
+  getNameByCode: state => currencyCode => state.currencies.find(currency => currency.code === currencyCode).name
+}
+
 export const mutations = {
   SET_CURRENCIES(state, currencies) {
     state.currencies = currencies

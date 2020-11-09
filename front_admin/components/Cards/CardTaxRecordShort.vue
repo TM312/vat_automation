@@ -41,7 +41,7 @@
     </b-card-text>
     <b-card-text class="mt-3">
       <nuxt-link
-        :to="`/clients/${clientPublicId}/tax-records/${taxRecord.public_id}`"
+        :to="`/seller-firms/${clientPublicId}/tax-records/${taxRecord.public_id}`"
         exact
       >
         Details

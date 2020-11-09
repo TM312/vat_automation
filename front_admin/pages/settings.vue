@@ -19,7 +19,7 @@
 <script>
 export default {
   name: "Settings",
-  layout: 'tax',
+  layout: 'admin',
   data() {
     return {
       user: ""

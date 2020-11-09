@@ -3,44 +3,44 @@
     <b-nav vertical pills>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}`"
+        :to="`/seller-firms/${sellerFirmPublicId}`"
         exact
       >
         Company
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}/items`"
+        :to="`/seller-firms/${sellerFirmPublicId}/items`"
         exact
         prefetch
-        :disabled="!clientPublicId"
+        :disabled="!sellerFirmPublicId"
       >
         Items
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}/transactions`"
+        :to="`/seller-firms/${sellerFirmPublicId}/transactions`"
         exact
         prefetch
-        :disabled="!clientPublicId"
+        :disabled="!sellerFirmPublicId"
       >
         Transactions
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}/tax-records`"
+        :to="`/seller-firms/${sellerFirmPublicId}/tax-records`"
         exact
         prefetch
-        :disabled="!clientPublicId"
+        :disabled="!sellerFirmPublicId"
       >
         Tax Records
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${clientPublicId}/upload`"
+        :to="`/seller-firms/${sellerFirmPublicId}/upload`"
         exact
         :link-class="linkClass(4)"
-        :disabled="!clientPublicId"
+        :disabled="!sellerFirmPublicId"
       >
         Upload Files
       </b-nav-item>
@@ -52,7 +52,7 @@
 export default {
   name: "NavbarTaxSide",
   props: {
-    clientPublicId: {
+    sellerFirmPublicId: {
       default: null,
       type: String,
       required: false,

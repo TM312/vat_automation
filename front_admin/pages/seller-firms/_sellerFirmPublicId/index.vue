@@ -1,6 +1,6 @@
 <template>
   <div>
-    <overview-base-data-loading v-if="$fetchState.pending && (sellerFirm.public_id != clientPublicId || sellerFirm.length === 0)" />
+    <overview-base-data-loading v-if="$fetchState.pending && (sellerFirm.public_id != sellerFirmPublicId || sellerFirm.length === 0)" />
     <overview-base-data v-else />
   </div>
 </template>
@@ -8,18 +8,18 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  layout: "tax-client",
+  layout: "admin-seller-firm",
 
   async fetch() {
     const { store } = this.$nuxt.context
-    if (this.sellerFirm.length == 0 || this.sellerFirm.public_id !== this.clientPublicId) {
-      await store.dispatch('seller_firm/get_by_public_id', this.clientPublicId)
+    if (this.sellerFirm.length == 0 || this.sellerFirm.public_id !== this.sellerFirmPublicId) {
+      await store.dispatch('seller_firm/get_by_public_id', this.sellerFirmPublicId)
     }
   },
 
   async asyncData({ params }) {
-    const clientPublicId = params.clientPublicId
-    return { clientPublicId }
+    const sellerFirmPublicId = params.sellerFirmPublicId
+    return { sellerFirmPublicId }
   },
 
 

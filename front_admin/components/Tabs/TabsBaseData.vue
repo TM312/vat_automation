@@ -1,0 +1,33 @@
+<template>
+  <b-tabs vertical pills>
+    <b-tab title="Channels" active>
+      <tab-channels />
+    </b-tab>
+    <b-tab title="Countries" lazy>
+      <tab-countries />
+    </b-tab>
+    <b-tab title="Currencies" lazy>
+      <tab-currencies />
+    </b-tab>
+    <b-tab title="Tax Treatments" lazy>
+      <tab-tax-treatments />
+    </b-tab>
+    <b-tab title="Tax Rate Types" lazy>
+      <h1>Here gets all Tax Rate Types Data</h1>
+    </b-tab>
+    <b-tab title="Vat Thresholds" lazy>
+      <h1>Here gets all Vat Thresholds Data</h1>
+    </b-tab>
+  </b-tabs>
+</template>
+
+<script>
+export default {
+  name: 'TabsBaseData'
+
+}
+</script>
+
+<style>
+
+</style>

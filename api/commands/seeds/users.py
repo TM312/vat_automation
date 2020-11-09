@@ -12,19 +12,11 @@ class AdminSeedService:
     def seed_admin():
         new_admin = Admin(
             name = 'Thomas M.',
-            email = 'tm@mail.de',
+            email = 'thomas.moellers@rwth-aachen.de',
             password = 'ch_ch_ch_check',
             role = 'zzz'
         )
         db.session.add(new_admin)
-
-        new_admin2 = Admin(
-            name='Nico P.',
-            email='nico@email.com',
-            password='check_the_mic',
-            role='employee'
-        )
-        db.session.add(new_admin2)
         db.session.commit()
 
     @staticmethod

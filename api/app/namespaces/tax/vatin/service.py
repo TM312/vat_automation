@@ -63,8 +63,11 @@ class VATINService:
             ).first()
 
     @staticmethod
-    def get_unvalidated(limit: int) -> List[VATIN]:
-        return VATIN.query.filter_by(valid=None).limit(limit).all()
+    def get_expiring(limit: int) -> List[VATIN]:
+        return VATIN.query.filter(
+            VATIN.valid == True,
+            VATIN.valid_to <= date.today() + timedelta(days=10)
+        ).limit(limit).all()
 
     @staticmethod
     def update(vatin_id: int, data_changes: VATINInterface) -> VATIN:

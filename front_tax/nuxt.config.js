@@ -1,6 +1,6 @@
 export default {
     server: {
-        port: 14000, // default: 3000
+        port: 22406, // default: 3000
         host: '0.0.0.0' // default: localhost
     },
     /*
@@ -164,7 +164,7 @@ export default {
 
     auth: {
         strategies: {
-            local_tax_auditor: {
+            local: {
                 _scheme: 'local',
                 endpoints: {
                     login: {
