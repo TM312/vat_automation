@@ -111,6 +111,7 @@ export default {
       'BFormDatepicker',
       'BFormGroup',
       'BFormInput',
+      'BFormTextarea',
       'BFormInvalidFeedback',
       'BFormValidFeedback',
       'BFormSelect',
