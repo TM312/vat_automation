@@ -41,10 +41,10 @@ class AdminBusinessIdResource(Resource):
     @ns.marshal_with(business_dto)
     def get(self, public_id: str) -> Business:
         '''Get One Business'''
-        return BusinessService.get_by_id(UUID(public_id))
+        return BusinessService.get_by_id(public_id)
 
     @login_required
     @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
         '''Delete A Single Business'''
-        return BusinessService.delete_by_id(UUID(public_id))
+        return BusinessService.delete_by_id(public_id)

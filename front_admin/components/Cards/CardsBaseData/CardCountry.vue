@@ -45,8 +45,7 @@ export default {
     return {
       edit: false,
       form: {
-        name: null,
-        code: null,
+        name: null
       }
     }
   },

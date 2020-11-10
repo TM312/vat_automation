@@ -23,11 +23,7 @@
     <b-card-sub-title>
       <b-row>
         <b-col cols="auto">
-          <b-form-input
-            v-if="edit"
-            v-model="form.code"
-          />
-          <span v-else>{{ currency.code }}</span>
+          {{ currency.code }}
         </b-col>
         <b-col cols="auto ml-auto">
           <b-button
@@ -61,8 +57,7 @@ export default {
       buttonBusy: false,
       edit: false,
       form: {
-        name: null,
-        code: null,
+        name: null
       },
     }
   },
@@ -72,7 +67,6 @@ export default {
             edit(newVal) {
                 if (newVal) {
                     this.form.name = this.currency.name
-                    this.form.code = this.currency.code
                 }
             },
         },
@@ -98,11 +92,11 @@ export default {
                 const { store } = this.$nuxt.context;
                 const currency_code = this.currency.code;
                 const data_changes = this.removeEmpty();
-                console.log(data_changes);
                 const payload = [currency_code, data_changes];
                 await store.dispatch("currency/update", payload);
                 this.makeToast();
                 this.buttonBusy = false;
+                this.edit = false
             },
 
             makeToast() {

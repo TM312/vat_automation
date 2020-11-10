@@ -57,7 +57,6 @@ class CurrencyIdResource(Resource):
 
         current_app.logger.info('currency_code:', currency_code)
 
-        data_changes: CurrencyInterface = request.parsed_obj
+        data_changes: CurrencyInterface = request.json
         current_app.logger.info('data_changes:', data_changes)
-        pass
-        # return CurrencyService.update(currency_code, data_changes)
+        return CurrencyService.update(currency_code, data_changes)

@@ -43,7 +43,9 @@ def login_required(f):
 
 # accepted_u_types accepts arguments (more info here: https://blog.miguelgrinberg.com/post/the-ultimate-guide-to-python-decorators-part-iii-decorators-with-arguments)
 # also: https://www.artima.com/weblogs/viewpost.jsp?thread=240845#decorator-functions-with-decorator-arguments
-def accepted_u_types(*args):
+
+
+def accepted_u_types(*u_types):
     def accepted_u_types_inner_decorator(f):
         # @wraps(f)
         def wrap(*args, **kwargs):
