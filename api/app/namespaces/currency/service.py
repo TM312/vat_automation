@@ -19,9 +19,10 @@ class CurrencyService:
     @staticmethod
     def update(code: str, data_changes: CurrencyInterface) -> Currency:
         currency = CurrencyService.get_by_code(code)
-        currency.update(data_changes)
-        db.session.commit()
-        return currency
+        if isinstance(currency, Currency):
+            currency.update(data_changes)
+            db.session.commit()
+            return currency
 
     @staticmethod
     def delete_by_code(code: str):

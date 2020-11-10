@@ -26,14 +26,15 @@ ns.add_model(seller_dto_admin.name, seller_dto_admin)
 @ns.route('/')
 class SellerResource(Resource):
     '''Get all Seller'''
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(seller_dto, envelope='data')
     def get(self) -> List[Seller]:
         '''List Of Registered Seller Firms'''
         return SellerService.get_all()
 
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin', 'seller')
     @ns.expect(seller_dto, validate=True)
     @ns.marshal_with(seller_dto)
     def post(self):
@@ -42,17 +43,28 @@ class SellerResource(Resource):
         return SellerService.create(admin_data)
 
 
+@ns.route('/self')
+class SellerSelfResource(Resource):
+    '''Get Seller Self'''
+    @login_required
+    @accepted_u_types('admin', 'seller')
+    @ns.marshal_with(seller_dto, envelope='data')
+    def get(self) -> List[Seller]:
+        return SellerService.get_by_id(g.user.id)
+
+
+
 @ns.route('/<int:seller_id>')
 @ns.param('seller_id', 'Seller firm ID')
 class SellerIdResource(Resource):
-    #@login_required
+    @login_required
     @accepted_u_types('admin')
     @ns.marshal_with(seller_dto)
     def get(self, seller_id: int) -> Seller:
         '''Get One Seller'''
         return SellerService.get_by_id(seller_id)
 
-    #@login_required
+    @login_required
     @accepted_u_types('admin')
     def delete(self, seller_id: int) -> Response:
         '''Delete A Single Seller'''

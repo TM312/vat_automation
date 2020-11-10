@@ -1,7 +1,7 @@
 from typing import List
 
 from flask import request
-from flask import current_app
+from flask import current_app, g
 from flask.wrappers import Response
 
 from flask_restx import Namespace, Resource
@@ -35,6 +35,17 @@ class AdminResource(Resource):
         """Create A Single Seller Firm"""
         admin_data: AdminInterface = request.json
         return AdminService.create(admin_data)
+
+
+@ns.route('/self')
+class AdminSelfResource(Resource):
+    '''Get Admin Self'''
+    @login_required
+    @accepted_u_types('admin')
+    @ns.marshal_with(admin_dto, envelope='data')
+    def get(self) -> List[Admin]:
+        return AdminService.get_by_id(g.user.id)
+
 
 
 @ns.route('/<int:admin_id>')

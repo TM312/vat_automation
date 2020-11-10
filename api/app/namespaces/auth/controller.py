@@ -21,8 +21,8 @@ ns.add_model(auth_dto.name, auth_dto)
 @ns.route("/")
 class AdminTokenResource(Resource):
     """Get all tokens"""
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(auth_dto)
     def get(self) -> List[Token]:
         """List Of Registered Tokens"""
@@ -30,8 +30,8 @@ class AdminTokenResource(Resource):
 
 @ns.route("/<string:auth_token>")
 class AdminTokenIdResource(Resource):
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_with(auth_dto)
     def get(self, auth_token: TokenInterface) -> Token:
         """Get One Token"""
@@ -57,6 +57,7 @@ class UserLogout(Resource):
     User Logout Resource
     """
     @login_required
+    @accepted_u_types('admin')
     def post(self):
         # get auth token from request header
         auth_token: TokenInterface = request.headers.get('Authorization')

@@ -2,6 +2,7 @@
   <b-container class="my-5">
     <b-tabs content-class="mt-3 py-3">
       <b-tab title="General" active>
+        <!-- <card-user /> -->
         <b>Email:</b>
         {{ user.email }}
         <br />
@@ -22,7 +23,7 @@ export default {
   layout: 'admin',
   data() {
     return {
-      user: ""
+      user: ''
     }
   },
 

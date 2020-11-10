@@ -178,7 +178,7 @@ export default {
             method: 'post',
           },
           user: {
-            url: 'user/tax_auditor/self',
+            url: 'user/admin/self',
             method: 'get',
             propertyName: 'data',
           },

@@ -12,6 +12,7 @@ from . import business_dto, business_sub_dto, business_admin_dto
 from .service_parent import BusinessService
 
 from app.namespaces.utils.decorators import login_required, accepted_u_types
+from app.extensions import cache
 
 
 ns = Namespace('Business', description='Business Related Operations')  # noqa
@@ -26,6 +27,7 @@ class AdminBusinessListResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.marshal_list_with(business_dto, envelope='data')
+    @cache.cached(timeout=60)
     def get(self) -> List[Business]:
         '''List Of Registered Business Firms'''
         return BusinessService.get_all()
