@@ -5,9 +5,28 @@ from werkzeug.exceptions import Unauthorized, Forbidden
 
 from ...auth.service import TokenService
 
+#https://stackoverflow.com/questions/653368/how-to-create-a-python-decorator-that-can-be-used-either-with-or-without-paramet
+def doublewrap(f):
+    '''
+    a decorator decorator, allowing the decorator to be used as:
+    @decorator(with, arguments, and=kwargs)
+    or
+    @decorator
+    '''
+    @wraps(f)
+    def new_dec(*args, **kwargs):
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            # actual decorated function
+            return f(args[0])
+        else:
+            # decorator arguments
+            return lambda realf: f(realf, *args, **kwargs)
+
+    return new_dec
+
 
 def login_required(f):
-    @wraps(f)
+    # @wraps(f)
     def wrap(*args, **kwargs):
         if request.headers.get("Authorization"):
             # get user via authorization token
@@ -23,11 +42,16 @@ def login_required(f):
     return wrap
 
 # accepted_u_types accepts arguments (more info here: https://blog.miguelgrinberg.com/post/the-ultimate-guide-to-python-decorators-part-iii-decorators-with-arguments)
-def accepted_u_types(*u_types):
+# also: https://www.artima.com/weblogs/viewpost.jsp?thread=240845#decorator-functions-with-decorator-arguments
+def accepted_u_types(*args):
     def accepted_u_types_inner_decorator(f):
-        @wraps(f)
+        # @wraps(f)
         def wrap(*args, **kwargs):
             # user is available from @login_required
+            # # admin is always able to enter
+            # if g.user.u_type == 'admin':
+            #     return f(*args, **kwargs)
+            # else:
             for u_type in u_types:
                 if g.user.u_type == u_type:
                     return f(*args, **kwargs)
@@ -35,6 +59,7 @@ def accepted_u_types(*u_types):
 
         return wrap
     return accepted_u_types_inner_decorator
+
 
 
 def accepted_roles(*roles):

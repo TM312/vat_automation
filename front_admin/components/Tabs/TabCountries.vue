@@ -10,31 +10,7 @@
         :key="country.code"
         class="my-2 px-2"
       >
-        <b-card class="h-100">
-          <b-card-title>
-            <b-row>
-              <b-col cols="auto">
-                {{ country.name }}
-              </b-col>
-              <b-col cols="auto ml-auto">
-                <b-button variant="outline-warning" size="sm">
-                  <b-icon icon="pencil-square" /> Edit
-                </b-button>
-              </b-col>
-            </b-row>
-          </b-card-title>
-          <b-card-sub-title>
-            {{ country.code }} | Vat Code:
-            {{ country.vat_country_code }}
-          </b-card-sub-title>
-          <b-card-text v-if="!!country.currency_code" class="mt-3">
-            Currency: {{ country.currency_code }} - {{ $store.getters["currency/getNameByCode"](country.currency_code) }}
-          </b-card-text>
-          <b-card-text class="mt-3">
-            Validity: {{ country.valid_from }} -
-            {{ country.valid_to }}
-          </b-card-text>
-        </b-card>
+        <card-country :country="country" />
       </b-col>
     </b-row>
   </div>
@@ -62,6 +38,7 @@ export default {
       ],
     }
   },
+
   computed: {
     ...mapState({
       countries: (state) => state.country.countries,

@@ -26,18 +26,19 @@ ns.add_model(tax_auditor_sub_dto.name, tax_auditor_sub_dto)
 @ns.route('/')
 class TaxAuditorResource(Resource):
     '''Get all TaxAuditor'''
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(tax_auditor_dto, envelope='data')
     def get(self) -> List[TaxAuditor]:
         '''List Of Registered TaxAuditor Firms'''
         return TaxAuditorService.get_all()
 
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin', 'tax_auditor')
     @ns.expect(tax_auditor_dto, validate=True)
     @ns.marshal_with(tax_auditor_dto)
     def post(self):
-        """Create A Single Seller Firm"""
+        """Create A Single Tax Auditor"""
         admin_data: TaxAuditorInterface = request.json
         return TaxAuditorService.create(admin_data)
 
@@ -46,10 +47,9 @@ class TaxAuditorResource(Resource):
 class TaxAuditorSelfResource(Resource):
     '''Get all TaxAuditor'''
     @login_required
-    #@accepted_u_types('admin')
-    @ns.marshal_list_with(tax_auditor_dto, envelope='data')
+    @accepted_u_types('admin', 'tax_auditor')
+    @ns.marshal_with(tax_auditor_dto, envelope='data')
     def get(self) -> List[TaxAuditor]:
-        '''List Of Registered TaxAuditor Firms'''
         return TaxAuditorService.get_by_id(g.user.id)
 
 
@@ -57,14 +57,14 @@ class TaxAuditorSelfResource(Resource):
 @ns.route('/<int:tax_auditor_id>')
 @ns.param('tax_auditor_id', 'Seller firm ID')
 class TaxAuditorIdResource(Resource):
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_with(tax_auditor_dto, envelope='data')
     def get(self, tax_auditor_id: int) -> TaxAuditor:
         '''Get One TaxAuditor'''
         return TaxAuditorService.get_by_id(tax_auditor_id)
 
-    #@login_required
+    @login_required
     @accepted_u_types('admin')
     def delete(self, tax_auditor_id: int) -> Response:
         '''Delete A Single TaxAuditor'''
@@ -82,6 +82,7 @@ class TaxAuditorIdResource(Resource):
 @ns.route("/<string:seller_firm_public_id>/follow_unfollow")
 class SellerFirmInformationResource(Resource):
     @login_required
+    @accepted_u_types('admin', 'tax_auditor')
     @ns.marshal_with(tax_auditor_dto, envelope='data')
     def get(self, seller_firm_public_id: str):
         """Create A Single Seller Firm"""

@@ -1,11 +1,14 @@
 from typing import List
-from flask import request
+from flask import request, current_app
 from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import Currency
 from . import currency_dto
 from .service import CurrencyService
+
+from app.namespaces.utils.decorators import login_required, accepted_u_types
+from app.extensions import cache
 
 
 ns = Namespace("Currency", description="Currency Related Operations")  # noqa
@@ -14,12 +17,16 @@ ns.add_model(currency_dto.name, currency_dto)
 
 @ns.route("/")
 class CurrencyResource(Resource):
-    """Currencys"""
+    """Currencies"""
+    @login_required
     @ns.marshal_list_with(currency_dto, envelope='data')
+    @cache.cached(timeout=60)
     def get(self) -> List[Currency]:
-        """Get all Currencys"""
+        """Get all Currencies"""
         return CurrencyService.get_all()
 
+    @login_required
+    @accepted_u_types('admin')
     @ns.expect(currency_dto, validate=True)
     @ns.marshal_with(currency_dto)
     def post(self) -> Currency:
@@ -41,10 +48,16 @@ class CurrencyIdResource(Resource):
         code = CurrencyService.delete_by_code(currency_code)
         return jsonify(dict(status="Success", code=code))
 
+    @login_required
+    @accepted_u_types('admin')
     @ns.expect(currency_dto, validate=True)
-    @ns.marshal_with(currency_dto)
+    @ns.marshal_with(currency_dto, envelope="data")
     def put(self, currency_code: str) -> Currency:
         """Update Single Currency"""
 
+        current_app.logger.info('currency_code:', currency_code)
+
         data_changes: CurrencyInterface = request.parsed_obj
-        return CurrencyService.update(currency_code, data_changes)
+        current_app.logger.info('data_changes:', data_changes)
+        pass
+        # return CurrencyService.update(currency_code, data_changes)
