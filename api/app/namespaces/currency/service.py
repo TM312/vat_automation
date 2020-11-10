@@ -1,9 +1,11 @@
 from typing import List
 from app.extensions import db
-
+from flask import current_app
 
 from . import Currency
 from .interface import CurrencyInterface
+
+from werkzeug.exceptions import InternalServerError
 
 
 class CurrencyService:
@@ -21,7 +23,13 @@ class CurrencyService:
         currency = CurrencyService.get_by_code(code)
         if isinstance(currency, Currency):
             currency.update(data_changes)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as e:
+                current_app.logger.warning('Exception in Currency Update: {}'.format(e))
+                db.session.rollback()
+                raise InternalServerError
+
             return currency
 
     @staticmethod
