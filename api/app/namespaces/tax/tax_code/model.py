@@ -18,4 +18,11 @@ class TaxCode(db.Model):  # type: ignore
 
 
     def __repr__(self):
-        return '<TaxCode:{} valid from:{}>'.format(self.code, self.description)
+        return '<TaxCode:{}>'.format(self.code)
+
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'code':
+                setattr(self, key, val)
+        return self

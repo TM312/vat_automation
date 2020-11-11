@@ -18,11 +18,12 @@ class PlatformService:
     @staticmethod
     def update(platform_code: int, data_changes: PlatformInterface) -> Platform:
         platform = PlatformService.get_by_code(platform_code)
-        platform.update(data_changes)
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
+        if isinstance(platform, Platform):
+            platform.update(data_changes)
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
         return platform
 
     @staticmethod

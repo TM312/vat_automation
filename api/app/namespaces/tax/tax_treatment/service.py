@@ -20,7 +20,7 @@ class TaxTreatmentService:
     @staticmethod
     def update(tax_treatment_code: str, data_changes: TaxTreatmentInterface) -> TaxTreatment:
         tax_treatment = TaxTreatmentService.get_by_code(tax_treatment_code)
-        if tax_treatment:
+        if isinstance(tax_treatment, TaxTreatment):
             tax_treatment.update(data_changes)
             db.session.commit()
             return tax_treatment

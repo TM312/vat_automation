@@ -6,8 +6,13 @@
           {{ country.name }}
         </b-col>
         <b-col cols="auto ml-auto">
-          <b-button variant="outline-warning" size="sm">
-            <b-icon icon="pencil-square" /> Edit
+          <b-button variant="outline-warning" size="sm" :pressed.sync="edit">
+            <span v-show="edit">
+              <b-icon icon="x-circle" /> Cancel
+            </span>
+            <span v-show="!edit">
+              <b-icon icon="pencil-square" /> Edit
+            </span>
           </b-button>
         </b-col>
       </b-row>

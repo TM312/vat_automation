@@ -23,14 +23,10 @@ class Currency(db.Model):  # type: ignore
 
 
     def __repr__(self):
-        return '<Currency: {}>'.format(self.code)
-
+        return '<Currency: {} - {}>'.format(self.code, self.name)
 
     def update(self, data_changes):
         for key, val in data_changes.items():
-            if key == 'code':
-                pass
-            else:
+            if key.lower() != 'code':
                 setattr(self, key, val)
-
         return self

@@ -12,6 +12,7 @@ from .service import SellerService
 from .interface import SellerInterface
 
 from app.namespaces.utils.decorators.auth import login_required, accepted_u_types, confirmation_required
+from app.extensions import cache
 
 
 
@@ -28,6 +29,7 @@ class SellerResource(Resource):
     '''Get all Seller'''
     @login_required
     @accepted_u_types('admin')
+    @cache.cached(timeout=60)
     @ns.marshal_list_with(seller_dto, envelope='data')
     def get(self) -> List[Seller]:
         '''List Of Registered Seller Firms'''
