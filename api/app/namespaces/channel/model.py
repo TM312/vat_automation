@@ -16,3 +16,13 @@ class Channel(db.Model):
         secondary=channel_tax_code_AT,
         back_populates="channels"
     )
+
+    def __repr__(self):
+        return '<Channel: {} - {}>'.format(self.code, self.name)
+
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'code':
+                setattr(self, key, val)
+        return self

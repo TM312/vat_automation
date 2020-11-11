@@ -16,4 +16,10 @@ class Platform(db.Model):
 
 
     def __repr__(self):
-        return '<Platform: {} (code : {})>'.format(self.name, self.code)
+        return '<Platform: {} - {}>'.format(self.code, self.name)
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'code':
+                setattr(self, key, val)
+        return self

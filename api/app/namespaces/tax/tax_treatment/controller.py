@@ -6,8 +6,10 @@ from flask.wrappers import Response
 from . import TaxTreatment
 from . import tax_treatment_dto
 from .service import TaxTreatmentService
+from .interface import TaxTreatmentInterface
 
 from app.namespaces.utils.decorators import login_required, employer_required, accepted_u_types
+from app.extensions import cache
 
 
 ns = Namespace("TaxTreatment", description="TaxTreatment Related Operations")  # noqa
@@ -19,6 +21,7 @@ class TaxTreatmentResource(Resource):
     """TaxTreatments"""
     @login_required
     @ns.marshal_list_with(tax_treatment_dto, envelope='data')
+    @cache.cached(timeout=60)
     def get(self) -> List[TaxTreatment]:
         """Get all TaxTreatments"""
         return TaxTreatmentService.get_all()
@@ -57,5 +60,5 @@ class TaxTreatmentIdResource(Resource):
     def put(self, tax_treatment_code: str) -> TaxTreatment:
         """Update Single TaxTreatment"""
 
-        data_changes: TaxTreatmentInterface = request.parsed_obj
+        data_changes: TaxTreatmentInterface = request.json
         return TaxTreatmentService.update(tax_treatment_code, data_changes)

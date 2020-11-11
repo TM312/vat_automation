@@ -37,10 +37,13 @@ class CurrencyResource(Resource):
 @ns.route("/<string:currency_code>")
 @ns.param("currency_code", "Currency database code")
 class CurrencyIdResource(Resource):
+    @login_required
     def get(self, currency_code: str) -> Currency:
         """Get Single Currency"""
         return CurrencyService.get_by_code(currency_code)
 
+    @login_required
+    @accepted_u_types('admin')
     def delete(self, currency_code: str) -> Response:
         """Delete Single Currency"""
         from flask import jsonify

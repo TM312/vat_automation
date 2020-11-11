@@ -9,6 +9,7 @@ from . import tax_rate_type_dto, tax_rate_type_sub_dto
 from .service import TaxRateTypeService
 
 from app.namespaces.utils.decorators import login_required, accepted_u_types
+from app.extensions import cache
 
 
 ns = Namespace("TaxRateType", description="TaxRateType Related Operations")  # noqa
@@ -22,6 +23,7 @@ class TaxRateTypeResource(Resource):
     """TaxRateTypes"""
     @login_required
     @ns.marshal_list_with(tax_rate_type_sub_dto, envelope='data')
+    @cache.cached(timeout=60)
     def get(self) -> List[TaxRateType]:
         """Get all TaxRateTypes"""
         return TaxRateTypeService.get_all()
@@ -59,5 +61,5 @@ class TaxRateTypeIdResource(Resource):
     def put(self, tax_rate_type_code: str) -> TaxRateType:
         """Update Single TaxRateType"""
 
-        data_changes: TaxRateTypeInterface = request.parsed_obj
+        data_changes: TaxRateTypeInterface = request.json
         return TaxRateTypeService.update(tax_rate_type_code, data_changes)

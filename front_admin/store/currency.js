@@ -15,7 +15,7 @@ export const mutations = {
     state.currency = currency
   },
   // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
-  UPDATE_CURRENCY(state, currency) {
+  UPDATE_IN_LIST(state, currency) {
     var index = state.currencies.findIndex(el => (el.code === currency.code))
     state.currencies = [
       ...state.currencies.slice(0, index),
@@ -57,13 +57,13 @@ export const actions = {
     }
   },
 
-  async update({ commit }, payload) {
+  async update_in_list({ commit }, payload) {
     const currency_code = payload.shift()
     const data_changes = payload[0]
     const res = await this.$repositories.currency.update(currency_code, data_changes)
     const { status, data } = res
     if (status === 200 && data.data) {
-      commit('UPDATE_CURRENCY', data.data)
+      commit('UPDATE_IN_LIST', data.data)
     } else {
       // Handle error here
     }

@@ -18,3 +18,9 @@ class TaxRateType(db.Model):  # type: ignore
 
     def __repr__(self):
         return '<TaxRateType: {}'.format(self.code)
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'code':
+                setattr(self, key, val)
+        return self

@@ -18,9 +18,10 @@ class TaxCodeService:
     @staticmethod
     def update(tax_code_code: str, data_changes: TaxCodeInterface) -> TaxCode:
         tax_code = TaxCodeService.get_by_code(tax_code_code)
-        tax_code.update(data_changes)
-        db.session.commit()
-        return tax_code
+        if isinstance(tax_code, TaxCode):
+            tax_code.update(data_changes)
+            db.session.commit()
+            return tax_code
 
     @staticmethod
     def delete_by_code(tax_code_code: str):

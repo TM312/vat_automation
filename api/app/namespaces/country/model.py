@@ -18,6 +18,12 @@ class EU(db.Model):
         back_populates="eus"
     )
 
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'id':
+                setattr(self, key, val)
+        return self
+
 
 class Country(db.Model):  # type: ignore
     """ Country model """
@@ -57,3 +63,9 @@ class Country(db.Model):  # type: ignore
 
     def __repr__(self):
         return '<Country: {}>'.format(self.code)
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            if key.lower() != 'code':
+                setattr(self, key, val)
+        return self
