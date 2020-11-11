@@ -7,7 +7,7 @@
             v-if="edit"
             v-model="form.name"
           />
-          <span v-else>{{ channel.name }}</span>
+          <span v-else>{{ platform.name }}</span>
         </b-col>
         <b-col cols="auto ml-auto">
           <b-button variant="outline-warning" size="sm" :pressed.sync="edit">
@@ -24,7 +24,7 @@
     <b-card-sub-title>
       <b-row>
         <b-col cols="auto">
-          <span>{{ channel.code }}</span>
+          <span>{{ platform.code }}</span>
         </b-col>
         <b-col cols="auto ml-auto">
           <b-button
@@ -32,43 +32,22 @@
             variant="success"
             size="sm"
             :disabled="buttonBusy"
-            @click="updateChannel()"
+            @click="updatePlatform()"
           >
             Update
           </b-button>
         </b-col>
       </b-row>
     </b-card-sub-title>
-    <b-card-text class="mt-3">
-      <b-form-textarea
-        v-if="edit"
-        v-model="form.description"
-        rows="3"
-        max-rows="6"
-      />
-      <span v-else>{{ channel.description }}</span>
-    </b-card-text>
-    <b-card-text class="mt-3">
-      <span v-if="channel.platform_code === 'AMZ'">Test
-        <b-img
-          src="@/assets/img/logos/amazon_logo_slim.png"
-          class="d-inline-block align-top"
-          height="20"
-        />
-      </span>
-      <span v-else>
-        {{ channel.platform_code }}
-      </span>
-    </b-card-text>
   </b-card>
 </template>
 
 <script>
 export default {
-  name: 'CardChannel',
+  name: 'CardPlatform',
 
   props: {
-    channel: {
+    platform: {
       type: Object,
       required: true,
     },
@@ -89,8 +68,7 @@ export default {
     /*eslint-disable */
         edit(newVal) {
             if (newVal) {
-                this.form.name = this.channel.name;
-                this.form.description = this.channel.description;
+                this.form.name = this.platform.name;
             }
         },
     },
@@ -104,7 +82,7 @@ export default {
                 if (obj[key] && typeof obj[key] === "object") {
                     data_changes[key] = this.removeNonChanges(obj[key]); // recurse
                     // keep only changes and not null values
-                } else if (obj[key] != null && obj[key] != this.channel[key]) {
+                } else if (obj[key] != null && obj[key] != this.platform[key]) {
                     data_changes[key] = obj[key]; // copy value
                 }
             });
@@ -112,13 +90,13 @@ export default {
             return data_changes;
         },
 
-        async updateChannel() {
+        async updatePlatform() {
             this.buttonBusy = true;
             const { store } = this.$nuxt.context;
-            const channel_code = this.channel.code;
+            const platform_code = this.platform.code;
             const data_changes = this.removeNonChanges();
-            const payload = [channel_code, data_changes];
-            await store.dispatch("channel/update_in_list", payload);
+            const payload = [platform_code, data_changes];
+            await store.dispatch("platform/update_in_list", payload);
             this.makeToast();
             this.buttonBusy = false;
             this.edit = false;
@@ -126,7 +104,7 @@ export default {
 
         makeToast() {
             this.$bvToast.toast(
-                `Channel "${this.channel.code}" has been successfully updated!`,
+                `Platform "${this.platform.code}" has been successfully updated!`,
                 {
                     title: "Success",
                     variant: "success",

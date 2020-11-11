@@ -116,6 +116,7 @@ export default {
       'BFormValidFeedback',
       'BFormSelect',
       'BFormRow',
+      'BImg',
       'BJumbotron',
       'BModal',
       'BNav',

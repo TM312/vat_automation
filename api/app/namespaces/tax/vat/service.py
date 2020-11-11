@@ -37,8 +37,14 @@ class VatService:
     @staticmethod
     def update(vat_id: int, data_changes: VatInterface) -> Vat:
         vat = VatService.get_by_id(vat_id)
-        vat.update(data_changes)
-        db.session.commit()
+        if isinstance(vat, Vat):
+            vat.update(data_changes)
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
         return vat
 
     @staticmethod

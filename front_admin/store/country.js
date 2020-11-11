@@ -6,7 +6,7 @@ export const state = () => ({
 
 export const getters = {
   countryNameByCode: state => countryCode => state.countries.find(country => country.code === countryCode).name,
-  getInclCurrencyOnly: state => state.countries.filter(country => !!country.country_code)
+  getInclCurrencyOnly: state => state.countries.filter(country => !!country.currency_code)
 }
 
 export const mutations = {

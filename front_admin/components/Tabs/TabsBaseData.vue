@@ -1,5 +1,8 @@
 <template>
   <b-tabs vertical pills>
+    <b-tab title="Platforms" active>
+      <tab-platforms />
+    </b-tab>
     <b-tab title="Channels" active>
       <tab-channels />
     </b-tab>
@@ -13,6 +16,9 @@
       <tab-tax-treatments />
     </b-tab>
     <b-tab title="Tax Rate Types" lazy>
+      <h1>Here gets all Tax Rate Types Data</h1>
+    </b-tab>
+    <b-tab title="Vat Rates" lazy>
       <h1>Here gets all Tax Rate Types Data</h1>
     </b-tab>
     <b-tab title="Vat Thresholds" lazy>

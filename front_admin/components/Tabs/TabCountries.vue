@@ -33,8 +33,8 @@ export default {
     return {
       selected: true,
       options: [
-        { value: true, text: "Filter On" },
-        { value: false, text: "Show All" },
+        { value: true, text: "Countries w Currency Only" },
+        { value: false, text: "No Filter" },
       ],
     }
   },
@@ -43,14 +43,11 @@ export default {
     ...mapState({
       countries: (state) => state.country.countries,
     }),
+
     countriesSelect() {
-      if (this.selected) {
-        return this.$store.getters["country/getInclCurrencyOnly"]
-      } else {
-        return this.countries
-      }
+      return this.selected ? this.$store.getters["country/getInclCurrencyOnly"] : this.countries
     },
-  },
+  }
 }
 </script>
 

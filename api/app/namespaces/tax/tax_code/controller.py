@@ -56,7 +56,7 @@ class TaxCodeIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(tax_code_dto, validate=True)
-    @ns.marshal_with(tax_code_dto)
+    @ns.marshal_with(tax_code_dto, envelope='data')
     def put(self, tax_code_code: str) -> TaxCode:
         """Update Single TaxCode"""
 

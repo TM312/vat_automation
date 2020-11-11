@@ -4,8 +4,8 @@
       Here is all Channel Data
     </h1>
     <b-row cols="1" cols-xl="2">
-      <b-col v-for="channel in channels" :key="channel.code" class="my-2 px-2">
-        <card-channel :channel="channel" />
+      <b-col v-for="platform in platforms" :key="platform.code" class="my-2 px-2">
+        <card-platform :platform="platform" />
       </b-col>
     </b-row>
   </div>
@@ -15,17 +15,17 @@
 import { mapState } from "vuex"
 
 export default {
-  name: "TabChannels",
+  name: "TabPlatforms",
 
   async fetch() {
     const { store } = this.$nuxt.context
-    if (this.channels.length === 0) {
-      await store.dispatch("channel/get_all")
+    if (this.platforms.length === 0) {
+      await store.dispatch("platform/get_all")
     }
   },
   computed: {
     ...mapState({
-      channels: (state) => state.channel.channels,
+      platforms: (state) => state.platform.platforms,
     }),
   },
 }

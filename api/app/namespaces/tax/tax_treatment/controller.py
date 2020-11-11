@@ -56,9 +56,10 @@ class TaxTreatmentIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(tax_treatment_dto, validate=True)
-    @ns.marshal_with(tax_treatment_dto)
+    @ns.marshal_with(tax_treatment_dto, envelope='data')
     def put(self, tax_treatment_code: str) -> TaxTreatment:
         """Update Single TaxTreatment"""
 
         data_changes: TaxTreatmentInterface = request.json
+        print('in api -> data_changes:', data_changes, flush=True)
         return TaxTreatmentService.update(tax_treatment_code, data_changes)
