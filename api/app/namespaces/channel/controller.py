@@ -54,12 +54,8 @@ class ChannelIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(channel_dto, validate=True)
-    @ns.marshal_with(channel_dto)
+    @ns.marshal_with(channel_dto, envelope='data')
     def put(self, channel_code: str) -> Channel:
         """Update Single Channel"""
-
-        current_app.logger.info('channel_code:', channel_code)
-
         data_changes: ChannelInterface = request.json
-        current_app.logger.info('data_changes:', data_changes)
         return ChannelService.update(channel_code, data_changes)

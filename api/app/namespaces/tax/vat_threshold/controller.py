@@ -58,9 +58,9 @@ class VatThresholdIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(vat_threshold_dto, validate=True)
-    @ns.marshal_with(vat_threshold_dto)
+    @ns.marshal_with(vat_threshold_dto, envelope='data')
     def put(self, vat_threshold_id: int) -> VatThreshold:
         """Update Single VatThreshold"""
 
-        data_changes: VatThresholdInterface = request.parsed_obj
+        data_changes: VatThresholdInterface = request.json
         return VatThresholdService.update(vat_threshold_id, data_changes)

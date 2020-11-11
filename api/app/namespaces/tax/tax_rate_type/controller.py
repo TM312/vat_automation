@@ -57,7 +57,7 @@ class TaxRateTypeIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(tax_rate_type_dto, validate=True)
-    @ns.marshal_with(tax_rate_type_dto)
+    @ns.marshal_with(tax_rate_type_dto, envelope='data')
     def put(self, tax_rate_type_code: str) -> TaxRateType:
         """Update Single TaxRateType"""
 

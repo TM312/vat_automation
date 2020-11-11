@@ -29,8 +29,13 @@ class VatThresholdService:
         vat_threshold = VatThresholdService.get_by_id(vat_threshold_id)
         if isinstance(vat_threshold, VatThreshold):
             vat_threshold.update(data_changes)
-            db.session.commit()
-            return vat_threshold
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
+        return vat_threshold
 
     @staticmethod
     def update_by_public_id(vat_threshold_public_id: str, data_changes: VatThresholdInterface) -> VatThreshold:

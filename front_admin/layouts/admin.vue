@@ -20,6 +20,10 @@ export default {
   async fetch() {
     const { store } = this.$nuxt.context
 
+    if (this.platforms.length === 0) {
+      await store.dispatch("platform/get_all")
+    }
+
     if (this.countries.length === 0) {
       await store.dispatch("country/get_all")
     }
@@ -50,6 +54,7 @@ export default {
 
   computed: {
     ...mapState({
+      platforms: state => state.platform.platforms,
       channels: state => state.channel.channels,
       countries: state => state.country.countries,
       currencies: state => state.currency.currencies,

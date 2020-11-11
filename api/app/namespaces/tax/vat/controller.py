@@ -56,9 +56,9 @@ class VatIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(vat_dto, validate=True)
-    @ns.marshal_with(vat_dto)
+    @ns.marshal_with(vat_dto, envelope='data')
     def put(self, vat_id: int) -> Vat:
         """Update Single Vat"""
 
-        data_changes: VatInterface = request.parsed_obj
+        data_changes: VatInterface = request.json
         return VatService.update(vat_id, data_changes)

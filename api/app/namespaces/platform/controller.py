@@ -55,7 +55,7 @@ class PlatformIdResource(Resource):
     @login_required
     @accepted_u_types('admin')
     @ns.expect(platform_dto, validate=True)
-    @ns.marshal_with(platform_dto)
+    @ns.marshal_with(platform_dto, envelope='data')
     def put(self, platform_code: str) -> Platform:
         """Update Single Platform"""
 

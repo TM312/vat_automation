@@ -3,11 +3,8 @@
     <b-card-title>
       <b-row>
         <b-col cols="auto">
-          <b-form-input
-            v-if="edit"
-            v-model="form.name"
-          />
-          <span v-else>{{ channel.name }}</span>
+          <b-form-input v-if="edit" v-model="form.name" />
+          <span v-else>{{ taxTreatment.name }}</span>
         </b-col>
         <b-col cols="auto ml-auto">
           <b-button variant="outline-warning" size="sm" :pressed.sync="edit">
@@ -24,7 +21,7 @@
     <b-card-sub-title>
       <b-row>
         <b-col cols="auto">
-          <span>{{ channel.code }}</span>
+          {{ taxTreatment.code }}
         </b-col>
         <b-col cols="auto ml-auto">
           <b-button
@@ -32,7 +29,7 @@
             variant="success"
             size="sm"
             :disabled="buttonBusy"
-            @click="updateChannel()"
+            @click="updateTaxTreatment()"
           >
             Update
           </b-button>
@@ -46,29 +43,17 @@
         rows="3"
         max-rows="6"
       />
-      <span v-else>{{ channel.description }}</span>
-    </b-card-text>
-    <b-card-text class="mt-3">
-      <span v-if="channel.platform_code === 'AMZ'">Test
-        <b-img
-          src="@/assets/img/logos/amazon_logo_slim.png"
-          class="d-inline-block align-top"
-          height="20"
-        />
-      </span>
-      <span v-else>
-        {{ channel.platform_code }}
-      </span>
+      <span v-else>{{ taxTreatment.description }}</span>
     </b-card-text>
   </b-card>
 </template>
 
 <script>
 export default {
-  name: 'CardChannel',
+  name: "CardTaxTreatment",
 
   props: {
-    channel: {
+    taxTreatment: {
       type: Object,
       required: true,
     },
@@ -80,7 +65,7 @@ export default {
       edit: false,
       form: {
         name: null,
-        description: null,
+        description: null
       },
     }
   },
@@ -89,8 +74,8 @@ export default {
     /*eslint-disable */
         edit(newVal) {
             if (newVal) {
-                this.form.name = this.channel.name;
-                this.form.description = this.channel.description;
+                this.form.name = this.taxTreatment.name;
+                this.form.description = this.taxTreatment.description;
             }
         },
     },
@@ -103,8 +88,8 @@ export default {
             Object.keys(obj).forEach((key) => {
                 if (obj[key] && typeof obj[key] === "object") {
                     data_changes[key] = this.removeNonChanges(obj[key]); // recurse
-                    // keep only changes and not null values
-                } else if (obj[key] != null && obj[key] != this.channel[key]) {
+                    // only keep not null and changed values
+                } else if (obj[key] != null && obj[key] != this.taxTreatment[key]) {
                     data_changes[key] = obj[key]; // copy value
                 }
             });
@@ -112,13 +97,13 @@ export default {
             return data_changes;
         },
 
-        async updateChannel() {
+        async updateTaxTreatment() {
             this.buttonBusy = true;
             const { store } = this.$nuxt.context;
-            const channel_code = this.channel.code;
+            const taxTreatmentCode = this.taxTreatment.code;
             const data_changes = this.removeNonChanges();
-            const payload = [channel_code, data_changes];
-            await store.dispatch("channel/update_in_list", payload);
+            const payload = [taxTreatmentCode, data_changes];
+            await store.dispatch("tax_treatment/update_in_list", payload);
             this.makeToast();
             this.buttonBusy = false;
             this.edit = false;
@@ -126,7 +111,7 @@ export default {
 
         makeToast() {
             this.$bvToast.toast(
-                `Channel "${this.channel.code}" has been successfully updated!`,
+                `Tax Treatment "${this.taxTreatment.code}" has been successfully updated!`,
                 {
                     title: "Success",
                     variant: "success",
@@ -135,10 +120,8 @@ export default {
             );
         },
     },
-
-}
+};
 </script>
 
 <style>
-
 </style>
