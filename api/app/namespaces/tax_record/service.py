@@ -15,6 +15,7 @@ from .schema import TaxRecordSubSchema
 from app.namespaces.utils.service import HelperService, NotificationService, InputService
 from app.namespaces.utils import TransactionNotification
 from app.namespaces.transaction import Transaction
+from app.namespaces.transaction.service import TransactionService, TransactionExportService
 from app.namespaces.transaction_input import TransactionInput
 #from app.namespaces.transaction_input.service import TransactionInputService
 
@@ -68,7 +69,6 @@ class TaxRecordService:
     def retrieve_input_vars(object_type: str, seller_firm_public_id: str, tax_record_data_raw: Dict):
         from app.namespaces.business.seller_firm.service import SellerFirmService
         from app.namespaces.business.seller_firm import SellerFirm
-        from app.namespaces.transaction.service import TransactionService
         from app.namespaces.tax.vatin.service import VATINService
         from app.namespaces.tax.vatin import VATIN
         from app.namespaces.country.service import CountryService
@@ -134,7 +134,7 @@ class TaxRecordService:
         #365 days before end
         start_date = end_date - timedelta(days=365)
 
-        sales, refunds, _, movements = TaxRecordService.separate_transactions_by_type(transactions)
+        sales, refunds, _, movements = TransactionExportService.separate_transactions_by_type(transactions)
 
         (
             __local_sales_sales_net__, __local_sales_refunds_net__,
@@ -166,14 +166,6 @@ class TaxRecordService:
 
 
 
-    @staticmethod
-    def separate_transactions_by_type(transactions: List[Transaction]) -> List[List[Transaction]]:
-        sales = [transaction for transaction in transactions if transaction.type_code == 'SALE']
-        refunds = [transaction for transaction in transactions if transaction.type_code == 'REFUND']
-        acquisitions = [transaction for transaction in transactions if transaction.type_code == 'ACQUISITION']
-        movements = [transaction for transaction in transactions if transaction.type_code == 'MOVEMENT']
-
-        return sales, refunds, acquisitions, movements
 
 
     @staticmethod
@@ -413,7 +405,7 @@ class TaxRecordService:
             SocketService.emit_status_info(object_type, message)
             return False
 
-        sales, refunds, acquisitions, movements = TaxRecordService.separate_transactions_by_type(transactions)
+        sales, refunds, acquisitions, movements = TransactionExportService.separate_transactions_by_type(transactions)
 
 
         # LOCAL SALES
@@ -741,53 +733,27 @@ class TaxRecordService:
 
 
 
+
+class TaxRecordExportService:
+
     @staticmethod
+    def generate_tax_record_export(tax_record: TaxRecord):
 
-    def create_transaction_sheets(tax_record: TaxRecord, baseDir):
-        df=pd.DataFrame(
-            columns=[
-                "User_ID",
-                "Name",
-                "Gender",
-                "Birth Year",
-                "Age",
-                "Location",
-                "Country",
-                "Radius [in km]",
-                "rExact",
-                "Job Name",
-                "Job Title",
-                "School",
-                "Bio",
-                "Photos",
-                "#Photos",
-                "Date"
-            ]
-        )
-        for transaction in tax_record.transactions:
-            df=df.append(
-                {
-                    "User_ID":userId ,
-                    "Name":name,
-                    "Gender":gender,
-                    "Birth Year":birthYear,
-                    "Age":age,
-                    "Location":location,
-                    "Country":country,
-                    "Radius [in km]": radius2,
-                    "rExact": radius,
-                    "Job Name":jobName,
-                    "Job Title": jobTitle,
-                    "School":schoolName,
-                    "Bio":bio,
-                    "Photos":photos,
-                    "#Photos":lenPhotos,
-                    "Date":date
-                },
-                ignore_index=True
-            )
+       (
+            local_sales,
+            local_sales_reverse_charge,
+            distance_sales,
+            non_taxable_distance_sales,
+            intra_community_sales,
+            exports,
+            local_acquisitions,
+            intra_community_acquisitions
+        ) = TransactionExportService.separate_transactions_by_tax_treatment(tax_record.transactions)
 
-            df.to_csv(os.path.join(baseDir, tax_record.filename), mode="a", header=False)
+        seller_firm_name = tax_record.seller_firm.name
+
+
+        df.to_csv(os.path.join(baseDir, tax_record.filename), mode="a", header=False)
 
             #bad code
             df = pd.read_csv(os.path.join(baseDir, tax_record.filename))
@@ -796,7 +762,8 @@ class TaxRecordService:
             df=df.reset_index(drop=True)
             df.to_csv(os.path.join(baseDir, tax_record.filename), mode="w", header=True)
 
-        return i,j
+
+
 
 
 
@@ -835,28 +802,6 @@ class TaxRecordService:
 
 
 
-    # # celery task on this level
-    # @staticmethod
-    # def save_as_file(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, basepath: str, user_id: int, tax_jurisdiction_code: str) -> BinaryIO:
-    #     from app.namespaces.transaction.service import TransactionService
-
-    #     transactions = TransactionService.get_by_validity_public_id(start_date_str, end_date_str, seller_firm_public_id, tax_jurisdiction_code)
-
-    #     tax_record_dict = TaxRecordService.get_tax_record_dict_from_transactions(transactions)
-
-    #     # list of dataframes and sheet names
-    #     tab_names, df_list = TaxRecordService.get_df_list(tax_record_dict)
-    #     filename=TaxRecordService.create_filename(seller_firm_public_id, start_date_str, end_date_str)
-    #     os.makedirs(basepath, exist_ok=True)
-    #     file_path=os.path.join(basepath_in, filename)
-
-
-    #     # run function
-    #     tax_record_file= TaxRecordService.write_dfs_to_xlsx(dfs, sheets, file_path)
-
-
-    #     TaxRecordService.create(start_date_str, end_date_str, seller_firm_public_id, filename, user_id)
-
 
 
 
@@ -869,16 +814,6 @@ class TaxRecordService:
     #     #     return df_summary
 
 
-    #     @staticmethod
-    #     def create_filename(seller_firm_public_id: UUID, start_date_str: str, end_date_str: str) -> str:
-    #         today_as_str = str(date.today().strftime('%Y%m%d'))
-    #         seller_firm = Seller.query.filter(public_id = seller_firm_public_id).first()
-    #         if seller_firm.accounting_firm_client_id:
-    #             filename = '{}_{}_EXPORT_{}_{}.xlsx'.format(today_as_str, seller_firm.accounting_firm_client_id, start_date_str, end_date_str)
-    #         else:
-    #             filename = '{}_{}_EXPORT_{}_{}.xlsx'.format(today_as_str, seller_firm_public_id, start_date_str, end_date_str)
-
-    #         return filename
 
 
 
@@ -892,117 +827,6 @@ class TaxRecordService:
 
 
 
-
-
-    # @staticmethod
-    # def append_to_tax_record_dict(tax_record_dict: Dict, t_treatment_code: str, t_type_dict: Dict):
-    #     if t_treatment_code == 'LOCAL_SALE':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('LOCAL_SALES')
-
-    #     elif t_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('LOCAL_SALE_REVERSE_CHARGES')
-
-    #     elif t_treatment_code == 'DISTANCE_SALE':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('DISTANCE_SALES')
-
-    #     elif t_treatment_code == 'NON_TAXABLE_DISTANCE_SALE':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('NON_TAXABLE_DISTANCE_SALES')
-
-    #     elif t_treatment_code == 'INTRA_COMMUNITY_SALE':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('INTRA_COMMUNITY_SALES')
-
-    #     elif t_treatment_code == 'EXPORT':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('EXPORTS')
-
-    #     elif t_treatment_code == 'LOCAL_ACQUISITION':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('LOCAL_ACQUISITIONS')
-
-    #     elif t_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
-    #         t_treatment_list: List[Dict] = tax_record_dict.get('INTRA_COMMUNITY_ACQUISITIONS')
-
-
-    #     else:
-    #         raise InternalServerError
-
-    #     t_treatment_list.append(t_type_dict)
-
-
-
-    # @staticmethod
-    # def create_t_type_dict(t_treatment_code: str, tax_record_base_dict: Dict, transaction_input: TransactionInput, t: Transaction) -> Dict:
-    #     if t_treatment_code == 'LOCAL_SALE':
-    #         t_type_dict=tax_record_base_dict
-
-    #     elif t_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE':
-    #         add_local_sales_reverse_charge = {
-    #             'VAT_RATE_REVERSE_CHARGE': t.reverse_charge_vat_rate,
-    #             'INVOICE_AMOUNT_VAT_REVERSE_CHARGE': t.invoice_amount_reverse_charge_vat
-    #         }
-
-    #         t_type_dict={**tax_record_base_dict, **add_local_sales_reverse_charge}
-
-
-    #     elif t_treatment_code == 'DISTANCE_SALE':
-    #         t_type_dict = tax_record_base_dict
-
-    #     elif t_treatment_code == 'NON_TAXABLE_DISTANCE_SALE':
-    #         t_type_dict = tax_record_base_dict
-
-    #     elif t_treatment_code == 'INTRA_COMMUNITY_SALE':
-    #         t_type_dict = tax_record_base_dict
-
-    #     elif t_treatment_code == 'EXPORT':
-    #         t_type_dict = tax_record_base_dict
-
-    #     elif t_treatment_code == 'LOCAL_ACQUISITION':
-    #         t_type_dict = tax_record_base_dict
-
-    #     elif t_treatment_code == 'INTRA_COMMUNITY_ACQUISITION':
-    #         t_type_dict = tax_record_base_dict
-
-
-    #     else:
-    #         raise UnprocessableEntity('Transaction type unknown.')
-
-    #     return t_type_dict
-
-
-
-
-    # @staticmethod
-    # def get_tax_record_dict_from_transactions(transactions: Transaction) -> TaxRecordDictInterface:
-    #     from app.namespaces.tax.vatin.service import VATINService
-    #     from app.namespaces.tax.vatin import VATIN
-    #     from app.namespaces.user.service_parent import UserService
-
-
-
-    #     local_sales = local_sales_reverse_charge = distance_sales = non_taxable_distance_sales = intra_community_sales = exports = domestic_acquisitions = ica = []
-    #     t_treatment_list=[]
-
-    #     tax_record_dict = {
-    #         'LOCAL_SALES': local_sales,
-    #         'LOCAL_SALE_REVERSE_CHARGES': local_sales_reverse_charge,
-    #         'DISTANCE_SALES': distance_sales,
-    #         'NON_TAXABLE_DISTANCE_SALES': non_taxable_distance_sales,
-    #         'INTRA_COMMUNITY_SALES': intra_community_sales,
-    #         'EXPORTS': exports,
-    #         'LOCAL_ACQUISITIONS': domestic_acquisitions,
-    #         'INTRA_COMMUNITY_ACQUISITIONS': ica
-    #     }
-
-
-    #     for t in transactions:
-    #         seller_firm = SellerFirm.query.filter(id = t.account.seller_firm_id).first()
-    #         t_treatment_code = t.tax_treatment
-    #         transaction_input = TransactionInput.query.filter_by(transaction_id = t.id).first()
-    #         arrival_seller_vatin = VATINService.get_by_id(t.arrival_seller_vatin_id)
-    #         departure_seller_vatin = VATINService.get_by_id(t.departure_seller_vatin_id)
-    #         seller_vatin = VATINService.get_by_id(t.seller_vatin_id)
-    #         customer_vatin=VATINService.get_by_id(t.customer_vatin_id)
-
-    #         info_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'info')
-    #         warning_notifications: List[TransactionNotification] = NotificationService.get_by_transaction_input_id_status(transaction_input.id, 'warning')
 
 
     #         tax_record_base_dict = {
@@ -1132,40 +956,3 @@ class TaxRecordService:
     #         TaxRecordService.append_to_tax_record_dict(tax_record_dict, t_treatment_code, t_type_dict)
 
     #     return tax_record_dict
-
-
- # def download_tax_record(tax_record_public_id: str):
-    #     from app.namespaces.business.seller_firm.service import SellerFirmService
-    #     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
-
-    #     tax_record = TaxRecordService.get_by_public_id(tax_record_public_id)
-    #     if tax_record:
-    #         seller_firm = SellerFirm.query.filter_by(id = seller_firm_id).first()
-    #         if g.user.employer_id == tax_record.seller_firm_id or seller_firm in g.user.employer.clients:
-    #             send_from_directory(directory=BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, filename=tax_record.filename, as_attachment=True)
-    #         else:
-    #             raise Unauthorized('You are not authorized to retrieve a tax record from the seller firm associated with the id {}'.format(tax_record_public_id))
-
-    #     else:
-    #         raise NotFound('A Tax Record with the given ID does not exist.')
-
-    # @staticmethod
-    # def generate_tax_record(start_date_str: str, end_date_str: str, seller_firm_public_id: UUID, tax_jurisdiction_code: str) -> Dict:
-    #     from app.namespaces.business.seller_firm import SellerFirm
-    #     BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = current_app.config.BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM
-
-    #     seller_firm = SellerFirm.query.filter_by(public_id = seller_firm_public_id)
-    #     if g.user.employer in seller_firm.accounting_firms:
-    #         user_id = g.user.id
-
-    #         #!!! call as async celery task
-    #         TaxRecordService.save_as_file(start_date_str, end_date_str, seller_firm_public_id, BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM, user_id, tax_jurisdiction_code)
-
-    #         response_object = {
-    #             'status': 'success',
-    #             'message': 'A tax record for the period {}-{} is being generated.'.format(start_date_str, end_date_str)
-    #         }
-    #         return response_object
-
-    #     else:
-    #         raise Unauthorized('You are not authorized to retrieve tax records for this seller firm. Please make sure to establish a client relationship between your employer and the seller firm first.')
