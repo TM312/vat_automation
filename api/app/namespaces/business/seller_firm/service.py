@@ -251,7 +251,7 @@ class SellerFirmService:
 
 
         # processing starts here
-        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type, seller_firm_id=seller_firm_id)
 
         if data_type == 'static':
             basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM

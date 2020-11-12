@@ -337,16 +337,16 @@ class InputService:
 
 
 
-    @staticmethod
-    def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
-        STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config.STATIC_DATA_ALLOWED_EXTENSIONS
-        BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
-        try:
-            file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
-        except:
-            raise
+    # @staticmethod
+    # def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
+    #     STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config.STATIC_DATA_ALLOWED_EXTENSIONS
+    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
+    #     try:
+    #         file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
+    #     except:
+    #         raise
 
-        return file_path_in
+    #     return file_path_in
 
 
 
@@ -372,22 +372,11 @@ class InputService:
         return secure_filename(file.filename)
 
     @staticmethod
-    def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, **kwargs) -> str:
+    def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, file_type: str) -> str:
         if InputService.allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             stored_filename = InputService.get_secure_filename(file)
 
-            if 'file_type' in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
-                basepath_in = os.path.join(basepath, kwargs['file_type'], 'in')
-
-            elif 'file_type' in kwargs and 'in_out' in kwargs and kwargs.get('in_out') == False:
-                basepath_in = os.path.join(basepath, kwargs['file_type'])
-
-            elif 'file_type' not in kwargs and ('in_out' not in kwargs or kwargs.get('in_out') == True):
-                basepath_in = os.path.join(basepath, 'in')
-
-            elif 'file_type' not in kwargs and 'in_out' in kwargs and kwargs.get('in_out') == False:
-                basepath_in = os.path.join(basepath)
-
+            basepath_in = os.path.join(basepath, file_type, 'in')
 
             os.makedirs(basepath_in, exist_ok=True)
 
@@ -409,7 +398,11 @@ class InputService:
 
 
     @staticmethod
-    def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str):
+    def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str, **kwargs):
+
+        """
+        kwargs takes 'seller_firm_id' as an argument to determine the seller firm specific path
+        """
 
         if data_type == 'static':
             basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM

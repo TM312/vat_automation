@@ -994,3 +994,194 @@ class TransactionService:
             item_tax_code_code = calculated_item_tax_code_code
 
         return item_tax_code_code, calculated_item_tax_code_code
+
+
+
+
+
+class TransactionExportService:
+
+    @staticmethod
+    def create_df_transactions(transactions: List[Transaction], seller_firm_name: str) -> df: pd.DataFrame:
+
+        df = pd.DataFrame(
+            columns=[
+                'created_on',
+                'created_on',
+                'modified_at',
+                'modified_by',
+                'notifications',
+                'transaction_input',
+                'seller_firm',
+                'item',
+                'type_code',
+                'amazon_vat_calculation_service',
+                'customer_relationship_checked',
+                'customer_relationship',
+                'customer_vatin',
+                'supplier_relationship',
+                'supplier_vatin',
+                'tax_jurisdiction_code',
+                'arrival_country_code',
+                'departure_country_code',
+                'tax_treatment_code',
+                'tax_date',
+                'tax_calculation_date',
+                'item_tax_code_code',
+                'item_tax_rate_type_code',
+                'shipment_tax_rate_type_code',
+                'gift_wrap_tax_rate_type_code',
+                'item_price_net',
+                'item_price_discount_net',
+                'item_price_total_net',
+                'shipment_price_net',
+                'shipment_price_discount_net',
+                'shipment_price_total_net',
+                'gift_wrap_price_net',
+                'gift_wrap_price_discount_net',
+                'gift_wrap_price_total_net',
+                'item_price_vat_rate',
+                'item_price_vat',
+                'item_price_discount_vat',
+                'item_price_total_vat',
+                'shipment_price_vat_rate',
+                'shipment_price_vat',
+                'shipment_price_discount_vat',
+                'shipment_price_total_vat',
+                'gift_wrap_price_vat_rate',
+                'gift_wrap_price_vat',
+                'gift_wrap_price_discount_vat',
+                'gift_wrap_price_total_vat',
+                'total_value_net',
+                'total_value_vat',
+                'total_value_gross',
+                'transaction_currency_code',
+                'invoice_currency_code',
+                'invoice_exchange_rate_date',
+                'invoice_exchange_rate',
+                'invoice_amount_net',
+                'invoice_amount_vat',
+                'invoice_amount_gross',
+                'reverse_charge_vat_rate',
+                'invoice_amount_reverse_charge_vat',
+                'arrival_seller_vatin',
+                'departure_seller_vatin',
+                'seller_vatin'
+            ]
+        )
+        for transaction in transactions:
+            customer_vatin = '{}-{}'.format(transaction.customer_vatin.country_code,
+                                            transaction.customer_vatin.number) if transaction.customer_vatin_id else None,
+            supplier_vatin = '{}-{}'.format(transaction.supplier_vatin.country_code,
+                                            transaction.supplier_vatin.number) if transaction.supplier_vatin_id else None,
+            arrival_seller_vatin = '{}-{}'.format(transaction.arrival_seller_vatin.country_code,
+                                                  transaction.arrival_seller_vatin.number) if transaction.arrival_seller_vatin_id else None,
+            departure_seller_vatin = '{}-{}'.format(transaction.departure_seller_vatin.country_code,
+                                                    transaction.departure_seller_vatin.number) if transaction.departure_seller_vatin_id else None,
+            seller_vatin = '{}-{}'.format(transaction.seller_vatin.country_code,
+                                          transaction.seller_vatin.number) if transaction.seller_vatin_id else None,
+
+            df = df.append(
+                {
+                    'created_on': str(transaction.created_on) if transaction.created_on else None,
+                    'modified_at': str(transaction.modified_at) if transaction.modified_at else None,
+                    'modified_by': transaction.modifier.name if transaction.modified_by else None,
+                    'notifications': len(transaction.notifications) > 0,
+                    'transaction_input': transaction.transaction_input.public_id if transaction.transaction_input_id else None,
+                    'seller_firm': seller_firm_name if transaction.seller_firm_id else None,
+                    'item': transaction.item.sku if transaction.item_id else None,
+                    'type_code': transaction.type_code if transaction.type_code else None,
+                    'amazon_vat_calculation_service': transaction.amazon_vat_calculation_service if transaction.amazon_vat_calculation_service else None,
+                    'customer_relationship_checked': transaction.customer_relationship_checked if transaction.customer_relationship_checked else None,
+                    'customer_relationship': transaction.customer_relationship if transaction.customer_relationship else None,
+                    'customer_vatin': customer_vatin,
+                    'supplier_relationship': transaction.supplier_relationship if transaction.supplier_relationship else None,
+                    'supplier_vatin': supplier_vatin,
+                    'tax_jurisdiction_code': transaction.tax_jurisdiction_code if transaction.tax_jurisdiction_code else None,
+                    'arrival_country_code': transaction.arrival_country_code if transaction.arrival_country_code else None,
+                    'departure_country_code': transaction.departure_country_code if transaction.departure_country_code else None,
+                    'tax_treatment_code': transaction.tax_treatment_code if transaction.tax_treatment_code else None,
+                    'tax_date': str(transaction.tax_date) if transaction.tax_date else None,
+                    'tax_calculation_date': str(transaction.tax_calculation_date) if transaction.tax_calculation_date else None,
+                    'item_tax_code_code': transaction.item_tax_code_code if transaction.item_tax_code_code else None,
+                    'item_tax_rate_type_code': transaction.item_tax_rate_type_code if transaction.item_tax_rate_type_code else None,
+                    'shipment_tax_rate_type_code': transaction.shipment_tax_rate_type_code if transaction.shipment_tax_rate_type_code else None,
+                    'gift_wrap_tax_rate_type_code': transaction.gift_wrap_tax_rate_type_code if transaction.gift_wrap_tax_rate_type_code else None,
+                    'item_price_net': transaction.item_price_net if transaction.item_price_net else None,
+                    'item_price_discount_net': transaction.item_price_discount_net if transaction.item_price_discount_net else None,
+                    'item_price_total_net': transaction.item_price_total_net if transaction.item_price_total_net else None,
+                    'shipment_price_net': transaction.shipment_price_net if transaction.shipment_price_net else None,
+                    'shipment_price_discount_net': transaction.shipment_price_discount_net if transaction.shipment_price_discount_net else None,
+                    'shipment_price_total_net': transaction.shipment_price_total_net if transaction.shipment_price_total_net else None,
+                    'gift_wrap_price_net': transaction.gift_wrap_price_net if transaction.gift_wrap_price_net else None,
+                    'gift_wrap_price_discount_net': transaction.gift_wrap_price_discount_net if transaction.gift_wrap_price_discount_net else None,
+                    'gift_wrap_price_total_net': transaction.gift_wrap_price_total_net if transaction.gift_wrap_price_total_net else None,
+                    'item_price_vat_rate': transaction.item_price_vat_rate if transaction.item_price_vat_rate else None,
+                    'item_price_vat': transaction.item_price_vat if transaction.item_price_vat else None,
+                    'item_price_discount_vat': transaction.item_price_discount_vat if transaction.item_price_discount_vat else None,
+                    'item_price_total_vat': transaction.item_price_total_vat if transaction.item_price_total_vat else None,
+                    'shipment_price_vat_rate': transaction.shipment_price_vat_rate if transaction.shipment_price_vat_rate else None,
+                    'shipment_price_vat': transaction.shipment_price_vat if transaction.shipment_price_vat else None,
+                    'shipment_price_discount_vat': transaction.shipment_price_discount_vat if transaction.shipment_price_discount_vat else None,
+                    'shipment_price_total_vat': transaction.shipment_price_total_vat if transaction.shipment_price_total_vat else None,
+                    'gift_wrap_price_vat_rate': transaction.gift_wrap_price_vat_rate if transaction.gift_wrap_price_vat_rate else None,
+                    'gift_wrap_price_vat': transaction.gift_wrap_price_vat if transaction.gift_wrap_price_vat else None,
+                    'gift_wrap_price_discount_vat': transaction.gift_wrap_price_discount_vat if transaction.gift_wrap_price_discount_vat else None,
+                    'gift_wrap_price_total_vat': transaction.gift_wrap_price_total_vat if transaction.gift_wrap_price_total_vat else None,
+                    'total_value_net': transaction.total_value_net if transaction.total_value_net else None,
+                    'total_value_vat': transaction.total_value_vat if transaction.total_value_vat else None,
+                    'total_value_gross': transaction.total_value_gross if transaction.total_value_gross else None,
+                    'transaction_currency_code': transaction.transaction_currency_code if transaction.transaction_currency_code else None,
+                    'invoice_currency_code': transaction.invoice_currency_code if transaction.invoice_currency_code else None,
+                    'invoice_exchange_rate_date': str(transaction.invoice_exchange_rate_date) if transaction.invoice_exchange_rate_date else None,
+                    'invoice_exchange_rate': transaction.invoice_exchange_rate if transaction.invoice_exchange_rate else None,
+                    'invoice_amount_net': transaction.invoice_amount_net if transaction.invoice_amount_net else None,
+                    'invoice_amount_vat': transaction.invoice_amount_vat if transaction.invoice_amount_vat else None,
+                    'invoice_amount_gross': transaction.invoice_amount_gross if transaction.invoice_amount_gross else None,
+                    'reverse_charge_vat_rate': transaction.reverse_charge_vat_rate if transaction.reverse_charge_vat_rate else None,
+                    'invoice_amount_reverse_charge_vat': transaction.invoice_amount_reverse_charge_vat if transaction.invoice_amount_reverse_charge_vat else None,
+                    'arrival_seller_vatin': arrival_seller_vatin,
+                    'departure_seller_vatin': departure_seller_vatin,
+                    'seller_vatin': seller_vatin,
+                },
+                ignore_index=True
+            )
+
+        return df
+
+
+    @staticmethod
+    def separate_transactions_by_type(transactions: List[Transaction]) -> List[List[Transaction]]:
+        sales = [transaction for transaction in transactions if transaction.type_code == 'SALE']
+        refunds = [transaction for transaction in transactions if transaction.type_code == 'REFUND']
+        acquisitions = [transaction for transaction in transactions if transaction.type_code == 'ACQUISITION']
+        movements = [transaction for transaction in transactions if transaction.type_code == 'MOVEMENT']
+
+        return (
+            sales,
+            refunds,
+            acquisitions,
+            movements
+        )
+
+    @staticmethod
+    def separate_transactions_by_tax_treatment(transactions: List[Transaction]) -> List[List[Transaction]]:
+        local_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE']
+        local_sales_reverse_charge = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_SALE_REVERSE_CHARGE']
+        distance_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'DISTANCE_SALE']
+        non_taxable_distance_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'NON_TAXABLE_DISTANCE_SALE']
+        intra_community_sales = [transaction for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_SALE']
+        exports = [transaction for transaction in transactions if transaction.tax_treatment_code == 'EXPORT']
+        local_acquisitions = [transaction for transaction in transactions if transaction.tax_treatment_code == 'LOCAL_ACQUISITION']
+        intra_community_acquisitions = [transaction for transaction in transactions if transaction.tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION']
+
+        return (
+            local_sales,
+            local_sales_reverse_charge,
+            distance_sales,
+            non_taxable_distance_sales,
+            intra_community_sales,
+            exports,
+            local_acquisitions,
+            intra_community_acquisitions
+        )
