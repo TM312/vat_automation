@@ -53,12 +53,8 @@ class Config(object):
 
     DATAPATH = datapath = basepath + '/data'
     BASE_PATH_TEMPLATES = DATAPATH + '/templates'
+    BASE_PATH_BUSINESS_DATA = DATAPATH + '/business_data'
 
-    BASE_PATH_BUSINESS_DATA = datapath + '/business_data'
-    BASE_PATH_DATA_SELLER_FIRM = datapath + '/seller_firm_data'
-    BASE_PATH_STATIC_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/static'
-    BASE_PATH_TRANSACTION_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/transaction'
-    BASE_PATH_TAX_RECORD_DATA_SELLER_FIRM = BASE_PATH_DATA_SELLER_FIRM + '/tax_record'
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 

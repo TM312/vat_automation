@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
 from app.extensions import db
 
-
+from app.namespaces.business import Business
 
 class TemplateService:
 
@@ -150,6 +150,17 @@ class InputService:
         #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
         string = string_raw.lower().translate({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"}).replace(" ", "-").strip("-")
         return re.sub(pattern, "-", string)
+
+    @staticmethod
+    def stringify_snake_case(string_raw: str) -> str:
+        import re
+        pattern = re.compile(r'-{2,}')
+        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
+        string = string_raw.lower().translate(
+            {ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=-+"}).replace(" ", "_").strip("-")
+        return re.sub(pattern, "_", string)
+
+
 
 
 
@@ -315,18 +326,18 @@ class InputService:
             raise UnprocessableEntity('Unable to identify the file type')
 
 
-    @staticmethod
-    def determine_data_type(file_type: str) -> str:
-        if file_type in ['account_list', 'distance_sale_list', 'item_list', 'vat_numbers']:
-            return 'static'
+    # @staticmethod
+    # def determine_data_type(file_type: str) -> str:
+    #     if file_type in ['account_list', 'distance_sale_list', 'item_list', 'vat_numbers']:
+    #         return 'static'
 
-        elif file_type in ['transactions_amazon']:
-            return 'recurring'
+    #     elif file_type in ['transactions_amazon']:
+    #         return 'recurring'
 
-        elif file_type in ['seller_firm']:
-            return 'business'
+    #     elif file_type in ['seller_firm']:
+    #         return 'business'
 
-        else:
+    #     else:
             raise
 
     @staticmethod
@@ -340,9 +351,9 @@ class InputService:
     # @staticmethod
     # def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
     #     STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config.STATIC_DATA_ALLOWED_EXTENSIONS
-    #     BASE_PATH_STATIC_DATA_SELLER_FIRM = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
+    #     BASE_PATH_BUSINESS_DATA = current_app.config.BASE_PATH_BUSINESS_DATA
     #     try:
-    #         file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_STATIC_DATA_SELLER_FIRM, file_type=file_type)
+    #         file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_BUSINESS_DATA, file_type=file_type)
     #     except:
     #         raise
 
@@ -371,12 +382,13 @@ class InputService:
     def get_secure_filename(file: BinaryIO) -> str:
         return secure_filename(file.filename)
 
+
     @staticmethod
-    def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, file_type: str) -> str:
+    def store_file(file: BinaryIO, allowed_extensions: List[str], basepath: str, business_id: int, file_type: str) -> str:
         if InputService.allowed_file(filename=file.filename, allowed_extensions=allowed_extensions):
             stored_filename = InputService.get_secure_filename(file)
 
-            basepath_in = os.path.join(basepath, file_type, 'in')
+            basepath_in = os.path.join(basepath, str(business_id), file_type, 'in')
 
             os.makedirs(basepath_in, exist_ok=True)
 
@@ -398,21 +410,10 @@ class InputService:
 
 
     @staticmethod
-    def move_data_to_file_type(file_path_tbd: str, data_type: str, file_type: str, **kwargs):
+    def move_data_to_file_type(file_path_tbd: str, file_type: str, business_id: int):
 
-        """
-        kwargs takes 'seller_firm_id' as an argument to determine the seller firm specific path
-        """
-
-        if data_type == 'static':
-            basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
-        elif data_type == 'recurring':
-            basepath = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
-        elif data_type == 'business':
-            basepath = current_app.config.BASE_PATH_BUSINESS_DATA
-
-        basepath_tbd = os.path.join(current_app.config.DATAPATH, 'tbd')
-        basepath_file_type = os.path.join(basepath, file_type, 'in')
+        basepath = current_app.config.BASE_PATH_BUSINESS_DATA
+        basepath_file_type = os.path.join(basepath, str(business_id), file_type, 'in')
         os.makedirs(basepath_file_type, exist_ok=True)
 
         file_name = os.path.basename(file_path_tbd)
@@ -425,13 +426,13 @@ class InputService:
 
 
     @staticmethod
-    def move_file_to_out(file_path_in: str, basepath: str, file_type: str):
-        basepath_in = os.path.join(basepath, file_type, 'in')
-        basepath_out = os.path.join(basepath, file_type, 'out')
+    def move_file_to_out(file_path_in: str, basepath: str, file_type: str, business_id: int):
+        basepath_in = os.path.join(basepath, str(business_id), file_type, 'in')
+        basepath_out = os.path.join(basepath, str(business_id), file_type, 'out')
         os.makedirs(basepath_out, exist_ok=True)
 
         file_name = os.path.basename(file_path_in)
-        file_path_out = os.path.join(basepath, file_type, 'out', file_name)
+        file_path_out = os.path.join(basepath_out, file_name)
         try:
             shutil.move(file_path_in, file_path_out)
         except:
