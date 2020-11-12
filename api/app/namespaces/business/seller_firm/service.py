@@ -208,7 +208,7 @@ class SellerFirmService:
 
         # each file is initially stored in a temp folder and undergoes sanitizing
         try:
-            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, business=seller_firm, file_type='tbd')
         except Exception as e:
             print(e, flush=True)
             SocketService.emit_status_error_invalid_file(message = e.description)
@@ -234,12 +234,12 @@ class SellerFirmService:
             SocketService.emit_status_error_invalid_file(message)
             return False
 
-        try:
-            data_type = InputService.determine_data_type(file_type)
-        except:
-            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
-            SocketService.emit_status_error_invalid_file(message)
-            return False
+        # try:
+        #     data_type = InputService.determine_data_type(file_type)
+        # except:
+        #     message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+        #     SocketService.emit_status_error_invalid_file(message)
+        #     return False
 
         #Prepare SellerFirmNotification
         seller_firm_notification_data = {
@@ -251,54 +251,48 @@ class SellerFirmService:
 
 
         # processing starts here
-        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type, seller_firm_id=seller_firm_id)
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, file_type, business_id=seller_firm_id)
 
-        if data_type == 'static':
-            basepath = current_app.config.BASE_PATH_STATIC_DATA_SELLER_FIRM
+        basepath = current_app.config.BASE_PATH_BUSINESS_DATA
 
-            if file_type == 'account_list':
-                from app.tasks.asyncr import async_handle_account_data_upload
+        if file_type == 'account_list':
+            from app.tasks.asyncr import async_handle_account_data_upload
 
-                response_object = async_handle_account_data_upload.apply_async(
-                    retry=True,
-                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
-                    )
-
-
-            elif file_type == 'distance_sale_list':
-                from app.tasks.asyncr import async_handle_distance_sale_data_upload
-                response_object = async_handle_distance_sale_data_upload.apply_async(
-                    retry=True,
-                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
-                    )
-
-
-            elif file_type == 'item_list':
-                from app.tasks.asyncr import async_handle_item_data_upload
-                response_object = async_handle_item_data_upload.apply_async(
-                    retry=True,
-                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
-                    )
-
-            elif file_type == 'vat_numbers':
-                from app.tasks.asyncr import async_handle_vatin_data_upload
-                response_object = async_handle_vatin_data_upload.apply_async(
-                    retry=True,
-                    args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
-                    )
-
-
-
-        elif data_type == 'recurring':
-            basepath = current_app.config.BASE_PATH_TRANSACTION_DATA_SELLER_FIRM
-
-            if file_type == 'transactions_amazon':
-                from app.tasks.asyncr import async_handle_transaction_input_data_upload
-                response_object = async_handle_transaction_input_data_upload.apply_async(
-                    retry=True,
-                    args=[file_path_in, file_type, df_encoding, delimiter, basepath,
-                          user_id, seller_firm_id, seller_firm_notification_data]
+            response_object = async_handle_account_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                 )
+
+
+        elif file_type == 'distance_sale_list':
+            from app.tasks.asyncr import async_handle_distance_sale_data_upload
+            response_object = async_handle_distance_sale_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                )
+
+
+        elif file_type == 'item_list':
+            from app.tasks.asyncr import async_handle_item_data_upload
+            response_object = async_handle_item_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                )
+
+        elif file_type == 'vat_numbers':
+            from app.tasks.asyncr import async_handle_vatin_data_upload
+            response_object = async_handle_vatin_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
+                )
+
+        if file_type == 'transactions_amazon':
+            from app.tasks.asyncr import async_handle_transaction_input_data_upload
+            response_object = async_handle_transaction_input_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath,
+                        user_id, seller_firm_id, seller_firm_notification_data]
+            )
 
         else:
             current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} ({})'.format(g.user.name, user_id))
@@ -339,7 +333,7 @@ class SellerFirmService:
 
         # each file is initially stored in a temp folder and undergoes sanitizing
         try:
-            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, file_type='tbd')
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, business_id=0, file_type='tbd')
         except Exception as e:
             SocketService.emit_status_error_invalid_file(message = e.description)
             return False
@@ -369,32 +363,24 @@ class SellerFirmService:
             SocketService.emit_status_error_invalid_file(message)
             return False
 
-        try:
-            data_type = InputService.determine_data_type(file_type)
-        except:
-            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
-            SocketService.emit_status_error_invalid_file(message)
-            return False
+        # try:
+        #     data_type = InputService.determine_data_type(file_type)
+        # except:
+        #     message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+        #     SocketService.emit_status_error_invalid_file(message)
+        #     return False
 
-        # processing starts here
-        file_path_in = InputService.move_data_to_file_type(file_path_tbd, data_type, file_type)
-
-        if data_type == 'business':
-            basepath = current_app.config.BASE_PATH_BUSINESS_DATA
-
-            from app.tasks.asyncr import async_handle_seller_firm_data_upload
-
-            response_object = async_handle_seller_firm_data_upload.apply_async(
-                retry=True,
-                args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed, seller_firm_notification_data]
-                )
+        # processing starts here / seller firm id not yet assigned => 0
+        file_path_in = InputService.move_data_to_file_type(file_path_tbd, file_type, business_id=0)
 
 
-        else:
-            current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} (id: {})'.format(g.user.name, user_id))
-            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_in)[:128])
-            SocketService.emit_status_error_invalid_file(message)
-            return False
+        from app.tasks.asyncr import async_handle_seller_firm_data_upload
+
+        response_object = async_handle_seller_firm_data_upload.apply_async(
+            retry=True,
+            args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, claimed, seller_firm_notification_data]
+            )
+
 
         return {
             "task_id": response_object.id,
@@ -406,7 +392,7 @@ class SellerFirmService:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
         response_object = SellerFirmService.create_seller_firms(df, file_path_in, user_id, claimed, seller_firm_notification_data)
 
-        InputService.move_file_to_out(file_path_in, basepath, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type, business_id=0)
 
         return response_object
 

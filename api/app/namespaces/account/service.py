@@ -133,7 +133,7 @@ class AccountService:
         response_object = AccountService.create_accounts(df, file_path_in, user_id, seller_firm_id)
         tag = TagService.get_by_code('ACCOUNT')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
-        InputService.move_file_to_out(file_path_in, basepath, file_type)
+        InputService.move_file_to_out(file_path_in, basepath, file_type, business_id=seller_firm_id)
 
         return response_object
 
