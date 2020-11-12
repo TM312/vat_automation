@@ -27,7 +27,7 @@ class TransactionTypeResource(Resource):
     # @ns.marshal_with(transaction_type_dto)
     # def post(self) -> TransactionType:
     #     """Create a Single TransactionType"""
-    #     return TransactionTypeService.create(request.parsed_obj)
+    #     return TransactionTypeService.create(request.json)
 
 
 # @ns.route("/<string:tag_code>")
@@ -50,5 +50,5 @@ class TransactionTypeResource(Resource):
 #     def put(self, tag_code: str) -> TransactionType:
 #         """Update Single TransactionType"""
 
-#         data_changes: TransactionTypeInterface = request.parsed_obj
+#         data_changes: TransactionTypeInterface = request.json
 #         return TransactionTypeService.update(tag_code, data_changes)

@@ -428,32 +428,20 @@ export default {
     },
 
     async submitPayload() {
-      // try {
-      // await this.create_by_seller_firm_public_id();
       const seller_firm_public_id = this.sellerFirm.public_id
       var tax_record_data = this.payload
       await this.$repositories.tax_record.create_by_seller_firm_public_id(seller_firm_public_id, tax_record_data)
-      //     await this.$store.dispatch(
-      //         "seller_firm/get_by_public_id",
-      //         this.$route.params.public_id
-      //     );
-      //     this.$emit('flash')
-      //     await this.$toast.success('New tax record succesfully added.', {
-      //         duration: 5000
-      //     });
-      // } catch (error) {
-      //     this.$toast.error(error, { duration: 5000 });
-      // }
+      this.makeToast()
+
     },
 
-    // async create_by_seller_firm_public_id() {
-    //     const data_array = [this.$route.params.public_id, this.payload]
-
-    //     await this.$store.dispatch(
-    //         "tax_record/create_by_seller_firm_public_id",
-    //         data_array
-    //     );
-    // },
+    makeToast() {
+      this.$bvToast.toast(`Succesfully created a new tax record (${this.payload.tax_jurisdiction_code}: ${this.payload.valid_from}-${this.payload.valid_from}).`, {
+        title: 'New Tax Record',
+        variant: 'success',
+        autoHideDelay: 10000,
+      })
+    }
   }
 }
 </script>

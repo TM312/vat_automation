@@ -7,7 +7,7 @@ from . import Account
 from . import account_dto, account_sub_dto, account_admin_dto
 from .service import AccountService
 
-from app.namespaces.utils.decorators import login_required, employer_required
+from app.namespaces.utils.decorators import login_required, accepted_roles
 
 
 ns = Namespace("Account", description="Account Related Operations")  # noqa
@@ -20,16 +20,20 @@ ns.add_model(account_admin_dto.name, account_admin_dto)
 @ns.route("/")
 class AccountResource(Resource):
     """Accounts"""
+    @login_required
+    @accepted_roles('admin')
     @ns.marshal_list_with(account_dto, envelope='data')
     def get(self) -> List[Account]:
         """Get all Accounts"""
         return AccountService.get_all()
 
+    @login_required
+    @accepted_roles('admin')
     @ns.expect(account_dto, validate=True)
     @ns.marshal_with(account_dto)
     def post(self) -> Account:
-        """Create a Single Account"""
-        return AccountService.create(request.parsed_obj)
+        """Create a Single Account For Any Firm. For Specific Firms"""
+        return AccountService.create(request.json)
 
 
 @ns.route("/<string:account_public_id>")
@@ -55,12 +59,12 @@ class AccountIdResource(Resource):
     def put(self, account_public_id: int) -> Account:
         """Update Single Account"""
 
-        data_changes: AccountInterface = request.parsed_obj
+        data_changes: AccountInterface = request.json
         return AccountService.update_by_public_id(account_public_id, data_changes)
 
 
 @ns.route("/seller_firm/<string:seller_firm_public_id>")
-class DistanceSaleResource(Resource):
+class SellerFirmAccountResource(Resource):
     """ Create Account for a Specific Seller Firm based on its Public ID"""
 
     # @ns.expect(distance_sale_dto, validate=True)

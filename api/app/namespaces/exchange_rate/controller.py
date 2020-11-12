@@ -27,7 +27,7 @@ class ExchangeRateResource(Resource):
     @ns.marshal_with(exchange_rate_dto)
     def post(self) -> ExchangeRate:
         """Create a Single ExchangeRate"""
-        return ExchangeRateService.create(request.parsed_obj)
+        return ExchangeRateService.create(request.json)
 
 
 @ns.route("/<int:exchange_rate_id>")
@@ -49,5 +49,5 @@ class ExchangeRateIdResource(Resource):
     def put(self, exchange_rate_id: int) -> ExchangeRate:
         """Update Single ExchangeRate"""
 
-        data_changes: ExchangeRateInterface = request.parsed_obj
+        data_changes: ExchangeRateInterface = request.json
         return ExchangeRateService.update(exchange_rate_id, data_changes)

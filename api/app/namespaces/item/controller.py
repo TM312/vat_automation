@@ -30,7 +30,7 @@ class ItemResource(Resource):
     @ns.marshal_with(item_dto)
     def post(self) -> Item:
         """Create a Single Item"""
-        return ItemService.create(request.parsed_obj)
+        return ItemService.create(request.json)
 
 
 @ns.route("/<string:item_public_id>")
@@ -52,7 +52,7 @@ class ItemIdResource(Resource):
     def put(self, item_public_id: str) -> Item:
         """Update Single Item"""
 
-        data_changes: ItemInterface = request.parsed_obj
+        data_changes: ItemInterface = request.json
         return ItemService.update_by_public_id(item_public_id, data_changes)
 
 

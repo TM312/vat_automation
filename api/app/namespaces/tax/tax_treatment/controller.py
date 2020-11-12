@@ -32,7 +32,7 @@ class TaxTreatmentResource(Resource):
     @ns.marshal_with(tax_treatment_dto)
     def post(self) -> TaxTreatment:
         """Create a Single TaxTreatment"""
-        return TaxTreatmentService.create(request.parsed_obj)
+        return TaxTreatmentService.create(request.json)
 
 
 @ns.route("/<string:tax_treatment_code>")

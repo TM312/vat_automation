@@ -34,7 +34,7 @@ class VatThresholdResource(Resource):
     @ns.marshal_with(vat_threshold_admin_dto)
     def post(self) -> VatThreshold:
         """Create a Single VatThreshold"""
-        return VatThresholdService.create(request.parsed_obj)
+        return VatThresholdService.create(request.json)
 
 
 @ns.route("/<int:vat_threshold_id>")

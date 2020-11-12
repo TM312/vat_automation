@@ -1,5 +1,7 @@
 <template>
   <div>
+    <alert-transaction-meta v-if="transaction.modified_at" class="mb-3" :transaction="transaction" />
+
     <b-row>
       <b-col cols="12" lg="6" xl="4">
         <card-transaction-base-data :transaction="transaction" />

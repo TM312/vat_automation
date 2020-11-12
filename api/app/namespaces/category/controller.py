@@ -27,4 +27,4 @@ class CategoryResource(Resource):
     @ns.marshal_with(category_dto)
     def post(self) -> Category:
         """Create a Single Category"""
-        return CategoryService.create(request.parsed_obj)
+        return CategoryService.create(request.json)

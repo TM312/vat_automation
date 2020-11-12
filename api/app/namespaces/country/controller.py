@@ -5,7 +5,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import Country, EU
-from . import country_dto, country_sub_dto, eu_dto
+from . import country_dto, country_sub_dto, eu_dto, eu_admin_dto
 from .service import CountryService
 
 from app.namespaces.utils.decorators import login_required, accepted_u_types
@@ -17,6 +17,7 @@ ns = Namespace("Country", description="Country Related Operations")  # noqa
 ns.add_model(country_dto.name, country_dto)
 ns.add_model(country_sub_dto.name, country_sub_dto)
 ns.add_model(eu_dto.name, eu_dto)
+ns.add_model(eu_admin_dto.name, eu_admin_dto)
 
 
 @ns.route("/")
@@ -35,7 +36,7 @@ class CountryResource(Resource):
     @ns.marshal_with(country_dto)
     def post(self) -> Country:
         """Create a Single Country"""
-        return CountryService.create(request.parsed_obj)
+        return CountryService.create(request.json)
 
 
 @ns.route("/<string:country_code>")

@@ -27,7 +27,7 @@ class TagResource(Resource):
     # @ns.marshal_with(tag_dto)
     # def post(self) -> Tag:
     #     """Create a Single Tag"""
-    #     return TagService.create(request.parsed_obj)
+    #     return TagService.create(request.json)
 
 
 # @ns.route("/<string:tag_code>")
@@ -50,5 +50,5 @@ class TagResource(Resource):
 #     def put(self, tag_code: str) -> Tag:
 #         """Update Single Tag"""
 
-#         data_changes: TagInterface = request.parsed_obj
+#         data_changes: TagInterface = request.json
 #         return TagService.update(tag_code, data_changes)

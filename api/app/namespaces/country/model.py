@@ -4,12 +4,12 @@ from app.extensions import db
 from app.namespaces.utils.ATs import eu_country_AT
 
 
-#### ^potentially change to
-#db.Column('country_code', db.String(4), db.ForeignKey('country.code'), primary_key=True) !!!!
+
 
 class EU(db.Model):
     __tablename__ = "eu"
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(64), unique=True)
     valid_from = db.Column(db.Date, nullable=False)
     valid_to = db.Column(db.Date)
     countries = db.relationship(
@@ -17,6 +17,10 @@ class EU(db.Model):
         secondary=eu_country_AT,
         back_populates="eus"
     )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.public_id = 'EU-{}-{}'.format(kwargs.get('valid_from'), kwargs.get('valid_to'))
 
     def update(self, data_changes):
         for key, val in data_changes.items():
@@ -30,19 +34,21 @@ class Country(db.Model):  # type: ignore
     __tablename__ = "country"
 
     code = db.Column(db.String(4), primary_key=True)
+
     vat_country_code = db.Column(db.String(4))
     name = db.Column(db.String(64), nullable=False)
-    valid_from = db.Column(db.Date)
-    valid_to = db.Column(db.Date)
+    # valid_from = db.Column(db.Date)
+    # valid_to = db.Column(db.Date)
 
-    #tax_codes = db.relationship('Vat', back_populates='country')
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
+
+    # non-mirrored relationships
     eus = db.relationship(
         "EU",
         secondary=eu_country_AT,
         back_populates="countries"
     )
 
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
     distance_sales = db.relationship('DistanceSale', backref='arrival_country', lazy=True)
     seller_firms = db.relationship('SellerFirm', backref='establishment_country')
 

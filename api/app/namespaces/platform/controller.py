@@ -32,7 +32,7 @@ class PlatformResource(Resource):
     @ns.marshal_with(platform_dto)
     def post(self) -> Platform:
         """Create a Single Platform"""
-        return PlatformService.create(request.parsed_obj)
+        return PlatformService.create(request.json)
 
 
 @ns.route("/<string:platform_code>")

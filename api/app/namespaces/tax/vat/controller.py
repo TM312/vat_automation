@@ -33,7 +33,7 @@ class VatResource(Resource):
     @ns.marshal_with(vat_dto)
     def post(self) -> Vat:
         """Create a Single Vat"""
-        return VatService.create(request.parsed_obj)
+        return VatService.create(request.json)
 
 
 @ns.route("/<int:vat_id>")
