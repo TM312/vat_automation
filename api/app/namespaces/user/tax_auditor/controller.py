@@ -75,7 +75,7 @@ class TaxAuditorIdResource(Resource):
     def put(self, tax_auditor_id: int) -> TaxAuditor:
         """Update Single TaxAuditor"""
 
-        changes: TaxAuditorInterface = request.parsed_obj
+        changes: TaxAuditorInterface = request.json
         return TaxAuditorService.update(tax_auditor_id, changes)
 
 

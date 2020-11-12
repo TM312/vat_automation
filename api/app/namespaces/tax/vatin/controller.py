@@ -31,7 +31,7 @@ class VATINResource(Resource):
     @ns.marshal_with(vatin_dto)
     def post(self) -> VATIN:
         """Create a Single VATIN"""
-        return VATINService.create(request.parsed_obj)
+        return VATINService.create(request.json)
 
 
 @ns.route("/<string:vatin_public_id>")
@@ -53,7 +53,7 @@ class VATINIdResource(Resource):
     def put(self, vatin_public_id: str) -> VATIN:
         """Update Single VATIN"""
 
-        data_changes: VATINInterface = request.parsed_obj
+        data_changes: VATINInterface = request.json
         return VATINService.update_by_public_id(vatin_public_id, data_changes)
 
 

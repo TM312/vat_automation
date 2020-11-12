@@ -96,6 +96,20 @@ class TransactionService:
         return transactions
 
 
+    @staticmethod
+    def update_by_public_id(transaction_public_id: str, data_changes: TransactionInterface) -> Transaction:
+        transaction = TransactionService.get_by_public_id(transaction_public_id)
+        if isinstance(transaction, Transaction):
+            transaction.update(data_changes)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                raise
+
+            return transaction
+
+
 
     @staticmethod
     def create_transaction_s(transaction_input: TransactionInputInterface) -> Transaction:

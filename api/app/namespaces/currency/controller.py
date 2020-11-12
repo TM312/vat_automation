@@ -31,7 +31,7 @@ class CurrencyResource(Resource):
     @ns.marshal_with(currency_dto)
     def post(self) -> Currency:
         """Create a Single Currency"""
-        return CurrencyService.create(request.parsed_obj)
+        return CurrencyService.create(request.json)
 
 
 @ns.route("/<string:currency_code>")

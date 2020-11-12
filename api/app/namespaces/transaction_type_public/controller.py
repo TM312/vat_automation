@@ -27,7 +27,7 @@ class TransactionTypePublicResource(Resource):
     # @ns.marshal_with(transaction_type_public_dto)
     # def post(self) -> TransactionTypePublic:
     #     """Create a Single TransactionTypePublic"""
-    #     return TransactionTypePublicService.create(request.parsed_obj)
+    #     return TransactionTypePublicService.create(request.json)
 
 
 # @ns.route("/<string:tag_code>")
@@ -50,5 +50,5 @@ class TransactionTypePublicResource(Resource):
 #     def put(self, tag_code: str) -> TransactionTypePublic:
 #         """Update Single TransactionTypePublic"""
 
-#         data_changes: TransactionTypePublicInterface = request.parsed_obj
+#         data_changes: TransactionTypePublicInterface = request.json
 #         return TransactionTypePublicService.update(tag_code, data_changes)

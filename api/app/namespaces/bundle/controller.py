@@ -58,5 +58,5 @@ class BundleIdResource(Resource):
     def put(self, bundle_public_id: str) -> Bundle:
         """Update Single Bundle"""
 
-        data_changes: BundleInterface = request.parsed_obj
+        data_changes: BundleInterface = request.json
         return BundleService.update_by_public_id(Bundle, data_changes)

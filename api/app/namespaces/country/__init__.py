@@ -1,5 +1,5 @@
 from .model import Country, EU
-from .schema import country_dto, country_sub_dto, eu_dto
+from .schema import country_dto, country_sub_dto, eu_dto, eu_admin_dto
 
 
 BASE_ROUTE = "country"

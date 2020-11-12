@@ -40,7 +40,6 @@ class Business(db.Model):  # type: ignore
     __mapper_args__ = {'polymorphic_on': b_type}
 
 
-
     def __init__(self, **kwargs):
         from .service_parent import BusinessService
         super().__init__(**kwargs)

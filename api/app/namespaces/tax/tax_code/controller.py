@@ -33,7 +33,7 @@ class TaxCodeResource(Resource):
     @ns.marshal_with(tax_code_dto)
     def post(self) -> TaxCode:
         """Create a Single TaxCode"""
-        return TaxCodeService.create(request.parsed_obj)
+        return TaxCodeService.create(request.json)
 
 
 @ns.route("/<string:tax_code_code>")

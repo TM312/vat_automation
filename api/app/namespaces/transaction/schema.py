@@ -22,6 +22,8 @@ transaction_sub_dto = Model('transaction_sub', {
 transaction_dto = transaction_sub_dto.clone('transaction', {
     'notifications': fields.List(fields.Nested(transaction_notification_dto)),
     'created_on': fields.DateTime,
+    'modified_at': fields.DateTime,
+    'modified_by': fields.String(attribute=lambda x: x.modifier.name, readonly=True),
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'tax_calculation_date': fields.Date,
     # 'account_public_id': fields.String(attribute=lambda x: x.account.public_id, readonly=True),

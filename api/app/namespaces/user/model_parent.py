@@ -34,7 +34,8 @@ class User(db.Model):  # type: ignore
     avatar_hash = db.Column(db.String(40))
     location = db.Column(db.String(32))
 
-    transaction_input_uploads = db.relationship('TransactionInput', backref='uploader', order_by='desc(TransactionInput.created_on)', lazy=True)
+    transaction_input_uploads = db.relationship('TransactionInput', backref='uploader', lazy=True)
+    modified_transactions = db.relationship('Transaction', backref='modifier', order_by='desc(Transaction.modified_at)', lazy=True)
 
     created_accounts = db.relationship('Account', backref='creator', order_by='desc(Account.created_on)', lazy=True)
     created_businesses = db.relationship('Business', backref='creator', order_by="desc(Business.created_on)", primaryjoin="Business.created_by==User.id", post_update=True)

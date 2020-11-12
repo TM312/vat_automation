@@ -65,7 +65,7 @@ class TransactionInputIdResource(Resource):
     def put(self, transaction_input_public_id: str) -> TransactionInput:
         """Update Single TransactionInput"""
 
-        data_changes: TransactionInputInterface = request.parsed_obj
+        data_changes: TransactionInputInterface = request.json
         return TransactionInputService.update_by_public_id(transaction_input_public_id, data_changes)
 
 

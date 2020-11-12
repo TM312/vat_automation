@@ -117,7 +117,14 @@ class TaxRecordService:
             message = 'There are no transactions by this seller for this period and tax jurisdiction.'
             raise ExpectationFailed(message)
 
-        return seller_firm, start_date, end_date, tax_jurisdiction, vatin, transactions
+        return (
+            seller_firm,
+            start_date,
+            end_date,
+            tax_jurisdiction,
+            vatin,
+            transactions
+        )
 
 
 
@@ -734,6 +741,62 @@ class TaxRecordService:
 
 
 
+    @staticmethod
+
+    def create_transaction_sheets(tax_record: TaxRecord, baseDir):
+        df=pd.DataFrame(
+            columns=[
+                "User_ID",
+                "Name",
+                "Gender",
+                "Birth Year",
+                "Age",
+                "Location",
+                "Country",
+                "Radius [in km]",
+                "rExact",
+                "Job Name",
+                "Job Title",
+                "School",
+                "Bio",
+                "Photos",
+                "#Photos",
+                "Date"
+            ]
+        )
+        for transaction in tax_record.transactions:
+            df=df.append(
+                {
+                    "User_ID":userId ,
+                    "Name":name,
+                    "Gender":gender,
+                    "Birth Year":birthYear,
+                    "Age":age,
+                    "Location":location,
+                    "Country":country,
+                    "Radius [in km]": radius2,
+                    "rExact": radius,
+                    "Job Name":jobName,
+                    "Job Title": jobTitle,
+                    "School":schoolName,
+                    "Bio":bio,
+                    "Photos":photos,
+                    "#Photos":lenPhotos,
+                    "Date":date
+                },
+                ignore_index=True
+            )
+
+            df.to_csv(os.path.join(baseDir, tax_record.filename), mode="a", header=False)
+
+            #bad code
+            df = pd.read_csv(os.path.join(baseDir, tax_record.filename))
+            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+            df = df.drop_duplicates()
+            df=df.reset_index(drop=True)
+            df.to_csv(os.path.join(baseDir, tax_record.filename), mode="w", header=True)
+
+        return i,j
 
 
 

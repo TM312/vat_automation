@@ -11,7 +11,7 @@ from . import Transaction
 from .service import TransactionService
 from .schema import transaction_dto, transaction_admin_dto, transaction_sub_dto
 
-from app.namespaces.utils.decorators import login_required
+from app.namespaces.utils.decorators import login_required, accepted_roles
 
 ns = Namespace("Transaction", description="Transaction Related Operations")  # noqa
 ns.add_model(transaction_dto.name, transaction_dto)
@@ -27,8 +27,9 @@ parser.add_argument('page', type=int)
 @ns.route("/")
 class TransactionResource(Resource):
     """Transactions"""
-    @ns.marshal_list_with(transaction_dto, envelope='data')
     @login_required
+    @accepted_roles('admin')
+    @ns.marshal_list_with(transaction_dto, envelope='data')
     def get(self) -> List[Transaction]:
         """Get all Transactions"""
         return TransactionService.get_all()
@@ -37,11 +38,21 @@ class TransactionResource(Resource):
 @ns.route("/<string:transaction_public_id>")
 @ns.param("transaction_id", "Transaction database ID")
 class TransactionIdResource(Resource):
-    @ns.marshal_with(transaction_dto, envelope='data')
     @login_required
+    @ns.marshal_with(transaction_dto, envelope='data')
     def get(self, transaction_public_id: str) -> Transaction:
         """Get Single Transaction"""
         return TransactionService.get_by_public_id(transaction_public_id)
+
+
+    @login_required
+    @ns.expect(transaction_dto, validate=True)
+    @ns.marshal_with(transaction_dto)
+    def put(self, transaction_public_id: int) -> Transaction:
+        """Update Single Transaction"""
+
+        data_changes: TransactionInterface = request.json
+        return TransactionService.update_by_public_id(transaction_public_id, data_changes)
 
 
 @ns.route("/tax_record/init")  # <string:tax_record_public_id><int:page>")

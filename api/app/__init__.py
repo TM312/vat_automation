@@ -11,7 +11,7 @@ from app.extensions import (
     session,
     socket_io)
 from app.logs.service import LogService
-from flask import Flask, jsonify
+from flask import Flask, jsonify, current_app
 from werkzeug.contrib.fixers import ProxyFix
 from dynaconf.contrib import FlaskDynaconf
 from celery import Celery
@@ -43,6 +43,8 @@ def create_app(env):
     def teardown_request(exception):
         if exception:
             db.session.rollback()
+            current_app.logger.debug(e)
+
         db.session.remove()
 
     return app

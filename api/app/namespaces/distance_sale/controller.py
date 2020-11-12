@@ -33,7 +33,7 @@ class DistanceSaleResource(Resource):
     @ns.marshal_with(distance_sale_dto)
     def post(self) -> DistanceSale:
         """Create a Single DistanceSale"""
-        return DistanceSaleService.create(request.parsed_obj)
+        return DistanceSaleService.create(request.json)
 
 
 @ns.route("/<string:distance_sale_public_id>")

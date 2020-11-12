@@ -18,6 +18,8 @@ class TaxRecord(db.Model):
     created_on = db.Column(db.Date, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+    filename = db.Column(db.String(128), nullable=False)
+
     # downloaded_by_users = db.relationship('User', secondary=tax_record_user_AT, back_populates='downloaded_tax_records')
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
 
@@ -636,3 +638,13 @@ class TaxRecord(db.Model):
     @payable_vat_amount.setter
     def payable_vat_amount(self, value):
         self._payable_vat_amount = int(round(value * 100)) if value is not None else None
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.filename = '{}_{}_{}_{}.csv'.format(
+            kwargs.get('tax_jurisdiction_code'),
+            kwargs.get('start_date'),
+            kwargs.get('end_date'),
+            str(uuid4())[:8]
+        )

@@ -1,5 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
+from flask import g
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -17,6 +18,9 @@ class Transaction(db.Model):  # type: ignore
     public_id = db.Column(UUID(as_uuid=True), default=uuid4)
 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime)
+    modified_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+
     tax_records = db.relationship('TaxRecord', secondary=tax_record_transaction_AT, back_populates='transactions', cascade="all, delete")
     notifications = db.relationship('TransactionNotification', backref='transaction', lazy=True, cascade='all, delete-orphan')
 
@@ -335,11 +339,15 @@ class Transaction(db.Model):  # type: ignore
 
 
 
-
-
     def __repr__(self):
-        return '<ID: {} - {}>'.format(self.id, self.tax_jurisdiction_code)
-        #return '<Transaction {}: Tax Jurisdiction: {} | Type: {} | Tax Treatment: {}>'.format(self.id, self.tax_jurisdiction_code, self.type_code, self.tax_treatment_code)
+        return '<ID: {} - {} - {} - {}>'.format(self.id, self.type_code, self.tax_treatment_code, self.tax_jurisdiction_code)
 
 
-#### ENUM ???ß
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        self.modified_at = datetime.utcnow()
+        # https://flask.palletsprojects.com/en/1.1.x/api/#application-globals
+        if 'user' in g:
+            self.modified_by = g.user.id
+        return self

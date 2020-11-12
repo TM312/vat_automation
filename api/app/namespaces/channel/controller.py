@@ -31,7 +31,7 @@ class ChannelResource(Resource):
     @ns.marshal_with(channel_dto)
     def post(self) -> Channel:
         """Create a Single Channel"""
-        return ChannelService.create(request.parsed_obj)
+        return ChannelService.create(request.json)
 
 
 @ns.route("/<string:channel_code>")

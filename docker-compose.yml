@@ -29,8 +29,8 @@ services:
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
             - "14000"
-        depends_on:
-            - api
+        # depends_on:
+        #     - api
         networks:
             - web
         command: "npm run start"
@@ -47,8 +47,8 @@ services:
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
             - "22406"
-        depends_on:
-            - api
+        # depends_on:
+        #     - api
         networks:
             - web
         command: "npm run start"
@@ -65,8 +65,8 @@ services:
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
             - "31729"
-        depends_on:
-            - api
+        # depends_on:
+        #     - api
         networks:
             - web
         command: "npm run start"

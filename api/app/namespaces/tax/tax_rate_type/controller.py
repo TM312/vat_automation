@@ -34,7 +34,7 @@ class TaxRateTypeResource(Resource):
     @ns.marshal_with(tax_rate_type_dto)
     def post(self) -> TaxRateType:
         """Create a Single TaxRateType"""
-        return TaxRateTypeService.create(request.parsed_obj)
+        return TaxRateTypeService.create(request.json)
 
 
 @ns.route("/<string:tax_rate_type_code>")

@@ -3,8 +3,11 @@
     <b-tab title="Platforms" active>
       <tab-platforms />
     </b-tab>
-    <b-tab title="Channels" active>
+    <b-tab title="Channels">
       <tab-channels />
+    </b-tab>
+    <b-tab title="EU" lazy>
+      <tab-eu />
     </b-tab>
     <b-tab title="Countries" lazy>
       <tab-countries />
@@ -23,6 +26,12 @@
     </b-tab>
     <b-tab title="Vat Thresholds" lazy>
       <h1>Here gets all Vat Thresholds Data</h1>
+    </b-tab>
+    <b-tab title="Transaction Type" lazy>
+      <h1>Here gets all Transaction Types Data</h1>
+    </b-tab>
+    <b-tab title="Transaction Type Public" lazy>
+      <h1>Here gets all Public Transaction Types Data</h1>
     </b-tab>
   </b-tabs>
 </template>
