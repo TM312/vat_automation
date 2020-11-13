@@ -10,7 +10,7 @@
       pill
       variant="outline-primary"
       block
-      class="my-3"
+      class="my-4"
       @click="subscribe()"
     >
       Submit

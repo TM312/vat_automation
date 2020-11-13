@@ -10,7 +10,18 @@
             <b-col>
               <h6>Products</h6>
             </b-col>
-            <b-col>Other Stuff</b-col>
+            <b-col>
+              <h6>Company</h6><br />
+              <nuxt-link to="/about">
+                About
+              </nuxt-link><br />
+              <nuxt-link to="/contact">
+                Contact
+              </nuxt-link><br />
+              <nuxt-link to="/privacy">
+                Privacy &amp; Terms
+              </nuxt-link>
+            </b-col>
           </b-row>
         </b-col>
       </b-row>
