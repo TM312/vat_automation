@@ -39,8 +39,8 @@ class TaxAuditorResource(Resource):
     @ns.marshal_with(tax_auditor_dto)
     def post(self):
         """Create A Single Tax Auditor"""
-        admin_data: TaxAuditorInterface = request.json
-        return TaxAuditorService.create(admin_data)
+        tax_auditor_data: TaxAuditorInterface = request.json
+        return TaxAuditorService.create(tax_auditor_data)
 
 
 @ns.route('/self')

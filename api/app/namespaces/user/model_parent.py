@@ -25,11 +25,11 @@ class User(db.Model):  # type: ignore
     confirmed_on = db.Column(db.DateTime)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    name = db.Column(db.String(32), unique=True)
+    name = db.Column(db.String(32))
     email = db.Column(db.String(32), unique=True)
     # https://docs.sqlalchemy.org/en/13/core/constraints.html
     employer_id = db.Column(db.Integer, db.ForeignKey('business.id', name='fk_user_employer_id_business'))
-    role = db.Column(db.String, nullable=False) # roles = ['employee', '_', 'admin']
+    role = db.Column(db.String, default='employee') # roles = ['employee', '_', 'admin']
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(40))
     location = db.Column(db.String(32))

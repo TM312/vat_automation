@@ -5,7 +5,8 @@ export const state = () => ({
 })
 
 export const getters = {
-  countryNameByCode: state => countryCode => state.countries.find(country => country.code === countryCode).name
+  countryNameByCode: state => countryCode => state.countries.find(country => country.code === countryCode).name,
+  getInclCurrencyOnly: state => state.countries.filter(country => !!country.currency_code)
 }
 
 export const mutations = {
@@ -17,6 +18,16 @@ export const mutations = {
   },
   SET_EU(state, eu) {
     state.eu = eu
+  },
+
+  // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
+  UPDATE_IN_LIST(state, country) {
+    var index = state.countries.findIndex(el => (el.code === country.code))
+    state.countries = [
+      ...state.countries.slice(0, index),
+      country,
+      ...state.countries.slice(index + 1)
+    ]
   }
 }
 
@@ -63,11 +74,13 @@ export const actions = {
     }
   },
 
-  async update({ commit }, country_code, data_changes) {
+  async update_in_list({ commit }, payload) {
+    const country_code = payload.shift()
+    const data_changes = payload[0]
     const res = await this.$repositories.country.update(country_code, data_changes)
     const { status, data } = res
     if (status === 200 && data.data) {
-      commit('SET_COUNTRY', data.data)
+      commit('UPDATE_IN_LIST', data.data)
     } else {
       // Handle error here
     }
