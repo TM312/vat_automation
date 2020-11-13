@@ -3,6 +3,7 @@ import pandas as pd
 
 from app.extensions import db
 from flask import current_app, g
+from werkzeug.exceptions import NotFound, InternalServerError
 
 from .model import Subscriber
 from .interface import SubscriberInterface
@@ -32,14 +33,15 @@ class SubscriberService:
         new_subscriber = Subscriber(
             name = subscriber_data.get('name'),
             email = subscriber_data.get('email'),
-            employer_id = subscriber_data.get('employer_id'),
-            role = subscriber_data.get('role'),
-            password = subscriber_data.get('password'),
-            location = subscriber_data.get('location')
+            u_type_indicated=subscriber_data.get('u_type_indicated')
         )
-
         db.session.add(new_subscriber)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.debug(e)
+            db.session.rollback()
+            raise InternalServerError
 
         return new_subscriber
 
@@ -47,8 +49,13 @@ class SubscriberService:
     def update(subscriber_id: int, data_changes) -> Subscriber:
         subscriber = SubscriberService.get_by_id(subscriber_id)
         subscriber.update(data_changes)
-        subscriber.update_last_seen()
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.debug(e)
+            db.session.rollback()
+            raise InternalServerError
+
         return subscriber
 
 
