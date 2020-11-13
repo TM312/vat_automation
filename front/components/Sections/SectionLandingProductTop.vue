@@ -5,7 +5,7 @@
         <b-row cols="1" cols-md="2">
           <b-col>
             <b-jumbotron
-              header="Infrastructure to run your ecommerce business successfully"
+              header="Infrastructure to run your e-commerce business successfully"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"

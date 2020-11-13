@@ -23,14 +23,14 @@
                 If you are keen to jump on board once we release our upcoming features to
                 the first users, enter your email below.
               </p>
-              <form-landing-contact class="mt-5" />
+              <form-landing-contact class="mt-2" />
             </div>
           </b-tab>
           <b-tab title="For Potential Partners">
             <div class="mt-3">
               <p class="lead text-muted">
                 You are a tax consultant or service provider for
-                e-commerce sellers and interested in our upcoming service?
+                e-commerce sellers and interested in a collaboration?
                 Get in touch and we can arrange a meeting!
               </p>
               <br />

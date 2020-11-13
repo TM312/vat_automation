@@ -14,21 +14,20 @@
             Fair Pricing
           </h5>
           <p class="lead">
-            We release hundreds of features and improvements each
-            year to help you stay ahead of industry shifts. (On
-            average, we deploy our production API 16x per day.)
+            Our service has been developed with a great focus on automation to allow for efficient processes and fair prices.
+            Check out our <nuxt-link to="/pricing">
+              pricing page
+            </nuxt-link> for details.
           </p>
         </div>
       </b-col>
       <b-col class="mb-4">
         <div id="neuphormism" class="h-100 p-4">
           <h5 class="text-info">
-            Fast Improvements
+            Fast Improvement Cycles
           </h5>
           <p class="lead">
-            We release hundreds of features and improvements each
-            year to help you stay ahead of industry shifts. (On
-            average, we deploy our production API 16x per day.)
+            We deploy product improvements on a daily basis. Our internal technology capabilities further facilitate fast innovation cycles for new products and features.
           </p>
         </div>
       </b-col>
