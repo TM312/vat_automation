@@ -9,6 +9,14 @@ export const mutations = {
   },
   SET_CHANNEL(state, channel) {
     state.channel = channel
+  },
+  UPDATE_CHANNEL_IN_LIST(state, currency) {
+    var index = state.currencies.findIndex(el => (el.code === currency.code))
+    state.currencies = [
+      ...state.currencies.slice(0, index),
+      currency,
+      ...state.currencies.slice(index + 1)
+    ]
   }
 }
 
@@ -44,11 +52,13 @@ export const actions = {
     }
   },
 
-  async update({ commit }, channel_code, data_changes) {
+  async update_in_list({ commit }, payload) {
+    const channel_code = payload.shift()
+    const data_changes = payload[0]
     const res = await this.$repositories.channel.update(channel_code, data_changes)
     const { status, data } = res
     if (status === 200 && data.data) {
-      commit('SET_CHANNEL', data.data)
+      commit('UPDATE_CHANNEL_IN_LIST', data.data)
     } else {
       // Handle error here
     }

@@ -739,7 +739,7 @@ class TaxRecordExportService:
     @staticmethod
     def generate_tax_record_export(tax_record: TaxRecord):
 
-       (
+        (
             local_sales,
             local_sales_reverse_charge,
             distance_sales,
@@ -755,12 +755,12 @@ class TaxRecordExportService:
 
         df.to_csv(os.path.join(baseDir, tax_record.filename), mode="a", header=False)
 
-            #bad code
-            df = pd.read_csv(os.path.join(baseDir, tax_record.filename))
-            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-            df = df.drop_duplicates()
-            df=df.reset_index(drop=True)
-            df.to_csv(os.path.join(baseDir, tax_record.filename), mode="w", header=True)
+        #bad code
+        df = pd.read_csv(os.path.join(baseDir, tax_record.filename))
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+        df = df.drop_duplicates()
+        df=df.reset_index(drop=True)
+        df.to_csv(os.path.join(baseDir, tax_record.filename), mode="w", header=True)
 
 
 

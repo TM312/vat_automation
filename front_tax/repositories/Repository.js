@@ -20,6 +20,8 @@ import TaxRecordRepository from './TaxRecordRepository'
 import TaxTreatmentRepository from './TaxTreatmentRepository'
 import TransactionRepository from './TransactionRepository'
 import TransactionInputRepository from './TransactionInputRepository'
+import TransactionTypeRepository from './TransactionTypeRepository'
+import TransactionTypePublicRepository from './TransactionTypePublicRepository'
 import UserRepository from './UserRepository'
 import UtilsRepository from './UtilsRepository'
 import VatRepository from './VatRepository'
@@ -49,6 +51,8 @@ export default ($axios) => ({
   tax_treatment: TaxTreatmentRepository($axios),
   transaction: TransactionRepository($axios),
   transaction_input: TransactionInputRepository($axios),
+  transaction_type: TransactionTypeRepository($axios),
+  transaction_type_public: TransactionTypePublicRepository($axios),
   user: UserRepository($axios),
   utils: UtilsRepository($axios),
   vat: VatRepository($axios),

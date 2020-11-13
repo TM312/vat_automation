@@ -44,22 +44,22 @@
         <!-- in-year selection by quarters -->
         <b-row v-show="!!yearString" cols="1" cols-md="2" cols-lg="4">
           <b-col class="mb-2">
-            <b-button :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q1'" block @click="setQ(1)">
+            <b-button :disabled="test('Q1')" :variant="test('Q1') ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Q1'" block @click="setQ(1)">
               Q1
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q2'" block @click="setQ(2)">
+            <b-button :disabled="test('Q2')" :variant="test('Q2') ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Q2'" block @click="setQ(2)">
               Q2
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q3'" block @click="setQ(3)">
+            <b-button :disabled="test('Q3')" :variant="test('Q3') ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Q3'" block @click="setQ(3)">
               Q3
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Q4'" block @click="setQ(4)">
+            <b-button :disabled="test('Q4')" :variant="test('Q4') ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Q4'" block @click="setQ(4)">
               Q4
             </b-button>
           </b-col>
@@ -68,63 +68,63 @@
         <!-- in-year selection by months -->
         <b-row v-show="!!yearString" class="mt-2" cols="1" cols-md="3" cols-lg="4" cols-xl="6">
           <b-col class="mb-2">
-            <b-button :disabled="test(0)" :variant="test(0) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Jan'" block @click="setM(0)">
+            <b-button :disabled="test(0)" :variant="test(0) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Jan'" block @click="setM(0)">
               Jan
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(1)" :variant="test(1) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Feb'" block @click="setM(1)">
+            <b-button :disabled="test(1)" :variant="test(1) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Feb'" block @click="setM(1)">
               Feb
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(2)" :variant="test(2) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'March'" block @click="setM(2)">
+            <b-button :disabled="test(2)" :variant="test(2) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'March'" block @click="setM(2)">
               March
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(3)" :variant="test(3) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'April'" block @click="setM(3)">
+            <b-button :disabled="test(3)" :variant="test(3) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'April'" block @click="setM(3)">
               April
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(4)" :variant="test(4) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'May'" block @click="setM(4)">
+            <b-button :disabled="test(4)" :variant="test(4) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'May'" block @click="setM(4)">
               May
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(5)" :variant="test(5) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'June'" block @click="setM(5)">
+            <b-button :disabled="test(5)" :variant="test(5) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'June'" block @click="setM(5)">
               June
             </b-button>
           </b-col>
 
           <b-col class="mb-2">
-            <b-button :disabled="test(6)" :variant="test(6) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'July'" block @click="setM(6)">
+            <b-button :disabled="test(6)" :variant="test(6) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'July'" block @click="setM(6)">
               July
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(7)" :variant="test(7) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Aug'" block @click="setM(7)">
+            <b-button :disabled="test(7)" :variant="test(7) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Aug'" block @click="setM(7)">
               Aug
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(8)" :variant="test(8) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Sep'" block @click="setM(8)">
+            <b-button :disabled="test(8)" :variant="test(8) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Sep'" block @click="setM(8)">
               Sep
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(9)" :variant="test(9) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Oct'" block @click="setM(9)">
+            <b-button :disabled="test(9)" :variant="test(9) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Oct'" block @click="setM(9)">
               Oct
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(10)" :variant="test(10) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Nov'" block @click="setM(10)">
+            <b-button :disabled="test(10)" :variant="test(10) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Nov'" block @click="setM(10)">
               Nov
             </b-button>
           </b-col>
           <b-col class="mb-2">
-            <b-button :disabled="test(11)" :variant="test(11) ? 'outline-secondary' : 'outline-primary'" :pressed="selected == 'Dec'" block @click="setM(11)">
+            <b-button :disabled="test(11)" :variant="test(11) ? 'outline-secondary' : 'outline-primary'" :pressed="selectedTimePeriod == 'Dec'" block @click="setM(11)">
               Dec
             </b-button>
           </b-col>
@@ -238,7 +238,7 @@ export default {
 
     },
 
-    selected() {
+    selectedTimePeriod() {
       var selected = null
 
       if (
@@ -369,12 +369,6 @@ export default {
 
     },
 
-    // setPastMonth() {
-    //     var pastMonthString = this.$dateFns.format(this.pastMonthDate, 'yyyy-MM')
-
-    //     this.payload.start_date = pastMonthString + '-01'
-    //     this.payload.end_date = pastMonthString + '-31'
-    // },
 
     setQ(quarter) {
       // https://en.wikipedia.org/wiki/Calendar_year

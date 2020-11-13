@@ -41,8 +41,8 @@ class SellerResource(Resource):
     @ns.marshal_with(seller_dto)
     def post(self):
         """Create A Single Seller Firm"""
-        admin_data: SellerInterface = request.json
-        return SellerService.create(admin_data)
+        seller_data: SellerInterface = request.json
+        return SellerService.create(seller_data)
 
 
 @ns.route('/self')
