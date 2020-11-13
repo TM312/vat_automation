@@ -156,7 +156,7 @@ export default {
           this.$route.params.public_id
         )
         this.$emit('flash')
-        await this.$toast.success('New distance sale succesfully added.', {
+        await this.$toast.success('New distance sale successfully added.', {
           duration: 5000
         })
       } catch (error) {

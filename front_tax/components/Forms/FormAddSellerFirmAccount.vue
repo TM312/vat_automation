@@ -115,7 +115,7 @@ export default {
           this.$route.params.public_id
         )
         this.$emit('flash')
-        await this.$toast.success('New account succesfully added.', {
+        await this.$toast.success('New account successfully added.', {
           duration: 5000
         })
       } catch (error) {
