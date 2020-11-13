@@ -116,7 +116,7 @@ export default {
 
 
         this.$emit('flash')
-        await this.$toast.success('New client succesfully added.', {
+        await this.$toast.success('New client successfully added.', {
           duration: 5000
         })
       } catch (error) {
