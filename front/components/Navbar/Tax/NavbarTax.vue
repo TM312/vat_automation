@@ -6,7 +6,7 @@
     </div>
     <div v-show="!$auth.loggedIn">
       <!-- NAVBAR WHEN NOT AUTHENTICATED -->
-      <navbar-unauth class="pr-5" />
+      <navbar-unauth />
     </div>
   </div>
 </template>

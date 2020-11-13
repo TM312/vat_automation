@@ -1002,7 +1002,7 @@ class TransactionService:
 class TransactionExportService:
 
     @staticmethod
-    def create_df_transactions(transactions: List[Transaction], seller_firm_name: str) -> df: pd.DataFrame:
+    def create_df_transactions(transactions: List[Transaction], seller_firm_name: str) -> pd.DataFrame:
 
         df = pd.DataFrame(
             columns=[

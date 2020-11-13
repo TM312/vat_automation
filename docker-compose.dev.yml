@@ -12,25 +12,25 @@ services:
               - ./front/:/home/app
         command: "npm run dev"
 
-    front_admin:
-        build:
-            context: ./front_admin
-            dockerfile: Dockerfile.dev
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        volumes:
-              - ./front_admin/:/home/app
-        command: "npm run dev"
+    # front_admin:
+    #     build:
+    #         context: ./front_admin
+    #         dockerfile: Dockerfile.dev
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     volumes:
+    #           - ./front_admin/:/home/app
+    #     command: "npm run dev"
 
-    front_tax:
-        build:
-            context: ./front_tax
-            dockerfile: Dockerfile.dev
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        volumes:
-              - ./front_tax/:/home/app
-        command: "npm run dev"
+    # front_tax:
+    #     build:
+    #         context: ./front_tax
+    #         dockerfile: Dockerfile.dev
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     volumes:
+    #           - ./front_tax/:/home/app
+    #     command: "npm run dev"
 
     proxy:
         container_name: proxy
@@ -59,28 +59,28 @@ services:
         #command: '/bin/sh -c ''while :; do sleep 6h; nginx -s reload; done & exec nginx -g "daemon off;"'''
 
 
-    rabbitmq:
-        env_file:
-            - .dev.env
+    # rabbitmq:
+    #     env_file:
+    #         - .dev.env
 
-    redis:
-        env_file:
-            - .dev.env
+    # redis:
+    #     env_file:
+    #         - .dev.env
 
-    celery-worker:
-        env_file:
-            - .dev.env
+    # celery-worker:
+    #     env_file:
+    #         - .dev.env
 
-    celery-beat:
-        env_file:
-            - .dev.env
+    # celery-beat:
+    #     env_file:
+    #         - .dev.env
 
-    flower:
-        ports:
-            - 8888:8888
+    # flower:
+    #     ports:
+    #         - 8888:8888
 
-        env_file:
-            - .dev.env
+    #     env_file:
+    #         - .dev.env
 
 
 

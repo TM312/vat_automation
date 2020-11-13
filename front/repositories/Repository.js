@@ -13,6 +13,7 @@ import PlatformRepository from './PlatformRepository'
 import SellerRepository from './SellerRepository'
 import SellerFirmRepository from './SellerFirmRepository'
 import StatusRepository from './StatusRepository'
+import SubscriberRepository from './SubscriberRepository'
 import TaxAuditorRepository from './TaxAuditorRepository'
 import TaxCodeRepository from './TaxCodeRepository'
 import TaxRateTypeRepository from './TaxRateTypeRepository'
@@ -44,6 +45,7 @@ export default ($axios) => ({
   seller: SellerRepository($axios),
   seller_firm: SellerFirmRepository($axios),
   status: StatusRepository($axios),
+  subscriber: SubscriberRepository($axios),
   tax_auditor: TaxAuditorRepository($axios),
   tax_code: TaxCodeRepository($axios),
   tax_rate_type: TaxRateTypeRepository($axios),
