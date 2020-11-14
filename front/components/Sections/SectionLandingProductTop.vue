@@ -5,17 +5,22 @@
         <b-row cols="1" cols-md="2">
           <b-col>
             <b-jumbotron
-              header="Infrastructure to run your e-commerce business successfully"
+              header="Vat Compliance For Your E-commerce Business"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"
               text-variant="dark"
             >
               <template #lead style="max-width: 40rem" class="mt-5">
-                Tax-Automation provides Amazon sellers with the tools to manage their business and meet their vat requirements across Europe.
-                We assist you with the registration and your preliminary turnover tax returns.
-                Use our platform to keep track of your sales and all relevant distance selling thresholds.
+                Tax-Automation provides Amazon sellers with the tools to meet their vat requirements across Europe.
+                We assist with the vat registration and preliminary turnover tax returns.
+                Our platform allows to keep track of sales and all relevant distance selling thresholds.
               </template>
+
+              <b-button pill variant="outline-primary" @mouseover="buttonHover = true" @mouseleave="buttonHover = false">
+                Product Details
+                <b-icon :icon="buttonHover ? 'arrow-right' : 'chevron-right'" class="ml-1" />
+              </b-button>
             </b-jumbotron>
           </b-col>
           <b-col>
@@ -30,6 +35,12 @@
 <script>
 export default {
   name: "SectionLandingProductTop",
+
+  data() {
+    return {
+      buttonHover: false
+    }
+  },
 }
 </script>
 

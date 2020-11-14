@@ -5,7 +5,7 @@
     </h6>
     <h1>A Seller Centered Approach Leveraging Modern Technology</h1>
     <p class="lead text-muted">
-      This is the accompyning text
+      An engineering driven team, caring for customer satisfaction, a high quality product, and efficient processes.
     </p>
     <b-row cols="1" cols-lg="2" class="my-5">
       <b-col class="mb-4">
