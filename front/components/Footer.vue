@@ -8,7 +8,10 @@
         <b-col>
           <b-row>
             <b-col>
-              <h6>Products</h6>
+              <h6>Products</h6><br />
+              <nuxt-link to="/vat-compliance">
+                Vat Compliance
+              </nuxt-link><br />
             </b-col>
             <b-col>
               <h6>Company</h6><br />

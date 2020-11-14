@@ -5,7 +5,9 @@
       v-model="email"
       placeholder="Your Email"
     />
-    <small class="text-muted mt-2">No spam. You can unsubscribe at any time.</small>
+    <small class="text-muted">
+      We sent out updates around once a month. You can unsubscribe at any time.
+    </small>
     <b-button
       pill
       variant="outline-primary"
