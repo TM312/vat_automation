@@ -9,11 +9,7 @@
     </p>
     <b-row cols="1" cols-lg="2" align-v="stretch" class="mt-5">
       <b-col cols="6" lg="5" class="px-5">
-        <b-img
-          src="@/assets/img/illustrations/undraw_subscribe.svg"
-          center
-          fluid
-        />
+        <spaceship-beam />
       </b-col>
       <b-col cols="auto">
         <b-tabs pills class="mt-3">
