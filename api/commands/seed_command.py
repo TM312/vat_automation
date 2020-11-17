@@ -97,12 +97,10 @@ class SeedCommand(Command):
 
             print('Seeding businesses...')
             AccountingFirmSeedService.seed_accounting_firm()
-            SellerFirmSeedService.seed_sample_seller_firm()
 
             print('Seeding users...')
             AdminSeedService.seed_admin()
             TaxAuditorSeedService.seed_tax_auditor()
-            SellerSeedService.seed_seller()
 
 
             print('Appending Transaction Types to Tax Treatments...')
@@ -114,20 +112,19 @@ class SeedCommand(Command):
             print('Appending Users to Businesses...')
             AccountingFirmSeedService.append_tax_auditor_to_accounting_firm()
             AdminSeedService.append_accounting_firm_to_admin()
-            SellerSeedService.append_seller_firm_to_seller()
 
             print('Appending Channels to Platforms...')
             PlatformSeedService.append_channels_to_platform()
 
             db.session.commit()
 
-            # print('Creating Vat Rates...')
-            # response_object_vat_rates = VatSeedService.seed_tax_rates()
-            # response_objects.append(response_object_vat_rates)
+            print('Creating Vat Rates...')
+            response_object_vat_rates = VatSeedService.seed_tax_rates()
+            response_objects.append(response_object_vat_rates)
 
-            # print('Creating Exchange Rates...')
-            # response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
-            # response_objects.append(response_object_exchange_rates)
+            print('Creating Exchange Rates...')
+            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+            response_objects.append(response_object_exchange_rates)
 
             print('Creating Vat Thresholds...')
             response_object_vat_thresholds = VatThresholdSeedService.seed_vat_thresholds()
@@ -138,8 +135,16 @@ class SeedCommand(Command):
             response_objects.append(response_object_transaction_types_public)
 
             print('Preparing Sample Seller Firm Showcase...')
+            print('...Sample Seller Firm')
+            SellerFirmSeedService.seed_sample_seller_firm()
+            print('...Sample Seller')
+            SellerSeedService.seed_seller()
+            print('...Append Seller To Firm')
+            SellerSeedService.append_seller_firm_to_seller()
+            print('...Seller Firm Static Data')
             SampleFirmInformationSeedService.seed_sample_data_static()
-            # SampleFirmInformationSeedService.seed_sample_transaction_input_data()
+            print('...Seller Firm Transaction Data')
+            SampleFirmInformationSeedService.seed_sample_transaction_input_data()
 
 
             for response_object in response_objects:

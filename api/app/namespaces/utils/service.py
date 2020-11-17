@@ -9,7 +9,7 @@ from . import TransactionNotification, SellerFirmNotification
 from .interface import SellerFirmNotificationInterface
 
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity
+from werkzeug.exceptions import UnsupportedMediaType, RequestEntityTooLarge, UnprocessableEntity, InternalServerError
 from app.extensions import db
 
 from app.namespaces.business import Business
@@ -455,7 +455,7 @@ class InputService:
                 raise UnsupportedMediaType('Cannot read file {}.'.format(file_name))
 
         else:
-            raise  # !!! (not a file)
+            raise InternalServerError('Not a path: {}'.format(file_path))  # !!! (not a file)
 
 
     @staticmethod

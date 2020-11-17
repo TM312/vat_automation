@@ -89,33 +89,33 @@ services:
     #         - internal
     #         - web
 
-    # redis:
-    #     container_name: redis
-    #     build:
-    #         context: ./redis
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - REDIS_VERSION=${REDIS_VERSION}
-    #     ports:
-    #         - "6379:6379"
-    #     depends_on:
-    #         - helper
-    #     healthcheck:
-    #         test: ['CMD', 'redis-cli', 'ping']
-    #         interval: 30s
-    #         timeout: 15s
-    #         retries: 3
-    #     networks:
-    #         - web
-    #         - internal
-    #     sysctls:
-    #         - net.core.somaxconn=511
+    redis:
+        container_name: redis
+        build:
+            context: ./redis
+            dockerfile: Dockerfile
+            args:
+                - REDIS_VERSION=${REDIS_VERSION}
+        ports:
+            - "6379:6379"
+        depends_on:
+            - helper
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 30s
+            timeout: 15s
+            retries: 3
+        networks:
+            - web
+            - internal
+        sysctls:
+            - net.core.somaxconn=511
 
-    # helper:
-    #     container_name: helper
-    #     image: alpine
-    #     command: sh -c "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
-    #     privileged: true
+    helper:
+        container_name: helper
+        image: alpine
+        command: sh -c "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+        privileged: true
 
 
     # celery-worker:

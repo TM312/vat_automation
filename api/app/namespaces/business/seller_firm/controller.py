@@ -59,6 +59,7 @@ class SellerFirmIdResource(Resource):
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)
 
 
+
 @ns.route("/<string:seller_firm_public_id>/upload")
 class SellerFirmInformationResource(Resource):
     # decorators = [limiter.limit("10/second")]
@@ -67,6 +68,15 @@ class SellerFirmInformationResource(Resource):
         """Upload data for the indicated seller firm"""
         seller_firm_file: BinaryIO = request.files["file"]
         return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file)
+
+
+@ns.route('/sample')
+class SellerFirmIdResource(Resource):
+    @ns.marshal_with(seller_firm_dto, envelope='data')
+    def get(self) -> SellerFirm:
+        '''Get Bond Store Ltd'''
+        return SellerFirmService.get_by_name_establishment_country(seller_firm_name='Bond Store Ltd', establishment_country_code='GB')
+
 
 
 # @ns.route('/as_client')
