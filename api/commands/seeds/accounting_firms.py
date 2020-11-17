@@ -6,11 +6,6 @@ class AccountingFirmSeedService:
 
     @staticmethod
     def seed_accounting_firm():
-        # accounting_firm_gvc = AccountingFirm(
-        #     name = 'Global VAT Compliance',
-        #     address = 'Loire 192, 2491 AM Den Haag, Netherlands'
-        # )
-        # db.session.add(accounting_firm_gvc)
 
         accounting_firm_test = AccountingFirm(
             name='Test Accounting Firm',
@@ -23,19 +18,6 @@ class AccountingFirmSeedService:
 
     @staticmethod
     def append_tax_auditor_to_accounting_firm():
-        # gvc = AccountingFirm.query.filter_by(name='Global VAT Compliance').first()
-
-        # tax_auditor_gvc_main = TaxAuditor.query.filter_by(name = 'GVC Main').first()
-        # tax_auditor_gvc_1 = TaxAuditor.query.filter_by(name = 'GVC Tax Auditor 1').first()
-        # tax_auditor_gvc_2 = TaxAuditor.query.filter_by(name = 'GVC Tax Auditor 2').first()
-        # tax_auditor_gvc_3 = TaxAuditor.query.filter_by(name = 'GVC Tax Auditor 3').first()
-
-        # gvc_all = [
-        #     tax_auditor_gvc_main,
-        #     tax_auditor_gvc_1,
-        #     tax_auditor_gvc_2,
-        #     tax_auditor_gvc_3
-        # ]
 
         test = AccountingFirm.query.filter_by(name='Test Accounting Firm').first()
 

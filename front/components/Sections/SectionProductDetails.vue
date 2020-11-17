@@ -1,7 +1,7 @@
 <template>
   <section>
     <h6 class="text-primary">
-      Modern Platform for a Solid Infrastructure
+      Modern Platform For A Solid Infrastructure
     </h6>
     <h1>
       An extending suite of services

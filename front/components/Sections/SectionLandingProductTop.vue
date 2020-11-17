@@ -5,7 +5,7 @@
         <b-row cols="1" cols-md="2">
           <b-col>
             <b-jumbotron
-              header="Vat Compliance For Your E-commerce Business"
+              header="Vat Compliance For Your E-Commerce Business"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"
@@ -17,7 +17,7 @@
                 Our platform allows to keep track of sales and all relevant distance selling thresholds.
               </template>
 
-              <b-button pill variant="outline-primary" @mouseover="buttonHover = true" @mouseleave="buttonHover = false">
+              <b-button pill variant="outline-primary" to="/vat-compliance" @mouseover="buttonHover = true" @mouseleave="buttonHover = false">
                 Product Details
                 <b-icon :icon="buttonHover ? 'arrow-right' : 'chevron-right'" class="ml-1" />
               </b-button>

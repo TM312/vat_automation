@@ -51,10 +51,10 @@ class ExchangeRatesSeedService:
             date_string = exchange_rate_date.strftime('%Y-%m-%d')
 
             #below you find the worst code ever
-            while not date_string in df['Date'].values:
+            while date_string not in df['Date'].values:
                 calc_exchange_rate_date -=  timedelta(days=1)
                 date_string = calc_exchange_rate_date.strftime('%Y-%m-%d')
-                print('in loop', flush=True)
+                print('date: {} not in csv'.format(date_string), flush=True)
 
 
             row = df.loc[df['Date'] == date_string]

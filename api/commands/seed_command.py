@@ -33,7 +33,8 @@ from .seeds.exchange_rates import ExchangeRatesSeedService
 from .seeds.platforms import platforms, PlatformSeedService
 from .seeds.channels import channels
 from .seeds.accounting_firms import AccountingFirmSeedService
-from .seeds.users import AdminSeedService, TaxAuditorSeedService
+from .seeds.sample_seller_firm import SellerFirmSeedService, SampleFirmInformationSeedService
+from .seeds.users import AdminSeedService, TaxAuditorSeedService, SellerSeedService
 from .seeds.tags import tags
 
 countries = CountrySeedService.seed_countries()
@@ -96,10 +97,12 @@ class SeedCommand(Command):
 
             print('Seeding businesses...')
             AccountingFirmSeedService.seed_accounting_firm()
+            SellerFirmSeedService.seed_sample_seller_firm()
 
             print('Seeding users...')
             AdminSeedService.seed_admin()
             TaxAuditorSeedService.seed_tax_auditor()
+            SellerSeedService.seed_seller()
 
 
             print('Appending Transaction Types to Tax Treatments...')
@@ -111,19 +114,20 @@ class SeedCommand(Command):
             print('Appending Users to Businesses...')
             AccountingFirmSeedService.append_tax_auditor_to_accounting_firm()
             AdminSeedService.append_accounting_firm_to_admin()
+            SellerSeedService.append_seller_firm_to_seller()
 
             print('Appending Channels to Platforms...')
             PlatformSeedService.append_channels_to_platform()
 
             db.session.commit()
 
-            print('Creating Vat Rates...')
-            response_object_vat_rates = VatSeedService.seed_tax_rates()
-            response_objects.append(response_object_vat_rates)
+            # print('Creating Vat Rates...')
+            # response_object_vat_rates = VatSeedService.seed_tax_rates()
+            # response_objects.append(response_object_vat_rates)
 
-            print('Creating Exchange Rates...')
-            response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
-            response_objects.append(response_object_exchange_rates)
+            # print('Creating Exchange Rates...')
+            # response_object_exchange_rates = ExchangeRatesSeedService.create_historic_exchange_rates()
+            # response_objects.append(response_object_exchange_rates)
 
             print('Creating Vat Thresholds...')
             response_object_vat_thresholds = VatThresholdSeedService.seed_vat_thresholds()
@@ -132,6 +136,10 @@ class SeedCommand(Command):
             print('Creating Public Transaction Types...')
             response_object_transaction_types_public = TransactionTypePublicSeedService.seed_transaction_types_public()
             response_objects.append(response_object_transaction_types_public)
+
+            print('Preparing Sample Seller Firm Showcase...')
+            SampleFirmInformationSeedService.seed_sample_data_static()
+            # SampleFirmInformationSeedService.seed_sample_transaction_input_data()
 
 
             for response_object in response_objects:

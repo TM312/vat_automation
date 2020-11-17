@@ -18,6 +18,7 @@ class SellerFirm(Business):
     __mapper_args__ = {'polymorphic_identity': 'seller_firm'}
 
     claimed = db.Column(db.Boolean, default=False)
+    # establishment_country_code is nullable for seller firms but can not set it as nullable because of inheritance. Would require any kind of firm to provide establishment_country_code.
     establishment_country_code = db.Column(db.String(8), db.ForeignKey('country.code'))
 
 
