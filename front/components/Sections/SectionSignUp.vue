@@ -1,9 +1,10 @@
 <template>
   <section class="my-5">
     <h6 class="text-primary">
-      Get In Touch
+      Beam Me Up
+      <!-- Get In Touch -->
     </h6>
-    <h1>Coming in January 2021</h1>
+    <h1>Coming Soon</h1>
     <p class="lead my-2">
       Continuous feedback is the best way to build a product you love. Let's start a dialogue.
     </p>
@@ -15,8 +16,10 @@
         <b-tabs pills class="mt-3">
           <b-tab title="For Amazon Sellers" active>
             <div class="mt-3">
-              <p class="lead text-muted">
-                If you want to be among the first to learn about and experiment with new features, enter your email below.
+              <p class="text-muted">
+                If you want to be among the first to try upcoming features, enter your email below. Over the coming weeks we will start to open for selected sellers from this list.
+              </p>
+              <p class="text-muted">
                 We will use your email for updates about new features and gathering feedback only.
               </p>
               <form-landing-contact class="mt-2" />
@@ -24,7 +27,7 @@
           </b-tab>
           <b-tab title="For Potential Partners">
             <div class="mt-3">
-              <p class="lead text-muted">
+              <p class="text-muted">
                 If you are a tax consultant or service provider for
                 e-commerce sellers and interested in a collaboration?
                 Get in touch! We would love to hear from you.

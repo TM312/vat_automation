@@ -2,7 +2,9 @@
 
 from app.namespaces.user.admin import Admin
 from app.namespaces.user.tax_auditor import TaxAuditor
+from app.namespaces.user.seller import Seller
 from app.namespaces.business.accounting_firm import AccountingFirm
+from app.namespaces.business.seller_firm import SellerFirm
 
 from app.extensions import db
 
@@ -22,32 +24,14 @@ class AdminSeedService:
     @staticmethod
     def append_accounting_firm_to_admin():
         thomas = Admin.query.filter_by(name='Thomas M.').first()
-        # gvc = AccountingFirm.query.filter_by(name='Global VAT Compliance').first()
         testAF = AccountingFirm.query.filter_by(name='Test Accounting Firm').first()
 
-        # if not isinstance(gvc, AccountingFirm) or not isinstance(testAF, AccountingFirm) or not isinstance(thomas, Admin):
-        #     raise
-
-        # else:
-            # thomas.created_businesses.append(gvc)
         thomas.created_businesses.append(testAF)
 
 
 class TaxAuditorSeedService:
     @staticmethod
     def seed_tax_auditor():
-        # new_tax_auditor = TaxAuditor( name = 'GVC Main', email = 'gvc_main@mail.com', password = 'another_d3y_4NothR_p4$$w_ord', role = 'admin')
-        # db.session.add(new_tax_auditor)
-
-        # new_tax_auditor1 = TaxAuditor( name='GVC Tax Auditor 1', email='gvc_tax_auditor1@mail.com', password='another_d3y_4NothR_p4$$w_ord', role='tax_auditor')
-        # db.session.add(new_tax_auditor1)
-
-        # new_tax_auditor2 = TaxAuditor( name='GVC Tax Auditor 2', email='gvc_tax_auditor2@mail.com', password='another_d3y_4NothR_p4$$w_ord', role='tax_auditor')
-        # db.session.add(new_tax_auditor2)
-
-        # new_tax_auditor3 = TaxAuditor( name='GVC Tax Auditor 3', email='gvc_tax_auditor3@mail.com', password='another_d3y_4NothR_p4$$w_ord', role='tax_auditor')
-        # db.session.add(new_tax_auditor3)
-
         test_firm_auditor = TaxAuditor( name='Test User Main', email='test_ta_main@mail.com', password='another_d3y_4NothR_p4$$w_ord', role='admin')
         db.session.add(test_firm_auditor)
 
@@ -61,3 +45,24 @@ class TaxAuditorSeedService:
         db.session.add(test_firm_auditor_3)
 
         db.session.commit()
+
+
+class SellerSeedService:
+    @staticmethod
+    def seed_seller():
+        new_seller = Seller(
+            name='James B.',
+            email='james.b@mi6-mail.com',
+            password='ch_ch_ch_check',
+            role='007'
+        )
+        db.session.add(new_seller)
+        db.session.commit()
+
+    @staticmethod
+    def append_seller_firm_to_seller():
+        james = Seller.query.filter_by(name='James B.').first()
+        bond_store = SellerFirm.query.filter_by(
+            name='Bond Store Ltd').first()
+
+        james.created_businesses.append(bond_store)
