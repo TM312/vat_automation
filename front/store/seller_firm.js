@@ -108,6 +108,16 @@ export const actions = {
     }
   },
 
+  async get_sample({ commit }) {
+    const res = await this.$repositories.seller_firm.get_sample()
+    const { status, data } = res
+    if (status === 200 && data.data) {
+      commit('SET_SELLER_FIRM', data.data)
+    } else {
+      // Handle error here
+    }
+  },
+
   async create({ commit }, seller_firm_data) {
     const res = await this.$repositories.seller_firm.create(seller_firm_data)
     const { status, data } = res

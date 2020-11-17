@@ -18,6 +18,10 @@
           We believe sustainable, organic growth is the best way to build a lasting company.
 
           Previously, I was the co-founder of Drip. I host a weekly podcast called The Art of Product.
+
+          <hr />
+
+          sellerFirm: {{ sellerFirm }}
         </template>
       </b-jumbotron>
     </b-container>
@@ -94,10 +98,25 @@
 </template>
 
 <script>
-import FormLandingContact from '../components/Forms/FormLandingContact.vue'
+import { mapState } from 'vuex'
+
 export default {
-  components: { FormLandingContact },
   layout: "default",
+
+  async fetch() {
+    const { store } = this.$nuxt.context
+
+    if (this.sellerFirm.length === 0) {
+      await store.dispatch("seller_firm/get_sample")
+    }
+  },
+
+  computed: {
+    ...mapState({
+      sellerFirm: state => state.seller_firm.seller_firm
+    })
+  },
+
 }
 </script>
 

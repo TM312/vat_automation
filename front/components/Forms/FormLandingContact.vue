@@ -50,8 +50,8 @@ export default {
   methods: {
     subscribe() {
       this.$axios
-      this.form.email
-      this.form.feedback
+      //   this.form.email
+      //   this.form.feedback
 
       this.$axios({
         method: "GET",

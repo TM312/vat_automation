@@ -4,6 +4,10 @@ export default ($axios) => ({
     return $axios.get(`${resource}/`)
   },
 
+  get_sample() {
+    return $axios.get(`${resource}/sample`)
+  },
+
   create(payload) {
     return $axios.post(`${resource}/`, payload)
   },

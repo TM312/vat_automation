@@ -81,7 +81,7 @@ class Item(db.Model):  # type: ignore
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<Item: Seller_id: {} – SKU: {} – validity: {}-{}>'.format(self.seller_firm_id, self.sku, self.valid_from, self.valid_to)
+        return '<Item: Seller_id: {} – SKU: {}>'.format(self.seller_firm_id, self.sku)
 
 
 

@@ -36,11 +36,10 @@ class VatSeedService:
                 # counter += 1
                 tax_code = df_types.iloc[tax_code_row]['tax_code']
                 tax_rate_type_code = df_types.loc[df_types['tax_code'] == tax_code][country].iloc[0]
-                rate = df_rates.loc[df_rates['country_code'] == country].loc[df_rates['tax_rate_type_code'] == tax_rate_type_code].iloc[0]['rate']
+                rate = df_rates.loc[df_rates['country_code'] == country].loc[df_rates['tax_rate_type_code'] == tax_rate_type_code].iloc[0]['rate'] if not tax_rate_type_code == 'Z' else 0
 
                 vat_data = {
                     'valid_from': SERVICE_START_DATE,
-                    # 'valid_to': TAX_DEFAULT_VALIDITY,
                     'country_code': country,
                     'tax_code_code': tax_code,
                     'tax_rate_type_code': tax_rate_type_code,

@@ -3,6 +3,8 @@
 from app.namespaces.user.admin import Admin
 from app.namespaces.user.tax_auditor import TaxAuditor
 from app.namespaces.user.seller import Seller
+from app.namespaces.user.seller.service import SellerService
+
 from app.namespaces.business.accounting_firm import AccountingFirm
 from app.namespaces.business.seller_firm import SellerFirm
 
@@ -61,8 +63,8 @@ class SellerSeedService:
 
     @staticmethod
     def append_seller_firm_to_seller():
-        james = Seller.query.filter_by(name='James B.').first()
-        bond_store = SellerFirm.query.filter_by(
-            name='Bond Store Ltd').first()
+
+        james = SellerService.get_by_email('james.b@mi6-mail.com')
+        bond_store = SellerFirm.query.filter_by(name='Bond Store Ltd').first()
 
         james.created_businesses.append(bond_store)

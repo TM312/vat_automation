@@ -49,6 +49,7 @@ COPY wait-for-it.sh wait-for-it.sh
 WORKDIR /home
 #copy data
 COPY data data/
+COPY seeds seeds/
 
 WORKDIR /home/api
 

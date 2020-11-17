@@ -68,7 +68,7 @@ class ExchangeRatesSeedService:
                     'date': exchange_rate_date,
                     'base': 'EUR',
                     'target': currency_code,
-                    'rate': value
+                    'rate': round(value, 5)
                 }
                 print('exchange_rate_data: source: {} | date: {} | calc_date {} | base: {} | target: {} | rate: {}'.format(
                     exchange_rate_data['source'],
@@ -86,7 +86,7 @@ class ExchangeRatesSeedService:
                 # creating reverse rates
                 exchange_rate_data['base'] = currency_code
                 exchange_rate_data['target'] = 'EUR'
-                exchange_rate_data['rate'] = 1/value
+                exchange_rate_data['rate'] = round(1/value, 5)
 
                 ExchangeRateService.create(exchange_rate_data)
                 counter += 1
