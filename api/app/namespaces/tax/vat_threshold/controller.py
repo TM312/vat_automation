@@ -22,7 +22,7 @@ ns.add_model(vat_threshold_history_dto.name, vat_threshold_history_dto)
 @ns.route("/")
 class VatThresholdResource(Resource):
     """VatThresholds"""
-    @login_required
+    # @login_required
     @ns.marshal_list_with(vat_threshold_sub_dto, envelope='data')
     def get(self) -> List[VatThreshold]:
         """Get all VatThresholds"""

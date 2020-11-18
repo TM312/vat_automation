@@ -6,9 +6,8 @@
           {{ sellerFirm.name }}
         </b-col>
         <b-col cols="auto">
-          <button-follow-seller-firm :seller-firm="sellerFirm" />
           <b-button
-            v-if="$auth.user.role === 'admin'"
+            v-if="!!$auth.user && $auth.user.role === 'admin'"
             size="sm"
             variant="outline-danger"
             :disabled="buttonDisabled"

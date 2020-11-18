@@ -23,7 +23,7 @@ ns.add_model(eu_admin_dto.name, eu_admin_dto)
 @ns.route("/")
 class CountryResource(Resource):
     """Countrys"""
-    @login_required
+    # @login_required
     @ns.marshal_list_with(country_dto, envelope='data')
     @cache.cached(timeout=60)
     def get(self) -> List[Country]:

@@ -5,14 +5,17 @@ from flask import current_app
 from flask.wrappers import Response
 from flask_restx import Namespace, Resource
 
-from app.extensions import limiter
-
 from . import SellerFirm
 from . import seller_firm_dto, seller_firm_sub_dto, seller_firm_admin_dto
 from .service import SellerFirmService
 from .interface import SellerFirmInterface
 
 from app.namespaces.utils.decorators import login_required, accepted_u_types, confirmation_required, employer_required, accepted_roles
+
+from app.extensions import (
+    limiter,
+    cache
+)
 
 
 ns = Namespace("SellerFirm", description="Seller Firm Related Operations")  # noqa
@@ -71,8 +74,9 @@ class SellerFirmInformationResource(Resource):
 
 
 @ns.route('/sample')
-class SellerFirmIdResource(Resource):
+class SellerFirmSampleResource(Resource):
     @ns.marshal_with(seller_firm_dto, envelope='data')
+    # @cache.cached(timeout=60) #cannot be cached beause of relationships
     def get(self) -> SellerFirm:
         '''Get Bond Store Ltd'''
         return SellerFirmService.get_by_name_establishment_country(seller_firm_name='Bond Store Ltd', establishment_country_code='GB')

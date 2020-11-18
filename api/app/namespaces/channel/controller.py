@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask.wrappers import Response
 
 from . import Channel
-from . import channel_dto
+from . import channel_dto, channel_sub_dto
 from .service import ChannelService
 from .interface import ChannelInterface
 
@@ -13,13 +13,14 @@ from app.extensions import cache
 
 ns = Namespace("Channel", description="Channel Related Operations")  # noqa
 ns.add_model(channel_dto.name, channel_dto)
+ns.add_model(channel_sub_dto.name, channel_sub_dto)
 
 
 @ns.route("/")
 class ChannelResource(Resource):
     """Channels"""
-    @login_required
-    @ns.marshal_list_with(channel_dto, envelope='data')
+    # @login_required
+    @ns.marshal_list_with(channel_sub_dto, envelope='data')
     @cache.cached(timeout=60)
     def get(self) -> List[Channel]:
         """Get all Channels"""

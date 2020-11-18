@@ -1,5 +1,5 @@
 from .model import Channel
-from .schema import channel_dto
+from .schema import channel_dto, channel_sub_dto
 
 
 BASE_ROUTE = "channel"

@@ -21,52 +21,21 @@
 
           <hr />
 
-          sellerFirm: {{ sellerFirm }}
+          <h2>sellerFirm fetched? {{ !!sellerFirm }}</h2>
         </template>
       </b-jumbotron>
     </b-container>
 
+    <b-container v-if="!$fetchState.pending">
+      <section-vat-compliance-data-upload v-if="!$fetchState.pending" class="py-5" />
+
+      <section-vat-compliance-company-information v-if="!$fetchState.pending" class="py-5" />
+    </b-container>
+    <b-container v-if="!$fetchState.pending" fluid>
+      <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" class="py-5" />
+    </b-container>
     <b-container>
-      <section id="data-upload" class="py-5">
-        <b-row>
-          <b-col cols="6" lg="4">
-            <b-img fluid src="@/assets/img/placeholders/product.png" />
-          </b-col>
-          <b-col cols="6" lg="8">
-            <p class="lead text-dark">
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-            </p>
-          </b-col>
-        </b-row>
-      </section>
-
-      <section id="company-information" class="py-5">
-        <b-row>
-          <b-col cols="6" lg="8">
-            <p class="lead text-dark">
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-            </p>
-          </b-col>
-          <b-col cols="6" lg="4">
-            <b-img fluid src="@/assets/img/placeholders/product.png" />
-          </b-col>
-        </b-row>
-      </section>
-
-      <section id="transactions-overview" class="py-5">
-        <b-row>
-          <b-col cols="6" lg="4">
-            <b-img fluid src="@/assets/img/placeholders/product.png" />
-          </b-col>
-          <b-col cols="6" lg="8">
-            <p class="lead text-dark">
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-            </p>
-          </b-col>
-        </b-row>
-      </section>
-
-      <section id="tax-record-information" class="py-5">
+      <section id="vat-compliance-tax-record-information" class="py-5">
         <b-row>
           <b-col cols="6" lg="8">
             <p class="lead text-dark">
@@ -80,7 +49,7 @@
       </section>
 
       <section
-        id="sign-up"
+        id="vat-compliance-sign-up"
         style="max-width: 45rem"
         class="my-5"
         background="light"
@@ -109,11 +78,49 @@ export default {
     if (this.sellerFirm.length === 0) {
       await store.dispatch("seller_firm/get_sample")
     }
+
+    if (this.countries.length === 0) {
+      await store.dispatch("country/get_all")
+    }
+
+    if (this.currencies.length === 0) {
+      await store.dispatch("currency/get_all")
+    }
+
+    if (this.taxTreatments.length === 0) {
+      await store.dispatch("tax_treatment/get_all")
+    }
+
+    if (this.taxRateTypes.length === 0) {
+      await store.dispatch("tax_rate_type/get_all")
+    }
+
+    if (this.channels.length === 0) {
+      await store.dispatch("channel/get_all")
+    }
+
+    if (this.vatThresholds.length === 0) {
+      await store.dispatch("vat_threshold/get_all")
+    }
+
+    if (this.transactionInputs.length === 0) {
+      await store.dispatch("transaction_input/get_sample")
+    }
+
+
   },
 
   computed: {
     ...mapState({
-      sellerFirm: state => state.seller_firm.seller_firm
+      sellerFirm: state => state.seller_firm.seller_firm,
+      channels: state => state.channel.channels,
+      countries: state => state.country.countries,
+      currencies: state => state.currency.currencies,
+      taxTreatments: state => state.tax_treatment.tax_treatments,
+      taxRateTypes: state => state.tax_rate_type.tax_rate_types,
+      vatThresholds: state => state.vat_threshold.vat_thresholds,
+      transactionInputs: state => state.transaction_input.transaction_inputs
+
     })
   },
 

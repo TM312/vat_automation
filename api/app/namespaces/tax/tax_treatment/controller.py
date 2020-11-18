@@ -19,7 +19,7 @@ ns.add_model(tax_treatment_dto.name, tax_treatment_dto)
 @ns.route("/")
 class TaxTreatmentResource(Resource):
     """TaxTreatments"""
-    @login_required
+    # @login_required
     @ns.marshal_list_with(tax_treatment_dto, envelope='data')
     @cache.cached(timeout=60)
     def get(self) -> List[TaxTreatment]:

@@ -10,7 +10,7 @@
             </b-badge>
           </div>
         </b-col>
-        <b-col cols="auto">
+        <b-col v-if="!showcase" cols="auto">
           <b-form-checkbox v-model="editMode" name="check-button" switch />
         </b-col>
       </b-row>
@@ -73,7 +73,7 @@
           </b-table>
         </div>
 
-        <div v-else>
+        <div v-else-if="editMode && !showcase">
           <b-tabs content-class="mt-3">
             <b-tab title="Create" active>
               <lazy-form-add-seller-firm-distance-sale @flash="flashCount" />
@@ -94,6 +94,14 @@ import { mapState } from "vuex"
 
 export default {
   name: "CardDistanceSales",
+
+  props: {
+    showcase: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
 
   data() {
     return {

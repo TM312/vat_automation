@@ -4,6 +4,10 @@ export default ($axios) => ({
     return $axios.get(`${resource}/`)
   },
 
+  get_sample() {
+    return $axios.get(`${resource}/sample`)
+  },
+
   get_by_public_id(transaction_input_public_id) {
     return $axios.get(`${resource}/${transaction_input_public_id}`)
   },
@@ -17,7 +21,7 @@ export default ($axios) => ({
   },
 
   get_by_seller_firm_public_id(params) {
-    return $axios.get(`${resource}/seller_firm/`, {params})
+    return $axios.get(`${resource}/seller_firm/`, { params })
   },
 
   update_by_public_id(transaction_input_public_id, payload) {

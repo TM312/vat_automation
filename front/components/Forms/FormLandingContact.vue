@@ -2,7 +2,7 @@
   <div>
     <b-form-input v-model="form.email" placeholder="Your Email" />
     <b-form-textarea
-      v-if="this.feedbackOn"
+      v-if="feedbackOn"
       id="feedback"
       v-model="form.feedback"
       placeholder="Is there any feature that would make our service more useful for you? Just let us know here."

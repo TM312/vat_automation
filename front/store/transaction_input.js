@@ -85,6 +85,16 @@ export const actions = {
     }
   },
 
+  async get_sample({ commit }) {
+    const res = await this.$repositories.transaction_input.get_sample()
+    const { status, data } = res
+    if (status === 200 && data.data) {
+      commit('SET_TRANSACTION_INPUTS', data.data)
+    } else {
+      // Handle error here
+    }
+  },
+
 
   async delete_all({ commit }) {
     const res = await this.$repositories.transaction_input.delete_all()
