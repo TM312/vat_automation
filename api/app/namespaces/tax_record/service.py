@@ -33,6 +33,13 @@ class TaxRecordService:
         return TaxRecord.query.filter_by(public_id=tax_record_public_id).first()
 
     @staticmethod
+    def create_for_bond_store_ltd(seller_firm_public_id: str, parameters: List) -> TaxRecord:
+        from app.namespaces.user.seller.service import SellerService
+        james = SellerService.get_by_email('james.b@mi6-mail.com')
+        return TaxRecordService.create_by_seller_firm_public_id(seller_firm_public_id, james.id, tax_record_data_raw=parameters)
+
+
+    @staticmethod
     def get_by_seller_firm_tax_jurisdiction_validity(seller_firm_id: int, tax_jurisdiction_code: str, start_date: date, end_date: date) -> TaxRecord:
         return TaxRecord.query.filter(
             TaxRecord.seller_firm_id == seller_firm_id,
@@ -401,9 +408,9 @@ class TaxRecordService:
 
         tax_record = TaxRecordService.get_by_seller_firm_tax_jurisdiction_validity(seller_firm.id, tax_jurisdiction.code, start_date, end_date)
         if isinstance(tax_record, TaxRecord):
-            message = 'A tax record for this period and tax jurisdiction already exists.'
+            message = 'Success'
             SocketService.emit_status_info(object_type, message)
-            return False
+            return tax_record
 
         sales, refunds, acquisitions, movements = TransactionExportService.separate_transactions_by_type(transactions)
 

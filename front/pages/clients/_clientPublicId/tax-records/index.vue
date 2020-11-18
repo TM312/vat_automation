@@ -1,51 +1,18 @@
 <template>
   <div>
-    <div v-if="taxRecordOverview">
-      <b-tabs content-class="mt-3">
-        <b-tab title="Overview" active>
-          <div v-if="$fetchState.pending">
-            <b-row class="mb-3" cols="1" cols-md="2" cols-xl="4">
-              <b-col v-for="i in 20" :key="i" class="mb-2">
-                <card-tax-record-short-skeleton />
-              </b-col>
-            </b-row>
-          </div>
-          <div v-else>
-            <div v-if="taxRecords.length === 0">
-              <b-card>
-                <b-card-text>
-                  <h5 class="text-muted text-center m-5">
-                    No Tax Records Created Yet
-                  </h5>
-                </b-card-text>
-              </b-card>
-            </div>
-            <div v-else>
-              <b-row
-                class="mb-3"
-                cols="1"
-                cols-md="2"
-                cols-xl="4"
-              >
-                <b-col
-                  v-for="(taxRecord, i) in taxRecords"
-                  :key="i"
-                  class="mb-2"
-                >
-                  <card-tax-record-short
-                    :tax-record="taxRecord"
-                    :client-public-id="sellerFirm.public_id"
-                  />
-                </b-col>
-              </b-row>
-            </div>
-          </div>
-        </b-tab>
-        <b-tab title="Create New">
-          <lazy-form-add-seller-firm-tax-record />
-        </b-tab>
-      </b-tabs>
-    </div>
+    <b-tabs content-class="mt-3">
+      <b-tab title="Overview" active>
+        <div v-if="$fetchState.pending">
+          <view-tax-records-skeleton />
+        </div>
+        <div v-else>
+          <view-tax-records :seller-firm="sellerFirm" :tax-records="taxRecords" />
+        </div>
+      </b-tab>
+      <b-tab title="Create New">
+        <lazy-form-add-seller-firm-tax-record />
+      </b-tab>
+    </b-tabs>
   </div>
 </template>
 
@@ -68,7 +35,6 @@ export default {
   data() {
     return {
       taxRecordPublicId: "",
-      taxRecordOverview: true,
     }
   },
 

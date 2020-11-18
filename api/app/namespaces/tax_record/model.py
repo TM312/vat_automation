@@ -16,9 +16,9 @@ class TaxRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(UUID(as_uuid=True), unique=True, default=uuid4)
     created_on = db.Column(db.Date, default=datetime.utcnow)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    filename = db.Column(db.String(128), nullable=False)
+    filename = db.Column(db.String(128))
 
     # downloaded_by_users = db.relationship('User', secondary=tax_record_user_AT, back_populates='downloaded_tax_records')
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)

@@ -9,6 +9,21 @@ export const mutations = {
     state.tax_records.push(payload)
   },
 
+  // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
+  UPDATE_IN_LIST(state, tax_record) {
+    var index = state.tax_records.findIndex(el => (el.code === tax_record.code))
+    if (index === -1) {
+      state.tax_records.push(tax_record)
+
+    } else {
+      state.tax_records = [
+        ...state.tax_records.slice(0, index),
+        tax_record,
+        ...state.tax_records.slice(index + 1)
+      ]
+    }
+  },
+
   SET_TAX_RECORDS(state, payload) {
     state.tax_records = payload
   },
@@ -52,6 +67,18 @@ export const actions = {
     const { status, data } = res
     if (status === 200 && data.data) {
       commit('SET_TAX_RECORD', data.data)
+    } else {
+      // Handle error here
+    }
+  },
+
+  async get_or_create({ commit }, payload) {
+    const seller_firm_public_id = payload.shift()
+    const parameters = payload[0]
+    const res = await this.$repositories.tax_record.get_or_create(seller_firm_public_id, parameters)
+    const { status, data } = res
+    if (status === 200 && data.data) {
+      commit('UPDATE_IN_LIST', data.data)
     } else {
       // Handle error here
     }

@@ -19,11 +19,13 @@
     </template>
 
     <template v-slot:cell(processed)="data" class="align-center">
-      <b-icon
-        v-if="data.value"
-        icon="check-circle"
-        variant="success"
-      />
+      <span v-if="data.value">
+        <b-icon
+          v-b-popover.hover.top="'This transaction was successfully processed.'"
+          icon="check-circle"
+          variant="success"
+        />
+      </span>
       <span v-else><button-validate-transaction-input
         :transaction-input-public-id="data.item.public_id"
       /></span>
