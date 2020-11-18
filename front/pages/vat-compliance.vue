@@ -3,6 +3,10 @@
     <b-container class="py-5">
       <b-jumbotron bg-variant="transparent" text-variant="dark" header="Building with Sellers' in Mind">
         <template #lead class="text-secondary mt-5">
+          <h4 class="text-info">
+            Explore The Interactive Demo
+          </h4>
+
           Tax-Automation is a technology company that that builds economic infrastructure for the internet.
           Businesses of every size—from new startups to public
           companies—use our software to accept payments and manage their businesses online.
@@ -31,22 +35,13 @@
 
       <section-vat-compliance-company-information v-if="!$fetchState.pending" class="py-5" />
     </b-container>
+
     <b-container v-if="!$fetchState.pending" fluid>
       <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" class="py-5" />
     </b-container>
+
     <b-container>
-      <section id="vat-compliance-tax-record-information" class="py-5">
-        <b-row>
-          <b-col cols="6" lg="8">
-            <p class="lead text-dark">
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-            </p>
-          </b-col>
-          <b-col cols="6" lg="4">
-            <b-img fluid src="@/assets/img/placeholders/product.png" />
-          </b-col>
-        </b-row>
-      </section>
+      <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
 
       <section
         id="vat-compliance-sign-up"

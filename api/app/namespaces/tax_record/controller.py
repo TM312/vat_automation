@@ -75,3 +75,13 @@ class TaxRecordSellerFirmResource(Resource):
         async_create_tax_record_by_seller_firm_public_id.apply_async(
             args=[seller_firm_public_id, user_id, tax_record_data_raw]
             )
+
+
+@ns.route("/seller_firm/<string:seller_firm_public_id>/by_parameters")
+class TaxRecordSampleSellerFirmResource(Resource):
+    @ns.marshal_with(tax_record_dto, envelope='data')
+    def post(self, seller_firm_public_id: str) -> TaxRecord:
+        """Get Tax Records of Sample Bond Store Ltd """
+        parameters: TaxRecordInterface = request.json
+        if seller_firm_public_id == 'bond-store-ltd':
+            return TaxRecordService.create_for_bond_store_ltd(seller_firm_public_id, parameters)

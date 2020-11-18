@@ -9,7 +9,7 @@
       provided templates. You receive live updates if everything worked.
       Your company information is updated on the fly.
     </p>
-    <b-tabs pills class="my-3">
+    <b-tabs pills>
       <b-tab title="Company" active class="py-3">
         <p class="text-dark">
           Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
@@ -56,6 +56,3 @@ export default {
   name: "SectionVatComplianceCompanyInformation",
 }
 </script>
-
-<style>
-</style>

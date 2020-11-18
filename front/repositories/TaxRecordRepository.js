@@ -16,6 +16,10 @@ export default ($axios) => ({
     return $axios.get(`${resource}/seller_firm/${seller_firm_public_id}`)
   },
 
+  get_or_create(seller_firm_public_id, payload) {
+    return $axios.post(`${resource}/seller_firm/${seller_firm_public_id}/by_parameters`, payload)
+  },
+
   create_by_seller_firm_public_id(seller_firm_public_id, payload) {
     return $axios.post(`${resource}/seller_firm/${seller_firm_public_id}`, payload)
   }
