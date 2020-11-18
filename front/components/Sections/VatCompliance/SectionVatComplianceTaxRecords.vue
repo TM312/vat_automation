@@ -22,6 +22,11 @@
         />
       </b-tab>
     </b-tabs>
+    <b-collapse id="collapse-tax-record-tables" class="py-3 mt-2">
+      <b-card id="neuphormism">
+        <container-tax-record-tables />
+      </b-card>
+    </b-collapse>
   </section>
 </template>
 
@@ -44,3 +49,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+    #neuphormism {
+        border-radius: 5px;
+        box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
+    }
+</style>
