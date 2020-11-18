@@ -18,7 +18,7 @@ ns.add_model(currency_dto.name, currency_dto)
 @ns.route("/")
 class CurrencyResource(Resource):
     """Currencies"""
-    @login_required
+    # @login_required
     @ns.marshal_list_with(currency_dto, envelope='data')
     @cache.cached(timeout=60)
     def get(self) -> List[Currency]:

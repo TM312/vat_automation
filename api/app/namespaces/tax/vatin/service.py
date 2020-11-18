@@ -583,8 +583,8 @@ class VATINService:
         )
 
         if not country["validator"].match("{}{}".format(country_code, number)):
-            msg = "{} does not match the country's VAT ID specifications.".format(
-                country_code)
+            msg = "{} {} does not match the country's VAT ID specifications.".format(
+                country_code, number)
             raise HTTPException(msg)
 
 

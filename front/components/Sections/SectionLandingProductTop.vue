@@ -5,7 +5,7 @@
         <b-row cols="1" cols-md="2">
           <b-col>
             <b-jumbotron
-              header="Vat Compliance For Your E-Commerce Business"
+              header="Vat Compliance For Your Amazon Business"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"
@@ -14,7 +14,7 @@
               <template #lead style="max-width: 40rem" class="mt-5">
                 Tax-Automation provides Amazon sellers with the tools to meet their vat requirements across Europe.
                 We assist with the vat registration and preliminary turnover tax returns.
-                Our platform allows to keep track of sales and all relevant distance selling thresholds.
+                Our advanced platform allows to keep track of sales and all relevant distance selling thresholds.
               </template>
 
               <b-button pill variant="outline-primary" to="/vat-compliance" @mouseover="buttonHover = true" @mouseleave="buttonHover = false">

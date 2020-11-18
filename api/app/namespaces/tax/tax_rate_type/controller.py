@@ -21,7 +21,7 @@ ns.add_model(tax_rate_type_sub_dto.name, tax_rate_type_sub_dto)
 @ns.route("/")
 class TaxRateTypeResource(Resource):
     """TaxRateTypes"""
-    @login_required
+    # @login_required
     @ns.marshal_list_with(tax_rate_type_sub_dto, envelope='data')
     @cache.cached(timeout=60)
     def get(self) -> List[TaxRateType]:

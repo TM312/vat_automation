@@ -4,7 +4,10 @@ from flask import request
 from flask_restx import Namespace, Resource, reqparse
 from flask.wrappers import Response
 
-from app.extensions import limiter
+from app.extensions import (
+    limiter,
+    cache
+)
 
 from . import transaction_input_dto, transaction_input_sub_dto, transaction_input_admin_dto
 from . import TransactionInput
@@ -40,6 +43,15 @@ class TransactionInputResource(Resource):
         from flask import jsonify
 
         return TransactionInputService.delete_all()
+
+
+@ns.route('/sample')
+class TransactionInputSampleResource(Resource):
+    @ns.marshal_with(transaction_input_dto, envelope='data')
+    def get(self) -> List[TransactionInput]:
+        '''Get Bond Store Ltd Transaction Inputs'''
+        return TransactionInputService.get_all_by_seller_firm_public_id('bond-store-ltd')
+
 
 
 @ns.route("/<string:transaction_input_public_id>")

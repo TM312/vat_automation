@@ -95,6 +95,25 @@ class SampleFirmInformationSeedService:
 class VATINSeedService:
 
     @staticmethod
+    def seed_bond_transaction_vatins():
+        valid_from = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
+        vatin_data_list = [
+            {
+                'valid_from': valid_from,
+                'request_date': date.today(),
+                'country_code': 'AT',
+                'number': 'U58004634',
+                'valid': True,
+                'name': 'Theaterservice Graz GmbH',
+                'address': 'Kaiser-Josef-Platz 10, AT-8010 Graz'
+            }
+        ]
+
+        for vatin_data in vatin_data_list:
+            VATINService.create(vatin_data)
+
+
+    @staticmethod
     def seed_bond_vatins(seller_firm_id):
         valid_from = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
         vatin_data_list = [

@@ -14,7 +14,7 @@ vat_threshold_history_dto = Model('vat_threshold_history', {
 vat_threshold_sub_dto = Model('vat_threshold_sub', {
     'public_id': fields.String(readonly=True),
 
-    #attribuitess
+    #attributes
     'country_code': fields.String,
     'value': fields.String,
     'currency_code': fields.String

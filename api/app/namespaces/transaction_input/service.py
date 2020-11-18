@@ -56,7 +56,14 @@ class TransactionInputService:
 
     @staticmethod
     def get_all_by_seller_firm_id(seller_firm_id: int) -> List[TransactionInput]:
-        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).limit(100).all()
+        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).all()
+
+    @staticmethod
+    def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TransactionInput]:
+        from app.namespaces.business.seller_firm.service import SellerFirmService
+        seller_firm_id = SellerFirmService.get_by_public_id(seller_firm_public_id).id
+        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).all()
+
 
     @staticmethod
     def get_by_seller_firm_public_id(seller_firm_public_id: str, **kwargs) -> List[TransactionInput]:

@@ -33,7 +33,7 @@ from .seeds.exchange_rates import ExchangeRatesSeedService
 from .seeds.platforms import platforms, PlatformSeedService
 from .seeds.channels import channels
 from .seeds.accounting_firms import AccountingFirmSeedService
-from .seeds.sample_seller_firm import SellerFirmSeedService, SampleFirmInformationSeedService
+from .seeds.sample_seller_firm import SellerFirmSeedService, SampleFirmInformationSeedService, VATINSeedService
 from .seeds.users import AdminSeedService, TaxAuditorSeedService, SellerSeedService
 from .seeds.tags import tags
 
@@ -143,6 +143,8 @@ class SeedCommand(Command):
             SellerSeedService.append_seller_firm_to_seller()
             print('...Seller Firm Static Data')
             SampleFirmInformationSeedService.seed_sample_data_static()
+            print('...arrival vat numbers')
+            VATINSeedService.seed_bond_transaction_vatins()
             print('...Seller Firm Transaction Data')
             SampleFirmInformationSeedService.seed_sample_transaction_input_data()
 
