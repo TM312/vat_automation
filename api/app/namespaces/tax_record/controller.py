@@ -21,6 +21,7 @@ ns.add_model(tax_record_sub_dto.name, tax_record_sub_dto)
 @ns.route("/")
 class TaxRecordResource(Resource):
     """TaxRecords"""
+    @login_required
     @accepted_u_types('admin')
     @ns.marshal_list_with(tax_record_dto, envelope='data')
     def get(self) -> List[TaxRecord]:
@@ -41,8 +42,8 @@ class TaxRecordResource(Resource):
 
 @ns.route("/<string:tax_record_public_id>")
 class TaxRecordResource(Resource):
-    @login_required
-    @employer_required
+    # @login_required
+    # @employer_required
     @ns.marshal_with(tax_record_dto, envelope='data')
     def get(self, tax_record_public_id):
         return TaxRecordService.get_by_public_id(tax_record_public_id)

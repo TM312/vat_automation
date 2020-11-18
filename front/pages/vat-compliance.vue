@@ -53,7 +53,7 @@
           <h6 class="text-primary">
             Let's Get In Touch
           </h6>
-          <h3>Help us building a product you love.</h3>
+          <h3>Help us building a product you <mark class="red">love</mark>.</h3>
           <form-landing-contact class="my-3" feedback-on />
         </b-container>
       </section>
@@ -123,4 +123,8 @@ export default {
 </script>
 
 <style>
+mark.red {
+    color:#ff0000;
+    background: none;
+}
 </style>

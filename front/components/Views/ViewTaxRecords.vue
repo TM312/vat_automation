@@ -19,6 +19,7 @@
           <card-tax-record-short
             :tax-record="taxRecord"
             :client-public-id="sellerFirm.public_id"
+            :showcase="showcase"
           />
         </b-col>
       </b-row>
@@ -40,7 +41,8 @@ export default {
     },
     showcase: {
       type: Boolean,
-      required: false
+      required: false,
+      default: false
     }
 
   }
