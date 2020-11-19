@@ -8,14 +8,14 @@
     class="mt-3"
   >
     <template v-slot:cell(transaction_type_public_code)="data">
-      <nuxt-link
-        v-if="data.item.public_id != $route.params.public_id"
-        :to="`/clients/${clientPublicId}/transactions/${data.item.public_id}`"
-        exact
+      <b-button
+        size="sm"
+        pill
+        variant="link"
+        @click="fetchTransactionInput(data.item.public_id)"
       >
         {{ data.value }}
-      </nuxt-link>
-      <span v-else>{{ data.value }}</span>
+      </b-button>
     </template>
 
     <template v-slot:cell(processed)="data" class="align-center">
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: "TableTransactionInputs",
@@ -153,6 +154,25 @@ export default {
         },
       ],
     }
+  },
+
+  computed: {
+    ...mapState({
+      transactionInput: state => state.transaction_input.transaction_input
+    })
+  },
+
+  methods: {
+    async fetchTransactionInput(transactionInputPublicId) {
+      this.$root.$emit(
+        "bv::toggle::collapse",
+        "collapse-transaction-input"
+      )
+      if (Object.keys(this.transactionInput).length === 0 || this.transactionInput.public_id !== transactionInputPublicId) {
+        const { store } = this.$nuxt.context
+        await store.dispatch("transaction_input/get_by_public_id", transactionInputPublicId)
+      }
+    },
   }
 }
 </script>

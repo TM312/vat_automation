@@ -341,6 +341,7 @@
     </b-form-group>
 
     <b-button
+      v-show="parameters.tax_jurisdiction_code != null"
       variant="primary"
       block
       :disabled="
@@ -632,6 +633,7 @@ export default {
             payload
           )
           this.makeToastSuccess()
+          this.reset()
         } catch (error) {
           this.makeToastError(error)
         }
@@ -642,6 +644,7 @@ export default {
             this.parameters
           )
           this.makeToastSuccess()
+          this.reset()
         } catch (error) {
           this.makeToastError(error)
         }

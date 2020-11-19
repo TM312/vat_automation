@@ -8,22 +8,30 @@
     class="mt-3"
   >
     <template v-slot:cell(transaction_type_public_code)="data">
-      <nuxt-link
-        v-if="data.item.public_id != $route.params.public_id"
-        :to="`/clients/${clientPublicId}/transactions/${data.item.public_id}`"
-        exact
+      <div v-if="!showcase">
+        <nuxt-link
+          v-if="data.item.public_id != $route.params.public_id"
+          :to="`/clients/${clientPublicId}/transactions/${data.item.public_id}`"
+          exact
+        >
+          {{ data.value }}
+        </nuxt-link>
+        <span v-else>{{ data.value }}</span>
+      </div>
+
+      <b-button
+        v-else
+        size="sm"
+        pill
+        variant="outline-primary"
+        @click="fetchTransactionInput(data.item.public_id)"
       >
         {{ data.value }}
-      </nuxt-link>
-      <span v-else>{{ data.value }}</span>
+      </b-button>
     </template>
 
     <template v-slot:cell(processed)="data" class="align-center">
-      <b-icon
-        v-if="data.value"
-        icon="check-circle"
-        variant="success"
-      />
+      <b-icon v-if="data.value" icon="check-circle" variant="success" />
       <span v-else><button-validate-transaction-input
         :transaction-input-public-id="data.item.public_id"
       /></span>
@@ -72,6 +80,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: "TableTransactionInputs",
@@ -89,18 +98,23 @@ export default {
 
     perPage: {
       type: Number,
-      required: true
+      required: true,
     },
 
     currentPage: {
       type: Number,
-      required: true
+      required: true,
+    },
+
+    showcase: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
 
   data() {
     return {
-
       fieldsBundle: [
         {
           key: "complete_date",
@@ -154,7 +168,26 @@ export default {
         },
       ],
     }
-  }
+  },
+
+  computed: {
+    ...mapState({
+      transactionInput: state => state.transaction_input.transaction_input
+    })
+  },
+
+  methods: {
+    async fetchTransactionInput(transactionInputPublicId) {
+      this.$root.$emit(
+        "bv::toggle::collapse",
+        "collapse-transaction-input"
+      )
+      if (Object.keys(this.transactionInput).length === 0 || this.transactionInput.public_id !== transactionInputPublicId) {
+        const { store } = this.$nuxt.context
+        await store.dispatch("transaction_input/get_by_public_id", transactionInputPublicId)
+      }
+    },
+  },
 }
 </script>
 

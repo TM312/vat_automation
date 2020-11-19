@@ -15,7 +15,6 @@
         </b-col>
         <b-col cols="auto" class="mr-auto">
           <span>
-            <!-- <b>Set Filter:</b> -->
             <b-button-group class="ml-1">
               <b-button
                 variant="outline-success"
@@ -93,8 +92,7 @@ export default {
   computed: {
     ...mapState({
       sellerFirm: (state) => state.seller_firm.seller_firm,
-      transactionInputsFull: (state) =>
-        state.transaction_input.transaction_inputs,
+      transactionInputsFull: (state) => state.transaction_input.transaction_inputs,
     }),
 
     transactionInputs() {
@@ -137,7 +135,7 @@ export default {
       const { store } = this.$nuxt.context
       const params = {
         seller_firm_public_id: this.sellerFirm.public_id,
-        page: this.currentPage + 1,
+        page: this.currentPage/2 + 1,
       }
       await store.dispatch(
         "transaction_input/get_by_seller_firm_public_id",

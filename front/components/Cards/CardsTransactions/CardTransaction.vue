@@ -2,11 +2,11 @@
   <div>
     <alert-transaction-meta v-if="transaction.modified_at" class="mb-3" :transaction="transaction" />
     <b-row>
-      <b-col cols="12" lg="6" xl="4">
+      <b-col cols="12" xl="4">
         <card-transaction-base-data :transaction="transaction" />
 
 
-        <div class="mt-5">
+        <div class="py-5">
           <b-card
             v-if="transaction.tax_treatment_code === 'INTRA_COMMUNITY_ACQUISITION' ||
               transaction.tax_treatment_code === 'LOCAL_ACQUISITION'"
@@ -144,7 +144,7 @@
           </b-card>
         </div>
       </b-col>
-      <b-col cols="12" lg="6" xl="8">
+      <b-col cols="12" xl="8">
         <card-transaction-prices :transaction="transaction" />
       </b-col>
     </b-row>

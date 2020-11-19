@@ -1,6 +1,6 @@
 <template>
   <section id="vat-compliance-data-upload">
-    <div>
+    <div class="text-right">
       <h6 class="text-primary">
         Step 1
         <!-- Get In Touch -->
