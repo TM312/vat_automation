@@ -18,6 +18,9 @@
               <nuxt-link to="/about">
                 About
               </nuxt-link><br />
+              <nuxt-link to="/pricing">
+                Pricing
+              </nuxt-link><br />
               <nuxt-link to="/contact">
                 Contact
               </nuxt-link><br />
