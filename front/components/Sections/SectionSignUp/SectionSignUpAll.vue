@@ -46,6 +46,6 @@
 
 <script>
 export default {
-  name: "SectionSignUp",
+  name: "SectionSignUpAll",
 }
 </script>

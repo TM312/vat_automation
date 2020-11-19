@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-row cols="1" cols-lg="2" cols-xl="4" class="my-2">
+    <b-row cols="1" cols-lg="2" :cols-xl="showcase ? 2 : 4" class="my-2">
       <b-col class="my-2 px-2">
         <b-card title="File" class="h-100">
           <b-table-lite borderless small :items="itemsFile" :fields="fieldsBase" class="mb-4">
@@ -51,7 +51,7 @@
       </b-col>
     </b-row>
 
-    <b-row cols="1" cols-lg="2" cols-xl="3" class="my-2">
+    <b-row cols="1" cols-lg="2" :cols-xl="showcase ? 2 : 3" class="my-2">
       <b-col class="my-2 px-2">
         <b-card title="Item" class="h-100">
           <b-table-lite borderless small :items="itemsItem" :fields="fieldsBase" class="mb-4">
@@ -60,12 +60,6 @@
               <span v-else><text-icon-na /></span>
             </template>
           </b-table-lite>
-        </b-card>
-      </b-col>
-
-      <b-col class="my-2 px-2">
-        <b-card title="Gross Prices" class="h-100">
-          <b-table hover borderless :items="itemsGrossPrices" :fields="fieldsGrossPrices" />
         </b-card>
       </b-col>
 
@@ -97,6 +91,12 @@
           </b-table-lite>
         </b-card>
       </b-col>
+
+      <b-col class="my-2 px-2">
+        <b-card title="Gross Prices" class="h-100">
+          <b-table hover borderless :items="itemsGrossPrices" :fields="fieldsGrossPrices" />
+        </b-card>
+      </b-col>
     </b-row>
   </div>
 </template>
@@ -105,6 +105,14 @@
 import { mapState } from 'vuex'
 export default {
   name:'CardTransactionInput',
+
+  props: {
+    showcase: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
 
   computed: {
     ...mapState({

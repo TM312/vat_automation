@@ -1,9 +1,10 @@
 <template>
-  <b-row cols="2" cols-md="3" cols-lg="4">
+  <b-row cols="2" :cols-xl="showcase ? 3 : 4">
     <!-- <h1>orderedBundle: {{ orderedBundle }}</h1> -->
     <b-col
       v-for="(transactionInput, index) in transactionInputsBundle"
       :key="transactionInput.public_id"
+      class="py-3"
     >
       <b-card
         :border-variant="borderVariant(transactionInput.public_id)"
@@ -16,13 +17,20 @@
             </b-col>
             <b-col cols="auto" class="ml-auto">
               <b-button
-                v-if="
-                  transactionInputPublicId !==
-                    transactionInput.public_id
-                "
+                v-if="!showcase && transactionInputPublicId !== transactionInput.public_id"
                 size="sm"
                 variant="outline-primary"
                 :to="`/clients/${clientPublicId}/transactions/${transactionInput.public_id}`"
+              >
+                Details
+              </b-button>
+
+              <b-button
+                v-else-if="showcase && transactionInputPublicId !== transactionInput.public_id"
+                size="sm"
+                pill
+                variant="outline-primary"
+                @click="fetchTransactionInput(transactionInput.public_id)"
               >
                 Details
               </b-button>
@@ -94,11 +102,18 @@ export default {
       type: String,
       required: true,
     },
+
+    showcase: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
 
   computed: {
     ...mapState({
-      transactionInputsBundle: (state) => state.transaction_input.transaction_inputs_bundle
+      transactionInputsBundle: (state) => state.transaction_input.transaction_inputs_bundle,
+      transactionInput: (state) => state.transaction_input.transaction_input
     }),
     // orderedBundle() {
     //   var orderedTransactionInputsBundle = this.transactionInputsBundle
@@ -108,6 +123,13 @@ export default {
   methods: {
     borderVariant(publicId) {
       return publicId === this.transactionInputPublicId ? "primary" : "secondary"
+    },
+
+    async fetchTransactionInput(transactionInputPublicId) {
+      if (Object.keys(this.transactionInput).length === 0 || this.transactionInput.public_id !== transactionInputPublicId) {
+        const { store } = this.$nuxt.context
+        await store.dispatch("transaction_input/get_by_public_id", transactionInputPublicId)
+      }
     },
   },
 }

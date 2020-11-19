@@ -10,14 +10,14 @@
             aria-controls="table-transaction-inputs"
             pills
             hide-goto-end-buttons
-            :disabled="transactionInputs.length===0"
+            :disabled="transactionInputs.length === 0"
           />
         </b-col>
         <b-col cols="auto" class="mr-auto">
           <span>
             <b-button-group class="ml-1">
               <b-button
-                variant="outline-success"
+                variant="outline-primary"
                 :pressed="null === channelCodeFilter"
                 @click="setFilter()"
               >
@@ -65,11 +65,25 @@
 import { mapState } from "vuex"
 
 export default {
-  name: 'CardTransactionInputsShowcase',
+  name: "CardTransactionInputsShowcase",
+
+  async fetch() {
+    if (this.transactionInputs.length === 0) {
+      const { store } = this.$nuxt.context
+      const params = {
+        seller_firm_public_id: this.sellerFirm.public_id,
+        page: 1,
+      }
+      await store.dispatch(
+        "transaction_input/get_sample",
+        params
+      )
+    }
+  },
 
   data() {
     return {
-      perPage: 10,
+      perPage: 5,
       currentPage: 1,
       channelCodeFilter: null,
     }
@@ -78,13 +92,33 @@ export default {
   computed: {
     ...mapState({
       sellerFirm: (state) => state.seller_firm.seller_firm,
-      transactionInputsFull: (state) => state.transaction_input.transaction_inputs
+      transactionInputsFull: (state) =>
+        state.transaction_input.transaction_inputs,
     }),
 
     transactionInputs() {
       return this.$store.getters["transaction_input/filterByChannelCode"](
         this.channelCodeFilter
       )
+    },
+
+    fetchMore() {
+      if (!this.channelCodeFilter) {
+        return (
+          this.currentPage >=
+                        this.transactionInputsFull.length / this.perPage
+        )
+      } else {
+        return false
+      }
+    },
+  },
+
+  watch: {
+    fetchMore(newVal) {
+      if (newVal) {
+        this.refresh()
+      }
     },
   },
 
@@ -99,7 +133,16 @@ export default {
           this.channelCodeFilter = channelCode
         }
       }
-    }
+    },
+
+    async refresh() {
+      const { store } = this.$nuxt.context
+      const params = {
+        seller_firm_public_id: this.sellerFirm.public_id,
+        page: this.currentPage / 10 + 1,
+      }
+      await store.dispatch("transaction_input/get_sample", params)
+    },
   },
 }
 </script>

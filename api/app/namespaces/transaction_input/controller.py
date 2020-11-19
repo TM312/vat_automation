@@ -45,19 +45,10 @@ class TransactionInputResource(Resource):
         return TransactionInputService.delete_all()
 
 
-@ns.route('/sample')
-class TransactionInputSampleResource(Resource):
-    @ns.marshal_with(transaction_input_dto, envelope='data')
-    def get(self) -> List[TransactionInput]:
-        '''Get Bond Store Ltd Transaction Inputs'''
-        return TransactionInputService.get_all_by_seller_firm_public_id('bond-store-ltd')
-
-
-
 @ns.route("/<string:transaction_input_public_id>")
 @ns.param("transaction_input_public_id", "TransactionInput database ID")
 class TransactionInputIdResource(Resource):
-    @login_required
+    # @login_required
     @ns.marshal_with(transaction_input_dto, envelope='data')
     def get(self, transaction_input_public_id: str) -> TransactionInput:
         """Get Single TransactionInput"""
@@ -84,21 +75,40 @@ class TransactionInputIdResource(Resource):
 @ns.route("/bundle/<string:bundle_public_id>")
 @ns.param("bundle_public_id", "TransactionInput Bundle Public ID")
 class TransactionInputBundleIdResource(Resource):
-    @login_required
+    # @login_required
     @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
     def get(self, bundle_public_id: str) -> List[TransactionInput]:
         """Get Bundle TransactionInputs"""
         return TransactionInputService.get_by_bundle_public_id(bundle_public_id)
 
-@ns.route("/seller_firm/") #<string:seller_firm_public_id><int:page>")
+@ns.route("/seller_firm/")
 @ns.param("seller_firm_public_id", "TransactionInput database ID")
 class TransactionInputSellerFirmIdResource(Resource):
     # decorators = [limiter.limit("5/second")]
     @login_required
     @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
     def get(self) -> List[TransactionInput]:
-        """Get Single TransactionInput"""
+        """Get Paginated Transaction Inputs"""
         args = parser.parse_args()
         seller_firm_public_id = args.get('seller_firm_public_id')
         if seller_firm_public_id is not None:
             return TransactionInputService.get_by_seller_firm_public_id(seller_firm_public_id, paginate=True, page=args.get('page'))
+
+@ns.route("/sample")
+@ns.param("seller_firm_public_id", "TransactionInput database ID")
+class TransactionInputSellerFirmIdResource(Resource):
+    @ns.marshal_list_with(transaction_input_sub_dto, envelope='data')
+    def get(self) -> List[TransactionInput]:
+        """Get Paginated Transaction Inputs from Seller Firm"""
+        args = parser.parse_args()
+        seller_firm_public_id = args.get('seller_firm_public_id')
+        if seller_firm_public_id == 'bond-store-ltd':
+            return TransactionInputService.get_by_seller_firm_public_id(seller_firm_public_id, paginate=True, page=args.get('page'))
+
+
+# @ns.route('/sample')
+# class TransactionInputSampleResource(Resource):
+#     @ns.marshal_with(transaction_input_dto, envelope='data')
+#     def get(self) -> List[TransactionInput]:
+#         '''Get Bond Store Ltd Transaction Inputs'''
+#         return TransactionInputService.get_all_by_seller_firm_public_id('bond-store-ltd')

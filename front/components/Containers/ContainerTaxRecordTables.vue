@@ -2,204 +2,75 @@
   <b-container fluid class="my-3">
     <b-row class="my-5 px-3" cols="1" cols-xl="2">
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Local Sales</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon id="popover-target-LOCAL_SALE" variant="info" icon="info-circle" @mouseover="setPopover('LOCAL_SALE')" />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsLocalSales"
-          :fields="fieldsNetVatGross"
-          hover
+        <h3>Local Sales</h3>
+        <table-local-sales
+          :fields-net-vat-gross="fieldsNetVatGross"
+          :tax-record="taxRecord"
         />
       </b-col>
 
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Local Sales Reverse Charge</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon id="popover-target-LOCAL_SALE_REVERSE_CHARGE" variant="info" icon="info-circle" @mouseover="setPopover('LOCAL_SALE_REVERSE_CHARGE') " />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsLocalSaleReverseCharges"
-          :fields="fieldsNetVatGross"
-          hover
+        <h3>Local Sale Reverse Charges</h3>
+        <table-local-sale-reverse-charges
+          :fields-net-vat-gross="fieldsNetVatGross"
+          :tax-record="taxRecord"
         />
       </b-col>
     </b-row>
 
     <b-row class="my-5" cols="1" cols-xl="2">
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Distance Sales</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-DISTANCE_SALE"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('DISTANCE_SALE')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsDistanceSales"
-          :fields="fieldsNetVatGross"
-          hover
+        <h3>Distance Sales</h3>
+        <table-distance-sales
+          :fields-net-vat-gross="fieldsNetVatGross"
+          :tax-record="taxRecord"
         />
       </b-col>
 
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Non-taxable Distance Sales</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-NON_TAXABLE_DISTANCE_SALE"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('NON_TAXABLE_DISTANCE_SALE')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsNonTaxableDistanceSales"
-          :fields="fieldsNetVatGross"
-          hover
+        <h3>Non-Taxable Distance Sales</h3>
+        <table-non-taxable-distance-sales
+          :fields-net-vat-gross="fieldsNetVatGross"
+          :tax-record="taxRecord"
         />
       </b-col>
     </b-row>
 
     <b-row class="my-5" cols="1" cols-xl="2">
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Intra-Community Sales</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-INTRA_COMMUNITY_SALE"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('INTRA_COMMUNITY_SALE')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsIntraCommunitySales"
-          :fields="fieldsNet"
-          hover
+        <h3>Intra-Community Sales</h3>
+        <table-intra-community-sales
+          :fields-net="fieldsNet"
+          :tax-record="taxRecord"
         />
       </b-col>
 
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Exports</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-EXPORT"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('EXPORT')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table :items="itemsExports" :fields="fieldsNet" hover />
+        <h3>Exports</h3>
+        <table-exports
+          :fields-net="fieldsNet"
+          :tax-record="taxRecord"
+        />
       </b-col>
     </b-row>
 
     <b-row class="my-5" cols="1" cols-xl="2">
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Intra-Community Acquisitions</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-INTRA_COMMUNITY_ACQUISITION"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('INTRA_COMMUNITY_ACQUISITION')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsIntraCommunityAcquisitions"
-          :fields="fieldsNetReverseCharge"
-          hover
+        <h3>Intra-Community Acquisitions</h3>
+        <table-intra-community-acquisitions
+          :fields-net-reverse-charge="fieldsNetReverseCharge"
+          :tax-record="taxRecord"
         />
       </b-col>
 
       <b-col class="mb-2 pr-5">
-        <b-row>
-          <b-col cols="auto">
-            <h3>Local Acquisitions</h3>
-          </b-col>
-          <b-col cols="auto mr-auto">
-            <b-icon
-              id="popover-target-LOCAL_ACQUISITION"
-              variant="info"
-              icon="info-circle"
-              @mouseover="setPopover('LOCAL_ACQUISITION')
-              "
-            />
-          </b-col>
-        </b-row>
-        <br />
-        <b-table
-          :items="itemsLocalAcquisitions"
-          :fields="fieldsNetVatGross"
-          hover
+        <h3>Local Acquisitions</h3>
+        <table-local-acquisitions
+          :fields-net-vat-gross="fieldsNetVatGross"
+          :tax-record="taxRecord"
         />
       </b-col>
     </b-row>
-
-    <b-popover target="popover-target-LOCAL_SALE" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-LOCAL_SALE_REVERSE_CHARGE" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-DISTANCE_SALE" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-NON_TAXABLE_DISTANCE_SALE" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-INTRA_COMMUNITY_SALE" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-EXPORT" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-INTRA_COMMUNITY_ACQUISITION" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
-    <b-popover target="popover-target-LOCAL_ACQUISITION" triggers="hover" placement="top" :title="taxTreatment.name">
-      {{ taxTreatment.description }}
-    </b-popover>
   </b-container>
 </template>
 
@@ -211,10 +82,6 @@ export default {
 
   data() {
     return {
-      taxTreatment: {
-        code: '...',
-        description: '...'
-      },
 
       fieldsNet: [
         {
@@ -301,191 +168,9 @@ export default {
       taxRecord: (state) => state.tax_record.tax_record,
     }),
 
-    itemsLocalSales() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.local_sales_sales_net,
-          vat: this.taxRecord.local_sales_sales_vat,
-          gross: this.taxRecord.local_sales_sales_gross,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.local_sales_refunds_net,
-          vat: this.taxRecord.local_sales_refunds_vat,
-          gross: this.taxRecord.local_sales_refunds_gross,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.local_sales_total_net,
-          vat: this.taxRecord.local_sales_total_vat,
-          gross: this.taxRecord.local_sales_total_gross,
-        },
-      ]
-    },
 
-    itemsLocalSaleReverseCharges() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.local_sale_reverse_charges_sales_net,
-          vat: this.taxRecord.local_sale_reverse_charges_sales_vat,
-          gross: this.taxRecord
-            .local_sale_reverse_charges_sales_gross,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.local_sale_reverse_charges_refunds_net,
-          vat: this.taxRecord.local_sale_reverse_charges_refunds_vat,
-          gross: this.taxRecord
-            .local_sale_reverse_charges_refunds_gross,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.local_sale_reverse_charges_total_net,
-          vat: this.taxRecord.local_sale_reverse_charges_total_vat,
-          gross: this.taxRecord
-            .local_sale_reverse_charges_total_gross,
-        },
-      ]
-    },
-
-    itemsDistanceSales() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.distance_sales_sales_net,
-          vat: this.taxRecord.distance_sales_sales_vat,
-          gross: this.taxRecord.distance_sales_sales_gross,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.distance_sales_refunds_net,
-          vat: this.taxRecord.distance_sales_refunds_vat,
-          gross: this.taxRecord.distance_sales_refunds_gross,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.distance_sales_total_net,
-          vat: this.taxRecord.distance_sales_total_vat,
-          gross: this.taxRecord.distance_sales_total_gross,
-        },
-      ]
-    },
-
-    itemsNonTaxableDistanceSales() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.non_taxable_distance_sales_sales_net,
-          vat: this.taxRecord.non_taxable_distance_sales_sales_vat,
-          gross: this.taxRecord
-            .non_taxable_distance_sales_sales_gross,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.non_taxable_distance_sales_refunds_net,
-          vat: this.taxRecord.non_taxable_distance_sales_refunds_vat,
-          gross: this.taxRecord
-            .non_taxable_distance_sales_refunds_gross,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.non_taxable_distance_sales_total_net,
-          vat: this.taxRecord.non_taxable_distance_sales_total_vat,
-          gross: this.taxRecord
-            .non_taxable_distance_sales_total_gross,
-        },
-      ]
-    },
-
-    itemsIntraCommunitySales() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.intra_community_sales_sales_net,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.intra_community_sales_refunds_net,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.intra_community_sales_total_net,
-        },
-      ]
-    },
-
-    itemsExports() {
-      return [
-        {
-          itemName: "Sales",
-          net: this.taxRecord.exports_sales_net,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.exports_refunds_net,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.exports_total_net,
-        },
-      ]
-    },
-
-    itemsIntraCommunityAcquisitions() {
-      return [
-        {
-          itemName: "Acquisitions",
-          net: this.taxRecord.ica_acquisitions_net,
-          reverseChargeVat: this.taxRecord
-            .ica_acquisitions_reverse_charge_vat,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.ica_refunds_net,
-          reverseChargeVat: this.taxRecord
-            .ica_refunds_reverse_charge_vat,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.ica_total_net,
-          reverseChargeVat: this.taxRecord
-            .ica_total_reverse_charge_vat,
-        },
-      ]
-    },
-
-    itemsLocalAcquisitions() {
-      return [
-        {
-          itemName: "Acquisitions",
-          net: this.taxRecord.local_acquisitions_acquisitions_net,
-          vat: this.taxRecord.local_acquisitions_acquisitions_vat,
-          gross: this.taxRecord.local_acquisitions_acquisitions_gross,
-        },
-        {
-          itemName: "Refunds",
-          net: this.taxRecord.local_acquisitions_refunds_net,
-          vat: this.taxRecord.local_acquisitions_refunds_vat,
-          gross: this.taxRecord.local_acquisitions_refunds_gross,
-        },
-        {
-          itemName: "Total",
-          net: this.taxRecord.local_acquisitions_total_net,
-          vat: this.taxRecord.local_acquisitions_total_vat,
-          gross: this.taxRecord.local_acquisitions_total_gross,
-        },
-      ]
-    },
   },
 
-  methods: {
-    setPopover(taxTreatmentCode) {
-      this.taxTreatment = this.$store.getters['tax_treatment/getByCode'](taxTreatmentCode)
-
-    }
-  },
 }
 </script>
 
