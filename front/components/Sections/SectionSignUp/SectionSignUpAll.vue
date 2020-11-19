@@ -4,7 +4,7 @@
       Beam Me Up
       <!-- Get In Touch -->
     </h6>
-    <h1>Coming Soon</h1>
+    <h1>Coming In January 2021</h1>
     <p class="lead my-2">
       Continuous feedback is the best way to build a product you love. Let's start a dialogue.
     </p>
@@ -17,10 +17,7 @@
           <b-tab title="For Amazon Sellers" active>
             <div class="mt-3">
               <p class="text-muted">
-                If you want to be among the first to try upcoming features, enter your email below. Over the coming weeks we will start to open for selected sellers from this list.
-              </p>
-              <p class="text-muted">
-                We will use your email for updates about new features and gathering feedback only.
+                you want to be the first to try the upcoming features, just enter your email below. Over the coming weeks we will start to open for selected sellers from this list.
               </p>
               <form-landing-contact class="mt-2" />
             </div>

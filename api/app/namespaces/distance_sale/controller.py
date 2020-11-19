@@ -39,7 +39,7 @@ class DistanceSaleResource(Resource):
 @ns.route("/<string:distance_sale_public_id>")
 @ns.param("distance_sale_public_id", "DistanceSale database ID")
 class DistanceSaleIdResource(Resource):
-    @login_required
+    # @login_required
     @ns.marshal_with(distance_sale_dto, envelope='data')
     def get(self, distance_sale_public_id: str) -> DistanceSale:
         """Get Single DistanceSale"""

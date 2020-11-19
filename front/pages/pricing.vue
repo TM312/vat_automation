@@ -1,10 +1,21 @@
 <template>
   <b-container class="py-5">
-    <b-jumbotron bg-variant="transparent" text-variant="dark" header="Developed with Sellers' needs in mind">
-      <template #lead class="mt-5">
-        Transparency &amp; Fair Pricing
-      </template>
-    </b-jumbotron>
+    <h1 class="text-dark">
+      Fair Prices For Sellers of All Sizes
+    </h1>
+    <h2 class="text-muted mt-3">
+      Start For Free
+    </h2>
+
+
+    <b-row>
+      <b-col>
+        <card-pricing-management-tool class="h-100" />
+      </b-col>
+      <b-col>
+        <card-pricing-vat-compliance />
+      </b-col>
+    </b-row>
   </b-container>
 </template>
 
@@ -13,6 +24,3 @@ export default {
   layout: "default",
 }
 </script>
-
-<style>
-</style>
