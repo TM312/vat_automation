@@ -4,7 +4,7 @@
       <b-tabs content-class="mt-3">
         <b-tab title="Overview" active>
           <div v-if="$fetchState.pending">
-            <b-row class="mb-3" cols="1" cols-md="2" cols-xl="4">
+            <b-row class="mb-3" cols="1" cols-md="2" cols-xl="3">
               <b-col v-for="i in 20" :key="i" class="mb-2">
                 <card-tax-record-short-skeleton />
               </b-col>
@@ -25,7 +25,7 @@
                 class="mb-3"
                 cols="1"
                 cols-md="2"
-                cols-xl="4"
+                cols-xl="3"
               >
                 <b-col
                   v-for="(taxRecord, i) in taxRecords"

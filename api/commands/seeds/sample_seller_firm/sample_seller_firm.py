@@ -27,7 +27,16 @@ class SellerFirmSeedService:
 
     @staticmethod
     def append_accounting_firm_to_seller_firm():
-        testAF = AccountingFirm.query.filter_by(name='Test Accounting Firm').first()
+        accounting_firm_bond = AccountingFirm.query.filter_by(name='Accounting Firm Bond').first()
         bondSF = SellerFirmService.get_by_name_establishment_country(seller_firm_name='Bond Store Ltd', establishment_country_code='GB')
 
-        testAF.clients.append(bondSF)
+        if not isinstance(accounting_firm_bond, AccountingFirm):
+            raise
+        accounting_firm_bond.clients.append(bondSF)
+        db.session.commit()
+
+        m_auditor = TaxAuditor.query.filter_by(name='M').first()
+        if not isinstance(m_auditor, TaxAuditor):
+            raise
+        m_auditor.key_accounts.append(bondSF)
+        db.session.commit()

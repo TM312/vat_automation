@@ -103,10 +103,9 @@ export default {
     },
 
     fetchMore() {
-      if (!this.channelCodeFilter) {
+      if (!this.channelCodeFilter && this.transactionInputsFull.length !== 0) {
         return (
-          this.currentPage >=
-                        this.transactionInputsFull.length / this.perPage
+          this.currentPage >= this.transactionInputsFull.length / this.perPage
         )
       } else {
         return false

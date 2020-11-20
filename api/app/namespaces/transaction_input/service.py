@@ -292,25 +292,22 @@ class TransactionInputService:
             start, stop, step = 0, total_number_transaction_inputs, 1
 
         # send status update via socket
-        SocketService.emit_status_success(0, abs(stop-start), original_filename, object_type)
+        SocketService.emit_status_success(0, total_number_transaction_inputs, original_filename, object_type)
 
         for i in range(start, stop, step):
-            print('in loop', i, flush=True)
-            current = i + 1
+            current = start - i + 1 if desc else i + 1
 
             try:
                 account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionInputService.get_df_vars(df, i, current, object_type)
             except Exception as e:
-                raise(e) #!!!!
-                # if e.code == 422:
-                #     SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
-                # elif e.code == 417:
-                #     SocketService.emit_status_error_no_value(current, object_type, e.description)
-                # return False
+                if e.code == 422:
+                    SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
+                elif e.code == 417:
+                    SocketService.emit_status_error_no_value(current, object_type, e.description)
+                return False
 
             try:
                 account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
-                print('account: {}, account_given_id: {}, channel_code: {}'.format(account, account_given_id, channel_code), flush=True)
             except:
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
                 return False
@@ -322,12 +319,6 @@ class TransactionInputService:
                 return False
 
             bundle = BundleService.get_or_create(account.id, item.id, given_id)
-
-            #!!!!
-            print('account: {}, item: {}, bundle: {}'.format(account, item, bundle), flush=True)
-            if account is None or item is None:
-                raise
-            #!!!!
 
             transaction_input = TransactionInputService.get_by_identifiers(account_given_id, channel_code, given_id, activity_id, item_sku)
             if transaction_input and transaction_input.processed:
@@ -511,7 +502,7 @@ class TransactionInputService:
 
 
                 # send status update via socket
-                SocketService.emit_status_success(abs(stop-current), abs(stop-start), original_filename, object_type)
+                SocketService.emit_status_success(current, total_number_transaction_inputs,  original_filename, object_type)
 
         # update distance sale history
         last_transaction = TransactionService.get_latest_by_seller_firm_id(account.seller_firm_id)

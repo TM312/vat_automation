@@ -13,6 +13,12 @@ class AccountingFirmSeedService:
         )
         db.session.add(accounting_firm_test)
 
+        accounting_firm_bond = AccountingFirm(
+            name='Accounting Firm Bond',
+            address='Address Bond'
+        )
+        db.session.add(accounting_firm_bond)
+
 
         db.session.commit()
 
@@ -33,12 +39,11 @@ class AccountingFirmSeedService:
             test_firm_auditor_3
         ]
 
-        # if not isinstance(gvc, AccountingFirm):
-        #     raise
-
-        # else:
-        # for tax_auditor in gvc_all:
-        #     gvc.employees.append(tax_auditor)
-
         for tax_auditor in test_all:
             test.employees.append(tax_auditor)
+
+
+        accounting_firm_bond = AccountingFirm.query.filter_by(name='Accounting Firm Bond').first()
+        m_auditor = TaxAuditor.query.filter_by(name = 'M').first()
+
+        accounting_firm_bond.employees.append(m_auditor)

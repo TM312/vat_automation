@@ -1,85 +1,78 @@
 <template>
-  <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
-    <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
-    <b-spinner v-else small label="Spinning" />
-    Upload
-  </b-button>
+    <b-button :disabled="buttonDisabled" variant="primary" @click="uploadFiles">
+        <b-icon v-if="!uploadInProgress" icon="box-arrow-in-right" />
+        <b-spinner v-else small label="Spinning" />
+        Upload
+    </b-button>
 </template>
 
 <script>
+    export default {
+        name: "ButtonUpload",
 
-export default {
-  name: 'ButtonUpload',
+        props: {
+            urlEndpointUpload: {
+                type: String,
+                required: true,
+            },
 
-  props: {
-    urlEndpointUpload: {
-      type: String,
-      required: true
-    },
-
-    files: {
-      type: Array,
-      required: true
-    }
-  },
-  data() {
-    return {
-      uploadInProgress: false
-    }
-  },
-  computed: {
-    buttonDisabled() {
-      if (this.files.length == 0 || this.uploadInProgress) {
-        return true
-      } else {
-        return false
-      }
-
-    },
-  },
-
-
-  methods: {
-
-    async uploadFiles() {
-      this.uploadInProgress = true
-      var config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
+            files: {
+                type: Array,
+                required: true,
+            },
         },
-      }
+        data() {
+            return {
+                uploadInProgress: false,
+            };
+        },
+        computed: {
+            buttonDisabled() {
+                if (this.files.length == 0 || this.uploadInProgress) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+        },
 
-      // FormData is a standard JS object
-      for (var i = 0; i != this.files.length;) {
-        let file = this.files[i]
-        const data = new FormData()
-        data.append('file', file)
+        methods: {
+            async uploadFiles() {
+                this.uploadInProgress = true;
+                var config = {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                };
 
-        // https://github.com/axios/axios/blob/master/examples/upload/index.html
-        try {
-          await this.$axios
-            .post(this.urlEndpointUpload, data, config)
+                // FormData is a standard JS object
+                for (var i = 0; i != this.files.length; ) {
+                    let file = this.files[i];
+                    const data = new FormData();
+                    data.append("file", file);
 
-            .then(
-              this.$emit('removeFile', i)
-              // response => {
-              // // !!! delete later below
-              // let taskId = response.data;
-              // }
-            )
+                    // https://github.com/axios/axios/blob/master/examples/upload/index.html
+                    try {
+                        await this.$axios
+                            .post(this.urlEndpointUpload, data, config)
 
-        } catch(err) {
-          console.log(err)
+                            .then(
+                                this.$emit("removeFile", i)
+                                // response => {
+                                // // !!! delete later below
+                                // let taskId = response.data;
+                                // }
+                            );
+                    } catch (err) {
+                        console.log(err);
 
-          i = this.files.length
-        }
+                        i = this.files.length;
+                    }
 
-        await this.sleep(1000)
-      }
-      this.uploadInProgress = false
-
-
-    }
-  }
-}
+                    await this.sleep(2500);
+                }
+                this.uploadInProgress = false;
+            },
+        },
+    };
 </script>

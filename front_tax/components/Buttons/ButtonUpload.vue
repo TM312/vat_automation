@@ -7,24 +7,23 @@
 </template>
 
 <script>
-
 export default {
-  name: 'ButtonUpload',
+  name: "ButtonUpload",
 
   props: {
     urlEndpointUpload: {
       type: String,
-      required: true
+      required: true,
     },
 
     files: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      uploadInProgress: false
+      uploadInProgress: false,
     }
   },
   computed: {
@@ -34,26 +33,24 @@ export default {
       } else {
         return false
       }
-
     },
   },
 
-
   methods: {
-
     async uploadFiles() {
       this.uploadInProgress = true
       var config = {
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         },
       }
 
       // FormData is a standard JS object
-      for (var i = 0; i != this.files.length;) {
+      for (var i = 0; i != this.files.length; ) {
+
         let file = this.files[i]
         const data = new FormData()
-        data.append('file', file)
+        data.append("file", file)
 
         // https://github.com/axios/axios/blob/master/examples/upload/index.html
         try {
@@ -61,25 +58,22 @@ export default {
             .post(this.urlEndpointUpload, data, config)
 
             .then(
-              this.$emit('removeFile', i)
+              this.$emit("removeFile", i)
               // response => {
               // // !!! delete later below
               // let taskId = response.data;
               // }
             )
-
-        } catch(err) {
+        } catch (err) {
           console.log(err)
 
           i = this.files.length
         }
 
-        await this.sleep(1000)
+        await this.sleep(2500)
       }
       this.uploadInProgress = false
-
-
-    }
-  }
+    },
+  },
 }
 </script>

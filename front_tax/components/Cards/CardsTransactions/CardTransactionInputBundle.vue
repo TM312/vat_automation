@@ -1,8 +1,8 @@
 <template>
-  <b-row cols="2" cols-md="3" cols-lg="4">
+  <b-row cols="2" cols-md="3">
     <!-- <h1>orderedBundle: {{ orderedBundle }}</h1> -->
     <b-col
-      v-for="(transactionInput, index) in transactionInputsBundle"
+      v-for="transactionInput in transactionInputsBundle"
       :key="transactionInput.public_id"
     >
       <b-card
@@ -31,16 +31,16 @@
         </b-card-title>
         <b-card-sub-title class="mb-3">
           <span>{{ transactionInput.complete_date }}</span>
-          <span>{{ index }}</span>
+          <!-- <span>{{ index }}</span> -->
           <!-- <span v-if="index > 0">{{ $dateFns.formatDistance(new Date(transactionInput.complete_date), new Date(transactionInput.complete_date)) }}</span> -->
 
-          <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date > transactionInput.complete_date) }}</span>
+          <!-- <span v-if="index > 0" class="px-2">{{ (transactionInputsBundle[index-1].complete_date > transactionInput.complete_date) }}</span>
           <span v-if="index > 0" class="px-2">{{
             transactionInputsBundle[index - 1].complete_date
-          }}</span>
+          }}</span> -->
         </b-card-sub-title>
-        <b-card-text class="font-weight-bold">
-          <b-row class="text-center">
+        <b-card-text>
+          <b-row class="text-left text-info">
             <b-col>
               <span
                 v-if="transactionInput.arrival_country_code"
