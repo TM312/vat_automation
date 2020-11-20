@@ -206,7 +206,7 @@ export default {
     io: {
         sockets: [{
             name: 'home',
-            url: 'http://127.0.0.1', // nginx reroutes to api
+            url: 'http://127.0.0.1:31729', // nginx reroutes to api
             default: true,
             vuex: {
                 mutations: [

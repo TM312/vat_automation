@@ -72,38 +72,15 @@ export default {
 
             .then(
               this.$emit('removeFile', i)
-              // response => {
-              // let responseObjects = response.data;
-
-              // for (var j = 0; j < responseObjects.length; j++) {
-              //     let responseObject = responseObjects[j]
-
-              //     if (responseObject.status == "success") {
-
-              //         this.$toast.success(responseObject.message, {
-              //             duration: 10000
-              //         });
-
-
-              //     } else {
-              //         this.$toast.error(responseObject.message, { duration: 10000 });
-              //     }
-              // }
-
-              // }
             )
 
         } catch(err) {
-          // console.log(err);
-          // this.$toast.error(
-          //     "An error occured. Please make sure you have tried to submit valid data.",
-          //     { duration: 10000 }
-          // );
           this.uploadInProgress = false
           i = this.files.length
         }
 
-        await this.sleep(1000)
+        await this.sleep(2500)
+
       }
       this.uploadInProgress = false
 

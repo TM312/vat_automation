@@ -34,6 +34,9 @@ class AdminSeedService:
 class TaxAuditorSeedService:
     @staticmethod
     def seed_tax_auditor():
+        m_auditor = TaxAuditor( name='M', email='m@mi6-bond.com', password='another_d3y_4NothR_p4$$w_ord', role='admin')
+        db.session.add(m_auditor)
+
         test_firm_auditor = TaxAuditor( name='Test User Main', email='test_ta_main@mail.com', password='another_d3y_4NothR_p4$$w_ord', role='admin')
         db.session.add(test_firm_auditor)
 

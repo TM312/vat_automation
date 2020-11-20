@@ -208,7 +208,7 @@ class SellerFirmService:
 
         # each file is initially stored in a temp folder and undergoes sanitizing
         try:
-            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, business=seller_firm, file_type='tbd')
+            file_path_tbd = InputService.store_file(file=file, allowed_extensions=DATA_ALLOWED_EXTENSIONS, basepath=DATAPATH, business_id=seller_firm_id, file_type='tbd')
         except Exception as e:
             print(e, flush=True)
             SocketService.emit_status_error_invalid_file(message = e.description)
@@ -228,6 +228,7 @@ class SellerFirmService:
             return False
 
         try:
+            print(df.head(), flush=True)
             file_type = InputService.determine_file_type(df)
         except:
             message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
@@ -252,6 +253,7 @@ class SellerFirmService:
 
         # processing starts here
         file_path_in = InputService.move_data_to_file_type(file_path_tbd, file_type, business_id=seller_firm_id)
+
 
         basepath = current_app.config.BASE_PATH_BUSINESS_DATA
 
@@ -286,7 +288,7 @@ class SellerFirmService:
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                 )
 
-        if file_type == 'transactions_amazon':
+        elif file_type == 'transactions_amazon':
             from app.tasks.asyncr import async_handle_transaction_input_data_upload
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
@@ -296,8 +298,8 @@ class SellerFirmService:
 
         else:
             current_app.logger.warning('Unrecogizable Seller Firm Data has been uploaded by {} ({})'.format(g.user.name, user_id))
-            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_in)[:128])
             original_filename = InputService.get_secure_filename(file)
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(original_filename[:128])
             SocketService.emit_status_error_invalid_file(message)
             return False
 
@@ -329,7 +331,7 @@ class SellerFirmService:
             claimed = False
 
         DATA_ALLOWED_EXTENSIONS = current_app.config.DATA_ALLOWED_EXTENSIONS
-        DATAPATH = current_app.config.DATAPATH
+        basepath = DATAPATH = current_app.config.DATAPATH
 
         # each file is initially stored in a temp folder and undergoes sanitizing
         try:
@@ -359,7 +361,8 @@ class SellerFirmService:
         try:
             file_type = InputService.determine_file_type(df)
         except:
-            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])
+            original_filename = InputService.get_secure_filename(file)
+            message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(original_filename[:128])
             SocketService.emit_status_error_invalid_file(message)
             return False
 

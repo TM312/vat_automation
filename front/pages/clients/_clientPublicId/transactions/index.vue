@@ -17,7 +17,7 @@
           <span>
             <b-button-group class="ml-1">
               <b-button
-                variant="outline-success"
+                variant="outline-primary"
                 :pressed="null === channelCodeFilter"
                 @click="setFilter()"
               >
@@ -102,7 +102,7 @@ export default {
     },
 
     fetchMore() {
-      if (!this.channelCodeFilter) {
+      if (!this.channelCodeFilter && this.transactionInputsFull.length !== 0) {
         return (this.currentPage >= this.transactionInputsFull.length / this.perPage)
       } else {
         return false

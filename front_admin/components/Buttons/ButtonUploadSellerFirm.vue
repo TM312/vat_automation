@@ -103,7 +103,7 @@ export default {
           i = this.files.length
         }
 
-        await this.sleep(1000)
+        await this.sleep(2500)
       }
       this.uploadInProgress = false
 

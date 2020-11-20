@@ -65,7 +65,7 @@ class SellerFirmIdResource(Resource):
 
 @ns.route("/<string:seller_firm_public_id>/upload")
 class SellerFirmInformationResource(Resource):
-    # decorators = [limiter.limit("10/second")]
+    decorators = [limiter.limit("10/minute")]
     @login_required
     def post(self, seller_firm_public_id) -> Response:
         """Upload data for the indicated seller firm"""
@@ -105,4 +105,7 @@ class SellerFirmInformationResource(Resource):
     def post(self) -> Response:
         """Create an unclaimed seller firm as a client"""
         seller_firm_information_file: BinaryIO = request.files["file"]
-        return SellerFirmService.process_seller_firm_information_file_upload(seller_firm_information_file)
+        try:
+            return SellerFirmService.process_seller_firm_information_file_upload(seller_firm_information_file)
+        except Exception as e:
+            print('Exception -->', e, flush=True)

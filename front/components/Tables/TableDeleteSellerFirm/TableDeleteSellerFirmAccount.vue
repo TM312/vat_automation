@@ -39,6 +39,7 @@ export default {
   computed: {
     ...mapState({
       accounts: state => state.seller_firm.seller_firm.accounts,
+      seller_firm: state => state.seller_firm.seller_firm.seller_firm,
     })
   },
 
@@ -49,7 +50,7 @@ export default {
         await this.deleteFile(publicId)
         await this.$store.dispatch(
           "seller_firm/get_by_public_id",
-          this.$route.params.public_id
+          this.seller_firm.public_id
         )
         this.tableIsBusy = false
       } catch (error) {

@@ -141,12 +141,19 @@ class SeedCommand(Command):
             SellerSeedService.seed_seller()
             print('...Append Seller To Firm')
             SellerSeedService.append_seller_firm_to_seller()
-            print('...Seller Firm Static Data')
-            SampleFirmInformationSeedService.seed_sample_data_static()
-            print('...arrival vat numbers')
-            VATINSeedService.seed_bond_transaction_vatins()
-            print('...Seller Firm Transaction Data')
-            SampleFirmInformationSeedService.seed_sample_transaction_input_data()
+            print('...Append Seller Firm to M')
+            SellerFirmSeedService.append_accounting_firm_to_seller_firm()
+
+            ## !!! activate for landing page
+
+            # print('...Seller Firm Static Data')
+            # SampleFirmInformationSeedService.seed_sample_data_static()
+            # print('...arrival vat numbers')
+            # VATINSeedService.seed_bond_transaction_vatins()
+            # print('...Seller Firm Transaction Data')
+            # SampleFirmInformationSeedService.seed_sample_transaction_input_data()
+            # db.session.commit()
+
 
 
             for response_object in response_objects:
