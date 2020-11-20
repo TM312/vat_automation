@@ -12,18 +12,20 @@
       </b-jumbotron>
     </b-container>
 
-    <b-container v-if="!$fetchState.pending">
-      <section-vat-compliance-data-upload v-if="!$fetchState.pending" class="py-5" />
+    <b-container class="py-5">
+      <section-vat-compliance-data-upload v-if="!$fetchState.pending" />
+    </b-container>
 
+    <b-container v-if="!$fetchState.pending">
       <section-vat-compliance-company-information v-if="!$fetchState.pending" class="py-5" />
     </b-container>
 
-    <b-container v-if="!$fetchState.pending" fluid>
-      <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" class="py-5" />
+    <b-container fluid class="py-5">
+      <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" />
     </b-container>
 
-    <b-container>
-      <section-vat-compliance-tax-records v-if="!$fetchState.pending" class="py-5" />
+    <b-container class="py-5">
+      <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
       <section-sign-up-sellers />
     </b-container>
   </div>

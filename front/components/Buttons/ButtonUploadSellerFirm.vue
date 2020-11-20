@@ -45,11 +45,7 @@ export default {
 
 
   methods: {
-    enableButton() {
-      if (this.files.length == 0) {
-        this.buttonDisabled = false
-      }
-    },
+
 
     async uploadFiles() {
       this.uploadInProgress = true
