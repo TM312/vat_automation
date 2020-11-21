@@ -23,18 +23,6 @@
         />
       </span>
     </b-container>
-    <b-container class="py-5">
-      <b-card
-        border-variant="info"
-        title="Interactive Demo"
-        sub-title="We have prepared a small demo that lets you get a feeling of our platform."
-      >
-        <b-card-text>
-          We have prepared a small demo that will provide you a good
-          idea how this process works.
-        </b-card-text>
-      </b-card>
-    </b-container>
   </section>
 </template>
 

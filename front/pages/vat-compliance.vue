@@ -5,6 +5,10 @@
     </b-container>
 
     <b-container class="py-5">
+      <section-vat-compliance-demo-introduction />
+    </b-container>
+
+    <b-container class="py-5">
       <section-vat-compliance-data-upload v-if="!$fetchState.pending" />
     </b-container>
 
