@@ -7,7 +7,7 @@
       <h6 class="text-primary">
         Let's Get In Touch
       </h6>
-      <h3>Help us building a product you <b-icon icon="heart-fill" variant="danger" /></h3>
+      <h3>Help us build a product you <b-icon icon="heart-fill" variant="danger" /></h3>
       <form-landing-contact class="my-3" feedback-on />
     </b-container>
   </section>

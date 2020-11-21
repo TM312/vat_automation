@@ -6,7 +6,7 @@
           Step 1
         <!-- Get In Touch -->
         </h6>
-        <h1>Data Upload</h1>
+        <h2>Data Upload</h2>
         <p class="lead my-2">
           Set up your company account within minutes by filling out the
           provided templates. You receive live updates if everything

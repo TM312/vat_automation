@@ -5,7 +5,7 @@
         <b-row cols="1" cols-lg="2">
           <b-col>
             <b-jumbotron
-              header="Vat Compliance For Your Amazon Business"
+              header="VAT Compliance For Your Amazon Business"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"
@@ -16,31 +16,15 @@
                 style="max-width: 40rem"
                 class="mt-5"
               >
-                Tax-Automation provides Amazon sellers with the
-                tools to meet their vat requirements across
-                Europe. We assist with the vat registration and
-                preliminary turnover tax returns. Our advanced
-                platform allows to keep track of sales and all
-                relevant distance selling thresholds.
+                Tax-Automation provides Amazon sellers with
+                tools to meet VAT requirements across
+                Europe. We assist with VAT registration and
+                preliminary turnover tax returns. Keep track of sales and all
+                relevant distance selling thresholds through our advanced
+                platform.
               </template>
 
-              <b-button
-                pill
-                variant="outline-primary"
-                to="/vat-compliance"
-                @mouseover="buttonHover = true"
-                @mouseleave="buttonHover = false"
-              >
-                Product Details
-                <b-icon
-                  :icon="
-                    buttonHover
-                      ? 'arrow-right'
-                      : 'chevron-right'
-                  "
-                  class="ml-1"
-                />
-              </b-button>
+              <button-enter-arrow-right to="/vat-compliance" content="Product Details" />
             </b-jumbotron>
           </b-col>
           <b-col cols="auto">
@@ -58,13 +42,7 @@
 
 <script>
 export default {
-  name: "SectionLandingProductTop",
-
-  data() {
-    return {
-      buttonHover: false,
-    }
-  },
+  name: "SectionLandingProductTop"
 }
 </script>
 

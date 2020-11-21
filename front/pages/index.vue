@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="landing">
     <section-landing-product-top class="my-3 py-5" />
     <b-container class="py-5">
       <section-testimonials class="my-5 py-5" />
       <!-- <section-supported-platforms class="my-5" /> -->
-      <section-why-us class="my-5" />
       <section-product-details class="my-5 py-5" />
+
+      <section-why-us class="my-5" />
       <section-sign-up-all class="my-5" />
     </b-container>
   </div>
@@ -18,10 +19,8 @@ export default {
 </script>
 
 <style scoped>
-   html,
-    body {
-        /* max-width: 100%; */
+.landing {
+        max-width: 100%;
         overflow-x: hidden;
     }
-
 </style>

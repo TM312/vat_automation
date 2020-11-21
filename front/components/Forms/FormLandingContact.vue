@@ -11,8 +11,7 @@
       class="mt-4"
     />
     <small class="text-muted">
-      We sent out updates around once a month. You can unsubscribe at any
-      time.
+      We sent out updates once a month. You can unsubscribe at any time.
     </small>
     <b-button
       pill

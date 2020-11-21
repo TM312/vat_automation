@@ -3,7 +3,7 @@
     <h6 class="text-primary">
       Step 2
     </h6>
-    <h1>Company Overview</h1>
+    <h2>Company Overview</h2>
     <p class="lead my-2">
       Set up your company account within minutes by filling out the
       provided templates. You receive live updates if everything worked.
