@@ -4,7 +4,7 @@
       <h6 class="text-primary">
         Step 4
       </h6>
-      <h1>Create Tax Records</h1>
+      <h2>Create Tax Records</h2>
       <p class="lead my-2">
         Get unparalleled insights by reviewing the processing of each
         individual transaction.

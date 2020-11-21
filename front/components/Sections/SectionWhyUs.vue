@@ -5,49 +5,66 @@
     </h6>
     <h1>A Seller Centered Approach Leveraging Modern Technology</h1>
     <p class="lead text-muted">
-      An engineering driven team, caring for customer satisfaction, a high quality product, and efficient processes.
+      An engineering driven team, caring for customer satisfaction, a high
+      quality product, and efficient processes.
     </p>
     <b-row cols="1" cols-lg="2" class="my-5">
+      <b-col class="mb-4">
+        <div id="neuphormism" class="h-100 p-4">
+          <h5 class="text-info">
+            Automation
+          </h5>
+          <p class="lead">
+            Save time and labor costs. Automated processing allows
+            you to file your preliminary turnover tax returns within
+            minutes. Check out our
+            <nuxt-link to="/vat-compliance">
+              VAT compliance page
+            </nuxt-link>
+            for details
+          </p>
+        </div>
+      </b-col>
+      <b-col class="mb-4">
+        <div id="neuphormism" class="h-100 p-4">
+          <h5 class="text-info">
+            High Accuracy
+          </h5>
+          <p class="lead">
+            Reduce your risks for fines from tax authorities. Our
+            calculations have been developed in collaboration with
+            leading tax consulting firms specialized on
+            international VAT filings and tested against various
+            providers.
+          </p>
+        </div>
+      </b-col>
       <b-col class="mb-4">
         <div id="neuphormism" class="h-100 p-4">
           <h5 class="text-info">
             Fair Pricing
           </h5>
           <p class="lead">
-            Our service has been developed with a great focus on automation to allow for efficient processes and fair prices.
-            Check out our <nuxt-link to="/pricing">
+            We focus on efficient processes facilitate fair prices
+            and customer satisfaction for businesses of all sizes.
+            Check out our
+            <nuxt-link to="/pricing">
               pricing page
-            </nuxt-link> for details.
+            </nuxt-link> for
+            details.
           </p>
         </div>
       </b-col>
       <b-col class="mb-4">
         <div id="neuphormism" class="h-100 p-4">
           <h5 class="text-info">
-            Fast Improvement Cycles
+            Ease-of-use
           </h5>
           <p class="lead">
-            We deploy product improvements on a daily basis. Our internal technology capabilities further facilitate fast innovation cycles for new products and features.
-          </p>
-        </div>
-      </b-col>
-      <b-col class="mb-4">
-        <div id="neuphormism" class="h-100 p-4">
-          <h5 class="text-info">
-            United Platform
-          </h5>
-          <p class="lead">
-            Our platform allows sellers, their tax auditors
-          </p>
-        </div>
-      </b-col>
-      <b-col class="mb-4">
-        <div id="neuphormism" class="h-100 p-4">
-          <h5 class="text-info">
-            Trusted Partner Network
-          </h5>
-          <p class="lead">
-            Our platform allows sellers, their tax auditors
+            Always know what's going on at the operational level. We
+            pay great attention to minimalistic design and an
+            unprecedented level of detail when it comes to
+            transactional data.
           </p>
         </div>
       </b-col>
@@ -63,7 +80,7 @@ export default {
 
 <style>
     /* #neuphormism {
-        border-radius: 5px;
-        box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
-    } */
+                    border-radius: 5px;
+                    box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
+                } */
 </style>

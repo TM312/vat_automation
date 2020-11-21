@@ -4,7 +4,7 @@
       <h6 class="text-primary">
         Step 3
       </h6>
-      <h1>Transaction Overview</h1>
+      <h2>Transaction Overview</h2>
       <p class="lead my-2">
         Get unparalleled insights by reviewing the processing of each
         individual transaction.

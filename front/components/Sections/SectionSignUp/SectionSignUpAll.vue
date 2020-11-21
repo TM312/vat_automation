@@ -6,7 +6,7 @@
     </h6>
     <h1>Coming In January 2021</h1>
     <p class="lead my-2">
-      Continuous feedback is the best way to build a product you love. Let's start a dialogue.
+      Continuous feedback is the best way to build a product you <b-icon icon="heart-fill" variant="danger" /> Let's start a dialogue.
     </p>
     <b-row cols="1" cols-lg="2" align-v="stretch" class="mt-5">
       <b-col cols="6" lg="5" class="px-5">
@@ -17,7 +17,7 @@
           <b-tab title="For Amazon Sellers" active>
             <div class="mt-3">
               <p class="text-muted">
-                you want to be the first to try the upcoming features, just enter your email below. Over the coming weeks we will start to open for selected sellers from this list.
+                Enter your email for exclusive access to our beta product and updates.
               </p>
               <form-landing-contact class="mt-2" />
             </div>

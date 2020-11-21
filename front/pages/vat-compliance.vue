@@ -1,15 +1,7 @@
 <template>
   <div>
-    <b-container class="py-5">
-      <b-jumbotron bg-variant="transparent" text-variant="dark" header="Building with Sellers' in Mind">
-        <template #lead class="text-secondary mt-5">
-          <h4 class="text-info">
-            Explore The Interactive Demo
-          </h4>
-
-          <p>Explanation of thhe Sample Case...</p>
-        </template>
-      </b-jumbotron>
+    <b-container class="py-5" style="max-width: 50rem">
+      <section-vat-compliance-top />
     </b-container>
 
     <b-container class="py-5">
