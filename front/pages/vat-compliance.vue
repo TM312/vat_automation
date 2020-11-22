@@ -4,11 +4,18 @@
       <section-vat-compliance-top />
     </b-container>
 
+
     <b-container class="py-5">
       <section-vat-compliance-demo-introduction />
     </b-container>
 
-    <b-container class="py-5">
+    <b-container class="justify-content-center my-3">
+      <b-button class="neumorphism" variant="primary" pill>
+        Upload <b-icon icon="chevron-down" />
+      </b-button>
+    </b-container>
+
+    <!-- <b-container class="py-5">
       <section-vat-compliance-data-upload v-if="!$fetchState.pending" />
     </b-container>
 
@@ -23,7 +30,7 @@
     <b-container class="py-5">
       <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
       <section-sign-up-sellers />
-    </b-container>
+    </b-container> -->
   </div>
 </template>
 
@@ -80,9 +87,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     mark.red {
         color: #ff0000;
         background: none;
     }
+
+    .neumorphism {
+        box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
+    }
+
 </style>

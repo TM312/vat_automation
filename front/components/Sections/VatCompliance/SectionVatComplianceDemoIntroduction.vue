@@ -2,16 +2,10 @@
   <section>
     <b-row>
       <b-col>
-        <b-card
-          bg-variant="info"
-          text-variant="white"
-        >
-          <b-card-text>
-            We have prepared a small demo that will provide you
-            a good idea how this process works.
-          </b-card-text>
-        </b-card>
-        <card-sample-test class="mt-5" />
+        <h3 class="text-info">
+          We have prepared a small demo that will provide you a good idea how this process works.
+        </h3>
+        <card-sample-test class="mt-5 sizing" />
       </b-col>
       <b-col />
     </b-row>
@@ -20,11 +14,13 @@
 
 <script>
 export default {
-  name: 'SectionVatComplianceDemoIntroduction'
-
+  name: "SectionVatComplianceDemoIntroduction",
 }
 </script>
 
-<style>
-
+<style scoped>
+    .sizing {
+        min-width: 30rem;
+        max-width: 50rem;
+    }
 </style>
