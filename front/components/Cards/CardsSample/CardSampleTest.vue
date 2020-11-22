@@ -6,7 +6,7 @@
       </b-col>
       <b-col cols="7">
         <h6 class="text-primary">
-          Sample Company
+          Introduction
         </h6>
         <h4>Bond Store Ltd</h4>
         <p class="my-2 text-dark">
@@ -14,9 +14,9 @@
         </p>
       </b-col>
     </b-row>
-    <p class="text-muted text-right">
-      1/XX
-    </p>
+    <div class="text-muted text-right">
+      <small>1/XX</small>
+    </div>
   </div>
 </template>
 
@@ -34,8 +34,6 @@ export default {
         padding-right: 3rem;
         padding-top: 3rem;
         border-radius: 15px;
-        min-width: 30rem;
-        max-width: 50rem;
         box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
     }
 </style>

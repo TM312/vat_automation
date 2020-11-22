@@ -1,6 +1,6 @@
 
 <template>
-  <b-card>
+  <b-card class="card-sample">
     <b-card-title>Upload</b-card-title>
     <b-card-sub-title class="my-2">
       {{ files.length }}
