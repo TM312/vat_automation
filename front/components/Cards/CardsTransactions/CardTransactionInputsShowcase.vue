@@ -1,6 +1,6 @@
 <template>
-  <b-card title="Transactions">
-    <div>
+  <b-card>
+    <div class="mt-3">
       <b-row>
         <b-col cols="auto">
           <b-pagination

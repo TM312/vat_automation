@@ -31,6 +31,10 @@
             />
           </template>
         </b-table>
+        <small class="text-secondary my-3">
+          Under accounts you store and manage your Amazon related IDs.
+          When processing we assign each transaction to the respective account to facilitate comparisons of the channel specific sales performance.
+        </small>
       </div>
 
       <div v-else-if="editMode && !showcase">
