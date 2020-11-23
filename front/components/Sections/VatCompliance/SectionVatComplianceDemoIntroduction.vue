@@ -3,9 +3,8 @@
     <b-row>
       <b-col>
         <h3 class="text-info">
-          We have prepared a small demo that will provide you a good idea how this process works.
+          Get to know the product by following the sample case below.
         </h3>
-        <card-sample-test class="mt-5 sizing" />
       </b-col>
       <b-col />
     </b-row>
@@ -17,10 +16,3 @@ export default {
   name: "SectionVatComplianceDemoIntroduction",
 }
 </script>
-
-<style scoped>
-    .sizing {
-        min-width: 30rem;
-        max-width: 50rem;
-    }
-</style>

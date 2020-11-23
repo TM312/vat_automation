@@ -71,6 +71,9 @@
               <span v-else><i>Not yet used.</i></span>
             </template>
           </b-table>
+          <small class="text-secondary my-3">
+            We regularly conduct validations of your VAT Numbers and send you a notification in case of invalidity.
+          </small>
         </div>
 
         <div v-else-if="editMode && !showcase">

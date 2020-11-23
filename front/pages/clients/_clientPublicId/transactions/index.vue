@@ -15,7 +15,7 @@
         </b-col>
         <b-col cols="auto" class="mr-auto">
           <span>
-            <b-button-group class="ml-1">
+            <b-button-group class="ml-1 neuphormism">
               <b-button
                 variant="outline-primary"
                 :pressed="null === channelCodeFilter"

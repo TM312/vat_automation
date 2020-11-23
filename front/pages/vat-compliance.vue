@@ -4,24 +4,12 @@
       <section-vat-compliance-top />
     </b-container>
 
-
     <b-container class="py-5">
       <section-vat-compliance-demo-introduction />
-    </b-container>
-
-    <b-container class="justify-content-center my-3">
-      <b-button class="neumorphism" variant="primary" pill>
-        Upload <b-icon icon="chevron-down" />
-      </b-button>
-    </b-container>
-
-    <!-- <b-container class="py-5">
       <section-vat-compliance-data-upload v-if="!$fetchState.pending" />
+      <section-vat-compliance-company-information v-if="!$fetchState.pending" />
     </b-container>
 
-    <b-container v-if="!$fetchState.pending">
-      <section-vat-compliance-company-information v-if="!$fetchState.pending" class="py-5" />
-    </b-container>
 
     <b-container fluid class="py-5">
       <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" />
@@ -30,7 +18,7 @@
     <b-container class="py-5">
       <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
       <section-sign-up-sellers />
-    </b-container> -->
+    </b-container>
   </div>
 </template>
 
@@ -81,7 +69,7 @@ export default {
       taxTreatments: (state) => state.tax_treatment.tax_treatments,
       taxRateTypes: (state) => state.tax_rate_type.tax_rate_types,
       vatThresholds: (state) => state.vat_threshold.vat_thresholds,
-    //   transactionInputs: (state) => state.transaction_input.transaction_inputs,
+      //   transactionInputs: (state) => state.transaction_input.transaction_inputs,
     }),
   },
 }
@@ -96,5 +84,4 @@ export default {
     .neumorphism {
         box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
     }
-
 </style>

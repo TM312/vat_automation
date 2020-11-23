@@ -2,7 +2,7 @@
   <section id="vat-compliance-transaction-overview" class="py-5">
     <b-container>
       <h6 class="text-primary">
-        Step 3
+        Level Of Detail
       </h6>
       <h2>Transaction Overview</h2>
       <p class="lead my-2">

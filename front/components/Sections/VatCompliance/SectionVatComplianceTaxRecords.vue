@@ -2,7 +2,7 @@
   <section id="vat-compliance-tax-record-information" class="py-5">
     <div class="text-right">
       <h6 class="text-primary">
-        Step 4
+        Automation
       </h6>
       <h2>Create Tax Records</h2>
       <p class="lead my-2">

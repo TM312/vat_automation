@@ -3,37 +3,57 @@
     <b-container>
       <div class="text-right">
         <h6 class="text-primary">
-          Step 1
-        <!-- Get In Touch -->
+          Base Data Management
         </h6>
-        <h2>Data Upload</h2>
-        <p class="lead my-2">
-          Set up your company account within minutes by filling out the
-          provided templates. You receive live updates if everything
-          worked. Your company information is updated on the fly.
-        </p>
+        <h2>Easy Company Set Up</h2>
       </div>
+      <p class="lead text-secondary mt-3">
+        Set up your company account within minutes by filling out the
+        provided templates. You receive live updates if everything
+        worked. Your company information is updated on the fly.
+      </p>
     </b-container>
 
-    <b-row>
-      <b-col cols="6" lg="8">
-        <div class="product-container">
-          <card-data-upload-showcase />
+    <b-row class="my-4">
+      <b-col class="mb-4" cols="12" xl="5">
+        <b-pagination
+          v-model="currentPage"
+          class="mb-2"
+          :per-page="perPage"
+          :total-rows="total"
+          pills
+          size="md"
+          hide-goto-end-buttons
+        />
+        <div class="product-container mt-3">
+          <card-sample
+            v-show="currentPage === 1"
+            :page="currentPage"
+            :total="total"
+            primer="Bond Store Ltd"
+            description="The sample company at hand is the 'Bond Store Ltd' based in London, GB, providing equipment for special missions as an Amazon seller in the PAN-EU program."
+            illustration="seller.svg"
+          />
+          <card-sample
+            v-show="currentPage === 2"
+            :page="currentPage"
+            :total="total"
+            primer="Base Data"
+            description="The accurate processing of Amazon's 'Sales Transaction Reports' requires information about a company's items, VAT numbers, existing distance selling acitvations, and Amazon account IDs."
+            illustration="processing.svg"
+          />
+          <card-sample
+            v-show="currentPage === 3"
+            :page="currentPage"
+            :total="total"
+            primer="Templates"
+            description="Our templates provide an easy way to quickly provide this information within a couple of minutes."
+            illustration="data_upload.svg"
+          />
         </div>
       </b-col>
-      <b-col cols="6" lg="4">
-        <p class="text-secondary">
-          1Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-          diam nonumy eirmod tempor invidunt ut labore et dolore magna
-          aliquyam erat, sed diam voluptua. At vero eos et accusam et
-          justo duo dolores et ea rebum. Stet clita kasd gubergren, no
-          sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
-          ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna
-          aliquyam erat, sed diam voluptua. At vero eos et accusam et
-          justo duo dolores et ea rebum. Stet clita kasd gubergren, no
-          sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
+      <b-col class="mb-4" cols="12" xl="7">
+        <card-data-upload-showcase />
       </b-col>
     </b-row>
   </section>
@@ -42,15 +62,22 @@
 <script>
 export default {
   name: "SectionVatComplianceDataUpload",
-//   props: {
-//     sellerFirm: {
-//       type: Array,
-//       required: true,
-//     },
-//   },
+
+  data() {
+    return {
+      currentPage: 1,
+      perPage: 1,
+      total: 3,
+    }
+  },
+  //   props: {
+  //     sellerFirm: {
+  //       type: Array,
+  //       required: true,
+  //     },
+  //   },
 }
 </script>
 
 <style>
-
 </style>

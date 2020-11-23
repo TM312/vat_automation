@@ -71,6 +71,10 @@
               </div>
             </template>
           </b-table>
+          <small class="text-secondary my-3">
+            Our distance sale monitoring solution tracks your taxable turnover in each country and compares it against the current thresholds.
+            We send you notifications when your company runs into risk of reaching one of the thresholds.
+          </small>
         </div>
 
         <div v-else-if="editMode && !showcase">

@@ -41,6 +41,7 @@ export const actions = {
     }
   },
 
+
   async get_by_id({ commit }, user_public_id) {
 
     const res = await this.$repositories.user.get_by_id(user_public_id)
