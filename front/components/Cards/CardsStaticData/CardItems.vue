@@ -49,12 +49,18 @@
             :current-page="currentPage"
           >
             <template v-slot:cell(unit_cost_price_net)="data">
-              {{ data.value }}
-              {{ data.item.unit_cost_price_currency_code }}
+              <span>{{ data.value }}</span>
+              <span>{{ data.item.unit_cost_price_currency_code === 'EUR' ? '€' : data.item.unit_cost_price_currency_code }}</span>
+            </template>
+
+            <template v-slot:cell(name)="data">
+              <span v-if="data.value.length > 30" v-b-tooltip.hover :title="data.value">{{ data.value.slice(0,20) }}...</span>
+              <span v-else>{{ data.value }}</span>
             </template>
 
             <template v-slot:cell(weight_kg)="data">
-              {{ data.value }} kg
+              <span v-if="data.value >= 1">{{ data.value }}kg</span>
+              <span v-else>{{ parseInt(data.value * 1000) }}g</span>
             </template>
           </b-table>
         </div>
@@ -122,6 +128,7 @@ export default {
         },
         {
           key: "unit_cost_price_net",
+          label: 'Net Unit Costs',
           sortable: false,
           formatter: (value) => {
             return Number.parseFloat(value).toFixed(2)

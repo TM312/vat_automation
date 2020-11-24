@@ -14,4 +14,4 @@ def attach_user(api, app):
     api.add_namespace(admin_ns, path=f"/{BASE_ROUTE}/admin")
     api.add_namespace(seller_ns, path=f"/{BASE_ROUTE}/seller")
     api.add_namespace(tax_auditor_ns, path=f"/{BASE_ROUTE}/tax_auditor")
-    api.add_namespace(tax_auditor_ns, path=f"/{BASE_ROUTE}/subscriber")
+    api.add_namespace(subscriber_ns, path=f"/{BASE_ROUTE}/subscriber")

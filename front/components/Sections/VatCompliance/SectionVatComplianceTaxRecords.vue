@@ -2,17 +2,59 @@
   <section id="vat-compliance-tax-record-information" class="py-5">
     <div class="text-right">
       <h6 class="text-primary">
-        Automation
+        Tax Record Creation
       </h6>
-      <h2>Create Tax Records</h2>
-      <p class="lead my-2">
-        Get unparalleled insights by reviewing the processing of each
-        individual transaction.
+      <h2>Automation At Your Hands</h2>
+      <p class="lead text-dark my-2">
+        Always have all your tax records in one place. Creating a new
+        one, when deadlines are approaching is a piece of cake. Try it
+        yourself.
       </p>
     </div>
     <b-tabs content-class="mt-3">
       <b-tab title="Create New" active>
-        <form-add-seller-firm-tax-record showcase />
+        <b-row>
+          <b-col cols="12" xl="7">
+            <form-add-seller-firm-tax-record showcase />
+          </b-col>
+          <b-col cols="12" xl="5">
+            <div>
+              <b-pagination
+                v-model="currentPage"
+                class="mb-3"
+                :per-page="perPage"
+                :total-rows="total"
+                pills
+                size="sm"
+                hide-goto-end-buttons
+              />
+              <card-sample
+                v-show="currentPage === 1"
+                :page="currentPage"
+                :total="total"
+                primer="Tax Record Creation"
+                description="Once you have uploaded all transaction data, you can create tax records for any country in the PAN-EU program."
+                illustration="data.svg"
+              />
+              <card-sample
+                v-show="currentPage === 2"
+                :page="currentPage"
+                :total="total"
+                primer="Tax Record Creation"
+                description="Use the form on the left side to create a new tax record."
+                illustration="data.svg"
+              />
+              <card-sample
+                v-show="currentPage === 3"
+                :page="currentPage"
+                :total="total"
+                primer="Bond Store Ltd"
+                description="For this example, only the 'Sales Tax Transaction Report' for January 2020 was uploaded. Therefore, meaningful tax records would lay between January 1st to January 31st, 2020."
+                illustration="data.svg"
+              />
+            </div>
+          </b-col>
+        </b-row>
       </b-tab>
       <b-tab title="Overview">
         <view-tax-records
@@ -27,7 +69,16 @@
         <b-card-title>
           <b-row>
             <b-col cols="auto" class="ml-auto">
-              <b-button size="sm" variant="outline-danger" @click="$root.$emit('bv::toggle::collapse', 'collapse-tax-record-tables')">
+              <b-button
+                size="sm"
+                variant="outline-danger"
+                @click="
+                  $root.$emit(
+                    'bv::toggle::collapse',
+                    'collapse-tax-record-tables'
+                  )
+                "
+              >
                 <b-icon icon="x" />
               </b-button>
             </b-col>
@@ -42,11 +93,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Local Sale Reverse Charges" class="py-3">
@@ -56,11 +107,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Distance Sales" class="py-3">
@@ -70,11 +121,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Non-Taxable Distance Sales" class="py-3">
@@ -84,11 +135,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Intra-Community Sales" class="py-3">
@@ -98,11 +149,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Exports" class="py-3">
@@ -112,25 +163,30 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
-            <b-tab title="Intra-Community Acquisitions" class="py-3">
+            <b-tab
+              title="Intra-Community Acquisitions"
+              class="py-3"
+            >
               <table-intra-community-acquisitions
                 v-if="Object.keys(taxRecord).length !== 0"
-                :fields-net-reverse-charge="fieldsNetReverseCharge"
+                :fields-net-reverse-charge="
+                  fieldsNetReverseCharge
+                "
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
             <b-tab title="Local Acquisitions" class="py-3">
@@ -140,11 +196,11 @@
                 :tax-record="taxRecord"
               />
               <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur sadipscing
-                elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam
-                voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum.
+                Lorem ipsum dolor sit amet, consetetur
+                sadipscing elitr, sed diam nonumy eirmod tempor
+                invidunt ut labore et dolore magna aliquyam
+                erat, sed diam voluptua. At vero eos et accusam
+                et justo duo dolores et ea rebum.
               </p>
             </b-tab>
           </b-tabs>
@@ -162,6 +218,9 @@ export default {
   data() {
     return {
       taxRecordPublicId: "",
+      currentPage: 1,
+      perPage: 1,
+      total: 3,
     }
   },
 

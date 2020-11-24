@@ -10,13 +10,16 @@
       <section-vat-compliance-company-information v-if="!$fetchState.pending" />
     </b-container>
 
+    <b-container class="py-5">
+      <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
+    </b-container>
+
 
     <b-container fluid class="py-5">
       <section-vat-compliance-transaction-overview v-if="!$fetchState.pending" />
     </b-container>
 
     <b-container class="py-5">
-      <section-vat-compliance-tax-records v-if="!$fetchState.pending" />
       <section-sign-up-sellers />
     </b-container>
   </div>

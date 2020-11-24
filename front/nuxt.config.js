@@ -82,6 +82,7 @@ export default {
             'FormInputPlugin',
             'FormRadioPlugin',
             'ToastPlugin',
+            'TooltipPlugin',
             'ModalPlugin'
         ],
         components: [

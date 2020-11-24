@@ -5,7 +5,7 @@
       v-if="feedbackOn"
       id="feedback"
       v-model="form.feedback"
-      placeholder="Is there any feature that would make our service more useful for you? Just let us know here."
+      placeholder="Is there any feature you need to are hoping for? Tell us, it's not unlikely that we can build it."
       rows="3"
       max-rows="8"
       class="mt-4"
@@ -47,38 +47,34 @@ export default {
   },
 
   methods: {
-    subscribe() {
-      this.$axios
-      //   this.form.email
-      //   this.form.feedback
-
-      this.$axios({
-        method: "GET",
-        url: this.urlEndpointTemplate,
-        responseType: "blob",
-      })
-
-        .then(
-          this.$bvToast.toast(
-            "Pleased with your interest and happy to connect!",
-            {
-              autoHideDelay: 5000,
-              variant: "success",
-            }
-          )
-        )
-
-        .catch(
-          this.$bvToast.toast(
-            "An error occured. Please try again later or contact one of the admins.",
-            {
-              autoHideDelay: 5000,
-              variant: "danger",
-            }
-          )
-        )
+    async subscribe() {
+      const { store } = this.$nuxt.context
+      try {
+        await store.dispatch( "subscriber/create", this.form )
+        this.makeToastSuccess()
+      } catch(error) {
+        this.makeToastError(error)
+      }
     },
-  },
+
+    makeToastSuccess() {
+      this.$bvToast.toast('Happy to connect!',
+        {
+          title: "Submission Successful",
+          variant: "success",
+          autoHideDelay: 10000,
+        }
+      )
+    },
+    makeToastError(error) {
+      this.$bvToast.toast(error, {
+        title: "Submission Failed",
+        variant: "danger",
+        autoHideDelay: 10000,
+      })
+    }
+
+  }
 }
 </script>
 

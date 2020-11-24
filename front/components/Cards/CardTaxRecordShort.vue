@@ -20,25 +20,13 @@
             <b>Payable Vat Amount:</b>
           </b-col>
           <b-col>
-            {{
-              Number.parseFloat(
-                taxRecord.taxable_turnover_amount
-              ).toFixed(2)
-            }}
+            {{ Number.parseFloat(taxRecord.taxable_turnover_amount).toFixed(2) }}
             {{ taxRecord.currency_code }}
             <br />
-            {{
-              Number.parseFloat(taxRecord.payable_vat_amount).toFixed(
-                2
-              )
-            }}
+            {{ Number.parseFloat(taxRecord.payable_vat_amount).toFixed(2) }}
             {{ taxRecord.currency_code }}
           </b-col>
         </b-row>
-
-      <!-- <b-button variant="link" class="mt-2 pl-0" @click="$emit('single-view', taxRecord.public_id)">
-        Details
-      </b-button> -->
       </b-card-text>
       <b-card-text class="mt-3">
         <nuxt-link
@@ -54,8 +42,16 @@
           pill
           variant="outline-primary"
           @click="fetchTaxRecord()"
+          @mouseover="buttonHover = true"
+          @mouseleave="buttonHover = false"
         >
-          Details <b-icon icon="arrow-right" class="mr-1" />
+          Details
+          <b-icon
+            :icon="
+              buttonHover ? 'arrow-right-short' : 'chevron-right'
+            "
+            class="ml-1"
+          />
         </b-button>
       </b-card-text>
     </b-card>
@@ -63,7 +59,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex"
 
 export default {
   name: "CardTaxRecordShort",
@@ -80,24 +76,39 @@ export default {
     showcase: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
+    },
+  },
+
+  data() {
+    return {
+      buttonHover: false,
     }
   },
 
   computed: {
     ...mapState({
-      taxRecordFull: state => state.tax_record.tax_record
-    })
+      taxRecordFull: (state) => state.tax_record.tax_record,
+    }),
   },
 
   methods: {
     async fetchTaxRecord() {
-      this.$root.$emit('bv::toggle::collapse', 'collapse-tax-record-tables')
-      if (this.taxRecordFull.length === 0 || this.taxRecordFull.public_id !== this.taxRecord.public_id) {
+      this.$root.$emit(
+        "bv::toggle::collapse",
+        "collapse-tax-record-tables"
+      )
+      if (
+        this.taxRecordFull.length === 0 ||
+                    this.taxRecordFull.public_id !== this.taxRecord.public_id
+      ) {
         const { store } = this.$nuxt.context
-        await store.dispatch("tax_record/get_by_public_id", this.taxRecord.public_id)
+        await store.dispatch(
+          "tax_record/get_by_public_id",
+          this.taxRecord.public_id
+        )
       }
-    }
+    },
   },
 }
 </script>
