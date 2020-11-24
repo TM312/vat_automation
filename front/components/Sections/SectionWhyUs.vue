@@ -3,7 +3,7 @@
     <h6 class="text-primary">
       Why Tax-Automation
     </h6>
-    <h1>A Seller Centered Approach Leveraging Modern Technology</h1>
+    <h1>Seller Centered Leveraging Modern Technology</h1>
     <p class="lead text-muted">
       An engineering driven team, caring for customer satisfaction, a high
       quality product, and efficient processes.
@@ -19,7 +19,7 @@
             you to file your preliminary turnover tax returns within
             minutes. Check out our
             <nuxt-link to="/vat-compliance">
-              VAT compliance page
+              product page
             </nuxt-link>
             for details
           </p>
