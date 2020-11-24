@@ -3,7 +3,7 @@
     <b-container class="py-5">
       <b-row>
         <b-col cols="6">
-          <span align-self="center" class="text-dark">&copy; Tax-Automation.com</span>
+          <span align-self="center" class="text-dark">&copy; <nuxt-link to="/">Tax-Automation.com</nuxt-link></span>
         </b-col>
         <b-col>
           <b-row>
