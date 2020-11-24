@@ -9,8 +9,7 @@
       </div>
       <p class="lead text-dark mt-3">
         Set up your company account within minutes by filling out the
-        provided templates. You receive live updates if everything
-        worked. Your company information is updated on the fly.
+        provided templates. Your company information is processed on the fly while you receive live status updates.
       </p>
     </b-container>
 
