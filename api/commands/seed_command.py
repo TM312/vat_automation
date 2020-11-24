@@ -146,13 +146,15 @@ class SeedCommand(Command):
 
             ## !!! activate for landing page
 
-            # print('...Seller Firm Static Data')
-            # SampleFirmInformationSeedService.seed_sample_data_static()
-            # print('...arrival vat numbers')
-            # VATINSeedService.seed_bond_transaction_vatins()
-            # print('...Seller Firm Transaction Data')
-            # SampleFirmInformationSeedService.seed_sample_transaction_input_data()
-            # db.session.commit()
+            print('...Seller Firm Static Data')
+            SampleFirmInformationSeedService.seed_sample_data_static()
+            print('...arrival vat numbers')
+            VATINSeedService.seed_bond_transaction_vatins()
+            print('...Seller Firm Transaction Data')
+            SampleFirmInformationSeedService.seed_sample_transaction_input_data()
+            db.session.commit()
+
+            ###!!! above for landing page
 
 
 

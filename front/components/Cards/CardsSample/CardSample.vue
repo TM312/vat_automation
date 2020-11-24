@@ -17,6 +17,11 @@
           src="@/assets/img/illustrations/seller.svg"
           fluid
         />
+        <b-img
+          v-else-if="illustration === 'data.svg'"
+          src="@/assets/img/illustrations/data.svg"
+          fluid
+        />
       </b-col>
       <b-col cols="8">
         <h6 class="text-primary">

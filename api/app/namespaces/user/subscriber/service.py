@@ -1,9 +1,10 @@
 from typing import List
 import pandas as pd
+import re
 
 from app.extensions import db
 from flask import current_app, g
-from werkzeug.exceptions import NotFound, InternalServerError
+from werkzeug.exceptions import NotFound, InternalServerError, UnprocessableEntity
 
 from .model import Subscriber
 from .interface import SubscriberInterface
@@ -14,8 +15,7 @@ class SubscriberService:
 
     @staticmethod
     def get_all() -> List[Subscriber]:
-        subscribers = Subscriber.query.all()
-        return subscribers
+        return Subscriber.query.all()
 
 
     @staticmethod
@@ -23,17 +23,30 @@ class SubscriberService:
         return Subscriber.query.filter_by(id = subscriber_id).first()
 
     @staticmethod
+    def get_by_email(subscriber_email: str) -> Subscriber:
+        return Subscriber.query.filter_by(email=subscriber_email).first()
+
+    @staticmethod
     def get_by_public_id(subscriber_public_id: str) -> Subscriber:
         return Subscriber.query.filter_by(public_id=subscriber_public_id).first()
 
+    @staticmethod
+    def get_or_create(subscriber_data: SubscriberInterface):
+        email = subscriber_data.get('email')
+        subscriber = SubscriberService.get_by_email(email)
+        if not isinstance(subscriber, Subscriber):
+            if not re.fullmatch("[^@]+@[^@]+\.[^@]+", email):
+                raise UnprocessableEntity('Please provide a valid email address.')
 
+            else:
+                subscriber = SubscriberService.create(subscriber_data)
+        return subscriber
 
     @staticmethod
     def create(subscriber_data: SubscriberInterface) -> Subscriber:
         new_subscriber = Subscriber(
-            name = subscriber_data.get('name'),
-            email = subscriber_data.get('email'),
-            u_type_indicated=subscriber_data.get('u_type_indicated')
+            feedback = subscriber_data.get('feedback'),
+            email = subscriber_data.get('email')
         )
         db.session.add(new_subscriber)
         try:
@@ -41,7 +54,7 @@ class SubscriberService:
         except Exception as e:
             current_app.logger.debug(e)
             db.session.rollback()
-            raise InternalServerError
+            raise InternalServerError(e)
 
         return new_subscriber
 

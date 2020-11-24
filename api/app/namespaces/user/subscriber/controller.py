@@ -35,8 +35,9 @@ class SubscriberResource(Resource):
 
 
     @ns.expect(subscriber_dto, validate=True)
-    @ns.marshal_with(subscriber_dto)
-    def post(self):
+    @ns.marshal_with(subscriber_dto, envelope='data')
+    def post(self) -> Subscriber:
         """Create A Single Tax Auditor"""
         subscriber_data: SubscriberInterface = request.json
-        return SubscriberService.create(subscriber_data)
+        print('request.json', request.json, flush=True)
+        return SubscriberService.get_or_create(subscriber_data)

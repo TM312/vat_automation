@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable="lg" type="light" variant="light">
+  <b-navbar toggleable="lg" type="light" variant="white" style="opacity:0.8">
     <b-navbar-brand to="/">
       Tax-Automation
     </b-navbar-brand>
@@ -15,10 +15,16 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
+        <b-nav-item to="/pricing">
+          Pricing
+        </b-nav-item>
+        <!-- <b-nav-item to="/register">
+          Sign Up
+        </b-nav-item> -->
         <!-- Using 'button-content' slot -->
-        <b-button variant="outline-success" to="/login">
+        <!-- <b-button variant="outline-success" to="/login">
           Sign In
-        </b-button>
+        </b-button> -->
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>

@@ -9,8 +9,7 @@ from . import User, Action
 class UserService:
     @staticmethod
     def get_all() -> List[User]:
-        users = User.query.all()
-        return users
+        return User.query.all()
 
     @staticmethod
     def get_by_public_id(public_id: str) -> User:

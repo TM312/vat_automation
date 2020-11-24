@@ -1,12 +1,6 @@
 <template>
-  <b-card bg-variant="white" lg="6" xl="4" style="max-width: 80rem">
-    <b-form-group
-      label-cols-lg="2"
-      label="New Tax Record"
-      label-size="lg"
-      label-class="font-weight-bold pt-0"
-      class="mb-2"
-    >
+  <b-card bg-variant="white" lg="6" xl="4" style="max-width: 80rem" title="New Tax Record" sub-title="Just choose the country and period you need, we take care for the rest.">
+    <b-card-text class="mt-3">
       <b-form-group
         label-cols-sm="3"
         label-align-sm="right"
@@ -121,7 +115,6 @@
           cols="1"
           cols-md="3"
           cols-lg="4"
-          cols-xl="6"
         >
           <b-col class="mb-2">
             <b-button
@@ -338,23 +331,23 @@
           </b-col>
         </b-row>
       </b-form-group>
-    </b-form-group>
 
-    <b-button
-      v-show="parameters.tax_jurisdiction_code != null"
-      variant="primary"
-      block
-      :disabled="
-        parameters.tax_jurisdiction_code == null ||
-          parameters.start_date == null ||
-          parameters.end_date == null
-      "
-      @click="submitPayload()"
-    >
-      <b-icon icon="box-arrow-in-up" />
-      <!-- <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span> -->
-      <span>Generate New Tax Record</span>
-    </b-button>
+      <b-button
+        v-show="parameters.tax_jurisdiction_code != null"
+        variant="primary"
+        block
+        :disabled="
+          parameters.tax_jurisdiction_code == null ||
+            parameters.start_date == null ||
+            parameters.end_date == null
+        "
+        @click="submitPayload()"
+      >
+        <b-icon icon="box-arrow-in-up" />
+        <!-- <span v-if="sellerFirm.transactions.length === 0">There are no processed transactions available for this seller firm</span> -->
+        <span>Generate New Tax Record</span>
+      </b-button>
+    </b-card-text>
   </b-card>
 </template>
 

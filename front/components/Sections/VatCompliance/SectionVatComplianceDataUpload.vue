@@ -3,11 +3,11 @@
     <b-container>
       <div class="text-right">
         <h6 class="text-primary">
-          Base Data Management
+          Data Management
         </h6>
-        <h2>Easy Company Set Up</h2>
+        <h2>Simple Set Up &amp; Data Upload</h2>
       </div>
-      <p class="lead text-secondary mt-3">
+      <p class="lead text-dark mt-3">
         Set up your company account within minutes by filling out the
         provided templates. You receive live updates if everything
         worked. Your company information is updated on the fly.

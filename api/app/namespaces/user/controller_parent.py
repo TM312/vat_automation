@@ -25,6 +25,8 @@ ns.add_model(action_dto.name, action_dto)
 @ns.route("/")
 class AdminUserListResource(Resource):
     """Get all Users"""
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(user_dto_admin, envelope='data')
     def get(self) -> List[User]:
         """List Of Registered Users"""
@@ -34,8 +36,8 @@ class AdminUserListResource(Resource):
 @ns.route("/actions")
 class AdminUserActionsResource(Resource):
     """Get all User Actions"""
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_list_with(action_dto, envelope='data')
     def get(self) -> List[Action]:
         """List of user actions"""
@@ -45,24 +47,24 @@ class AdminUserActionsResource(Resource):
 @ns.route("/<string:public_id>")
 @ns.param("public_id", "Public user ID")
 class AdminUserIdResource(Resource):
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     @ns.marshal_with(user_dto_admin, envelope='data')
     def get(self, public_id: str) -> User:
         """Get One User"""
-        return UserService.get_by_public_id(UUID(public_id))
+        return UserService.get_by_public_id(public_id)
 
-    #@login_required
-    #@accepted_u_types('admin')
+    @login_required
+    @accepted_u_types('admin')
     def delete(self, public_id: str) -> Response:
         """Delete A Single User"""
-        return UserService.delete_by_public_id(UUID(public_id))
+        return UserService.delete_by_public_id(public_id)
 
 
 @ns.route("/self")
 class UserSelfResource(Resource):
     @login_required
-    #@accepted_u_types('admin')
+    # @accepted_u_types('admin')
     @ns.marshal_with(user_dto)
     def get(self, envelope='data') -> User:
         """Get One User"""
