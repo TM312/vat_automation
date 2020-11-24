@@ -107,6 +107,7 @@ export default {
             'BDropdownItem',
             'BDropdownHeader',
             'BDropdownDivider',
+            'BEmbed',
             'BForm',
             'BFormCheckbox',
             'BFormDatepicker',

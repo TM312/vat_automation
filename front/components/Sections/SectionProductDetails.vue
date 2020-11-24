@@ -1,24 +1,74 @@
 <template>
   <section>
     <h6 class="text-primary">
-      Modern Platform For A Solid Infrastructure
+      Fully Automated Infrastructure
     </h6>
-    <h1>
-      An extending suite of services
-    </h1>
-    <p class="lead text-secondary">
-      We are on a mission to provide e-commerce sellers with the best experience to manage their operations. Starting with our module for vat compliance, we rely on your feedback and our capabilities to quickly improve our services to your needs.
-    </p>
+    <h1>File Your Preliminary VAT Tax Returns In Minutes</h1>
+    <b-row class="mt-3">
+      <b-col cols="12" lg="6">
+        <p class="lead text-secondary">
+          We are on a mission to provide you with the best experience
+          to stay vat compliant and manage your operations.
+        </p>
+        <b-row>
+          <b-col cols="6">
+            <p>
+              <span><b-icon icon="check-circle" variant="success" /></span>
+              <span class="ml-1">VAT Threshold Monitoring</span>
+            </p>
+            <p>
+              <span><b-icon icon="check-circle" variant="success" /></span>
+              <span class="ml-1">Easy Data Upload</span>
+            </p>
+          </b-col>
+          <b-col cols="6">
+            <p>
+              <span><b-icon icon="check-circle" variant="success" /></span>
+              <span class="ml-1">Vat Number Validation</span>
+            </p>
+            <p>
+              <span><b-icon icon="check-circle" variant="success" /></span>
+              <span class="ml-1">Daily Exchange Rates</span>
+            </p>
+          </b-col>
+          <b-col cols="12">
+            <p>
+              <span><b-icon icon="check-circle" variant="success" /></span>
+              <span class="ml-1">Monitoring Of Reported Amazon Data</span>
+            </p>
+          </b-col>
+        </b-row>
+
+        <button-enter-arrow-right
+          to="/vat-compliance"
+          content="Product Details"
+          class="mt-4"
+        />
+      </b-col>
+      <b-col cols="12" lg="6">
+        <b-card class="neuphormism">
+          <b-embed type="video" aspect="4by3" controls>
+            <source
+              src="@/assets/vid/Untitled.mv4"
+              type="video/mp4"
+            />
+          </b-embed>
+          <!-- <b-img fluid src="@/assets/img/product/transactions_lq.mov" /> -->
+        </b-card>
+      </b-col>
+    </b-row>
+    <div></div>
   </section>
 </template>
 
 <script>
 export default {
-  name: 'SectionProductDetails'
-
+  name: "SectionProductDetails",
 }
 </script>
 
 <style>
-
+    .neuphormism {
+        box-shadow: 6px 6px 12px #bdbcbc, -6px -6px 12px #ffffff !important;
+    }
 </style>

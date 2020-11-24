@@ -17,7 +17,7 @@
           <b-tab title="For Amazon Sellers" active>
             <div class="mt-3">
               <p class="text-muted">
-                Enter your email for exclusive access to our beta product and updates.
+                Enter your email for early access and updates.
               </p>
               <form-landing-contact class="mt-2" />
             </div>
