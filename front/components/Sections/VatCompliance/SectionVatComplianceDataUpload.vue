@@ -8,8 +8,7 @@
         <h2>Simple Set Up &amp; Data Upload</h2>
       </div>
       <p class="lead text-dark mt-3">
-        Set up your company account within minutes by filling out the
-        provided templates. Your company information is processed on the fly while you receive live status updates.
+        Quickly set up your company account by filling out the provided templates. Your company information is processed on the fly while you receive live status updates.
       </p>
     </b-container>
 
@@ -69,12 +68,6 @@ export default {
       total: 3,
     }
   },
-  //   props: {
-  //     sellerFirm: {
-  //       type: Array,
-  //       required: true,
-  //     },
-  //   },
 }
 </script>
 

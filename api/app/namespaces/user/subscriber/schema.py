@@ -9,10 +9,11 @@ subscriber_sub_dto = user_sub_dto.clone('subscriber_sub', {
 })
 
 
-subscriber_dto = subscriber_sub_dto.clone('subscriber', {
+subscriber_dto = Model('subscriber', {
+    'email': fields.String
 })
 
 
-subscriber_dto_admin = subscriber_dto.clone('subscriber_admin', {
+subscriber_dto_admin = user_dto.clone('subscriber_admin', {
     'id': fields.Integer(readonly=True)
 })

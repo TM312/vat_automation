@@ -6,42 +6,42 @@ tax_treatments = [
     {
         'code': 'LOCAL_SALE',
         'name': 'Local Sale',
-        'description': 'Local Sales indicate that departure and arrival country are the same. They only apply to Sales and Refunds and are taxable in the country of departure.'
+        'description': 'Transaction taxable in the country of departure. Local Sale (Departure = Arrival Country). Limited to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'LOCAL_SALE_REVERSE_CHARGE',
         'name': 'Local Sale Reverse Charge',
-        'description': 'In the case of B2B transactions Local Sales may under certain conditions be taxable with the Reverse Charge Mechanism. This for instance, depends on the item type or to the country of establishment of the transacting businesses.'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. Local Sale (Departure = Arrival Country). Limited to B2B Transactions (valid Customer VAT Number), to Transaction Types SALE and REFUND, and to certain Item Types, or to the country of establishment of the Seller and the Customer.'
     },
     {
         'code': 'DISTANCE_SALE',
         'name': 'Distance Sale',
-        'description': 'Distance Sales indicate the case of cross-border sales or refunds within the EU. These transactions are taxable in the country of arrival and only apply to B2C transactions.'
+        'description': 'Transaction taxable in the country of arrival. EU Cross-border Sale (Departure != Arrival Country). Limited to B2C Transactions, and to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'NON_TAXABLE_DISTANCE_SALE',
         'name': 'Non-taxable Distance Sale',
-        'description': 'Distance Sales commonly require non-taxable but additional reporting in the departure country.'
+        'description': 'Transaction non-taxable but to be reported in the country of departure. EU Cross-border Sale (Departure != Arrival Country). Limited to B2C Transactions, and to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'INTRA_COMMUNITY_SALE',
         'name': 'Intra Community Sale',
-        'description': 'Intra Community Sales are B2B EU cross-border transactions to which the Reverse Charge Mechanism applies.'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Sale (Departure != Arrival Country). Tax Treatment limited to B2B Transactions.'
     },
     {
         'code': 'EXPORT',
         'name': 'Export',
-        'description': 'Exports refer to the sale (or refund) of goods leaving the Single European Economic Area.'
+        'description': 'Sale of good(s) leaving the Single European Economic Area. Limited to Transaction Types SALE (and REFUND).'
     },
     {
         'code': 'LOCAL_ACQUISITION',
         'name': 'Local Acquisition',
-        'description': 'Local Acquisitions apply to transactions not outside the scope of sales and refunds.'
+        'description': 'Transaction taxable in the country of departure. Local Sale (Departure = Arrival Country). Tax Treatment limited to Transaction Types SALE and REFUND.'
     },
     {
         'code': 'INTRA_COMMUNITY_ACQUISITION',
         'name': 'Intra Community Acquisition',
-        'description': 'Intra Community Acquisitions are transaction to which the Reverse Charge taxation mechhanism applies. They are limited to B2B transactions across EU borders.'
+        'description': 'Transaction taxable with the Reverse Charge Mechanism. EU Cross-border Acquisition (Departure != Arrival Country). Tax Treatment limited to B2B Transactions.'
     }  # ,
     # {
     #     'code': 'IMPORT',

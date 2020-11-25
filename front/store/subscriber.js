@@ -4,7 +4,7 @@ export const state = () => ({
 })
 
 export const mutations = {
-  SET_SELLER(state, subscriber) {
+  SET_SUBSCRIBER(state, subscriber) {
     state.subscriber = subscriber
   }
 }
@@ -16,7 +16,7 @@ export const actions = {
     const res = await this.$repositories.subscriber.create(subscriber_data)
     const { status, data } = res
     if (status === 200 && data.data) {
-      commit('SET_SELLER', data.data)
+      commit('SET_SUBSCRIBER', data.data)
     } else {
       // Handle error here
     }
@@ -26,7 +26,7 @@ export const actions = {
     const res = await this.$repositories.subscriber.update(subscriber_id, data_changes)
     const { status, data } = res
     if (status === 200 && data.data) {
-      commit('SET_SELLER', data.data)
+      commit('SET_SUBSCRIBER', data.data)
     } else {
       // Handle error here
     }
@@ -37,7 +37,7 @@ export const actions = {
     const { status, data } = res
     if (status === 200 && data.data) {
       // Remove from store
-      commit('SET_SELLER', [])
+      commit('SET_SUBSCRIBER', [])
     } else {
       // Handle error here
     }

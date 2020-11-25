@@ -24,9 +24,9 @@
               <nuxt-link to="/contact">
                 Contact
               </nuxt-link><br />
-              <nuxt-link to="/privacy">
+              <!-- <nuxt-link to="/privacy">
                 Privacy &amp; Terms
-              </nuxt-link>
+              </nuxt-link> -->
             </b-col>
           </b-row>
         </b-col>

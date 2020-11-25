@@ -33,15 +33,15 @@
                 :page="currentPage"
                 :total="total"
                 primer="Tax Record Creation"
-                description="Once you have uploaded all transaction data, you can create tax records for any country in the PAN-EU program."
+                description="Create tax records for any country in the PAN-EU program by using the form on the left side."
                 illustration="data.svg"
               />
               <card-sample
                 v-show="currentPage === 2"
                 :page="currentPage"
                 :total="total"
-                primer="Tax Record Creation"
-                description="Use the form on the left side to create a new tax record."
+                primer="Bond Store Ltd"
+                description="For this example, only the 'Sales Tax Transaction Report' for January 2020 was uploaded. Therefore, meaningful tax records would lay between January 1st to January 31st, 2020."
                 illustration="data.svg"
               />
               <card-sample
@@ -49,7 +49,7 @@
                 :page="currentPage"
                 :total="total"
                 primer="Bond Store Ltd"
-                description="For this example, only the 'Sales Tax Transaction Report' for January 2020 was uploaded. Therefore, meaningful tax records would lay between January 1st to January 31st, 2020."
+                description="Once you have successfully created a new tax record, click on the 'Overview' tab above to get the details."
                 illustration="data.svg"
               />
             </div>
@@ -86,93 +86,65 @@
         </b-card-title>
         <b-card-text>
           <b-tabs pills vertical>
-            <b-tab title="Local Sales" active class="py-3">
+            <b-tab title="Local Sales" active>
               <table-local-sales
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('LOCAL_SALE').description }}
+              </small>
             </b-tab>
-            <b-tab title="Local Sale Reverse Charges" class="py-3">
+            <b-tab title="Local Sale Reverse Charges">
               <table-local-sale-reverse-charges
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('LOCAL_SALE_REVERSE_CHARGE').description }}
+              </small>
             </b-tab>
-            <b-tab title="Distance Sales" class="py-3">
+            <b-tab title="Distance Sales">
               <table-distance-sales
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('DISTANCE_SALE').description }}
+              </small>
             </b-tab>
-            <b-tab title="Non-Taxable Distance Sales" class="py-3">
+            <b-tab title="Non-Taxable Distance Sales">
               <table-non-taxable-distance-sales
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('NON_TAXABLE_DISTANCE_SALE').description }}
+              </small>
             </b-tab>
-            <b-tab title="Intra-Community Sales" class="py-3">
+            <b-tab title="Intra-Community Sales">
               <table-intra-community-sales
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net="fieldsNet"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
             </b-tab>
-            <b-tab title="Exports" class="py-3">
+            <b-tab title="Exports">
               <table-exports
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net="fieldsNet"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('EXPORT').description }}
+              </small>
             </b-tab>
             <b-tab
               title="Intra-Community Acquisitions"
-              class="py-3"
             >
               <table-intra-community-acquisitions
                 v-if="Object.keys(taxRecord).length !== 0"
@@ -181,27 +153,19 @@
                 "
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('INTRA_COMMUNITY_ACQUISITION').description }}
+              </small>
             </b-tab>
-            <b-tab title="Local Acquisitions" class="py-3">
+            <b-tab title="Local Acquisitions">
               <table-local-acquisitions
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <p class="text-dark">
-                Lorem ipsum dolor sit amet, consetetur
-                sadipscing elitr, sed diam nonumy eirmod tempor
-                invidunt ut labore et dolore magna aliquyam
-                erat, sed diam voluptua. At vero eos et accusam
-                et justo duo dolores et ea rebum.
-              </p>
+              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
+                {{ $store.getters['tax_treatment/getByCode']('LOCAL_ACQUISITION').description }}
+              </small>
             </b-tab>
           </b-tabs>
         </b-card-text>
@@ -229,6 +193,7 @@ export default {
       sellerFirm: (state) => state.seller_firm.seller_firm,
       taxRecords: (state) => state.tax_record.tax_records,
       taxRecord: (state) => state.tax_record.tax_record,
+      taxTreatments: state => state.tax_treatment.tax_treatments
     }),
 
     taxRecordCurrencyCode() {
@@ -247,7 +212,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -266,7 +231,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -275,7 +240,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -294,7 +259,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -303,7 +268,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecord.currency_code
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -312,7 +277,7 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecord.currency_code
+              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
             }`
           },
         },

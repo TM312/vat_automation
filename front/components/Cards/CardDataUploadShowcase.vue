@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 export default {
   name: "CardDataUploadShowcase",
 
@@ -126,6 +128,17 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      sellerFirm: (state) => state.seller_firm.seller_firm,
+      channels: (state) => state.channel.channels,
+      countries: (state) => state.country.countries,
+      currencies: (state) => state.currency.currencies,
+      taxTreatments: (state) => state.tax_treatment.tax_treatments,
+      taxRateTypes: (state) => state.tax_rate_type.tax_rate_types,
+      vatThresholds: (state) => state.vat_threshold.vat_thresholds,
+      transactionInputs: (state) => state.transaction_input.transaction_inputs,
+    }),
+
     buttonDisabled() {
       if (this.files.length == 0 || this.uploadInProgress) {
         return true
@@ -136,11 +149,54 @@ export default {
   },
 
   methods: {
+    async fetchData() {
+      const { store } = this.$nuxt.context
+
+      if (this.countries.length === 0) {
+        await store.dispatch("country/get_all")
+      }
+
+      if (this.currencies.length === 0) {
+        await store.dispatch("currency/get_all")
+      }
+
+      if (this.taxTreatments.length === 0) {
+        await store.dispatch("tax_treatment/get_all")
+      }
+
+      if (this.taxRateTypes.length === 0) {
+        await store.dispatch("tax_rate_type/get_all")
+      }
+
+      if (this.channels.length === 0) {
+        await store.dispatch("channel/get_all")
+      }
+
+      if (this.vatThresholds.length === 0) {
+        await store.dispatch("vat_threshold/get_all")
+      }
+
+      if (this.sellerFirm.length === 0) {
+        await store.dispatch("seller_firm/get_sample")
+      }
+
+      if (this.transactionInputs.length === 0) {
+        const params = {
+          seller_firm_public_id: this.sellerFirm.public_id,
+          page: 1,
+        }
+        await store.dispatch("transaction_input/get_sample", params)
+      }
+    },
+
     async uploadFilesShowcase() {
       this.uploadInProgress = true
       for (var i = 0; i != this.files.length; ) {
+        await this.fetchData()
         await this.sleep(1800)
-        const index = this.uploadedFiles.findIndex((e) => e.name === this.files[i].name)
+        const index = this.uploadedFiles.findIndex(
+          (e) => e.name === this.files[i].name
+        )
 
         this.makeToast(index, this.files[i])
         this.commitToShowcaseStore(index, this.files[i].type)

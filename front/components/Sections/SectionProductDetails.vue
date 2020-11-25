@@ -46,15 +46,13 @@
         />
       </b-col>
       <b-col cols="12" lg="6">
-        <b-card class="neuphormism">
-          <!-- <b-embed type="video" aspect="4by3">
+        <!-- <b-embed type="video" aspect="4by3">
             <source
               src="@/assets/vid/Untitled.m4v"
               type="video/mp4"
             />
           </b-embed> -->
-          <!-- <b-img fluid src="@/assets/img/product/transactions_lq.mov" /> -->
-        </b-card>
+        <b-img class="neuphormism" style="border-radius: 10px" fluid src="@/assets/img/product/transaction_inputs_browser.png" />
       </b-col>
     </b-row>
     <div></div>
