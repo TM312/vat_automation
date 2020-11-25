@@ -1,9 +1,9 @@
 <template>
   <section>
     <h6 class="text-primary">
-      Fully Automated Infrastructure
+      VAT Compliance
     </h6>
-    <h1>File Your Preliminary VAT Tax Returns In Minutes</h1>
+    <h1>Fully Automated Infrastructure</h1>
     <b-row class="mt-3">
       <b-col cols="12" lg="6">
         <p class="lead text-secondary">

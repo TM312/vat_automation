@@ -17,52 +17,54 @@
         <spaceship-beam />
       </b-col>
       <b-col cols="auto">
-        <b-tabs pills class="mt-3">
-          <b-tab title="For Amazon Sellers" active>
-            <div
-              v-if="Object.keys(subscriber).length === 0"
-              class="mt-3"
-            >
-              <p class="text-muted">
-                Enter your email for early access and updates.
-              </p>
-              <form-landing-contact class="mt-2" />
-            </div>
-            <div v-else class="mt-4">
-              <p class="text-muted">
-                <b-icon
-                  icon="check-circle"
-                  variant="success"
-                  class="mr-2"
-                />
-                Email successfully submitted!
-              </p>
-              <p class="text-dark">
-                We will soon start to invite users for early access. Contact us if there are certain features you need and which you couldn't find yet on our
-                <nuxt-link to="/vat-compliance">
-                  product page
-                </nuxt-link>.
-              </p>
-              <code style="color: purple">
-                service@tax-automation.com
-              </code>
-            </div>
-          </b-tab>
-          <b-tab title="For Potential Partners">
-            <div class="mt-3">
-              <p class="text-muted">
-                If you are a tax consultant or service provider
-                for e-commerce sellers and interested in a
-                collaboration? Get in touch! We would love to
-                hear from you.
-              </p>
-              <br />
-              <code style="color: purple">
-                contact@tax-automation.com
-              </code>
-            </div>
-          </b-tab>
-        </b-tabs>
+        <b-card v-if="Object.keys(subscriber).length === 0">
+          <b-tabs pills class="mt-3">
+            <b-tab title="For Amazon Sellers" active>
+              <div
+                v-if="Object.keys(subscriber).length === 0"
+                class="mt-3"
+              >
+                <p class="text-muted">
+                  Enter your email for early access and updates.
+                </p>
+                <form-landing-contact class="mt-2" />
+              </div>
+              <div v-else class="mt-4">
+                <p class="text-muted">
+                  <b-icon
+                    icon="check-circle"
+                    variant="success"
+                    class="mr-2"
+                  />
+                  Email successfully submitted!
+                </p>
+                <p class="text-dark">
+                  We will soon start to invite users for early access.
+                  Is there any feature you need to are looking for and which you couldn't find yet on our
+                  <nuxt-link to="/vat-compliance">
+                    product page
+                  </nuxt-link>? Tell us and we can build it.
+                </p>
+                <code style="color: purple">
+                  service@tax-automation.com
+                </code>
+              </div>
+            </b-tab>
+            <b-tab title="For Potential Partners">
+              <div class="my-3">
+                <p class="text-muted">
+                  If you are a tax consultant or service provider
+                  for e-commerce sellers and interested in a
+                  collaboration? Get in touch! We would love to
+                  hear from you.
+                </p>
+                <code style="color: purple">
+                  contact@tax-automation.com
+                </code>
+              </div>
+            </b-tab>
+          </b-tabs>
+        </b-card>
       </b-col>
     </b-row>
   </section>

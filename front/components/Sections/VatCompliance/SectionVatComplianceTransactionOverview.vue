@@ -13,20 +13,17 @@
           get the details of a single transactions.</span>
       </p>
     </b-container>
-    <b-container class="py-3" fluid style="max-width: 100rem">
-      <b-row>
-        <b-col v-if="Object.keys(sellerFirm).length === 0" cols="12" lg="3">
-          <card-sample
-            :page="currentPage"
-            :total="total"
-            primer="Bond Store Ltd"
-            description="Click on the 'Upload' button at the top of the page to retreive all transaction data."
-          />
-        </b-col>
-        <b-col>
-          <card-transaction-inputs-showcase id="neuphormism" />
-        </b-col>
-      </b-row>
+    <b-container v-if="Object.keys(sellerFirm).length === 0" class="py-3">
+      <card-sample
+        style="max-width: 30rem"
+        :page="currentPage"
+        :total="total"
+        primer="Bond Store Ltd"
+        description="Click on the 'Upload' button at the top of the page to retreive all transaction data."
+      />
+    </b-container>
+    <b-container v-else class="py-3" fluid style="max-width: 100rem">
+      <card-transaction-inputs-showcase id="neuphormism" />
       <b-collapse id="collapse-transaction-input" class="py-3 mt-2">
         <b-card id="neuphormism">
           <b-card-text>

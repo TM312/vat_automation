@@ -1,7 +1,7 @@
 <template>
-  <section id="vat-compliance-sign-up" style="max-width: 45rem">
+  <section id="vat-compliance-sign-up">
     <b-container align-h="center">
-      <div v-if="Object.keys(subscriber).length === 0">
+      <b-card v-if="Object.keys(subscriber).length === 0">
         <h6 class="text-primary">
           Let's Get In Touch
         </h6>
@@ -10,8 +10,8 @@
           <b-icon icon="heart-fill" variant="danger" />
         </h3>
 
-        <form-landing-contact class="my-3" feedback-on />
-      </div>
+        <form-landing-contact class="my-4" feedback-on />
+      </b-card>
       <div v-else>
         <h6 class="text-primary">
           Pleased with your interest!
@@ -27,9 +27,8 @@
             Email successfully submitted!
           </p>
           <p class="text-dark">
-            We will soon start to invite users for early
-            access. Contact us if there are certain features
-            you need and which you couldn't find yet.
+            We will soon start to invite users for early access.
+            Is there any feature you need to are looking for and which you couldn't find yet. Tell us and we can build it.
           </p>
           <code style="color:purple">service@tax-automation.com</code>
         </div>

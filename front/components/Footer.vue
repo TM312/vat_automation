@@ -21,9 +21,9 @@
               <nuxt-link to="/pricing">
                 Pricing
               </nuxt-link><br />
-              <nuxt-link to="/contact">
+              <!-- <nuxt-link to="/contact">
                 Contact
-              </nuxt-link><br />
+              </nuxt-link><br /> -->
               <!-- <nuxt-link to="/privacy">
                 Privacy &amp; Terms
               </nuxt-link> -->

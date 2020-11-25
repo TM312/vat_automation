@@ -3,9 +3,9 @@
     <b-jumbotron bg-variant="transparent" text-variant="dark" header="Building with Sellers' in Mind">
       <template #lead class="mt-5">
         Hi! I'm Thomas Moellers, the founder of Tax-Automation.
-        Our mission is to provide Amazon sellers with the best tools to manage their operations and stay VAT compliant.
+        Our mission is to provide Amazon sellers from single entrepreneurs to large merchants with the best tools to manage their operations and stay VAT compliant.
 
-        As a technology company we collaborate our technology expertise with leading tax consulting firms and Amazon sellers.
+        To do so, we collaborate with leading tax consulting firms and Amazon sellers.
 
         Previously, I was the co-creator of businessmodelnavigator.com.
 
