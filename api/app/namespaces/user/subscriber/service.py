@@ -45,7 +45,7 @@ class SubscriberService:
     @staticmethod
     def create(subscriber_data: SubscriberInterface) -> Subscriber:
         new_subscriber = Subscriber(
-            feedback = subscriber_data.get('feedback'),
+            feedback = subscriber_data.get('feedback')[:511],
             email = subscriber_data.get('email')
         )
         db.session.add(new_subscriber)

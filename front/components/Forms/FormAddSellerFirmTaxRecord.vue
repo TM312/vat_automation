@@ -9,6 +9,7 @@
         <b-form-select
           id="tax_jurisdiction_code"
           v-model="parameters.tax_jurisdiction_code"
+          :disabled="vatCountries.length === 0"
           :options="optionsCountryCode"
           required
         />
@@ -387,10 +388,7 @@ export default {
     ...mapState({
       countries: (state) => state.country.countries,
       sellerFirm: (state) => state.seller_firm.seller_firm,
-      vatCountries: (state) =>
-        state.seller_firm.seller_firm.vat_numbers.map(
-          (vatin) => vatin.country_code
-        ),
+      vatCountries: (state) => Object.keys(state.seller_firm.seller_firm).length !== 0 ? state.seller_firm.seller_firm.vat_numbers.map((vatin) => vatin.country_code) : [],
     }),
 
     currentYearString() {
@@ -646,7 +644,7 @@ export default {
 
     makeToastSuccess() {
       this.$bvToast.toast(
-        `Succesfully created a new tax record (${this.parameters.tax_jurisdiction_code}: ${this.parameters.valid_from}-${this.parameters.valid_from}).`,
+        `Successfully created a new tax record (${this.parameters.tax_jurisdiction_code}: ${this.parameters.start_date} to ${this.parameters.end_date}).`,
         {
           title: "New Tax Record",
           variant: "success",

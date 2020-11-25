@@ -28,7 +28,7 @@ class SubscriberResource(Resource):
     '''Get all Subscriber'''
     @login_required
     @accepted_u_types('admin')
-    @ns.marshal_list_with(subscriber_dto, envelope='data')
+    @ns.marshal_list_with(subscriber_dto_admin, envelope='data')
     def get(self) -> List[Subscriber]:
         '''List Of Registered Subscriber Firms'''
         return SubscriberService.get_all()

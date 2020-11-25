@@ -67,19 +67,6 @@ import { mapState } from "vuex"
 export default {
   name: "CardTransactionInputsShowcase",
 
-  async fetch() {
-    if (this.transactionInputs.length === 0) {
-      const { store } = this.$nuxt.context
-      const params = {
-        seller_firm_public_id: this.sellerFirm.public_id,
-        page: 1,
-      }
-      await store.dispatch(
-        "transaction_input/get_sample",
-        params
-      )
-    }
-  },
 
   data() {
     return {

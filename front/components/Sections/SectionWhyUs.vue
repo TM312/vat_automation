@@ -58,7 +58,7 @@
       <b-col class="mb-4">
         <div id="neuphormism" class="h-100 p-4">
           <h5 class="text-info">
-            Ease-of-use
+            Ease-Of-Use
           </h5>
           <p class="lead">
             Always know what's going on at the operational level. We

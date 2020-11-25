@@ -52,8 +52,9 @@ export default {
       try {
         await store.dispatch( "subscriber/create", this.form )
         this.makeToastSuccess()
-      } catch(error) {
-        this.makeToastError(error)
+      } catch(err) {
+        console.log(err.response.data.message)
+        this.makeToastError(err.response.data.message)
       }
     },
 
@@ -66,8 +67,8 @@ export default {
         }
       )
     },
-    makeToastError(error) {
-      this.$bvToast.toast(error, {
+    makeToastError(message) {
+      this.$bvToast.toast(message, {
         title: "Submission Failed",
         variant: "danger",
         autoHideDelay: 10000,

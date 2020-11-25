@@ -3,6 +3,7 @@
 
 ### Jupyter lab ####
 *.ipynb
+.ipynb_checkpoints
 
 ### Flask ###
 instance/*

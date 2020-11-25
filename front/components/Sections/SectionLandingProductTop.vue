@@ -14,7 +14,7 @@
               <template
                 #lead
                 style="max-width: 40rem"
-                class="mt-5"
+                class="mt-5 text-muted"
               >
                 Tax-Automation provides Amazon sellers with
                 tools to meet VAT requirements across
@@ -55,6 +55,7 @@ export default {
         border-radius: 5px;
         /* background:rgba(193, 194, 207, 0.4); */
     }
+
 
     .product-image {
         opacity: 0.95;

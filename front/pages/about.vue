@@ -2,13 +2,12 @@
   <b-container class="py-5">
     <b-jumbotron bg-variant="transparent" text-variant="dark" header="Building with Sellers' in Mind">
       <template #lead class="mt-5">
-        Hi! I'm Derrick Reimer, the founder of SavvyCal.
-        Our mission is to cut the friction and awkwardness out of scheduling time with people.
+        Hi! I'm Thomas Moellers, the founder of Tax-Automation.
+        Our mission is to provide Amazon sellers with the best tools to manage their operations and stay VAT compliant.
 
-        We’re an indie SaaS company with a little bit of financial backing from TinySeed.
-        We believe sustainable, organic growth is the best way to build a lasting company.
+        As a technology company we collaborate our technology expertise with leading tax consulting firms and Amazon sellers.
 
-        Previously, I was the co-founder of Drip. I host a weekly podcast called The Art of Product.
+        Previously, I was the co-creator of businessmodelnavigator.com.
 
         Tax-Automation is a technology company that
 

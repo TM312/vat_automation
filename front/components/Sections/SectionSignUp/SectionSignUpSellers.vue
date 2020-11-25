@@ -14,18 +14,25 @@
       </div>
       <div v-else>
         <h6 class="text-primary">
-          Please with your interest
+          Pleased with your interest!
         </h6>
         <h3>
           Help us build a product you
           <b-icon icon="heart-fill" variant="danger" />
         </h3>
 
-        <b-form-input>
-          <template #value>
-            {{ subscriber.email }} <b-icon icon="check-circle" variant="success" />
-          </template>
-        </b-form-input>
+        <div class="mt-4">
+          <p class="text-muted">
+            <b-icon icon="check-circle" variant="success" class="mr-2" />
+            Email successfully submitted!
+          </p>
+          <p class="text-dark">
+            We will soon start to invite users for early
+            access. Contact us if there are certain features
+            you need and which you couldn't find yet.
+          </p>
+          <code style="color:purple">service@tax-automation.com</code>
+        </div>
       </div>
     </b-container>
   </section>

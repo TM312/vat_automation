@@ -1,12 +1,16 @@
 <template>
   <section class="my-5">
-    <h6 class="text-primary">
+    <h6 v-if="Object.keys(subscriber).length === 0" class="text-primary">
       Beam Me Up
-      <!-- Get In Touch -->
+    </h6>
+    <h6 v-else class="text-primary">
+      Pleased With Your Interest
     </h6>
     <h1>Coming In January 2021</h1>
     <p class="lead my-2">
-      Continuous feedback is the best way to build a product you <b-icon icon="heart-fill" variant="danger" /> Let's start a dialogue.
+      Continuous feedback is the best way to build a product you
+      <b-icon icon="heart-fill" variant="danger" /> Let's start a
+      dialogue.
     </p>
     <b-row cols="1" cols-lg="2" align-v="stretch" class="mt-5">
       <b-col cols="6" lg="5" class="px-5">
@@ -15,22 +19,45 @@
       <b-col cols="auto">
         <b-tabs pills class="mt-3">
           <b-tab title="For Amazon Sellers" active>
-            <div class="mt-3">
+            <div
+              v-if="Object.keys(subscriber).length === 0"
+              class="mt-3"
+            >
               <p class="text-muted">
                 Enter your email for early access and updates.
               </p>
               <form-landing-contact class="mt-2" />
             </div>
+            <div v-else class="mt-4">
+              <p class="text-muted">
+                <b-icon
+                  icon="check-circle"
+                  variant="success"
+                  class="mr-2"
+                />
+                Email successfully submitted!
+              </p>
+              <p class="text-dark">
+                We will soon start to invite users for early access. Contact us if there are certain features you need and which you couldn't find yet on our
+                <nuxt-link to="/vat-compliance">
+                  product page
+                </nuxt-link>.
+              </p>
+              <code style="color: purple">
+                service@tax-automation.com
+              </code>
+            </div>
           </b-tab>
           <b-tab title="For Potential Partners">
             <div class="mt-3">
               <p class="text-muted">
-                If you are a tax consultant or service provider for
-                e-commerce sellers and interested in a collaboration?
-                Get in touch! We would love to hear from you.
+                If you are a tax consultant or service provider
+                for e-commerce sellers and interested in a
+                collaboration? Get in touch! We would love to
+                hear from you.
               </p>
               <br />
-              <code style="color:purple">
+              <code style="color: purple">
                 contact@tax-automation.com
               </code>
             </div>
@@ -42,7 +69,14 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 export default {
   name: "SectionSignUpAll",
+  computed: {
+    ...mapState({
+      subscriber: (state) => state.subscriber.subscriber,
+    }),
+  },
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="card-sample">
     <b-row>
-      <b-col cols="4">
+      <b-col v-if="illustration!==''" cols="4">
         <b-img
           v-if="illustration === 'data_upload.svg'"
           src="@/assets/img/illustrations/data_upload.svg"
@@ -75,7 +75,8 @@ export default {
     },
     illustration: {
       type: String,
-      required: true,
+      required: false,
+      default: ''
     },
   },
 
