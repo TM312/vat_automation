@@ -1,21 +1,15 @@
 <template>
   <b-container class="py-5">
-    <h1 class="text-dark">
-      Fair Prices For Sellers of All Sizes
-    </h1>
-    <h2 class="text-muted mt-3">
-      Start For Free
-    </h2>
+    <!-- <h5 style="color: purple">
+      Pricing
+    </h5> -->
+    <h1>Fair Prices For Sellers of All Sizes</h1>
+    <p class="lead mt-3">
+      Start For Free. Change Your Plan In Alignment To Your Needs.
+    </p>
 
 
-    <b-row>
-      <b-col>
-        <card-pricing-management-tool class="h-100" />
-      </b-col>
-      <b-col>
-        <card-pricing-vat-compliance />
-      </b-col>
-    </b-row>
+    <section-pricing-plans class="mt-5" />
   </b-container>
 </template>
 

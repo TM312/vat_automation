@@ -625,6 +625,7 @@ export default {
           )
           this.makeToastSuccess()
           this.reset()
+          this.$emit('created')
         } catch (error) {
           this.makeToastError(error)
         }
@@ -636,6 +637,7 @@ export default {
           )
           this.makeToastSuccess()
           this.reset()
+          this.$emit('created')
         } catch (error) {
           this.makeToastError(error)
         }

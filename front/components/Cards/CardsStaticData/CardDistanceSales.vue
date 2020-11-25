@@ -53,22 +53,28 @@
             </template>
 
             <template v-slot:cell(taxable_turnover_amount)="data">
-              <b-progress :max="vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value']" class="mb-3">
-                <b-progress-bar variant="primary" :value="data.item.taxable_turnover_amount" class="self-align-center" />
-                <!-- <b-progress-bar variant="warning" value="1" />
+              <b-row align-v="start">
+                <b-col>
+                  <b-progress :max="vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value']" class="mb-3">
+                    <b-progress-bar variant="primary" :value="data.item.taxable_turnover_amount" class="self-align-center" />
+                    <!-- <b-progress-bar variant="warning" value="1" />
                         <b-progress-bar variant="danger" value="2" /> -->
-              </b-progress>
-              <div class="text-muted">
-                <span v-if="data.item.vat_threshold">
-                  {{ Number.parseFloat(data.value).toFixed(2) }} {{ data.item.vat_threshold.currency_code }} / {{ data.item.vat_threshold.value }} {{ data.item.vat_threshold.currency_code }}
+                  </b-progress>
+                </b-col>
+                <b-col>
+                  <span v-if="data.item.vat_threshold" class="text-muted">
+                    {{ Number.parseFloat(data.value).toFixed(2) }} {{ data.item.vat_threshold.currency_code }} / {{ data.item.vat_threshold.value }} {{ data.item.vat_threshold.currency_code }}
                   <!-- {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code) }} /
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value'] }}
                   {{ vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['currency_code'] }} -->
-                </span>
+                  </span>
+                </b-col>
+              </b-row>
 
-                <!-- <span class="ml-2">|</span>
+
+
+              <!-- <span class="ml-2">|</span>
                 <span class="ml-2">Further information </span> -->
-              </div>
             </template>
           </b-table>
           <small class="text-secondary my-3">

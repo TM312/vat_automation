@@ -11,11 +11,14 @@
         yourself.
       </p>
     </div>
-    <b-tabs content-class="mt-3">
-      <b-tab title="Create New" active>
+    <b-tabs v-model="tab" content-class="mt-3">
+      <b-tab title="Create New" @click="tab = 0">
         <b-row>
           <b-col cols="12" xl="7">
-            <form-add-seller-firm-tax-record showcase />
+            <form-add-seller-firm-tax-record
+              showcase
+              @created="tab = 1"
+            />
           </b-col>
           <b-col cols="12" xl="5">
             <div>
@@ -44,20 +47,13 @@
                 description="For this example, only the 'Sales Tax Transaction Report' for January 2020 was uploaded. Therefore, meaningful tax records would lay between January 1st to January 31st, 2020."
                 illustration="data.svg"
               />
-              <card-sample
-                v-show="currentPage === 3"
-                :page="currentPage"
-                :total="total"
-                primer="Bond Store Ltd"
-                description="Once you have successfully created a new tax record, click on the 'Overview' tab above to get the details."
-                illustration="data.svg"
-              />
             </div>
           </b-col>
         </b-row>
       </b-tab>
-      <b-tab title="Overview">
+      <b-tab title="Overview" @click="tab = 1">
         <view-tax-records
+          v-if="Object.keys(sellerFirm).length !== 0"
           :seller-firm="sellerFirm"
           :tax-records="taxRecords"
           showcase
@@ -92,8 +88,15 @@
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('LOCAL_SALE').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "LOCAL_SALE"
+                  ).description
+                }}
               </small>
             </b-tab>
             <b-tab title="Local Sale Reverse Charges">
@@ -102,8 +105,15 @@
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('LOCAL_SALE_REVERSE_CHARGE').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "LOCAL_SALE_REVERSE_CHARGE"
+                  ).description
+                }}
               </small>
             </b-tab>
             <b-tab title="Distance Sales">
@@ -112,8 +122,15 @@
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('DISTANCE_SALE').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "DISTANCE_SALE"
+                  ).description
+                }}
               </small>
             </b-tab>
             <b-tab title="Non-Taxable Distance Sales">
@@ -122,8 +139,15 @@
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('NON_TAXABLE_DISTANCE_SALE').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "NON_TAXABLE_DISTANCE_SALE"
+                  ).description
+                }}
               </small>
             </b-tab>
             <b-tab title="Intra-Community Sales">
@@ -139,13 +163,18 @@
                 :fields-net="fieldsNet"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('EXPORT').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "EXPORT"
+                  ).description
+                }}
               </small>
             </b-tab>
-            <b-tab
-              title="Intra-Community Acquisitions"
-            >
+            <b-tab title="Intra-Community Acquisitions">
               <table-intra-community-acquisitions
                 v-if="Object.keys(taxRecord).length !== 0"
                 :fields-net-reverse-charge="
@@ -153,8 +182,15 @@
                 "
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('INTRA_COMMUNITY_ACQUISITION').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "INTRA_COMMUNITY_ACQUISITION"
+                  ).description
+                }}
               </small>
             </b-tab>
             <b-tab title="Local Acquisitions">
@@ -163,8 +199,15 @@
                 :fields-net-vat-gross="fieldsNetVatGross"
                 :tax-record="taxRecord"
               />
-              <small v-if="taxTreatments.length !== 0" class="mt-2 text-muted">
-                {{ $store.getters['tax_treatment/getByCode']('LOCAL_ACQUISITION').description }}
+              <small
+                v-if="taxTreatments.length !== 0"
+                class="mt-2 text-muted"
+              >
+                {{
+                  $store.getters["tax_treatment/getByCode"](
+                    "LOCAL_ACQUISITION"
+                  ).description
+                }}
               </small>
             </b-tab>
           </b-tabs>
@@ -181,10 +224,11 @@ export default {
 
   data() {
     return {
+      tab: 0,
       taxRecordPublicId: "",
       currentPage: 1,
       perPage: 1,
-      total: 3,
+      total: 2,
     }
   },
 
@@ -193,7 +237,7 @@ export default {
       sellerFirm: (state) => state.seller_firm.seller_firm,
       taxRecords: (state) => state.tax_record.tax_records,
       taxRecord: (state) => state.tax_record.tax_record,
-      taxTreatments: state => state.tax_treatment.tax_treatments
+      taxTreatments: (state) => state.tax_treatment.tax_treatments,
     }),
 
     taxRecordCurrencyCode() {
@@ -212,7 +256,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -231,7 +277,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -240,7 +288,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -259,7 +309,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -268,7 +320,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
@@ -277,7 +331,9 @@ export default {
           sortable: false,
           formatter: (value) => {
             return `${Number.parseFloat(value).toFixed(2)} ${
-              this.taxRecordCurrencyCode === 'EUR' ? '€' : this.taxRecordCurrencyCode
+              this.taxRecordCurrencyCode === "EUR"
+                ? "€"
+                : this.taxRecordCurrencyCode
             }`
           },
         },
