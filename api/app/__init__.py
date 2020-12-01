@@ -82,7 +82,7 @@ def register_extensions(app) -> None:
 def register_api(app):
     from flask_restx import Api
     from app.routes import register_routes
-    api = Api(app, title="Tax-Automation API", version="0.1.0")
+    api = Api(app, title="Tax-Automation API", version="0.8.0")
     register_routes(api, app)
     #register_routes(api, app, root=os.getenv('API_ROOT'))
     return None

@@ -18,40 +18,40 @@ version: '3'
 
 services:
 
-    front:
-        container_name: front
-        build:
-            context: ./front
-            dockerfile: Dockerfile
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        image: ${OWNER_NAME}/front:${VERSION_NUMBER}
-        restart: always
-        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-            - "14000"
-        # depends_on:
-        #     - api
-        networks:
-            - web
-        command: "npm run start"
-
-
-    # front_tax:
-    #     container_name: front_tax
+    # front:
+    #     container_name: front
     #     build:
-    #         context: ./front_tax
+    #         context: ./front
     #         dockerfile: Dockerfile
     #         args:
     #             - NODE_VERSION=${NODE_VERSION}
-    #     image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
+    #     image: ${OWNER_NAME}/front:${VERSION_NUMBER}
     #     restart: always
     #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-    #         - "22406"
+    #         - "14000"
     #     # depends_on:
     #     #     - api
     #     networks:
     #         - web
     #     command: "npm run start"
+
+
+    front_tax:
+        container_name: front_tax
+        build:
+            context: ./front_tax
+            dockerfile: Dockerfile
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
+        restart: always
+        expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+            - "22406"
+        # depends_on:
+        #     - api
+        networks:
+            - web
+        command: "npm run start"
 
 
     # front_admin:
@@ -73,21 +73,21 @@ services:
 
 
 
-    # rabbitmq:
-    #     container_name: rabbitmq
-    #     image: rabbitmq:management #3-alpine
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:management #3-alpine
 
-    #     ports:
-    #         - "15672:15672"
-    #         - "5672:5672"
-    #     healthcheck:
-    #         test: ['CMD', 'rabbitmqctl', 'status']
-    #         interval: 30s
-    #         timeout: 15s
-    #         retries: 3
-    #     networks:
-    #         - internal
-    #         - web
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+        healthcheck:
+            test: ['CMD', 'rabbitmqctl', 'status']
+            interval: 30s
+            timeout: 15s
+            retries: 3
+        networks:
+            - internal
+            - web
 
     redis:
         container_name: redis
@@ -118,34 +118,34 @@ services:
         privileged: true
 
 
-    # celery-worker:
-    #     # container_name: celery-worker
-    #     build:
-    #         context: ./api
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - PYTHON_VERSION=${PYTHON_VERSION}
-    #             # - GROUP_ID=1237
-    #             # - USER_ID=10239
+    celery-worker:
+        # container_name: celery-worker
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+                # - GROUP_ID=1237
+                # - USER_ID=10239
 
-    #     volumes:
-    #         - data:/home/data
+        volumes:
+            - data:/home/data
 
-    #     depends_on:
-    #         - postgres
-    #         - rabbitmq
-    #         - redis
-    #     networks:
-    #         - internal
+        depends_on:
+            - postgres
+            - rabbitmq
+            - redis
+        networks:
+            - internal
 
-    #     #The -A option gives Celery the application module and the Celery instance
-    #     # https://stackoverflow.com/questions/59651428/runtimewarningyoure-running-the-worker-with-superuser-privilegesthis-is-absol
-    #     # Celery 4 has nasty, very hard to find bug in worker.
-    #     # It works only with 4 defined queues after -Q parameter. If you need more queues, just start more workers.
-    #     # reference: https://pawelzny.com/python/celery/2017/08/14/celery-4-tasks-best-practices/
-    #     command: bash -c "celery worker -A wsgi:celery -P gevent --loglevel=info" #-Q default,low_priority,high_priority" !!!
+        #The -A option gives Celery the application module and the Celery instance
+        # https://stackoverflow.com/questions/59651428/runtimewarningyoure-running-the-worker-with-superuser-privilegesthis-is-absol
+        # Celery 4 has nasty, very hard to find bug in worker.
+        # It works only with 4 defined queues after -Q parameter. If you need more queues, just start more workers.
+        # reference: https://pawelzny.com/python/celery/2017/08/14/celery-4-tasks-best-practices/
+        command: bash -c "celery -A wsgi:celery worker -P gevent --loglevel=info" #-Q default,low_priority,high_priority" !!!
 
-    #     # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
+        # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
 
     # celery-beat:
     #     container_name: celery-beat
@@ -165,7 +165,7 @@ services:
     #     networks:
     #         - internal
     #                                 #The -A option gives Celery the application module and the Celery instance
-    #     command: bash -c "celery beat -A wsgi:celery --loglevel=info"
+    #     command: bash -c "celery -A wsgi:celery beat --loglevel=info"
 
 
 
@@ -199,9 +199,9 @@ services:
             - "5000"
         depends_on: # depends_on defines the order in which the services are started
             - postgres
-            # - rabbitmq #new
-            # - redis #new
-            # - celery-worker #new
+            - rabbitmq #new
+            - redis #new
+            - celery-worker #new
         volumes:
             - logs:/home/logs
             - seeds:/home/seeds
@@ -222,6 +222,8 @@ services:
                 - POSTGRES_VERSION=${POSTGRES_VERSION}
         image: ${OWNER_NAME}/postgres:${VERSION_NUMBER}
         restart: always
+        volumes:
+            - data:/data
         environment:
             - DATABASE=postgres
         expose:

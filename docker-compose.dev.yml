@@ -2,15 +2,15 @@ version: '3'
 
 services:
 
-    front:
-        build:
-            context: ./front
-            dockerfile: Dockerfile.dev
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        volumes:
-              - ./front/:/home/app
-        command: "npm run dev"
+    # front:
+    #     build:
+    #         context: ./front
+    #         dockerfile: Dockerfile.dev
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     volumes:
+    #           - ./front/:/home/app
+    #     command: "npm run dev"
 
     # front_admin:
     #     build:
@@ -22,15 +22,15 @@ services:
     #           - ./front_admin/:/home/app
     #     command: "npm run dev"
 
-    # front_tax:
-    #     build:
-    #         context: ./front_tax
-    #         dockerfile: Dockerfile.dev
-    #         args:
-    #             - NODE_VERSION=${NODE_VERSION}
-    #     volumes:
-    #           - ./front_tax/:/home/app
-    #     command: "npm run dev"
+    front_tax:
+        build:
+            context: ./front_tax
+            dockerfile: Dockerfile.dev
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        volumes:
+              - ./front_tax/:/home/app
+        command: "npm run dev"
 
     proxy:
         container_name: proxy
@@ -59,17 +59,17 @@ services:
         #command: '/bin/sh -c ''while :; do sleep 6h; nginx -s reload; done & exec nginx -g "daemon off;"'''
 
 
-    # rabbitmq:
-    #     env_file:
-    #         - .dev.env
+    rabbitmq:
+        env_file:
+            - .dev.env
 
     redis:
         env_file:
             - .dev.env
 
-    # celery-worker:
-    #     env_file:
-    #         - .dev.env
+    celery-worker:
+        env_file:
+            - .dev.env
 
     # celery-beat:
     #     env_file:
@@ -98,8 +98,8 @@ services:
 
 
     postgres:
-        volumes:
-            - pgdata_dev:/pgdata
+        # volumes:
+        #     - pgdata_dev:/pgdata
         environment:
             - DATABASE=postgres
         ports:
@@ -107,5 +107,5 @@ services:
         env_file:
             - .dev.env
 
-volumes:
-    pgdata_dev:
+# volumes:
+#     pgdata_dev:
