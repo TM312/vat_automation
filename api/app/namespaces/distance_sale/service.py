@@ -306,7 +306,7 @@ class DistanceSaleService:
 
                 # handling exact duplicates
                 # since a distance sale history is created by default when creating a seller firm, the history needs to be longer than 1 for the user to be notified
-                if active == distance_sale_history.active and len(distance_sale_history) > 1:
+                if active == distance_sale_history.active and len(distance_sale.distance_sale_history) > 1:
                     active_human_read = 'active' if active else 'inactive'
                     if not duplicate_counter > 2:
                         message = 'The {} registration for {} (state: {}) is already in the database. Registration has been skipped.'.format(object_type_human_read, distance_sale.arrival_country_code, active_human_read)

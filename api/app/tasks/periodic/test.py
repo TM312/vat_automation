@@ -1,6 +1,6 @@
 import random
 from datetime import datetime, timedelta
-from celery.task.base import periodic_task
+# from celery.task.base import periodic_task
 
 #from wsgi import celery
 from wsgi import app

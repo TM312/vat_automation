@@ -374,7 +374,11 @@ class SellerFirmService:
         #     return False
 
         # processing starts here / seller firm id not yet assigned => 0
-        file_path_in = InputService.move_data_to_file_type(file_path_tbd, file_type, business_id=0)
+        try:
+            file_path_in = InputService.move_data_to_file_type(file_path_tbd, file_type, business_id=0)
+        except:
+            SocketService.emit_status_error(object_type, 'Internal Server Error')
+            return False
 
 
         from app.tasks.asyncr import async_handle_seller_firm_data_upload
@@ -393,6 +397,7 @@ class SellerFirmService:
     @staticmethod
     def handle_seller_firm_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, claimed: bool, seller_firm_notification_data: Dict) -> Dict:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
+
         response_object = SellerFirmService.create_seller_firms(df, file_path_in, user_id, claimed, seller_firm_notification_data)
 
         InputService.move_file_to_out(file_path_in, basepath, file_type, business_id=0)

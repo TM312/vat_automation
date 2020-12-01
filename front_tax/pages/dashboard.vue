@@ -6,10 +6,10 @@
           <greeting-dashboard />
         </b-alert>
         <b-row>
-          <b-col cols="12" md="8" xl="9">
+          <b-col cols="12" md="8">
             <dashboard-dashboard />
           </b-col>
-          <b-col cols="12" md="4" xl="3">
+          <b-col cols="12" md="4">
             <b-card title="Notifications" sub-title="Get Updates About New Clients And Your Key Accounts">
               <b-card-text v-if="notifications.length === 0">
                 <div>Once you or your colleagues start inserting client data you will get notified about updates here.</div>

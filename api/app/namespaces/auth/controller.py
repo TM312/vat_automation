@@ -43,7 +43,7 @@ class UserLogin(Resource):
     """
     User Login Resource
     """
-    @ns.expect(user_dto, validate=True)
+    # @ns.expect(user_dto, validate=True)
     #@ns.header('Authorization',  description='Auth Token')
     def post(self):
         """ Login User """
