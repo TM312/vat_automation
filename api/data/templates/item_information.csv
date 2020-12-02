@@ -1,2 +1,2 @@
 valid_from,SKU,brand_name,name,ean,asin,fnksu,weight_kg,tax_code,unit_cost_price_currency_code,unit_cost_price_net
-01.06.16,WE-01-02-01-01-01-01-41,weltenmann,"WELTENMANN Classic Men Cotton Slip-on Espadrilles, Marine, 41",8.44E+12,B07DFKN4TM,X000UUSGXL,0.57,A_GEN_STANDARD,EUR,9.7
+01.01.20,ITEM-01,sample_brand,SAMPLE BRAND Item Name,8.44E+12,B07XXXX4TM,X000XXXXXL,1.57,A_GEN_STANDARD,EUR,19.7

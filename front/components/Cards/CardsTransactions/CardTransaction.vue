@@ -47,12 +47,11 @@
               </b-col>
             </b-row>
             <b-row v-if="transaction.supplier_vatin.name">
-              <b-col cols="5" xl="4">
+              <b-col cols="auto">
                 <b>Name:</b>
               </b-col>
               <b-col
-                cols="7"
-                xl="8"
+                cols="auto"
                 style="white-space: pre-wrap"
                 class="mr-auto"
               >
@@ -97,30 +96,29 @@
               </b-col>
             </b-row>
             <b-row v-if="transaction.customer_relationship === 'B2B'" class="mt-3">
-              <b-col cols="5" xl="4">
+              <b-col cols="auto">
                 <b>Vat Number:</b>
               </b-col>
               <b-col
-                cols="7"
-                xl="8"
+                cols="auto"
                 style="white-space: pre-wrap"
                 class="mr-auto"
               >
                 <span>{{ transaction.customer_vatin.country_code }} - {{ transaction.customer_vatin.number }}</span>
-                <span v-if="transaction.customer_vatin.number"><b-icon
+                <!-- <span v-if="transaction.customer_vatin.number"><b-icon
                   icon="info-circle"
                   @hover="getVatInfo()"
-                /></span>
+                  variant="info"
+                /></span> -->
               </b-col>
             </b-row>
             <div v-if="transaction.customer_vatin">
               <b-row v-if="transaction.customer_vatin.name">
-                <b-col cols="5" xl="4">
+                <b-col cols="auto">
                   <b>Name:</b>
                 </b-col>
                 <b-col
-                  cols="7"
-                  xl="8"
+                  cols="auto"
                   style="white-space: pre-wrap"
                   class="mr-auto"
                 >
@@ -132,8 +130,7 @@
                   <b>Address:</b>
                 </b-col>
                 <b-col
-                  cols="7"
-                  xl="8"
+                  cols="auto"
                   style="white-space: pre-wrap"
                   class="mr-auto"
                 >

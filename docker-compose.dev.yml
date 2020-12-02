@@ -71,9 +71,9 @@ services:
         env_file:
             - .dev.env
 
-    # celery-beat:
-    #     env_file:
-    #         - .dev.env
+    celery-beat:
+        env_file:
+            - .dev.env
 
     # flower:
     #     ports:

@@ -20,7 +20,7 @@
         <span v-if="Array.isArray(data.value) === true">
           <span>{{ data.value[0] }} </span>
           <b-popover
-            target="popover-vatin"
+            :target="`popover-vatin-${vatNumberByCountryCode}`"
             triggers="hover"
             placement="top"
             class="ml-2"
@@ -47,7 +47,7 @@
             </div>
           </b-popover>
           <b-badge
-            id="popover-vatin"
+            :id="`popover-vatin-${vatNumberByCountryCode}`"
             variant="secondary"
             class="ml-2"
           >
