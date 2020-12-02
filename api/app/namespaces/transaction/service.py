@@ -314,6 +314,17 @@ class TransactionService:
         reverse_charge_vat_rate: float = TransactionService.get_reverse_charge_vat_rate(transaction_input, arrival_country.code, tax_treatment_code, tax_date, item_tax_rate_type_code, item_history.tax_code_code)
         invoice_amount_reverse_charge_vat: float = TransactionService.get_invoice_amount_reverse_charge_vat(invoice_amount_net, reverse_charge_vat_rate)
 
+        #  ### !!!!!! DELETE
+        # if tax_treatment_code == 'INTRA_COMMUNITY_ACQUISITION' and invoice_amount_reverse_charge_vat > 0:
+        #     print("", flush=True)
+        #     print('base transaction_currency_code: ', transaction_currency_code, flush=True)
+        #     print('target invoice_currency_code: ', invoice_currency_code, flush=True)
+        #     print('invoice_exchange_rate_date: ', invoice_exchange_rate_date, flush=True)
+        #     print('invoice_exchange_rate: ', invoice_exchange_rate, flush=True)
+        #     print("total_value_net: {}, total_value_vat: {}, total_value_gross: {}".format(total_value_gross, total_value_vat, total_value_net), flush=True )
+        #     print("invoice_amount_net * reverse_charge_vat_rate = invoice_amount_reverse_charge_vat: {} * {} = {}".format(invoice_amount_net, reverse_charge_vat_rate, invoice_amount_net * reverse_charge_vat_rate), flush=True)
+        #     print("", flush=True)
+        # #### !!!!! DELETE
 
         try:
             arrival_seller_vatin = VATINService.get_vatin_or_None(arrival_country.vat_country_code, transaction_input.arrival_seller_vat_number, date=tax_date)

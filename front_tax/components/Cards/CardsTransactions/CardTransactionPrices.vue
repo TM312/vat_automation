@@ -259,12 +259,12 @@ export default {
         {
           x: `Reverse Charge (Rate: ${Number.parseFloat(
             this.transaction.reverse_charge_vat_rate * 100
-          ).toFixed(2)}%)`,
+          ).toFixed(1)}%)`,
           net: "-",
           vat: `${Number.parseFloat(
             this.transaction.invoice_amount_reverse_charge_vat
           ).toFixed(2)} ${
-            this.transaction.transaction_currency_code
+            this.transaction.invoice_currency_code
           }`,
           gross: "-",
         },

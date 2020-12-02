@@ -147,25 +147,25 @@ services:
 
         # The number of worker processes/threads can be changed using the --concurrency argument and defaults to the number of CPUs available on the machine.
 
-    # celery-beat:
-    #     container_name: celery-beat
-    #     build:
-    #         context: ./api
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - PYTHON_VERSION=${PYTHON_VERSION}
-    #             # - GROUP_ID=${GROUP_ID}
-    #             # - USER_ID=${USER_ID}
+    celery-beat:
+        container_name: celery-beat
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            args:
+                - PYTHON_VERSION=${PYTHON_VERSION}
+                # - GROUP_ID=${GROUP_ID}
+                # - USER_ID=${USER_ID}
 
-    #     depends_on:
-    #         - postgres
-    #         - rabbitmq
-    #         - redis
-    #         - celery-worker
-    #     networks:
-    #         - internal
-    #                                 #The -A option gives Celery the application module and the Celery instance
-    #     command: bash -c "celery -A wsgi:celery beat --loglevel=info"
+        depends_on:
+            - postgres
+            - rabbitmq
+            - redis
+            - celery-worker
+        networks:
+            - internal
+                                    #The -A option gives Celery the application module and the Celery instance
+        command: bash -c "celery -A wsgi:celery beat --loglevel=info"
 
 
 

@@ -47,7 +47,6 @@ class TransactionInputService:
     @staticmethod
     def get_by_bundle_public_id(bundle_public_id: str) -> List[TransactionInput]:
         if bundle_public_id == 'undefined' or bundle_public_id is None:
-            print('bundle_public_id == undefined')
             return None
         else:
             bundle = BundleService.get_by_public_id(bundle_public_id)
@@ -57,6 +56,10 @@ class TransactionInputService:
     @staticmethod
     def get_all_by_seller_firm_id(seller_firm_id: int) -> List[TransactionInput]:
         return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).all()
+
+    @staticmethod
+    def get_all_by_seller_firm_id_limit(seller_firm_id: int, limit: int=50) -> List[TransactionInput]:
+        return TransactionInput.query.filter_by(seller_firm_id=seller_firm_id).order_by(TransactionInput.complete_date.desc()).limit(50).all()
 
     @staticmethod
     def get_all_by_seller_firm_public_id(seller_firm_public_id: str) -> List[TransactionInput]:
@@ -540,7 +543,7 @@ class TransactionInputService:
     @staticmethod
     def push_all_by_seller_firm_id(seller_firm_id: int, object_type: str) -> None:
         socket_list = []
-        transaction_inputs = TransactionInputService.get_all_by_seller_firm_id(seller_firm_id)
+        transaction_inputs = TransactionInputService.get_all_by_seller_firm_id_limit(seller_firm_id)
 
         for transaction_input in transaction_inputs:
             # push transaction inputs to vuex via socket
