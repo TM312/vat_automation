@@ -436,7 +436,7 @@ export default {
     },
 
     makeToast() {
-      this.$bvToast.toast(`Successfully created a new tax record (${this.payload.tax_jurisdiction_code}: ${this.payload.valid_from}-${this.payload.valid_from}).`, {
+      this.$bvToast.toast(`Successfully created a new tax record (${this.payload.tax_jurisdiction_code}: ${this.payload.start_date} to ${this.payload.end_date}).`, {
         title: 'New Tax Record',
         variant: 'success',
         autoHideDelay: 10000,
