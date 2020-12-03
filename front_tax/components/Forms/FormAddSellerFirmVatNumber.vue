@@ -1,19 +1,15 @@
 <template>
   <b-card bg-variant="white">
     <b-form-group
-      label-cols-lg="2"
+      label-cols-xl="2"
       label="New Vat Number"
-      label-size="lg"
+      label-size="md"
       label-class="font-weight-bold pt-0"
       class="mb-2"
     >
-      <b-form-group
-        label-cols-sm="3"
-        label-align-sm="right"
-        label="VATIN"
-      >
+      <b-form-group>
         <b-row>
-          <b-col cols="6" md="4">
+          <b-col cols="12" lg="6" xl="4">
             <b-form-group
               description="Country Code"
             >
@@ -26,7 +22,7 @@
               />
             </b-form-group>
           </b-col>
-          <b-col cols="6" md="4">
+          <b-col cols="12" lg="6" xl="4">
             <b-form-group
               description="Number"
             >
@@ -40,7 +36,7 @@
               />
             </b-form-group>
           </b-col>
-          <b-col v-show="payload.number !== null" cols="6" md="2">
+          <b-col v-show="payload.number !== null" cols="12" lg="6" xl="2" class="mb-2">
             <b-button
               variant="outline-primary"
               :disabled="buttonVerifyDisabled"
@@ -51,7 +47,7 @@
               <span v-else><b-spinner small /></span>
             </b-button>
           </b-col>
-          <b-col v-show="payload.number !== null" cols="6" md="2">
+          <b-col v-show="payload.number !== null" cols="12" lg="6" xl="2" class="mb-2">
             <b-button
               variant="outline-secondary"
               block
@@ -200,7 +196,8 @@ export default {
   computed: {
     ...mapState({
       countries: state => state.country.countries,
-      vatin: state => state.vatin.vatin
+      vatin: state => state.vatin.vatin,
+      sellerFirm: state => state.seller_firm.seller_firm
     }),
 
     payloadValidString() {
@@ -334,8 +331,9 @@ export default {
         this.vatinValidated = (this.vatin.valid || this.vatin.valid === null) ? true : false
 
       } else {
-        await this.$toast.error('Oops, an error occured.', {
-          duration: 1000
+        await this.$bvToast.toast('Oops, an error occured.', {
+          autoHideDelay: 10000,
+          variant: 'danger'
         })
       }
       if (!this.vatinValidated || this.vatin.valid === null) {
@@ -357,22 +355,27 @@ export default {
 
         await this.$store.dispatch(
           "seller_firm/get_by_public_id",
-          this.$route.params.public_id
+          this.sellerFirm.public_id
         )
         this.$emit('flash')
-        await this.$toast.success('New vat number successfully added.', {
-          duration: 5000
+        await this.$bvToast.toast('New vat number successfully added.', {
+          title: "New Vat Number",
+          autoHideDelay: 10000,
+          variant: 'success'
         })
 
         this.reset()
 
       } catch (error) {
-        this.$toast.error(error, { duration: 5000 })
+        await this.$bvToast.toast(error, {
+          autoHideDelay: 10000,
+          variant: 'danger'
+        })
       }
     },
 
     async create_by_seller_firm_public_id() {
-      const data_array = [this.$route.params.public_id, this.payload]
+      const data_array = [this.sellerFirm.public_id, this.payload]
 
       await this.$store.dispatch(
         "vatin/create_by_seller_firm_public_id",
