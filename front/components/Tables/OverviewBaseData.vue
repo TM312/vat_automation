@@ -8,7 +8,7 @@
         <lazy-card-accounts class="mb-5 h-100" />
       </b-col>
     </b-row>
-    <b-row>
+    <b-row cols="1" cols-xl="2" class="my-2">
       <b-col class="my-2 px-2">
         <lazy-card-vat-numbers class="mb-5 h-100" />
       </b-col>
