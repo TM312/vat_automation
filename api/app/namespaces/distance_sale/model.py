@@ -21,6 +21,7 @@ class DistanceSale(db.Model):  # type: ignore
     seller_firm_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     arrival_country_code = db.Column(db.String(8), db.ForeignKey('country.code'), nullable=False)
     active = db.Column(db.Boolean, default=False)
+    ship_from_rule = db.Column(db.Boolean, default=False)
     _taxable_turnover_amount = db.Column(db.Integer, default=0)
     last_tax_date = db.Column(db.Date)
 
@@ -47,7 +48,7 @@ class DistanceSale(db.Model):  # type: ignore
 
 
     def __repr__(self):
-        return '<DistanceSale (seller firm id: {}): {} -> {}>'.format(self.seller_firm_id, self.arrival_country_code, self.active)
+        return '<DistanceSale (seller firm id: {}): {} -> active: {} | ship_from_rule: {}>'.format(self.seller_firm_id, self.arrival_country_code, self.active, self.ship_from_rule)
 
     def update(self, data_changes):
         from .service import DistanceSaleHistoryService
@@ -77,6 +78,7 @@ class DistanceSaleHistory(db.Model):  # type: ignore
     seller_firm_id = db.Column(db.Integer)
     arrival_country_code = db.Column(db.String(8))
     active = db.Column(db.Boolean, default=False)
+    ship_from_rule = db.Column(db.Boolean, default=False)
     _taxable_turnover_amount = db.Column(db.Integer, default=0)
     last_tax_date = db.Column(db.Date)
 
@@ -104,6 +106,7 @@ class DistanceSaleHistory(db.Model):  # type: ignore
             'seller_firm_id': self.seller_firm_id,
             'arrival_country_code': self.arrival_country_code,
             'active': self.active,
+            'ship_from_rule': self.ship_from_rule,
             'taxable_turnover_amount': self.taxable_turnover_amount,
             'last_tax_date': self.last_tax_date
 

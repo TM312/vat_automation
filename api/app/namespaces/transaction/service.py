@@ -143,7 +143,12 @@ class TransactionService:
             return False
 
         try:
-            item = ItemService.get_by_sku_account(transaction_input.item_sku, account)
+            item = ItemService.get_by_sku_seller_firm_id(transaction_input.item_sku, account.seller_firm_id)
+            if not isinstance(item, Item):
+                platform_code = account.channel.platform_code
+                if platform_code == 'AMZ':
+                    item = ItemService.get_by_asin_seller_firm_id(transaction_input.item_asin, seller_firm_id)
+
         except:
             SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
             return False

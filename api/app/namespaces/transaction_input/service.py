@@ -270,12 +270,12 @@ class TransactionInputService:
 
     @staticmethod
     def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int) -> List[Dict]:
+        #!!! make this general and add amazon specific function in file read columns
         from app.namespaces.account.service import AccountService
         from app.namespaces.bundle.service import BundleService
         from app.namespaces.item.service import ItemService
+        from app.namespaces.item import Item
         from app.namespaces.distance_sale.service import DistanceSaleService
-
-        print('enter create_transaction_inputs_and_transactions', flush=True)
 
         error_counter = 0
         total = total_number_transaction_inputs = len(df.index)
@@ -297,6 +297,8 @@ class TransactionInputService:
         # send status update via socket
         SocketService.emit_status_success(0, total_number_transaction_inputs, original_filename, object_type)
 
+        item_unit_cost_price_est = 1 #!!!TransactionInputProcessing.get_item_unit_cost_price_est(df)
+
         for i in range(start, stop, step):
             current = start - i + 1 if desc else i + 1
 
@@ -315,8 +317,23 @@ class TransactionInputService:
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
                 return False
 
+            seller_firm_id = account.seller_firm_id
             try:
-                item = ItemService.get_by_sku_account(item_sku, account)
+                item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+                if not isinstance(item, Item):
+                    platform_code = account.channel.platform_code
+                    if platform_code == 'AMZ':
+                        item_asin = InputService.get_str_or_None(df, i, column='ASIN'),
+                        item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
+                    if isinstance(item_sku, str):
+                        try:
+                            data_changes = {
+                                'item_sku': item_sku,
+                                'valid_from': complete_date
+                            }
+                            item.update(data_changes)
+                        except:
+                            db.session.rollback()
             except:
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
                 return False
@@ -357,10 +374,12 @@ class TransactionInputService:
                     'complete_date': complete_date,
 
                     'item_id': item.id,
-                    'item_sku': item_sku,
+                    'item_asin': item_asin if item_asin else None,
+                    'item_sku': item_sku if item_sku else None,
                     'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
                     'item_manufacture_country': InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY'),
                     'item_quantity': int(df.iloc[i]['QTY']),
+                    'item_unit_cost_price_est': item_unit_cost_price_est,
                     'item_weight_kg': InputService.get_float_or_None(df, i, column='ITEM_WEIGHT'),
                     'item_weight_kg_total': InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_WEIGHT'),
 
@@ -576,6 +595,7 @@ class TransactionInputService:
             arrival_date = transaction_input_data.get('arrival_date'),
             complete_date = transaction_input_data.get('complete_date'),
             item_id = transaction_input_data.get('item_id'),
+            item_asin=transaction_input_data.get('item_asin'),
             item_sku = transaction_input_data.get('item_sku'),
             item_name = transaction_input_data.get('item_name'),
             item_manufacture_country = transaction_input_data.get('item_manufacture_country'),

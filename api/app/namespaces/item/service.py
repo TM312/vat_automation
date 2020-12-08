@@ -13,8 +13,7 @@ from . import Item, ItemHistory
 from .schema import ItemSubSchema
 from .interface import ItemInterface
 
-from app.namespaces.account import Account
-from app.namespaces.utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService, TemplateService
 from app.namespaces.transaction_input import TransactionInput
 from app.namespaces.tag.service import TagService
 
@@ -41,11 +40,25 @@ class ItemService:
         return Item.query.filter_by(public_id = item_public_id).first()
 
     @staticmethod
-    def get_by_sku_account(item_sku: str, account: Account) -> Item:
+    def get_by_identifiers_seller_firm_id(item_sku: str, item_asin: str, seller_firm_id: int) -> Item:
+        item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+        if not isinstance(item, Item):
+            item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
+        return item
+
+    @staticmethod
+    def get_by_sku_seller_firm_id(item_sku: str, seller_firm_id: int) -> Item:
         return Item.query.filter(
             Item.sku==item_sku,
-            Item.seller_firm_id==account.seller_firm_id
+            Item.seller_firm_id==seller_firm_id
             ).first()
+
+    @staticmethod
+    def get_by_asin_seller_firm_id(item_asin: str, seller_firm_id: int) -> Item:
+        return Item.query.filter(
+            Item.sku == item_asin,
+            Item.seller_firm_id == seller_firm_id
+        ).first()
 
     @staticmethod
     def get_by_sku_seller_firm_id(sku: str, seller_firm_id: int) -> Item:
@@ -58,8 +71,14 @@ class ItemService:
     @staticmethod
     def update(item_id: int, data_changes: ItemInterface) -> Item:
         item = ItemService.get_by_id(item_id)
-        item.update(data_changes)
-        db.session.commit()
+        if isinstance(item, Item):
+            item.update(data_changes)
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
+                raise
+
         return item
 
     @staticmethod
@@ -124,7 +143,7 @@ class ItemService:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
             item_data['seller_firm_id'] = seller_firm.id
-            item = ItemService.get_by_sku_account(item_data['sku'], item_data['seller_firm_id'])
+            item = ItemService.get_by_sku_seller_firm_id(item_data['sku'], item_data['seller_firm_id'])
             if isinstance(item, Item):
                 return item
             else:
@@ -197,9 +216,9 @@ class ItemService:
         return response_object
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, seller_firm_id: int) -> List:
         try:
-            sku = InputService.get_str(df, i, column='SKU')
+            sku = InputService.get_str_or_None(df, i, column='SKU')
         except:
             raise UnprocessableEntity('SKU')
 
@@ -213,22 +232,23 @@ class ItemService:
             raise UnprocessableEntity('name')
 
         try:
+            asin = InputService.get_str_or_None(df, i, column='asin')
+        except:
+            raise UnprocessableEntity('asin')
+
+        try:
             unit_cost_price_net = InputService.get_float_or_None(df, i, column='unit_cost_price_net')
         except:
             raise UnprocessableEntity('unit_cost_price_net')
 
         try:
-            unit_cost_price_currency_code = InputService.get_str(df, i, column='unit_cost_price_currency_code')
+            unit_cost_price_currency_code = InputService.get_str_or_None(df, i, column='unit_cost_price_currency_code')
         except:
             raise UnprocessableEntity('unit_cost_price_currency_code')
 
+        item = ItemService.get_by_identifiers_seller_firm_id(sku, asin, seller_firm_id)
         try:
-            service_start_date = current_app.config.SERVICE_START_DATE
-            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            if isinstance(valid_from, date):
-                valid_from = valid_from if valid_from >= service_start_date else service_start_date
-            else:
-                valid_from = date.today()
+            valid_from = TemplateService.get_valid_from(df, i, item, Item)
 
         except:
             raise UnprocessableEntity('valid_from')
@@ -244,23 +264,22 @@ class ItemService:
             raise UnprocessableEntity('weight_kg')
 
         try:
-            tax_code_code = InputService.get_str(df, i, column='tax_code')
+            tax_code_code = InputService.get_str_or_None(df, i, column='tax_code')
         except:
             raise UnprocessableEntity('tax_code')
 
-        if not isinstance(sku, str):
-             raise ExpectationFailed('SKU')
 
-        if not isinstance(unit_cost_price_net, (float, int, complex)):
-            raise ExpectationFailed('unit_cost_price_net')
-
-        if not isinstance(unit_cost_price_currency_code, str):
-            raise ExpectationFailed('unit_cost_price_currency_code')
-
-        if not isinstance(valid_from, date):
-            raise ExpectationFailed('valid_from')
-
-        return sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code
+        return (
+            sku,
+            name,
+            asin,
+            unit_cost_price_net,
+            unit_cost_price_currency_code,
+            valid_from,
+            brand_name,
+            weight_kg,
+            tax_code_code
+        )
 
 
 
@@ -287,7 +306,7 @@ class ItemService:
             current = i + 1
 
             try:
-                sku, name, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type)
+                sku, name, asin, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type, seller_firm_id)
             except Exception as e:
                 if e.code == 422:
                     SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
@@ -296,13 +315,13 @@ class ItemService:
                 return False
 
 
-            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
 
             item_data = {
                 'valid_from': valid_from,
                 'created_by': user_id,
                 'original_filename': original_filename,
                 'sku': sku,
+                'asin': asin,
                 'seller_firm_id': seller_firm_id,
                 'brand_name': brand_name,
                 'name': name,
@@ -311,6 +330,8 @@ class ItemService:
                 'unit_cost_price_currency_code': unit_cost_price_currency_code,
                 'unit_cost_price_net': unit_cost_price_net
             }
+
+            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
 
             # handling item updates
             if isinstance(item, Item):
@@ -321,6 +342,7 @@ class ItemService:
                     if (
                         item_history.valid_from == valid_from
                         and item_history.sku == sku
+                        and item_history.asin == asin
                         and item_history.seller_firm_id == seller_firm_id
                         and item_history.brand_name == brand_name
                         and item_history.name == name
@@ -401,7 +423,6 @@ class ItemService:
     def create(item_data: ItemInterface) -> Item:
         new_item = Item(
             created_by = item_data.get('created_by'),
-            given_id = item_data.get('given_id'),
             active = item_data.get('active'),
             category_id = item_data.get('category_id'),
             original_filename = item_data.get('original_filename'),
@@ -526,7 +547,6 @@ class ItemHistoryService:
             item_id=item_data.get('item_id'),
 
             created_by = item_data.get('created_by'),
-            given_id = item_data.get('given_id'),
             active = item_data.get('active'),
             category_id = item_data.get('category_id'),
             original_filename = item_data.get('original_filename'),
