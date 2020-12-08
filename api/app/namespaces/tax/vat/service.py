@@ -108,70 +108,6 @@ class VatHistoryService:
             VatHistory.valid_to>=tax_date
             ).first()
 
-    @staticmethod
-    def handle_update(vat_id, data_changes):
-        """
-        When updating 3 cases can exist:
-
-        CASE EARLIER: The update's valid_from attribute is EARLIER than any other history object.
-            1. New history object is created
-            2. Oldest history object retrieved
-            3. Missing data change attributes complemented by those from oldest history object
-            4. New history object valid_to == oldest history object valid_from - timedelta(days=1)
-
-        CASE EQUAL: The update's valid_from attribute is EQUAL to another history object.
-            1. Data changes are implemented for the retrieved history object
-
-        CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid history object.
-            1. New history object is created
-            2. Current history object retrieved
-            3. Missing data change attributes complemented by those from history object
-            4. Current history object valid_to == new history object valid_from - timedelta(days=1)
-
-        """
-
-        # Trying to retrieve item history to decide case
-        valid_from = data_changes['valid_from']
-        vat_history = VatHistoryService.get_by_vat_id_date(vat_id, valid_from)
-
-
-        # CASE EARLIER
-        if not isinstance(vat_history, VatHistory):
-            #1.
-            new_vat_history = VatHistory(vat_id=vat_id)
-            db.session.add(new_vat_history)
-            #2.
-            vat_history = VatHistoryService.get_oldest(vat_id)
-            #3. and #4.
-            all_attr = {**vat_history.attr_as_dict(), **data_changes}
-            all_attr['valid_to'] = vat_history.valid_from - timedelta(days=1)
-            for key, val in all_attr.items():
-                setattr(new_vat_history, key, val)
-
-        else:
-            # CASE EQUAL
-            if valid_from == vat_history.valid_from:
-                for key, val in data_changes.items():
-                    setattr(vat_history, key, val)
-
-            # CASE LATER
-            else:
-                vat_history = VatHistoryService.get_current(vat_id)
-
-                #1.
-                new_vat_history = VatHistory(vat_id=vat_id)
-                db.session.add(new_vat_history)
-                #(2.) -> already exists
-                #3.
-                all_attr = {**vat_history.attr_as_dict(), **data_changes}
-
-                for key, val in all_attr.items():
-                    setattr(new_vat_history, key, val)
-
-                #4.
-                vat_history.valid_to = valid_from - timedelta(days=1)
-
-
 
     @staticmethod
     def get_oldest(vat_id: int) -> VatHistory:
@@ -183,13 +119,21 @@ class VatHistoryService:
 
 
     @staticmethod
-    def get_by_vat_id_date(vat_id: int, date: date) -> VatHistory:
+    def get_by_relationship_date(vat_id: int, date: date) -> VatHistory:
         return VatHistory.query.filter(
             VatHistory.vat_id == vat_id,
             VatHistory.valid_from <= date,
             VatHistory.valid_to >= date
         ).first()
 
+    @staticmethod
+    def create_empty(vat_id: int) -> VatHistory:
+        # create new vat history
+        new_vat_history = VatHistory(vat_id=vat_id)
+        db.session.add(new_vat_history)
+        db.session.commit()
+
+        return new_vat_history
 
     @staticmethod
     def create(vat_data) -> VatHistory:
@@ -212,6 +156,8 @@ class VatHistoryService:
         db.session.commit()
 
         return new_vat_history
+
+
 
 
     @staticmethod

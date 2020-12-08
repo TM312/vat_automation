@@ -41,8 +41,8 @@ class BusinessService:
 
     @staticmethod
     def create_public_id(name_pre: str) -> str:
-        from app.namespaces.utils.service import InputService
-        name = InputService.stringify(name_pre)
+        from app.namespaces.utils.service import HelperService
+        name = HelperService.stringify(name_pre)
         # vars for while loop
         business_exist = True
         i = 0

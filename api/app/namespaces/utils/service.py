@@ -16,6 +16,8 @@ from app.namespaces.business import Business
 
 class TemplateService:
 
+    # Actions related to handling templates
+
     def download_file(filename: str):
         BASE_PATH_TEMPLATES = current_app.config.BASE_PATH_TEMPLATES
         try:
@@ -38,6 +40,8 @@ class TemplateService:
 
 
 class HelperService:
+    # Actions for variable manipulations
+
     @staticmethod
     def get_date_from_str(date_string:str, date_format: str) -> date:
         try:
@@ -45,6 +49,86 @@ class HelperService:
         except:
             raise UnprocessableEntity('Unreadable date format.')
         return date
+
+    @staticmethod
+    def stringify(string_raw: str) -> str:
+        import re
+        pattern = re.compile(r'-{2,}')
+        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
+        string = string_raw.lower().translate({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"}).replace(" ", "-").strip("-")
+        return re.sub(pattern, "-", string)
+
+    @staticmethod
+    def stringify_snake_case(string_raw: str) -> str:
+        import re
+        pattern = re.compile(r'-{2,}')
+        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
+        string = string_raw.lower().translate(
+            {ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=-+"}).replace(" ", "_").strip("-")
+        return re.sub(pattern, "_", string)
+
+
+class HistoryService:
+    # Actions related to history objects
+
+
+    @staticmethod
+    def handle_update(obj_id: int, HistoryClass, ObjHistoryService, data_changes: Dict):
+        """
+            When updating 3 cases can exist:
+
+            CASE EARLIER: The update's valid_from attribute is EARLIER than any other history object.
+                1. New history obj is created
+                2. Oldest history obj retrieved
+                3. Missing data change attributes complemented by those from oldest history obj
+                4. New history obj valid_to == oldest history pbj valid_from - timedelta(days=1)
+
+            CASE EQUAL: The update's valid_from attribute is EQUAL to another history object.
+                1. Data changes are implemented for the retrieved history object
+
+            CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid history object.
+                1. New history obj is created
+                2. Current history obj retrieved
+                3. Missing data change attributes complemented by those from history obj
+                4. Current history obj valid_to == new history obj valid_from - timedelta(days=1)
+
+        """
+
+        #retrieve valid_from to decide for case
+        valid_from = data_changes['valid_from']
+        history_obj = ObjHistoryService.get_by_relationship_date(obj_id, valid_from)
+
+        # CASE EARLIER
+        if not isinstance(history_obj, HistoryClass):
+            #1.
+            new_history_obj = ObjHistoryService.create_empty(obj_id)
+            #2.
+            history_obj = ObjHistoryService.get_oldest(obj_id)
+            #3. and #4.
+            all_attr = {**history_obj.attr_as_dict(), **data_changes}
+            all_attr['valid_to'] = history_obj.valid_from - timedelta(days=1)
+            new_history_obj.update(all_attr)
+
+        else:
+            # CASE EQUAL
+            if valid_from == history_obj.valid_from:
+                history_obj.update(data_changes)
+
+
+            # CASE LATER
+            else:
+                history_obj = ObjHistoryService.get_current(obj_id)
+                #1.
+                new_history_obj = ObjHistoryService.create_empty(obj_id)
+                #(2.) -> already exists
+                # #3.
+                all_attr = {**history_obj.attr_as_dict(), **data_changes}
+                all_attr['valid_from'] = valid_from
+                new_history_obj.update(all_attr)
+
+                # #4.
+                history_obj.valid_to = valid_from - timedelta(days=1)
+
 
 
 
@@ -156,24 +240,8 @@ class NotificationService:
 
 
 class InputService:
-    @staticmethod
-    def stringify(string_raw: str) -> str:
-        import re
-        pattern = re.compile(r'-{2,}')
-        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
-        string = string_raw.lower().translate({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"}).replace(" ", "-").strip("-")
-        return re.sub(pattern, "-", string)
 
-    @staticmethod
-    def stringify_snake_case(string_raw: str) -> str:
-        import re
-        pattern = re.compile(r'-{2,}')
-        #https://stackoverflow.com/questions/23996118/replace-special-characters-in-a-string-python
-        string = string_raw.lower().translate(
-            {ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=-+"}).replace(" ", "_").strip("-")
-        return re.sub(pattern, "_", string)
-
-
+    # Actions for handling files or data frames
 
 
 
@@ -310,7 +378,10 @@ class InputService:
         if ('channel_code' in column_name_list and 'channel_code' in column_name_list):
             return 'account_list'
 
-        elif ('arrival_country_code' in column_name_list and 'active' in column_name_list):
+        elif ('arrival_country_code' in column_name_list
+            and 'active' in column_name_list
+            and 'ship_from_rule' in column_name_list
+            ):
             return 'distance_sale_list'
 
         elif ('SKU' in column_name_list
@@ -339,19 +410,7 @@ class InputService:
             raise UnprocessableEntity('Unable to identify the file type')
 
 
-    # @staticmethod
-    # def determine_data_type(file_type: str) -> str:
-    #     if file_type in ['account_list', 'distance_sale_list', 'item_list', 'vat_numbers']:
-    #         return 'static'
 
-    #     elif file_type in ['transactions_amazon']:
-    #         return 'recurring'
-
-    #     elif file_type in ['seller_firm']:
-    #         return 'business'
-
-    #     else:
-            raise
 
     @staticmethod
     def infer_delimiter(file_path_in: str) -> str:
@@ -360,17 +419,6 @@ class InputService:
         return inferred_sep
 
 
-
-    # @staticmethod
-    # def store_static_data_upload(file: BinaryIO, file_type: str) -> str:
-    #     STATIC_DATA_ALLOWED_EXTENSIONS = current_app.config.STATIC_DATA_ALLOWED_EXTENSIONS
-    #     BASE_PATH_BUSINESS_DATA = current_app.config.BASE_PATH_BUSINESS_DATA
-    #     try:
-    #         file_path_in = InputService.store_file(file=file, allowed_extensions=STATIC_DATA_ALLOWED_EXTENSIONS, basepath=BASE_PATH_BUSINESS_DATA, file_type=file_type)
-    #     except:
-    #         raise
-
-    #     return file_path_in
 
 
 

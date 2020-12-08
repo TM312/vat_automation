@@ -39,15 +39,26 @@ class Vat(db.Model):  # type: ignore
         return '<Vat: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
 
     def update(self, data_changes):
-        from .service import VatHistoryService
 
         for key, val in data_changes.items():
             setattr(self, key, val)
         self.modified_at = datetime.utcnow()
 
-        VatHistoryService.handle_update(self.id, data_changes)
+        """
+        In order to use HistoryService.handle_update(*) there need to be the following methods in place:
+            - vat_history.update(data_changes)
+            - VatHistoryService.get_oldest(vat_id)
+            - VatHistoryService.get_current(vat_id)
+            - VatHistoryService.get_by_relationship_date(vat_id, date)
+            - VatHistoryService.create_empty(vat_id)
+
+        """
+        from app.namespaces.utils.service import HistoryService
+        from .service import VatHistoryService
+        HistoryService.handle_update(self.id, VatHistory, VatHistoryService, data_changes)
 
         return self
+
 
 
 class VatHistory(db.Model):  # type: ignore
@@ -87,3 +98,8 @@ class VatHistory(db.Model):  # type: ignore
             'tax_rate_type_code': self.tax_rate_type_code,
             'rate': self.rate
         }
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

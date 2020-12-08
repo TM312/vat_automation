@@ -51,13 +51,24 @@ class DistanceSale(db.Model):  # type: ignore
         return '<DistanceSale (seller firm id: {}): {} -> active: {} | ship_from_rule: {}>'.format(self.seller_firm_id, self.arrival_country_code, self.active, self.ship_from_rule)
 
     def update(self, data_changes):
-        from .service import DistanceSaleHistoryService
 
         for key, val in data_changes.items():
             setattr(self, key, val)
         self.modified_at = datetime.utcnow()
 
-        DistanceSaleHistoryService.handle_update(self.id, data_changes)
+        # DistanceSaleHistoryService.handle_update(self.id, data_changes)
+        """
+        In order to use HistoryService.handle_update(*) there need to be the following methods in place:
+            - distance_sale_history.update(data_changes)
+            - DistanceSaleHistoryService.get_oldest(distance_sale_id)
+            - DistanceSaleHistoryService.get_current(distance_sale_id)
+            - DistanceSaleHistoryService.get_by_relationship_date(distance_sale_id, date)
+            - DistanceSaleHistoryService.create_empty(distance_sale_id)
+
+        """
+        from app.namespaces.utils.service import HistoryService
+        from .service import DistanceSaleHistoryService
+        HistoryService.handle_update(self.id, DistanceSaleHistory, DistanceSaleHistoryService, data_changes)
 
         return self
 
@@ -111,3 +122,8 @@ class DistanceSaleHistory(db.Model):  # type: ignore
             'last_tax_date': self.last_tax_date
 
         }
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

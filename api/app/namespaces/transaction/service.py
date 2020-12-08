@@ -261,7 +261,7 @@ class TransactionService:
         tax_calculation_date = TransactionService.get_tax_calculation_date(transaction_input.tax_calculation_date, tax_date, transaction_type.code, bundle.id)
         tax_jurisdiction: Country = TransactionService.get_tax_jurisdiction(tax_treatment_code, departure_country, arrival_country)
 
-        item_history = ItemHistoryService.get_by_item_id_date(item.id, tax_date)
+        item_history = ItemHistoryService.get_by_relationship_date(item.id, tax_date)
 
         item_tax_code_code, calculated_item_tax_code_code = TransactionService.get_item_tax_code_code(transaction_input, item_history.tax_code_code, platform_code, reference_tax_code=transaction_input.item_tax_code_code)
         item_vat_temp = VatHistoryService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction.code, tax_date)
@@ -653,7 +653,7 @@ class TransactionService:
             elif customer_relationship == 'B2C':
 
                 distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country.code, seller_firm_id)
-                distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, tax_date) if isinstance(distance_sale, DistanceSale) else None
+                distance_sale_history = DistanceSaleHistoryService.get_by_relationship_date(distance_sale.id, tax_date) if isinstance(distance_sale, DistanceSale) else None
 
                 distance_sale_history_active = (
                     distance_sale_history.active
