@@ -12,7 +12,7 @@ from . import DistanceSale, DistanceSaleHistory
 from .interface import DistanceSaleInterface
 from .schema import DistanceSaleSubSchema
 
-from app.namespaces.utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService, TemplateService
 from app.namespaces.tag.service import TagService
 
 from app.extensions.socketio.emitters import SocketService
@@ -149,27 +149,29 @@ class DistanceSaleService:
         return response_object
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
-        try:
-            service_start_date = current_app.config.SERVICE_START_DATE
-            valid_from = InputService.get_date_or_None(df, i, column='valid_from')
-            if isinstance(valid_from, date):
-                valid_from = valid_from if valid_from >= service_start_date else service_start_date
-            else:
-                valid_from = date.today()
-
-        except:
-            raise UnprocessableEntity('valid_from')
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, seller_firm_id: int) -> List:
 
         try:
             arrival_country_code = InputService.get_str(df, i, column='arrival_country_code')
         except:
             raise UnprocessableEntity('arrival_country_code')
 
+        distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country_code, seller_firm_id)
+        try:
+            valid_from = TemplateService.get_valid_from(df, i, distance_sale, DistanceSale)
+
+        except:
+            raise UnprocessableEntity('valid_from')
+
         try:
             active = InputService.get_bool(df, i, column='active', value_true=True)
         except:
             raise UnprocessableEntity('active')
+
+        try:
+            ship_from_rule = InputService.get_bool(df, i, column='ship_from_rule', value_true=True)
+        except:
+            raise UnprocessableEntity('ship_from_rule')
 
         if not isinstance(arrival_country_code, str):
             raise ExpectationFailed('arrival_country_code')
@@ -180,7 +182,7 @@ class DistanceSaleService:
         if not isinstance(valid_from, date):
             raise ExpectationFailed('valid_from')
 
-        return valid_from, arrival_country_code, active
+        return valid_from, arrival_country_code, active, ship_from_rule
 
 
     @staticmethod
@@ -280,7 +282,7 @@ class DistanceSaleService:
             current = i + 1
 
             try:
-                valid_from, arrival_country_code, active = DistanceSaleService.get_df_vars(df, i, current, object_type)
+                valid_from, arrival_country_code, active, ship_from_rule = DistanceSaleService.get_df_vars(df, i, current, object_type, seller_firm_id)
             except UnprocessableEntity as e:
                 SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
                 return False
@@ -297,7 +299,8 @@ class DistanceSaleService:
                 'original_filename': original_filename,
                 'seller_firm_id': seller_firm_id,
                 'arrival_country_code': arrival_country_code,
-                'active': active
+                'active': active,
+                'ship_from_rule': ship_from_rule
             }
 
             # handling distance sale update
@@ -306,7 +309,7 @@ class DistanceSaleService:
 
                 # handling exact duplicates
                 # since a distance sale history is created by default when creating a seller firm, the history needs to be longer than 1 for the user to be notified
-                if active == distance_sale_history.active and len(distance_sale.distance_sale_history) > 1:
+                if active == distance_sale_history.active and ship_from_rule == distance_sale_history.ship_from_rule and len(distance_sale.distance_sale_history) > 1:
                     active_human_read = 'active' if active else 'inactive'
                     if not duplicate_counter > 2:
                         message = 'The {} registration for {} (state: {}) is already in the database. Registration has been skipped.'.format(object_type_human_read, distance_sale.arrival_country_code, active_human_read)
@@ -386,7 +389,8 @@ class DistanceSaleService:
             original_filename = distance_sale_data.get('original_filename'),
             seller_firm_id=distance_sale_data.get('seller_firm_id'),
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
-            active = distance_sale_data.get('active')
+            active = distance_sale_data.get('active'),
+            ship_from_rule=distance_sale_data.get('ship_from_rule')
         )
 
         #add seller firm to db
@@ -505,7 +509,8 @@ class DistanceSaleHistoryService:
             created_by=distance_sale_data.get('created_by'),
             original_filename=distance_sale_data.get('original_filename'),
             arrival_country_code = distance_sale_data.get('arrival_country_code'),
-            active=distance_sale_data.get('active')
+            active=distance_sale_data.get('active'),
+            ship_from_rule=distance_sale_data.get('ship_from_rule')
         )
 
         db.session.add(new_distance_sale_history)

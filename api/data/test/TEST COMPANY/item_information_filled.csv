@@ -1,7 +1,0 @@
-seller_firm_public_id;valid_from;valid_to;SKU;brand_name;name;ean;asin;fnksu;weight_kg;tax_code;unit_cost_price_currency_code;unit_cost_price_net
-;01.01.2019;;t-p-1;test-brand-1;test-product-1;8.65E+12;B08DUW2TJW;X000000001;0.34;A_GEN_STANDARD;EUR;10.1
-;01.01.2019;;t-p-2;test-brand-1;test-product-2;8.65E+12;B08DUJ1S27;X000000002;0.41;A_GEN_STANDARD;EUR;8.5
-;01.01.2019;;t-p-3;test-brand-1;test-product-3;8.65E+12;B08DUHPSJL;X000000003;0.63;A_GEN_STANDARD;EUR;4.3
-;01.01.2019;;t-p-4;test-brand-2;test-product-4;8.65E+12;B08DUK921O;X000000004;0.52;A_GEN_STANDARD;EUR;6.8
-;01.01.2019;;t-p-5;test-brand-2;test-product-5;8.65E+12;B08DUF46YM;X000000005;0.8;A_FOOD_GEN;EUR;12.3
-;01.01.2020;;t-p-1;test-brand-1;test-product-1;8.65E+12;B08DUZ93SQ;X000000001;0.34;A_GEN_STANDARD;EUR;9.7

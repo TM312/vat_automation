@@ -23,6 +23,19 @@ class TemplateService:
         except Exception as e:
             print(e, flush=True)
 
+    @staticmethod
+    def get_valid_from(df: pd.DataFrame, i: int, obj, klass):
+        service_start_date = current_app.config.SERVICE_START_DATE
+        valid_from = InputService.get_date_or_None(df, i, column='valid_from')
+        if isinstance(valid_from, date):
+            valid_from = valid_from if valid_from >= service_start_date else service_start_date
+        else:
+            if isinstance(obj, klass):
+                valid_from = date.today()
+            else:
+                valid_from = service_start_date
+        return valid_from
+
 
 class HelperService:
     @staticmethod
