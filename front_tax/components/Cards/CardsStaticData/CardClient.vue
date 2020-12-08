@@ -21,8 +21,8 @@
       </b-row>
     </b-card-title>
     <b-card-sub-title class="mb-3">
-      {{ sellerFirm.address }} | Establishment:
-      {{ sellerFirmEstablishmentCountry }}
+      <span v-if="sellerFirm.address">{{ sellerFirm.address }} | </span>
+      <span v-if="sellerFirmEstablishmentCountry">Establishment: {{ sellerFirmEstablishmentCountry }} </span>
     </b-card-sub-title>
 
     <b-card-text>

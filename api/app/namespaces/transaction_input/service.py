@@ -189,74 +189,13 @@ class TransactionInputService:
     @staticmethod
     def handle_transaction_input_data_upload(file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: Dict) -> Dict:
         df = InputService.read_file_path_into_df(file_path_in, df_encoding, delimiter)
-        response_object = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id)
+        response_object = TransactionInputService.create_transaction_inputs_and_transactions(df, file_path_in, user_id, seller_firm_id)
         tag = TagService.get_by_code('TRANSACTION')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
         InputService.move_file_to_out(file_path_in, basepath, file_type, business_id=seller_firm_id)
 
         return response_object
 
-    @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
-
-        try:
-            account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
-        except:
-            raise UnprocessableEntity('UNIQUE_ACCOUNT_IDENTIFIER')
-
-        try:
-            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
-        except:
-            raise UnprocessableEntity('SALES_CHANNEL')
-
-        try:
-            given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
-        except:
-            raise UnprocessableEntity('TRANSACTION_EVENT_ID')
-
-        try:
-            activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
-        except:
-            raise UnprocessableEntity('ACTIVITY_TRANSACTION_ID')
-
-        try:
-            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
-        except:
-            raise UnprocessableEntity('SELLER_SKU')
-
-        try:
-            shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_DEPART_DATE')
-
-        try:
-            arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_ARRIVAL_DATE')
-
-        try:
-            complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_COMPLETE_DATE')
-
-
-        # send error status via socket
-        if not account_given_id or account_given_id == '':
-            raise ExpectationFailed('UNIQUE_ACCOUNT_IDENTIFIER')
-
-        if not channel_code or channel_code == '':
-            raise ExpectationFailed('SALES_CHANNEL')
-
-        if not given_id or given_id == '':
-            raise ExpectationFailed('TRANSACTION_EVENT_ID')
-
-        if not activity_id or activity_id == '':
-            raise ExpectationFailed('ACTIVITY_TRANSACTION_ID')
-
-        if not item_sku or item_sku == '':
-            raise ExpectationFailed('SELLER_SKU')
-
-        return account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date
 
     @staticmethod
     def verify_transaction_order(df, total) -> bool:
@@ -269,7 +208,7 @@ class TransactionInputService:
 
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int) -> List[Dict]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int) -> List[Dict]:
         #!!! make this general and add amazon specific function in file read columns
         from app.namespaces.account.service import AccountService
         from app.namespaces.bundle.service import BundleService
@@ -303,7 +242,19 @@ class TransactionInputService:
             current = start - i + 1 if desc else i + 1
 
             try:
-                account_given_id, channel_code, given_id, activity_id, item_sku, shipment_date, arrival_date, complete_date = TransactionInputService.get_df_vars(df, i, current, object_type)
+                (
+                    account_given_id
+                    channel_code
+                    given_id
+                    activity_id
+                    item_sku
+                    item_asin
+                    item_name
+                    shipment_date
+                    arrival_date
+                    complete_date
+                ) = TransactionInputVariableService.get_df_vars(df, i, current, object_type)
+
             except Exception as e:
                 if e.code == 422:
                     SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
@@ -311,32 +262,64 @@ class TransactionInputService:
                     SocketService.emit_status_error_no_value(current, object_type, e.description)
                 return False
 
-            try:
-                account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
-            except:
-                SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
-                return False
 
-            seller_firm_id = account.seller_firm_id
-            try:
-                item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
-                if not isinstance(item, Item):
-                    platform_code = account.channel.platform_code
-                    if platform_code == 'AMZ':
-                        item_asin = InputService.get_str_or_None(df, i, column='ASIN'),
-                        item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
-                    if isinstance(item_sku, str):
-                        try:
-                            data_changes = {
-                                'item_sku': item_sku,
-                                'valid_from': complete_date
-                            }
-                            item.update(data_changes)
-                        except:
-                            db.session.rollback()
-            except:
+            account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
+            if not isinstance(account, Account):
+                SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
+                try:
+                    account_data = {
+                        'created_by': user_id,
+                        'original_filename': original_filename,
+                        'seller_firm_id': seller_firm_id,
+                        'given_id': account_given_id,
+                        'channel_code': channel_code
+                    }
+                    account = AccountService.create(account_data)
+                except:
+                    db.session.rollback()
+                    return False
+
+
+
+            item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+            if not isinstance(item, Item):
+                platform_code = account.channel.platform_code
+                if platform_code == 'AMZ':
+                    item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
+
+                item_data = {
+                    'valid_from': valid_from,
+                    'created_by': user_id,
+                    'original_filename': original_filename,
+                    'sku': item_sku,
+                    'asin': item_asin,
+                    'seller_firm_id': seller_firm_id,
+                    'brand_name': brand_name,
+                    'name': item_name,
+                    'weight_kg': weight_kg,
+                    'tax_code_code': tax_code_code,
+                    'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                    'unit_cost_price_net': unit_cost_price_net
+                }
+                try:
+                    item.update(data_changes)
+                except:
+                    db.session.rollback()
+
+
+
+            if not isinstance(item, Item):
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
-                return False
+                # return False
+
+            if isinstance(item_sku, str) and not isinstance(item.sku, str):
+
+
+            print('in create_transaction_inputs_and_transactions', flush=True)
+            print('account:', account, flush=True)
+            print('asin: ', item_asin)
+            print('item:', item, flush=True)
+            print('given_id:', given_id, flush=True)
 
             bundle = BundleService.get_or_create(account.id, item.id, given_id)
 
@@ -374,9 +357,9 @@ class TransactionInputService:
                     'complete_date': complete_date,
 
                     'item_id': item.id,
-                    'item_asin': item_asin if item_asin else None,
-                    'item_sku': item_sku if item_sku else None,
-                    'item_name': InputService.get_str(df, i, column='ITEM_DESCRIPTION'),
+                    'item_asin': item_asin,
+                    'item_sku': item_sku,
+                    'item_name': item_name,
                     'item_manufacture_country': InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY'),
                     'item_quantity': int(df.iloc[i]['QTY']),
                     'item_unit_cost_price_est': item_unit_cost_price_est,
@@ -677,3 +660,93 @@ class TransactionInputService:
         db.session.commit()
 
         return new_transaction_input
+
+
+class TransactionInputVariableService:
+
+    @staticmethod
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+
+        try:
+            account_given_id = InputService.get_str(
+                df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
+        except:
+            raise UnprocessableEntity('UNIQUE_ACCOUNT_IDENTIFIER')
+
+        try:
+            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
+        except:
+            raise UnprocessableEntity('SALES_CHANNEL')
+
+        try:
+            given_id = InputService.get_str(
+                df, i, column='TRANSACTION_EVENT_ID')
+        except:
+            raise UnprocessableEntity('TRANSACTION_EVENT_ID')
+
+        try:
+            activity_id = InputService.get_str(
+                df, i, column='ACTIVITY_TRANSACTION_ID')
+        except:
+            raise UnprocessableEntity('ACTIVITY_TRANSACTION_ID')
+
+        try:
+            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
+        except:
+            raise UnprocessableEntity('SELLER_SKU')
+
+        try:
+            item_sku = InputService.get_str_or_None(
+                df, i, column='ITEM_DESCRIPTION')
+        except:
+            raise UnprocessableEntity('ITEM_DESCRIPTION')
+
+        try:
+            item_asin = InputService.get_str_or_None(df, i, column='ASIN')
+        except:
+            raise UnprocessableEntity('ASIN')
+
+        try:
+            shipment_date = InputService.get_date_or_None(
+                df, i, column='TRANSACTION_DEPART_DATE')
+        except:
+            raise UnprocessableEntity('TRANSACTION_DEPART_DATE')
+
+        try:
+            arrival_date = InputService.get_date_or_None(
+                df, i, column='TRANSACTION_ARRIVAL_DATE')
+        except:
+            raise UnprocessableEntity('TRANSACTION_ARRIVAL_DATE')
+
+        try:
+            complete_date = InputService.get_date_or_None(
+                df, i, column='TRANSACTION_COMPLETE_DATE')
+        except:
+            raise UnprocessableEntity('TRANSACTION_COMPLETE_DATE')
+
+        # send error status via socket
+        if not account_given_id or account_given_id == '':
+            raise ExpectationFailed('UNIQUE_ACCOUNT_IDENTIFIER')
+
+        if not channel_code or channel_code == '':
+            raise ExpectationFailed('SALES_CHANNEL')
+
+        if not given_id or given_id == '':
+            raise ExpectationFailed('TRANSACTION_EVENT_ID')
+
+        if not activity_id or activity_id == '':
+            raise ExpectationFailed('ACTIVITY_TRANSACTION_ID')
+
+        if not item_sku or item_sku == '':
+            raise ExpectationFailed('SELLER_SKU')
+
+        return (account_given_id,
+                channel_code,
+                given_id,
+                activity_id,
+                item_sku,
+                item_asin,
+                item_name,
+                shipment_date,
+                arrival_date,
+                complete_date)

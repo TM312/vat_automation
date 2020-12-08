@@ -54,7 +54,11 @@
             </template>
 
             <template v-slot:cell(weight_kg)="data">
-              {{ data.value }} kg
+              <span v-if="data.value !== 'NaN'">
+                <span v-if="data.value < 1">{{ Math.parseInt(data.value) * 100 }}g</span>
+                <span v-else>{{ data.value }}kg</span>
+              </span>
+              <span v-else>-</span>
             </template>
           </b-table>
         </div>
@@ -106,6 +110,7 @@ export default {
         { key: "brand_name", sortable: false },
         { key: "sku", label: "SKU", sortable: false },
         { key: "name", sortable: false },
+        { key: "asin", sortable: false },
         { key: "tax_code_code", label: "Tax Code", sortable: false },
         {
           key: "weight_kg",
@@ -119,7 +124,7 @@ export default {
           key: "unit_cost_price_net",
           sortable: false,
           formatter: (value) => {
-            return Number.parseFloat(value).toFixed(2)
+            return value !== null ? Number.parseFloat(value).toFixed(2) : null
           },
         },
       ],

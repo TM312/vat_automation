@@ -52,6 +52,16 @@
               </b-popover>
             </template>
 
+            <template v-slot:cell(ship_from_rule)="data">
+              <div>
+                <b-icon v-if="data.value === true" :id="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" icon="check-circle" variant="success" />
+                <b-icon v-else :id="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" icon="x-circle" variant="danger" />
+              </div>
+              <b-popover :target="`popover-target-distance-sale-history-${data.item.arrival_country_code}`" triggers="hover" placement="top" class="ml-2" title="History">
+                <div>Test {{ data.item.arrival_country_code }}</div>
+              </b-popover>
+            </template>
+
             <template v-slot:cell(taxable_turnover_amount)="data">
               <b-progress :max="vatThresholds.find((el) => el.country_code === data.item.arrival_country_code)['value']" class="mb-3">
                 <b-progress-bar variant="primary" :value="data.item.taxable_turnover_amount" class="self-align-center" />
@@ -113,6 +123,7 @@ export default {
       fields: [
         { key: 'arrival_country_code', label: 'Arrival Country', sortable: false },
         { key: 'active', sortable: false },
+        { key: 'ship_from_rule', sortable: false },
         { key: 'taxable_turnover_amount', label: 'Taxable Turnover (past 12 months)', sortable: true }
       ]
     }

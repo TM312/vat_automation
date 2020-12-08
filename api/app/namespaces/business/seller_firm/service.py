@@ -228,7 +228,6 @@ class SellerFirmService:
             return False
 
         try:
-            print(df.head(), flush=True)
             file_type = InputService.determine_file_type(df)
         except:
             message = 'Can not identify the type of the uploaded file "{}". Make sure to use one of the templates when uploading data.'.format(os.path.basename(file_path_tbd)[:128])

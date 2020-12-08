@@ -7,7 +7,7 @@
           <b>Address:</b>
         </b-col>
         <b-col cols="auto" class="mr-auto">
-          {{ business.address }}
+          {{ business.address !== null ? business.address : '-' }}
         </b-col>
       </b-form-row>
     </b-card-sub-title>

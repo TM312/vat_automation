@@ -86,13 +86,32 @@ class Item(db.Model):  # type: ignore
 
 
     def update(self, data_changes):
-        from .service import ItemHistoryService
 
         for key, val in data_changes.items():
             setattr(self, key, val)
         self.modified_at = datetime.utcnow()
 
-        ItemHistoryService.handle_update(self.id, data_changes)
+        """
+        In order to use HistoryService.handle_update(*) there need to be the following methods in place:
+            - item_history.update(data_changes)
+            - ItemHistoryService.get_oldest(item_id)
+            - ItemHistoryService.get_current(item_id)
+            - ItemHistoryService.get_by_relationship_date(item_id: int, date: date)
+            - ItemHistoryService.create_empty(item_id)
+
+        """
+        from app.namespaces.utils.service import HistoryService
+        from .service import ItemHistoryService
+
+        # ItemHistoryService.handle_update(self.id, data_changes)
+        try:
+            print('5a model try update history', flush=True)
+
+            HistoryService.handle_update(self.id, ItemHistory, ItemHistoryService, data_changes)
+        except:
+            raise
+
+        db.session.commit()
 
         return self
 
@@ -167,3 +186,8 @@ class ItemHistory(db.Model):  # type: ignore
             'unit_cost_price_currency_code': self.unit_cost_price_currency_code,
             'unit_cost_price_net': self.unit_cost_price_net,
         }
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

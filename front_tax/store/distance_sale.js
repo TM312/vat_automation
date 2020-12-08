@@ -5,7 +5,7 @@ export const state = () => ({
 
 
 export const getters = {
-  getPANEU: state => state.distance_sales.filter(distance_sale => ['DE', 'FR', 'PL', 'CZ', 'GB', 'IT', 'ES'].includes(distance_sale.arrival_country_code))
+  getPANEU: state => state.distance_sales.filter(distance_sale => ['DE', 'FR', 'PL', 'CZ', 'GB', 'IT', 'ES', 'NL'].includes(distance_sale.arrival_country_code))
 }
 
 export const mutations = {

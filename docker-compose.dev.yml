@@ -88,8 +88,9 @@ services:
 
     api:
         volumes:
-              - ./api/migrations/:/home/api/migrations
-              - ./api/logs/:/home/logs
+              - ./api/app:/home/api/app
+            #   - ./api/migrations/:/home/api/migrations
+            #   - ./api/logs/:/home/logs
             #   - ./api/seeds:/home/seeds
         env_file:
             - .dev.env

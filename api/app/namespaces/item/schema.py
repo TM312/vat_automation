@@ -18,6 +18,7 @@ item_sub_dto = Model('item_sub', {
     'public_id': fields.String(readonly=True),
     'original_filename': fields.String,
     'sku': fields.String,
+    'asin': fields.String,
     'brand_name': fields.String,
     'name': fields.String,
     'weight_kg': fields.Float,
@@ -31,7 +32,6 @@ item_dto = item_sub_dto.clone('item', {
     'created_on': fields.Date,
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
     'ean': fields.String,
-    'asin': fields.String,
     'fnsku': fields.String,
     'item_history': fields.List(fields.Nested(item_history_dto)),
 

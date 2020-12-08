@@ -13,7 +13,7 @@ from . import Item, ItemHistory
 from .schema import ItemSubSchema
 from .interface import ItemInterface
 
-from app.namespaces.utils.service import InputService, NotificationService, TemplateService
+from app.namespaces.utils.service import InputService, NotificationService, TemplateService, HistoryService
 from app.namespaces.transaction_input import TransactionInput
 from app.namespaces.tag.service import TagService
 
@@ -41,8 +41,9 @@ class ItemService:
 
     @staticmethod
     def get_by_identifiers_seller_firm_id(item_sku: str, item_asin: str, seller_firm_id: int) -> Item:
-        item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
-        if not isinstance(item, Item):
+        if isinstance(item_sku, str):
+            item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+        else:
             item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
         return item
 
@@ -246,12 +247,6 @@ class ItemService:
         except:
             raise UnprocessableEntity('unit_cost_price_currency_code')
 
-        item = ItemService.get_by_identifiers_seller_firm_id(sku, asin, seller_firm_id)
-        try:
-            valid_from = TemplateService.get_valid_from(df, i, item, Item)
-
-        except:
-            raise UnprocessableEntity('valid_from')
 
         try:
             brand_name = InputService.get_str_or_None(df, i, column='brand_name')
@@ -275,7 +270,6 @@ class ItemService:
             asin,
             unit_cost_price_net,
             unit_cost_price_currency_code,
-            valid_from,
             brand_name,
             weight_kg,
             tax_code_code
@@ -306,7 +300,7 @@ class ItemService:
             current = i + 1
 
             try:
-                sku, name, asin, unit_cost_price_net, unit_cost_price_currency_code, valid_from, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type, seller_firm_id)
+                sku, name, asin, unit_cost_price_net, unit_cost_price_currency_code, brand_name, weight_kg, tax_code_code = ItemService.get_df_vars(df, i, current, object_type, seller_firm_id)
             except Exception as e:
                 if e.code == 422:
                     SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
@@ -314,6 +308,11 @@ class ItemService:
                     SocketService.emit_status_error_invalid_value(object_type, e.description)
                 return False
 
+            item = ItemService.get_by_identifiers_seller_firm_id(sku, asin, seller_firm_id)
+            try:
+                valid_from = TemplateService.get_valid_from(df, i, item, Item)
+            except:
+                raise UnprocessableEntity('valid_from')
 
 
             item_data = {
@@ -331,11 +330,12 @@ class ItemService:
                 'unit_cost_price_net': unit_cost_price_net
             }
 
-            item = ItemService.get_by_sku_seller_firm_id(sku, seller_firm_id)
+
 
             # handling item updates
             if isinstance(item, Item):
-                item_history = ItemHistoryService.get_by_item_id_date(item.id, valid_from)
+
+                item_history = ItemHistoryService.get_by_relationship_date(item.id, valid_from)
                 if isinstance(item_history, ItemHistory):
 
                     # handling exact duplicates of relevant state
@@ -363,10 +363,10 @@ class ItemService:
 
                     # updating item
                     else:
-                        data_changes = item_data
                         try:
-                            item.update(data_changes)
+                            item.update(data_changes=item_data)
                             db.session.commit()
+                            continue
 
                         except:
                             db.session.rollback()
@@ -440,12 +440,15 @@ class ItemService:
         )
 
         db.session.add(new_item)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
 
         item_data['item_id'] = new_item.id
         try:
             ItemHistoryService.create(item_data)
-        except:
+        except Exception as e:
             db.session.rollback()
             raise
 
@@ -455,70 +458,6 @@ class ItemService:
 
 
 class ItemHistoryService:
-
-    @staticmethod
-    def handle_update(item_id, data_changes):
-
-        """
-        When updating 3 cases can exist:
-
-        CASE EARLIER: The update's valid_from attribute is EARLIER than any other item history object.
-            1. New item history is created
-            2. Oldest item history retrieved
-            3. Missing data change attributes complemented by those from oldest item history
-            4. New item history valid_to == oldest item history valid_from - timedelta(days=1)
-
-        CASE EQUAL: The update's valid_from attribute is EQUAL to another item history object.
-            1. Data changes are implemented for the retrieved item history object
-
-        CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid item history object.
-            1. New item history is created
-            2. Current item history retrieved
-            3. Missing data change attributes complemented by those from item history
-            4. Current item history valid_to == new item history valid_from - timedelta(days=1)
-
-        """
-
-        # Trying to retrieve item history to decide case
-        valid_from = data_changes['valid_from']
-        item_history = ItemHistoryService.get_by_item_id_date(item_id, valid_from)
-
-        # CASE EARLIER
-        if not isinstance(item_history, ItemHistory):
-            #1.
-            new_item_history = ItemHistory(item_id=item_id)
-            db.session.add(new_item_history)
-            #2.
-            item_history = ItemHistoryService.get_oldest(item_id)
-            #3. and #4.
-            all_attr = {**item_history.attr_as_dict(), **data_changes}
-            all_attr['valid_to'] = item_history.valid_from - timedelta(days=1)
-            for key, val in all_attr.items():
-                setattr(new_item_history, key, val)
-
-        else:
-            # CASE EQUAL
-            if valid_from == item_history.valid_from:
-                for key, val in data_changes.items():
-                    setattr(item_history, key, val)
-
-            # CASE LATER
-            else:
-                item_history = ItemHistoryService.get_current(item_id)
-                #1.
-                new_item_history = ItemHistory(item_id=item_id)
-                db.session.add(new_item_history)
-                #(2.) -> already exists
-                #3.
-                all_attr = {**item_history.attr_as_dict(), **data_changes}
-                all_attr['valid_from'] = valid_from
-
-                for key, val in all_attr.items():
-                    setattr(new_item_history, key, val)
-
-                #4.
-                item_history.valid_to = valid_from - timedelta(days=1)
-
 
 
     @staticmethod
@@ -530,7 +469,7 @@ class ItemHistoryService:
         return ItemHistory.query.filter_by(item_id=item_id).order_by(ItemHistory.valid_from.desc()).first()
 
     @staticmethod
-    def get_by_item_id_date(item_id: int, date: date):
+    def get_by_relationship_date(item_id: int, date: date):
         return ItemHistory.query.filter(
             ItemHistory.item_id == item_id,
             ItemHistory.valid_from <= date,
@@ -567,6 +506,16 @@ class ItemHistoryService:
         db.session.commit()
 
         return new_item_history
+
+    @staticmethod
+    def create_empty(item_id: int) -> ItemHistory:
+        # create new item history
+        new_item_history = ItemHistory(item_id=item_id)
+        db.session.add(new_item_history)
+        db.session.commit()
+
+        return new_item_history
+
 
 
 

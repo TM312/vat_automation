@@ -74,7 +74,7 @@ class DistanceSaleService:
 
             distance_sale = DistanceSaleService.get_by_arrival_country_seller_firm_id(arrival_country_code, seller_firm.id)
             if distance_sale:
-                distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, valid_from)
+                distance_sale_history = DistanceSaleHistoryService.get_by_relationship_date(distance_sale.id, valid_from)
                 if active == distance_sale_history.active:
                     return distance_sale
                 else:
@@ -305,7 +305,7 @@ class DistanceSaleService:
 
             # handling distance sale update
             if isinstance(distance_sale, DistanceSale):
-                distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale.id, valid_from)
+                distance_sale_history = DistanceSaleHistoryService.get_by_relationship_date(distance_sale.id, valid_from)
 
                 # handling exact duplicates
                 # since a distance sale history is created by default when creating a seller firm, the history needs to be longer than 1 for the user to be notified
@@ -412,72 +412,6 @@ class DistanceSaleService:
 class DistanceSaleHistoryService:
 
     @staticmethod
-    def handle_update(distance_sale_id, data_changes):
-        """
-        When updating 3 cases can exist:
-
-        CASE EARLIER: The update's valid_from attribute is EARLIER than any other history object.
-            1. New history object is created
-            2. Oldest history object retrieved
-            3. Missing data change attributes complemented by those from oldest history object
-            4. New history object valid_to == oldest history object valid_from - timedelta(days=1)
-
-        CASE EQUAL: The update's valid_from attribute is EQUAL to another history object.
-            1. Data changes are implemented for the retrieved history object
-
-        CASE LATER (main case): The update's valid_from attribute is LATER than the currently valid history object.
-            1. New history object is created
-            2. Current history object retrieved
-            3. Missing data change attributes complemented by those from history object
-            4. Current history object valid_to == new history object valid_from - timedelta(days=1)
-
-        """
-
-        # Retrieving item history to decide case
-        valid_from = data_changes['valid_from']
-        distance_sale_history = DistanceSaleHistoryService.get_by_distance_sale_id_date(distance_sale_id, valid_from)
-
-
-        # CASE EARLIER
-        if not isinstance(distance_sale_history, DistanceSaleHistory):
-            #1.
-            new_distance_sale_history = DistanceSaleHistory(distance_sale_id=distance_sale_id)
-            db.session.add(new_distance_sale_history)
-            #2.
-            distance_sale_history = DistanceSaleHistoryService.get_oldest(distance_sale_id)
-            #3. and #4.
-            all_attr = {**distance_sale_history.attr_as_dict(), **data_changes}
-            all_attr['valid_to'] = distance_sale_history.valid_from - timedelta(days=1)
-            for key, val in all_attr.items():
-                setattr(new_distance_sale_history, key, val)
-
-        else:
-            # CASE EQUAL
-            if valid_from == distance_sale_history.valid_from:
-                for key, val in data_changes.items():
-                    setattr(distance_sale_history, key, val)
-
-            # CASE LATER
-            else:
-                distance_sale_history = DistanceSaleHistoryService.get_current(distance_sale_id)
-
-                #1.
-                new_distance_sale_history = DistanceSaleHistory(distance_sale_id=distance_sale_id)
-                db.session.add(new_distance_sale_history)
-                #(2.) -> already exists
-                #3.
-                all_attr = {**distance_sale_history.attr_as_dict(), **data_changes}
-
-                for key, val in all_attr.items():
-                    setattr(new_distance_sale_history, key, val)
-
-                #4.
-                distance_sale_history.valid_to = valid_from - timedelta(days=1)
-
-
-
-
-    @staticmethod
     def get_oldest(distance_sale_id: int) -> DistanceSaleHistory:
         return DistanceSaleHistory.query.filter_by(distance_sale_id=distance_sale_id).order_by(DistanceSaleHistory.valid_from.asc()).first()
 
@@ -487,7 +421,7 @@ class DistanceSaleHistoryService:
 
 
     @staticmethod
-    def get_by_distance_sale_id_date(distance_sale_id: int, date: date) -> DistanceSaleHistory:
+    def get_by_relationship_date(distance_sale_id: int, date: date) -> DistanceSaleHistory:
         return DistanceSaleHistory.query.filter(
             DistanceSaleHistory.distance_sale_id == distance_sale_id,
             DistanceSaleHistory.valid_from <= date,
@@ -513,6 +447,15 @@ class DistanceSaleHistoryService:
             ship_from_rule=distance_sale_data.get('ship_from_rule')
         )
 
+        db.session.add(new_distance_sale_history)
+        db.session.commit()
+
+        return new_distance_sale_history
+
+    @staticmethod
+    def create_empty(distance_sale_id: int) -> DistanceSaleHistory:
+        # create new distance_sale history
+        new_distance_sale_history = DistanceSaleHistory(distance_sale_id=distance_sale_id)
         db.session.add(new_distance_sale_history)
         db.session.commit()
 
