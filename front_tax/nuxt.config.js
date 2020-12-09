@@ -213,10 +213,12 @@ export default {
                     { clear_accounts: 'seller_firm/CLEAR_ACCOUNTS' },
                     { new_account: 'seller_firm/PUSH_ACCOUNT' },
                     { new_accounts: 'seller_firm/PUSH_ACCOUNTS' },
+                    { update_account: 'seller_firm/UPDATE_ACCOUNT_IN_LIST' },
 
                     { clear_items: 'seller_firm/CLEAR_ITEMS' },
                     { new_item: 'seller_firm/PUSH_ITEM' },
                     { new_items: 'seller_firm/PUSH_ITEMS' },
+                    { update_item: 'seller_firm/UPDATE_ITEM_IN_LIST' },
 
                     { clear_distance_sales: 'seller_firm/CLEAR_DISTANCE_SALES' },
                     { new_distance_sale: 'seller_firm/PUSH_DISTANCE_SALE' },
