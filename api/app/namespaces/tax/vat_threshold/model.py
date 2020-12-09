@@ -51,6 +51,33 @@ class VatThreshold(db.Model):  # type: ignore
 
         return self
 
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        self.modified_at = datetime.utcnow()
+
+        """
+        In order to use HistoryService.handle_update(*) there need to be the following methods in place:
+            - vat_threshold_history.update(data_changes)
+            - VatThresholdHistoryService.get_oldest(vat_threshold_id)
+            - VatThresholdHistoryService.get_current(vat_threshold_id)
+            - VatThresholdHistoryService.get_by_relationship_date(vat_threshold_id: int, date: date)
+            - VatThresholdHistoryService.create_empty(vat_threshold_id)
+
+        """
+        from app.namespaces.utils.service import HistoryService
+        from .service import VatThresholdHistoryService
+        try:
+
+            HistoryService.handle_update(self.id, VatThresholdHistory, VatThresholdHistoryService, data_changes)
+        except:
+            raise
+
+        db.session.commit()
+
+        return self
+
+
 
 class VatThresholdHistory(db.Model):  # type: ignore
     """ Vat threshold history model """
@@ -84,3 +111,8 @@ class VatThresholdHistory(db.Model):  # type: ignore
             'value': self.value,
             'currency_code': self.currency_code
         }
+
+    def update(self, data_changes):
+        for key, val in data_changes.items():
+            setattr(self, key, val)
+        return self

@@ -82,7 +82,7 @@ class TransactionInputInterface(TypedDict, total=False):
     gift_wrap_price_total_net: str
     gift_wrap_price_total_vat: str
     gift_wrap_price_tax_rate: str
-    item_tax_code_code: str
+    item_given_tax_code_code: str
     departure_seller_vat_country_code: str
     departure_seller_vat_number: str
     arrival_seller_vat_country_code: str

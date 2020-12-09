@@ -91,7 +91,7 @@ transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
     'gift_wrap_price_total_net': fields.Float,
     'gift_wrap_price_total_vat': fields.Float,
     'gift_wrap_price_tax_rate': fields.Float,
-    'item_tax_code_code': fields.String,
+    'item_given_tax_code_code': fields.String,
     'departure_seller_vat_country_code': fields.String,
     'departure_seller_vat_number': fields.String,
     'arrival_seller_vat_country_code': fields.String,

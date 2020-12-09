@@ -68,6 +68,11 @@ class HelperService:
         return re.sub(pattern, "_", string)
 
 
+    @staticmethod
+    def get_earliest_date(*dates: List[date]) -> date:
+        return min([datum for datum in dates if datum is not None])
+
+
 class HistoryService:
     # Actions related to history objects
 
