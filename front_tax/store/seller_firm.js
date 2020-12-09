@@ -89,6 +89,24 @@ export const mutations = {
       vat_number,
       ...state.seller_firm.vat_numbers.slice(index + 1)
     ]
+  },
+    // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
+  UPDATE_ACCOUNT_IN_LIST(state, account) {
+    var index = state.seller_firm.accounts.findIndex(el => (el.public_id === account.public_id))
+    state.seller_firm.accounts = [
+      ...state.seller_firm.accounts.slice(0, index),
+      account,
+      ...state.seller_firm.accounts.slice(index + 1)
+    ]
+  },
+    // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
+  UPDATE_ITEM_IN_LIST(state, item) {
+    var index = state.seller_firm.items.findIndex(el => (el.public_id === item.public_id))
+    state.seller_firm.items = [
+      ...state.seller_firm.items.slice(0, index),
+      item,
+      ...state.seller_firm.items.slice(index + 1)
+    ]
   }
 }
 

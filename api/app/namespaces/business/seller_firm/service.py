@@ -292,7 +292,7 @@ class SellerFirmService:
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath,
-                        user_id, seller_firm_id, seller_firm_notification_data]
+                        user_id, seller_firm_id, seller_firm_notification_data, 'AMZ']
             )
 
         else:
