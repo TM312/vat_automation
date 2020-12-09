@@ -73,3 +73,16 @@ class TaxCodeService:
             except:
                 db.session.rollback()
                 raise
+
+    @staticmethod
+    def get_tax_code_code(platform_code: str = None, given_tax_code_code: str):
+        # tax_code_dict_AMZ = {
+        #     'A_GEN_STANDARD': 'STANDARD'
+        # }
+
+        if platform_code is None:
+            raise
+
+        elif platform_code == 'AMZ':
+            return given_tax_code_code
+            # return tax_code_dict_AMZ[given_tax_code_code]

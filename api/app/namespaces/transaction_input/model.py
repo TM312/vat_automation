@@ -101,7 +101,7 @@ class TransactionInput(db.Model):
     _gift_wrap_price_total_net = db.Column(db.Integer, default=0)
     _gift_wrap_price_total_vat = db.Column(db.Integer, default=0)
     _gift_wrap_price_tax_rate = db.Column(db.Integer, default=0)
-    item_tax_code_code = db.Column(db.String(40))
+    item_given_tax_code_code = db.Column(db.String(40))
     departure_seller_vat_country_code = db.Column(db.String(8))
     departure_seller_vat_number = db.Column(db.String(24))
     arrival_seller_vat_country_code = db.Column(db.String(8))

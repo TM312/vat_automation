@@ -213,6 +213,7 @@ export default {
       return [
         { key: 'Number', value: this.transactionInput.invoice_number },
         { key: 'Tax Jurisdiction', value: this.transactionInput.check_tax_jurisdiction ? this.capitalize(this.transactionInput.check_tax_jurisdiction) : null },
+        { key: 'Indicated Item Tax Code', value: this.transactionInput.item_given_tax_code_code ? this.transactionInput.item_given_tax_code_code : null },
         { key: 'Vat Amount', value: this.transactionInput.check_invoice_amount_vat ? `${this.transactionInput.check_invoice_amount_vat} ${this.transactionInput.check_invoice_currency_code}` : null},
         { key: 'Exchange Rate', value: this.transactionInput.check_invoice_exchange_rate ? `${this.transactionInput.check_invoice_exchange_rate} | Date: ${ this.transactionInput.check_invoice_exchange_rate_date}` : null}
       ]

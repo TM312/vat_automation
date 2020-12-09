@@ -263,7 +263,8 @@ class TransactionService:
 
         item_history = ItemHistoryService.get_by_relationship_date(item.id, tax_date)
 
-        item_tax_code_code, calculated_item_tax_code_code = TransactionService.get_item_tax_code_code(transaction_input, item_history.tax_code_code, platform_code, reference_tax_code=transaction_input.item_tax_code_code)
+        item_reference_tax_code = TaxCodeService.get_tax_code_code(platform_code, transaction_input.item_given_tax_code_code)
+        item_tax_code_code, calculated_item_tax_code_code = TransactionService.get_item_tax_code_code(item_history.tax_code_code, item_reference_tax_code)
         item_vat_temp = VatHistoryService.get_by_tax_code_country_tax_date(item_tax_code_code, tax_jurisdiction.code, tax_date)
         item_tax_rate_type_code=item_vat_temp.tax_rate_type_code
 
@@ -991,25 +992,20 @@ class TransactionService:
         return tax_jurisdiction
 
 
+
+
     @staticmethod
-    def get_item_tax_code_code(transaction_input: TransactionInput, item_history_tax_code_code: str, platform_code: str, **kwargs) -> str:
-        if platform_code == 'AMZ':
-            calculated_item_tax_code_code = item_history_tax_code_code
+    def get_item_tax_code_code(item_history_tax_code_code: str, reference_tax_code: str) -> str:
 
-        else:
-            raise
-
-        if 'reference_tax_code' in kwargs and kwargs['reference_tax_code'] != None:
-            reference_tax_code = kwargs['reference_tax_code']
-
-            if calculated_item_tax_code_code != reference_tax_code:
+        if reference_tax_code is not None:
+            if item_history_tax_code_code != reference_tax_code:
                 item_tax_code_code = reference_tax_code
             else:
-                item_tax_code_code = calculated_item_tax_code_code
+                item_tax_code_code = item_history_tax_code_code
         else:
-            item_tax_code_code = calculated_item_tax_code_code
+            item_tax_code_code = item_history_tax_code_code
 
-        return item_tax_code_code, calculated_item_tax_code_code
+        return item_tax_code_code, item_history_tax_code_code
 
 
 

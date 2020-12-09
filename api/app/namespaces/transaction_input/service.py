@@ -14,7 +14,7 @@ from . import TransactionInput
 from .interface import TransactionInputInterface
 from .schema import TransactionInputSubSchema
 
-from app.namespaces.utils.service import InputService, NotificationService
+from app.namespaces.utils.service import InputService, NotificationService, HelperService
 from app.namespaces.tag.service import TagService
 from app.namespaces.bundle import Bundle
 from app.namespaces.bundle.service import BundleService
@@ -196,20 +196,12 @@ class TransactionInputService:
         return response_object
 
 
-    @staticmethod
-    def verify_transaction_order(df, total) -> bool:
-
-        complete_date_top = InputService.get_date_or_None(df, 0, column='TRANSACTION_COMPLETE_DATE')
-        complete_date_bottom = InputService.get_date_or_None(df, total, column='TRANSACTION_COMPLETE_DATE')
-
-        return complete_date_top >= complete_date_bottom
-
-
 
     @staticmethod
     def create_transaction_inputs_and_transactions(df: pd.DataFrame, file_path_in: str, user_id: int, seller_firm_id: int, platform_code: str) -> List[Dict]:
         #!!! make this general and add amazon specific function in file read columns
         from app.namespaces.distance_sale.service import DistanceSaleService
+        from app.namespaces.tax.tax_code.service import TaxCodeService
 
         error_counter = 0
         total = total_number_transaction_inputs = len(df.index)
@@ -222,7 +214,7 @@ class TransactionInputService:
         duplicate_counter = 0
 
 
-        desc = TransactionInputService.verify_transaction_order(df, total_number_transaction_inputs-1)
+        desc = TransactionInputVariableService.verify_transaction_order(df, total_number_transaction_inputs-1, platform_code)
         if desc:
             start, stop, step = total_number_transaction_inputs-1, 0-1, -1
         else:
@@ -333,6 +325,8 @@ class TransactionInputService:
                     SocketService.emit_status_error_no_value(current, object_type, e.description)
                 return False
 
+            item_tax_code = TaxCodeService.get_tax_code_code(platform_code, item_given_tax_code_code)
+            valid_from = HelperService.get_earliest_date(shipment_date, arrival_date, complete_date, tax_calculation_date, invoice_exchange_rate_date)
             account_id, item_id = TransactionInputVariableService.create_or_upgrade_data(
                 account_given_id,
                 channel_code,
@@ -345,7 +339,7 @@ class TransactionInputService:
                 item_name,
                 item_brand_name,
                 item_weight_kg,
-                item_given_tax_code_code,
+                item_tax_code,
                 seller_firm_id,
                 valid_from
             )
@@ -354,7 +348,7 @@ class TransactionInputService:
 
             print('in create_transaction_inputs_and_transactions', flush=True)
             print('account_id:', account_id, flush=True)
-            print('asin: ', item_asin)
+            print('item_asin: ', item_asin)
             print('item_id:', item_id, flush=True)
             print('given_id:', given_id, flush=True)
 
@@ -454,7 +448,7 @@ class TransactionInputService:
 
                     'currency_code': currency_code,
 
-                    'item_tax_code_code': item_given_tax_code_code, #!!!! make adjustments later
+                    'item_given_tax_code_code': item_given_tax_code_code,
 
 
                     'departure_country_code': departure_country_code,
@@ -657,7 +651,7 @@ class TransactionInputService:
             gift_wrap_price_total_gross = transaction_input_data.get('gift_wrap_price_total_gross'),
             gift_wrap_price_tax_rate = transaction_input_data.get('gift_wrap_price_tax_rate'),
             currency_code = transaction_input_data.get('currency_code'),
-            item_tax_code_code = transaction_input_data.get('item_tax_code_code'),
+            item_given_tax_code_code = transaction_input_data.get('item_given_tax_code_code'),
             departure_country_code = transaction_input_data.get('departure_country_code'),
             departure_postal_code = transaction_input_data.get('departure_postal_code'),
             departure_city = transaction_input_data.get('departure_city'),
@@ -701,10 +695,24 @@ class TransactionInputService:
 
 class TransactionInputVariableService:
 
+
+   @staticmethod
+    def verify_transaction_order(df: pd.DataFrame, total: int, platform_code: str) -> bool:
+        if platform_code == 'AMZ':
+            return TransactionInputVariableService.verify_transaction_order_AMZ(df, total)
+
+    @staticmethod
+    def verify_transaction_order_AMZ(df, total) -> bool:
+        complete_date_top = InputService.get_date_or_None(df, 0, column='TRANSACTION_COMPLETE_DATE')
+        complete_date_bottom = InputService.get_date_or_None(df, total, column='TRANSACTION_COMPLETE_DATE')
+
+        return complete_date_top >= complete_date_bottom
+
+
     @staticmethod
     def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, platform_code: str) -> List:
         if platform_code == 'AMZ':
-            return TransactionInputVariableService.get_df_vars_AMZ(df: pd.DataFrame, i: int, current: int, object_type: str)
+            return TransactionInputVariableService.get_df_vars_AMZ(df, i, current, object_type)
 
 
     @staticmethod
