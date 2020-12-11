@@ -49,13 +49,16 @@
             :current-page="currentPage"
           >
             <template v-slot:cell(unit_cost_price_net)="data">
-              {{ data.value }}
-              {{ data.item.unit_cost_price_currency_code }}
+              <span v-if="data.value">
+                {{ data.value }}
+                {{ data.item.unit_cost_price_currency_code }}
+              </span>
+              <span v-else>-</span>
             </template>
 
             <template v-slot:cell(weight_kg)="data">
               <span v-if="data.value !== 'NaN'">
-                <span v-if="data.value < 1">{{ Math.parseInt(data.value) * 100 }}g</span>
+                <span v-if="data.value < 1">{{ Math.round(data.value) * 100 }}g</span>
                 <span v-else>{{ data.value }}kg</span>
               </span>
               <span v-else>-</span>

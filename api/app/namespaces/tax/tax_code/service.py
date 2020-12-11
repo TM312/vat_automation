@@ -75,14 +75,23 @@ class TaxCodeService:
                 raise
 
     @staticmethod
-    def get_tax_code_code(platform_code: str = None, given_tax_code_code: str):
+    def get_tax_code_code(given_tax_code_code: str, platform_code: str = None) -> str:
+
+        """
+        Users can indicate any Platform Specific Tax Code when uploading item data.
+        Herefore, the dicts are being merged.
+
+        If platform_code is indicated the platform specific dictionary will be used
+        """
         # tax_code_dict_AMZ = {
         #     'A_GEN_STANDARD': 'STANDARD'
         # }
 
-        if platform_code is None:
-            raise
 
-        elif platform_code == 'AMZ':
+
+        if platform_code == 'AMZ':
             return given_tax_code_code
             # return tax_code_dict_AMZ[given_tax_code_code]
+
+        elif platform_code is None:
+            raise

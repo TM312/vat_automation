@@ -223,14 +223,10 @@ class VATINService:
         except:
             raise UnprocessableEntity('valid_from')
 
-        if not isinstance(country_code, str):
-            raise ExpectationFailed('country_code')
 
         if not isinstance(number, str):
             raise ExpectationFailed('number')
 
-        if not isinstance(valid_from, date):
-            raise ExpectationFailed('valid_from')
 
         return country_code, number, valid_from
 
@@ -383,8 +379,7 @@ class VATINService:
         country_code_temp = vatin_data.get('country_code')
         number_temp = vatin_data.get('number')
 
-        country_code, number = VATINService.vat_precheck(
-            country_code_temp, number_temp)
+        country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
         if not country_code or not number:
             raise UnprocessableEntity('The submitted country code or number do not conform with the required standard.')
 
@@ -452,7 +447,7 @@ class VATINService:
 
     @staticmethod
     def get_vat_from_df(df: pd.DataFrame, i: int) -> List[str]:
-        country_code_temp = InputService.get_str(df, i, column='country_code')
+        country_code_temp = InputService.get_str_or_None(df, i, column='country_code')
         number_temp = InputService.get_str(df, i, column='number')
         country_code, number = VATINService.vat_precheck(country_code_temp, number_temp)
         return country_code, number
@@ -460,13 +455,10 @@ class VATINService:
 
     @staticmethod
     def vat_precheck(country_code_temp: str, number_temp_unform: str) -> List[str]:
-        if (country_code_temp == 'nan'
-            or number_temp_unform == 'nan'
-            or not number_temp_unform
-        ):
+        if number_temp_unform is None:
             return None, None
 
-        if not country_code_temp:
+        if country_code_temp is None:
             country_code_temp = number_temp_unform[:2].strip()
         else:
             country_code_temp.upper().replace(" ", "")
@@ -524,6 +516,11 @@ class VATINService:
             return response_object
 
 
+
+
+
+
+
     @staticmethod
     def process_single_submit(seller_firm_public_id: str, vatin_data_raw: VATINInterface) -> VATIN:
         from app.namespaces.business.seller_firm.service import SellerFirmService
@@ -546,7 +543,7 @@ class VATINService:
                 vatin = VATINService.process_validation_request(vatin_data_raw)
 
             data_changes = {k:v for k,v in vatin_data.items() if (v is not None and v != getattr(vatin, k))}
-            if data_changes:
+            if len(data_changes.items()) > 0:
                 vatin.update(data_changes)
                 db.session.commit()
             return vatin
@@ -598,6 +595,7 @@ class VIESService:
 
         """VIES API response data."""
         try:
+            sleep(randint(4, 6))
             vatin_data = VIESService.send_request_via_urllib(country_code, number)
 
         except Exception as e:
