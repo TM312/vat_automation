@@ -72,7 +72,7 @@ class Config(object):
     OLD_TRANSACTION_TOLERANCE_DAYS = 100
     SERVICE_START_DATE = datetime.strptime('01-06-2018', '%d-%m-%Y').date()
 
-    SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN', 'HUF', 'DKK', 'SEK', 'CHF', 'NOK'] #besides 'EUR'
+    SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN']#, 'HUF', 'DKK', 'SEK', 'CHF', 'NOK'] #besides 'EUR'
 
     TRANSACTIONS_PER_QUERY = NOTIFICATIONS_PER_QUERY = 50
 

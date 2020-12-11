@@ -37,6 +37,7 @@ class TransactionInput(db.Model):
 
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     item_sku = db.Column(db.String(128))
+    item_asin = db.Column(db.String(64))
     item_name = db.Column(db.String(256))
     item_manufacture_country = db.Column(db.String(128))
     item_quantity = db.Column(db.Integer)

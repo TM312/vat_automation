@@ -50,6 +50,9 @@ class Item(db.Model):  # type: ignore
 
     item_history = db.relationship('ItemHistory', backref='item', lazy=True, cascade='all, delete-orphan')
 
+    # untracked
+    _unit_cost_price_net_est = db.Column(db.Integer)
+
     transaction_inputs = db.relationship('TransactionInput', backref='item', lazy=True)
     transactions = db.relationship('Transaction', backref='item', lazy=True)
 
@@ -76,12 +79,20 @@ class Item(db.Model):  # type: ignore
     def unit_cost_price_net(self, value):
         self._unit_cost_price_net = int(round(value * 100)) if value is not None else None
 
+    @hybrid_property
+    def unit_cost_price_net_est(self):
+        return self._unit_cost_price_net_est / 100 if self._unit_cost_price_net_est is not None else None
+
+    @unit_cost_price_net_est.setter
+    def unit_cost_price_net_est(self, value):
+        self._unit_cost_price_net_est = int(round(value * 100)) if value is not None else None
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return '<Item: Seller_id: {} – SKU: {}>'.format(self.seller_firm_id, self.sku)
+        return '<Item: Seller_id: {} – SKU: {} - Tax Code: {}>'.format(self.seller_firm_id, self.sku, self.tax_code_code)
 
 
 
@@ -103,16 +114,18 @@ class Item(db.Model):  # type: ignore
         from app.namespaces.utils.service import HistoryService
         from .service import ItemHistoryService
 
-        # ItemHistoryService.handle_update(self.id, data_changes)
         try:
-            print('5a model try update history', flush=True)
-
             HistoryService.handle_update(self.id, ItemHistory, ItemHistoryService, data_changes)
         except:
             raise
 
         db.session.commit()
 
+        return self
+
+    def update_unit_cost_price_net_est(self: Item, unit_cost_price_net_est: float) -> Item:
+        self.unit_cost_price_net_est = unit_cost_price_net_est
+        db.session.commit()
         return self
 
 

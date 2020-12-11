@@ -157,6 +157,40 @@ class ItemService:
         return new_item
 
 
+    @staticmethod
+    def get_unit_cost_price_net_est(
+            seller_firm_id: int,
+            df_transaction_inputs: pd.DataFrame = None,
+            platform_code: str = None
+        ) -> float:
+
+        """
+        There are the following options for estimating the item unit cost prices prioritized in the order as followed:
+        1. Average of unit cost prices of other items
+            if len(item_unit_cost_prices) > 5:
+                Average of total value amt / qty in transaction reports
+        2. If
+
+        """
+
+        items_raw = ItemService.get_all_by_seller_firm_id(seller_firm_id)
+        item_unit_cost_prices = [item.unit_cost_price_net for item in items_raw if item.unit_cost_price_net is not None]
+        if items_raw is not None and len(item_unit_cost_prices) > 5:
+            unit_cost_price_net_est = sum(item_unit_cost_prices) / len(item_unit_cost_prices) #avg item_unit_cost_prices
+
+        elif df_transaction_inputs is not None and platform_code is not None:
+            from app.namespaces.transaction_input.service import TransactionInputVariableService
+            unit_cost_price_net_est = TransactionInputVariableService.get_item_unit_cost_price_est_from_transaction_inputs(df_transaction_inputs, platform_code)
+
+
+
+
+        else:
+            unit_cost_price_net_est = None
+
+
+
+        return unit_cost_price_net_est
 
 
 
@@ -296,6 +330,8 @@ class ItemService:
         # send status update via socket
         SocketService.emit_status_success(0, total, original_filename, object_type)
 
+        unit_cost_price_net_est = ItemService.get_unit_cost_price_net_est(seller_firm_id)
+
         for i in range(total_number_items):
             current = i + 1
 
@@ -327,7 +363,8 @@ class ItemService:
                 'weight_kg': weight_kg,
                 'tax_code_code': tax_code_code,
                 'unit_cost_price_currency_code': unit_cost_price_currency_code,
-                'unit_cost_price_net': unit_cost_price_net
+                'unit_cost_price_net': unit_cost_price_net,
+                'unit_cost_price_net_est': unit_cost_price_net_est
             }
 
 
@@ -436,7 +473,8 @@ class ItemService:
             weight_kg = item_data.get('weight_kg'),
             tax_code_code = item_data.get('tax_code_code'),
             unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
-            unit_cost_price_net = item_data.get('unit_cost_price_net')
+            unit_cost_price_net = item_data.get('unit_cost_price_net'),
+            unit_cost_price_net_est = item_data.get('unit_cost_price_net_est')
         )
 
         db.session.add(new_item)
@@ -446,6 +484,8 @@ class ItemService:
             db.session.rollback()
 
         item_data['item_id'] = new_item.id
+        item_data['tax_code_code'] = new_item.tax_code_code
+        item_data['unit_cost_price_currency_code'] = new_item.unit_cost_price_currency_code
         try:
             ItemHistoryService.create(item_data)
         except Exception as e:
@@ -499,7 +539,7 @@ class ItemHistoryService:
             weight_kg = item_data.get('weight_kg'),
             tax_code_code = item_data.get('tax_code_code'),
             unit_cost_price_currency_code = item_data.get('unit_cost_price_currency_code'),
-            unit_cost_price_net = item_data.get('unit_cost_price_net')
+            unit_cost_price_net = item_data.get('unit_cost_price_net'),
         )
 
         db.session.add(new_item_history)
