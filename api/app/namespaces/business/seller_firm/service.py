@@ -184,7 +184,7 @@ class SellerFirmService:
 
 
     @staticmethod
-    def process_data_upload(seller_firm_public_id, file: BinaryIO):
+    def process_data_upload(seller_firm_public_id, file: BinaryIO, data_retrieval: bool = False):
 
         """
         This function is the main entry point for any file uploaded that relate to a seller firm's data,
@@ -292,7 +292,7 @@ class SellerFirmService:
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath,
-                        user_id, seller_firm_id, seller_firm_notification_data, 'AMZ']
+                        user_id, seller_firm_id, seller_firm_notification_data, 'AMZ', data_retrieval]
             )
 
         else:
