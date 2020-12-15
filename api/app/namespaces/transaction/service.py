@@ -284,20 +284,24 @@ class TransactionService:
         gift_wrap_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=shipment_tax_rate_type_code, calculated_vat_rate=gift_wrap_vat_temp.rate)
         shipment_price_vat_rate: float = TransactionService.get_vat_rate(transaction_input, tax_jurisdiction, tax_treatment_code, tax_date, tax_rate_type_code=gift_wrap_tax_rate_type_code, calculated_vat_rate=shipment_vat_temp.rate)
 
-        item_price_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.item_price_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=False)
+        item_unit_cost_price_net_calc = item_history.unit_cost_price_net if item.unit_cost_price_net else item.unit_cost_price_net_est
+        print('item_unit_cost_price_net_calc: ', item_unit_cost_price_net_calc, flush=True)
+
+
+        item_price_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.item_price_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=False)
         print('item_price_net: ', item_price_net, flush=True)
-        item_price_discount_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=True)
-        item_price_total_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=False)
+        item_price_discount_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.item_price_discount_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=True)
+        item_price_total_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.item_price_total_gross, item_price_vat_rate, transaction_type.code, price_type='item', discount=False)
 
-        shipment_price_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=False)
+        shipment_price_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.shipment_price_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=False)
         print('shipment_price_net: ', shipment_price_net, flush=True)
-        shipment_price_discount_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=True)
-        shipment_price_total_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=False)
+        shipment_price_discount_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.shipment_price_discount_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=True)
+        shipment_price_total_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.shipment_price_total_gross, shipment_price_vat_rate, transaction_type.code, price_type='shipment', discount=False)
 
-        gift_wrap_price_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=False)
+        gift_wrap_price_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.gift_wrap_price_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=False)
         print('gift_wrap_price_net: ', gift_wrap_price_net, flush=True)
-        gift_wrap_price_discount_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=True)
-        gift_wrap_price_total_net: float = TransactionService.get_price_net(item_history.unit_cost_price_net, transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=False)
+        gift_wrap_price_discount_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.gift_wrap_price_discount_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=True)
+        gift_wrap_price_total_net: float = TransactionService.get_price_net(item_unit_cost_price_net_calc, transaction_input.gift_wrap_price_total_gross, gift_wrap_price_vat_rate, transaction_type.code, price_type='gift_wrap', discount=False)
 
         item_price_vat: float = TransactionService.get_price_vat(transaction_input.item_price_gross, item_price_vat_rate, transaction_type.code)
         print('item_price_vat: ', item_price_vat, flush=True)

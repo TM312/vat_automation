@@ -159,8 +159,9 @@ class ItemService:
 
 
     @staticmethod
-    def get_unit_cost_price_net_est(seller_firm_id: int, df_transaction_inputs: pd.DataFrame = None, platform_code: str = None, target_currency_code: str = 'EUR' ) -> float:
+    def get_unit_cost_price_net_est(seller_firm_id: int, df_transaction_inputs: pd.DataFrame = None, platform_code: str = None, target_currency_code: str = None) -> float:
         from app.namespaces.exchange_rate.service import ExchangeRateService
+        from app.namespaces.business.seller_firm.service import SellerFirmService
 
         """
         There are the following options for estimating the item unit cost prices prioritized in the order as followed:
@@ -171,6 +172,20 @@ class ItemService:
         3.
 
         """
+        print('enter get_unit_cost_price_net_est', flush=True)
+        print('target_currency_code:', target_currency_code, flush=True)
+
+
+        if target_currency_code is None:
+            seller_firm = SellerFirmService.get_by_id(seller_firm_id)
+            if seller_firm and seller_firm.establishment_country_code:
+                print('in if condition', flush=True)
+                target_currency_code = seller_firm.establishment_country.currency_code
+                print('target_currency_code', target_currency_code, flush=True)
+            else:
+                target_currency_code = 'EUR'
+
+        print('enter get_unit_cost_price_net_est')
 
         seller_firm_items = ItemService.get_all_by_seller_firm_id(seller_firm_id)
         item_unit_cost_prices = [
@@ -178,7 +193,7 @@ class ItemService:
                 base = item.unit_cost_price_currency_code,
                 target = target_currency_code,
                 date = date.today()
-                )
+                ).rate
             for item in seller_firm_items
             if item.unit_cost_price_net is not None and item.unit_cost_price_currency_code is not None
             ]
@@ -190,6 +205,7 @@ class ItemService:
         #CASE 2
         # Unit Cost Price is being estimated based on Transaction Report
         elif df_transaction_inputs is not None and platform_code is not None:
+            print('case 2 -> target_currency_code', target_currency_code, flush=True)
             from app.namespaces.transaction_input.service import TransactionInputVariableService
             unit_cost_price_net_est = TransactionInputVariableService.get_item_unit_cost_price_est_from_transaction_inputs(df_transaction_inputs, platform_code, target_currency_code)
 
@@ -224,12 +240,12 @@ class ItemService:
             notification_data_list.append(notification_data)
 
 
-        if item.asin and transaction_input.asin and item.asin != transaction_input.asin:
+        if item.asin and transaction_input.item_asin and item.asin != transaction_input.item_asin:
             notification_data = NotificationService.create_transaction_notification_data(
                 main_subject='ASIN',
                 original_filename=transaction_input.original_filename,
                 status='info',
-                reference_value=transaction_input.asin,
+                reference_value=transaction_input.item_asin,
                 calculated_value=item.asin,
                 transaction_id=transaction_id)
             notification_data_list.append(notification_data)

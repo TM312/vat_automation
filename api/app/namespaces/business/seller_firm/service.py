@@ -201,7 +201,10 @@ class SellerFirmService:
         """
         DATA_ALLOWED_EXTENSIONS = current_app.config.DATA_ALLOWED_EXTENSIONS
         DATAPATH = current_app.config.DATAPATH
-        user_id = g.user.id
+        try:
+            user_id = g.user.id
+        except:
+            user_id = None
 
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         seller_firm_id = seller_firm.id

@@ -119,10 +119,23 @@ class ExchangeRateService:
 
             ExchangeRateService.create(exchange_rate_data)
 
+            #creating same rates, i.e. 'EUR' to 'EUR'
+            exchange_rate_data = {
+                'source': 'ECB',
+                'date': date,
+                'base': currency_code,
+                'target': currency_code,
+                'rate': 1
+            }
+
+            ExchangeRateService.create(exchange_rate_data)
+
 
         currency_tuples = list(mit.distinct_combinations(supported_currencies, 2))
         for currency_tuple in currency_tuples:
             ExchangeRateService.create_between_rate(date, base=currency_tuple[0], target=currency_tuple[1])
+
+
 
 
 

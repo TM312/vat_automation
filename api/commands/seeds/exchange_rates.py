@@ -91,6 +91,18 @@ class ExchangeRatesSeedService:
                 ExchangeRateService.create(exchange_rate_data)
                 counter += 1
 
+                #creating same rates, i.e. 'EUR' to 'EUR'
+                exchange_rate_data = {
+                    'source': 'ECB',
+                    'date': exchange_rate_date,
+                    'base': currency_code,
+                    'target': currency_code,
+                    'rate': 1
+                }
+
+                ExchangeRateService.create(exchange_rate_data)
+                counter += 1
+
             currency_tuples = list(mit.distinct_combinations(SUPPORTED_CURRENCIES, 2))
 
             for currency_tuple in currency_tuples:

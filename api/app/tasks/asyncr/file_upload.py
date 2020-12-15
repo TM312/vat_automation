@@ -42,7 +42,7 @@ def async_handle_vatin_data_upload(self, file_path_in: str, file_type: str, df_e
 @celery.task(bind=True, name='api.app.tasks.asyncr.async_handle_transaction_input_data_upload')
 def async_handle_transaction_input_data_upload(self, file_path_in: str, file_type: str, df_encoding: str, delimiter: str, basepath: str, user_id: int, seller_firm_id: int, seller_firm_notification_data: SellerFirmNotificationInterface, platform_code: str, data_retrieval: bool = False):
     from app.namespaces.transaction_input.service import TransactionInputService
-    response_object = TransactionInputService.handle_transaction_input_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data, platform_code, data_retrieval)
+    response_object = TransactionInputService.handle_transaction_input_data_upload(file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data, platform_code, data_retrieval=True, target_currency_code=None)
 
     return response_object
 
