@@ -53,6 +53,11 @@
                 {{ data.value }}
                 {{ data.item.unit_cost_price_currency_code }}
               </span>
+              <span v-else-if="data.unit_cost_price_net_est">
+                <i>{{ data.unit_cost_price_net_est }}
+                  {{ data.item.unit_cost_price_currency_code }} (est.)
+                </i>
+              </span>
               <span v-else>-</span>
             </template>
 

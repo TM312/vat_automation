@@ -123,7 +123,7 @@ class Item(db.Model):  # type: ignore
 
         return self
 
-    def update_unit_cost_price_net_est(self: Item, unit_cost_price_net_est: float) -> Item:
+    def update_unit_cost_price_net_est(self, unit_cost_price_net_est: float):
         self.unit_cost_price_net_est = unit_cost_price_net_est
         db.session.commit()
         return self

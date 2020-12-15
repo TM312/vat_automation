@@ -2,7 +2,6 @@ import os
 from typing import List, BinaryIO, Dict
 import pandas as pd
 from datetime import date, datetime, timedelta
-import time
 import re
 from random import randint
 
@@ -592,6 +591,7 @@ class VIESService:
 
     @staticmethod #!! async??
     def send_request(country_code: str, number: str) -> Dict:
+        from time import sleep
 
         """VIES API response data."""
         try:
@@ -602,7 +602,6 @@ class VIESService:
             current_app.logger.warning('Exception: {} | URLLIB Request failed for VATIN: {}-{}'.format(e, country_code, number))
             try:
                 # VIES DB is unreliable therefore reducing requests per second
-                from time import sleep
                 sleep(randint(4,6))
                 vatin_data = VIESService.send_request_via_zeep(country_code, number)
 

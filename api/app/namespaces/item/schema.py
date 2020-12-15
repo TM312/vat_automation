@@ -57,6 +57,8 @@ class ItemSubSchema:
             'weight_kg': item.weight_kg,
             'tax_code_code': item.tax_code_code,
             'unit_cost_price_currency_code': item.unit_cost_price_currency_code,
-            'unit_cost_price_net': item.unit_cost_price_net
+            'unit_cost_price_net': item.unit_cost_price_net,
+            'unit_cost_price_net_est': item.unit_cost_price_net_est
+
         }
         return item_as_dict

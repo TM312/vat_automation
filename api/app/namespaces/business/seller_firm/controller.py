@@ -66,13 +66,13 @@ class SellerFirmIdResource(Resource):
 @ns.route("/<string:seller_firm_public_id>/upload")
 class SellerFirmInformationResource(Resource):
     decorators = [limiter.limit("10/minute")]
-    @login_required
+    # @login_required
     def post(self, seller_firm_public_id) -> Response:
         """Upload data for the indicated seller firm"""
         seller_firm_file: BinaryIO = request.files["file"]
         data_retrieval: bool = request.json
         print('data_retrieval:', data_retrieval, flush=True)
-        #return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file, )
+        return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file)
 
 
 @ns.route('/sample')

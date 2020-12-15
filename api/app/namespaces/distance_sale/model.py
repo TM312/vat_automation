@@ -38,7 +38,7 @@ class DistanceSale(db.Model):  # type: ignore
                 return 0
             else:
                 from app.namespaces.exchange_rate.service import ExchangeRateService
-                exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', self.last_tax_date)
+                exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', self.last_tax_date).rate
                 return round(self._taxable_turnover_amount / 100 * exchange_rate_HUN_EUR, 2) if self._taxable_turnover_amount is not None else None
 
     @taxable_turnover_amount.setter
@@ -102,7 +102,7 @@ class DistanceSaleHistory(db.Model):  # type: ignore
             return self._taxable_turnover_amount / 100 if self._taxable_turnover_amount is not None else None
         else:
             from app.namespaces.exchange_rate.service import ExchangeRateService
-            exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', self.last_tax_date)
+            exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', self.last_tax_date).rate
             return (self._taxable_turnover_amount / 100 * exchange_rate_HUN_EUR) if self._taxable_turnover_amount is not None else None
 
     @taxable_turnover_amount.setter
