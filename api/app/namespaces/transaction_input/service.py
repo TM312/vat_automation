@@ -7,7 +7,7 @@ from typing import List, BinaryIO, Dict
 
 from flask import g, current_app
 from sqlalchemy import or_
-from werkzeug.exceptions import UnsupportedMediaType, NotFound, UnprocessableEntity, ExpectationFailed, InternalServerError
+from werkzeug.exceptions import UnsupportedMediaType, NotFound, ExpectationFailed, InternalServerError
 from app.extensions import (
     db,
     socket_io)
@@ -15,6 +15,8 @@ from app.extensions import (
 from . import TransactionInput
 from .interface import TransactionInputInterface
 from .schema import TransactionInputSubSchema
+from .df_reader import AMZReader
+from .platform_handler import AMZHandler
 
 from app.namespaces.utils.service import InputService, NotificationService, HelperService
 from app.namespaces.tag.service import TagService
@@ -707,24 +709,31 @@ class TransactionInputService:
 class TransactionInputVariableService:
 
     @staticmethod
+    def get_item_unit_cost_price_est_from_transaction_inputs(df: pd.DataFrame, platform_code: str, target_currency_code: str, file_type: str) -> float:
+        from app.namespaces.exchange_rate.service import ExchangeRateService
+        # average of total value / qty * 0.6
+        # needs to be differentiated by platform because of platform specific column names
+        if platform_code == 'AMZ':
+            item_gross_prices = AMZReader.get_item_gross_prices(df, target_currency_code, file_type)
+
+
+        # general proceeding
+        avg_item_gross_price = mean(item_gross_prices)
+
+        item_unit_cost_price_est = avg_item_gross_price * 0.6
+        return item_unit_cost_price_est
+
+    @staticmethod
     def get_sale_transaction_input_by_bundle_id(bundle_id: int, platform_code: str) -> TransactionInput:
         if platform_code == 'AMZ':
-            sale_transaction_input = TransactionInput.query.filter(
-                TransactionInput.bundle_id == bundle_id,
-                or_(
-                    TransactionInput.transaction_type_public_code == 'SALE',
-                    TransactionInput.transaction_type_public_code == 'COMMINGLING_SELL'
-                )
-            ).first()
+            sale_transaction_input = AMZHandler.get_sale_transaction_input_by_bundle_id(bundle_id)
 
         return sale_transaction_input
-
 
     @staticmethod
     def verify_transaction_order(df: pd.DataFrame, total: int, platform_code: str, file_type: str) -> List[int]:
         if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                desc = TransactionInputVariableService.verify_transaction_order_AMZ2020(df, total)
+            desc = AMZReader.verify_transaction_order(df, total, file_type)
 
         # general/platform-independent
         if desc:
@@ -734,553 +743,13 @@ class TransactionInputVariableService:
 
         return start, stop, step, desc
 
-    @staticmethod
-    def verify_transaction_order_AMZ2020(df, total) -> bool:
-        complete_date_top = InputService.get_date_or_None(df, 0, column='TRANSACTION_COMPLETE_DATE')
-        complete_date_bottom = InputService.get_date_or_None(df, total-1, column='TRANSACTION_COMPLETE_DATE')
-
-        return complete_date_top >= complete_date_bottom
+     @staticmethod
 
 
     @staticmethod
     def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, platform_code: str, file_type: str) -> List:
         if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                return TransactionInputVariableService.get_df_vars_AMZ2020(df, i, current, object_type)
-
-
-    @staticmethod
-    def get_item_vars_AMZ2020(df_items: pd.DataFrame, i: int) -> List:
-        try:
-            item_sku = InputService.get_str(df_items, i, column='SELLER_SKU')
-        except:
-            raise UnprocessableEntity('SELLER_SKU')
-
-        try:
-            item_name = InputService.get_str_or_None(df_items, i, column='ITEM_DESCRIPTION')
-        except:
-            raise UnprocessableEntity('ITEM_DESCRIPTION')
-
-        try:
-            item_asin = InputService.get_str_or_None(df_items, i, column='ASIN')
-        except:
-            raise UnprocessableEntity('ASIN')
-
-        try:
-            item_weight_kg = InputService.get_float_or_None(df_items, i, column='ITEM_WEIGHT')
-        except:
-            raise UnprocessableEntity('ITEM_WEIGHT')
-
-        try:
-            item_given_tax_code_code = InputService.get_str_or_None(df_items, i, column='PRODUCT_TAX_CODE')
-        except:
-            raise UnprocessableEntity('PRODUCT_TAX_CODE')
-
-        return item_sku, item_name, item_asin, item_weight_kg, item_given_tax_code_code
-
-    @staticmethod
-    def get_account_vars_AMZ20202020(df_accounts: pd.DataFrame, i: int) -> List:
-        try:
-            account_given_id = InputService.get_str(df_accounts, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
-        except:
-            raise UnprocessableEntity('UNIQUE_ACCOUNT_IDENTIFIER')
-
-        try:
-            channel_code = InputService.get_str(df_accounts, i, column='SALES_CHANNEL')
-        except:
-            raise UnprocessableEntity('SALES_CHANNEL')
-
-        return account_given_id, channel_code
-
-
-
-    @staticmethod
-    def get_df_vars_AMZ2020(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
-
-        try:
-            account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
-        except:
-            raise UnprocessableEntity('UNIQUE_ACCOUNT_IDENTIFIER')
-
-        try:
-            channel_code = InputService.get_str(df, i, column='SALES_CHANNEL')
-        except:
-            raise UnprocessableEntity('SALES_CHANNEL')
-
-        try:
-            given_id = InputService.get_str(df, i, column='TRANSACTION_EVENT_ID')
-        except:
-            raise UnprocessableEntity('TRANSACTION_EVENT_ID')
-
-        try:
-            activity_id = InputService.get_str(df, i, column='ACTIVITY_TRANSACTION_ID')
-        except:
-            raise UnprocessableEntity('ACTIVITY_TRANSACTION_ID')
-
-        try:
-            item_sku = InputService.get_str(df, i, column='SELLER_SKU')
-        except:
-            raise UnprocessableEntity('SELLER_SKU')
-
-        try:
-            item_name = InputService.get_str_or_None(df, i, column='ITEM_DESCRIPTION')
-        except:
-            raise UnprocessableEntity('ITEM_DESCRIPTION')
-
-        try:
-            item_asin = InputService.get_str_or_None(df, i, column='ASIN')
-        except:
-            raise UnprocessableEntity('ASIN')
-
-        try:
-            shipment_date = InputService.get_date_or_None(df, i, column='TRANSACTION_DEPART_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_DEPART_DATE')
-
-        try:
-            arrival_date = InputService.get_date_or_None(df, i, column='TRANSACTION_ARRIVAL_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_ARRIVAL_DATE')
-
-        try:
-            complete_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_COMPLETE_DATE')
-
-
-        try:
-            public_activity_period = InputService.get_str(df, i, column='ACTIVITY_PERIOD')
-        except:
-            raise UnprocessableEntity('ACTIVITY_PERIOD')
-        try:
-            marketplace = InputService.get_str_or_None(df, i, column='MARKETPLACE')
-        except:
-            raise UnprocessableEntity('MARKETPLACE')
-        try:
-            transaction_type_public_code = InputService.get_str_or_None(df, i, column='TRANSACTION_TYPE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_TYPE')
-
-        try:
-            tax_calculation_date = InputService.get_date_or_None(df, i, column='TAX_CALCULATION_DATE')
-        except:
-            raise UnprocessableEntity('TAX_CALCULATION_DATE')
-
-        try:
-            item_manufacture_country = InputService.get_str_or_None(df, i, column='ITEM_MANUFACTURE_COUNTRY')
-        except:
-            raise UnprocessableEntity('ITEM_MANUFACTURE_COUNTRY')
-        try:
-            item_quantity = int(df.iloc[i]['QTY'])
-        except:
-            raise UnprocessableEntity('QTY')
-
-        try:
-            item_weight_kg = InputService.get_float_or_None(df, i, column='ITEM_WEIGHT')
-        except:
-            raise UnprocessableEntity('ITEM_WEIGHT')
-        try:
-            item_weight_kg_total = InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_WEIGHT')
-        except:
-            raise UnprocessableEntity('TOTAL_ACTIVITY_WEIGHT')
-
-        try:
-            unit_cost_price_net = InputService.get_float_or_None(df, i, column='COST_PRICE_OF_ITEMS')
-        except:
-            raise UnprocessableEntity('COST_PRICE_OF_ITEMS')
-
-        try:
-            item_price_discount_net = InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('PROMO_PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        try:
-            item_price_discount_vat = InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_VAT_AMT')
-        except:
-            raise UnprocessableEntity('PROMO_PRICE_OF_ITEMS_VAT_AMT')
-        try:
-            item_price_discount_gross = InputService.get_float_or_None(df, i, column='PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('PROMO_PRICE_OF_ITEMS_AMT_VAT_INCL')
-
-        try:
-            item_price_net = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        try:
-            item_price_vat = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_VAT_AMT')
-        except:
-            raise UnprocessableEntity('PRICE_OF_ITEMS_VAT_AMT')
-        try:
-            item_price_gross = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('PRICE_OF_ITEMS_AMT_VAT_INCL')
-
-        try:
-            item_price_total_net = InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('TOTAL_PRICE_OF_ITEMS_AMT_VAT_EXCL')
-        try:
-            item_price_total_vat = InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_VAT_AMT')
-        except:
-            raise UnprocessableEntity('TOTAL_PRICE_OF_ITEMS_VAT_AMT')
-        try:
-            item_price_total_gross = InputService.get_float_or_None(df, i, column='TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('TOTAL_PRICE_OF_ITEMS_AMT_VAT_INCL')
-
-        try:
-            item_price_vat_rate = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_VAT_RATE_PERCENT')
-        except:
-            raise UnprocessableEntity('PRICE_OF_ITEMS_VAT_RATE_PERCENT')
-
-        try:
-            shipment_price_discount_net = InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('PROMO_SHIP_CHARGE_AMT_VAT_EXCL')
-        try:
-            shipment_price_discount_vat = InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_VAT_AMT')
-        except:
-            raise UnprocessableEntity('PROMO_SHIP_CHARGE_VAT_AMT')
-        try:
-            shipment_price_discount_gross = InputService.get_float_or_None(df, i, column='PROMO_SHIP_CHARGE_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('PROMO_SHIP_CHARGE_AMT_VAT_INCL')
-
-        try:
-            shipment_price_net = InputService.get_float_or_None(df, i, column='SHIP_CHARGE_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('SHIP_CHARGE_AMT_VAT_EXCL')
-        try:
-            shipment_price_vat = InputService.get_float_or_None(df, i, column='SHIP_CHARGE_VAT_AMT')
-        except:
-            raise UnprocessableEntity('SHIP_CHARGE_VAT_AMT')
-        try:
-            shipment_price_gross = InputService.get_float_or_None(df, i, column='SHIP_CHARGE_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('SHIP_CHARGE_AMT_VAT_INCL')
-
-        try:
-            shipment_price_total_net = InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('TOTAL_SHIP_CHARGE_AMT_VAT_EXCL')
-        try:
-            shipment_price_total_vat = InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_VAT_AMT')
-        except:
-            raise UnprocessableEntity('TOTAL_SHIP_CHARGE_VAT_AMT')
-        try:
-            shipment_price_total_gross = InputService.get_float_or_None(df, i, column='TOTAL_SHIP_CHARGE_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('TOTAL_SHIP_CHARGE_AMT_VAT_INCL')
-
-        try:
-            shipment_price_vat_rate = InputService.get_float_or_None(df, i, column='SHIP_CHARGE_VAT_RATE_PERCENT')
-        except:
-            raise UnprocessableEntity('SHIP_CHARGE_VAT_RATE_PERCENT')
-
-        try:
-            sale_total_value_net = InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('TOTAL_ACTIVITY_VALUE_AMT_VAT_EXCL')
-        try:
-            sale_total_value_vat = InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_VAT_AMT')
-        except:
-            raise UnprocessableEntity('TOTAL_ACTIVITY_VALUE_VAT_AMT')
-        try:
-            sale_total_value_gross = InputService.get_float_or_None(df, i, column='TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('TOTAL_ACTIVITY_VALUE_AMT_VAT_INCL')
-
-        try:
-            gift_wrap_price_discount_net = InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('PROMO_GIFT_WRAP_AMT_VAT_EXCL')
-        try:
-            gift_wrap_price_discount_vat = InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_VAT_AMT')
-        except:
-            raise UnprocessableEntity('PROMO_GIFT_WRAP_VAT_AMT')
-        try:
-            gift_wrap_price_discount_gross = InputService.get_float_or_None(df, i, column='PROMO_GIFT_WRAP_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('PROMO_GIFT_WRAP_AMT_VAT_INCL')
-
-        try:
-            gift_wrap_price_net = InputService.get_float_or_None(df, i, column='GIFT_WRAP_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('GIFT_WRAP_AMT_VAT_EXCL')
-        try:
-            gift_wrap_price_vat = InputService.get_float_or_None(df, i, column='GIFT_WRAP_VAT_AMT')
-        except:
-            raise UnprocessableEntity('GIFT_WRAP_VAT_AMT')
-        try:
-            gift_wrap_price_gross = InputService.get_float_or_None(df, i, column='GIFT_WRAP_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('GIFT_WRAP_AMT_VAT_INCL')
-
-        try:
-            gift_wrap_price_total_net = InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_EXCL')
-        except:
-            raise UnprocessableEntity('TOTAL_GIFT_WRAP_AMT_VAT_EXCL')
-        try:
-            gift_wrap_price_total_vat = InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_VAT_AMT')
-        except:
-            raise UnprocessableEntity('TOTAL_GIFT_WRAP_VAT_AMT')
-        try:
-            gift_wrap_price_total_gross = InputService.get_float_or_None(df, i, column='TOTAL_GIFT_WRAP_AMT_VAT_INCL')
-        except:
-            raise UnprocessableEntity('TOTAL_GIFT_WRAP_AMT_VAT_INCL')
-
-        try:
-            gift_wrap_price_tax_rate = InputService.get_float_or_None(df, i, column='GIFT_WRAP_VAT_RATE_PERCENT')
-        except:
-            raise UnprocessableEntity('GIFT_WRAP_VAT_RATE_PERCENT')
-
-
-        try:
-            currency_code = InputService.get_str_or_None(df, i, column='TRANSACTION_CURRENCY_CODE')
-        except:
-            raise UnprocessableEntity('TRANSACTION_CURRENCY_CODE')
-
-        try:
-            item_given_tax_code_code = InputService.get_str_or_None(df, i, column='PRODUCT_TAX_CODE')
-        except:
-            raise UnprocessableEntity('PRODUCT_TAX_CODE')
-
-
-        try:
-            departure_country_code = InputService.get_str_or_None(df, i, column='DEPARTURE_COUNTRY')
-        except:
-            raise UnprocessableEntity('DEPARTURE_COUNTRY')
-        try:
-            departure_postal_code = InputService.get_single_str_compact(df, i, column='DEPARTURE_POST_CODE')
-        except:
-            raise UnprocessableEntity('DEPARTURE_POST_CODE')
-        try:
-            departure_city = InputService.get_str_or_None(df, i, column='DEPATURE_CITY')
-        except:
-            raise UnprocessableEntity('DEPATURE_CITY')
-
-        try:
-            arrival_country_code = InputService.get_str_or_None(df, i, column='ARRIVAL_COUNTRY')
-        except:
-            raise UnprocessableEntity('ARRIVAL_COUNTRY')
-        try:
-            arrival_postal_code = InputService.get_single_str_compact(df, i, column='ARRIVAL_POST_CODE')
-        except:
-            raise UnprocessableEntity('ARRIVAL_POST_CODE')
-        try:
-            arrival_city = InputService.get_str_or_None(df, i, column='ARRIVAL_CITY')
-        except:
-            raise UnprocessableEntity('ARRIVAL_CITY')
-        try:
-            arrival_address = InputService.get_str_or_None(df, i, column='ARRIVAL_ADDRESS')
-        except:
-            raise UnprocessableEntity('ARRIVAL_ADDRESS')
-
-        try:
-            sale_departure_country_code = InputService.get_str_or_None(df, i, column='SALE_DEPART_COUNTRY')
-        except:
-            raise UnprocessableEntity('SALE_DEPART_COUNTRY')
-        try:
-            sale_arrival_country_code = InputService.get_str_or_None(df, i, column='SALE_ARRIVAL_COUNTRY')
-        except:
-            raise UnprocessableEntity('SALE_ARRIVAL_COUNTRY')
-
-        try:
-            shipment_mode = InputService.get_str_or_None(df, i, column='TRANSPORTATION_MODE')
-        except:
-            raise UnprocessableEntity('TRANSPORTATION_MODE')
-        try:
-            shipment_conditions = InputService.get_str_or_None(df, i, column='DELIVERY_CONDITIONS')
-        except:
-            raise UnprocessableEntity('DELIVERY_CONDITIONS')
-
-        try:
-            departure_seller_vat_country_code = InputService.get_str_or_None(df, i, column='SELLER_DEPART_VAT_NUMBER_COUNTRY')
-        except:
-            raise UnprocessableEntity('SELLER_DEPART_VAT_NUMBER_COUNTRY')
-        try:
-            departure_seller_vat_number = InputService.get_str_or_None(df, i, column='SELLER_DEPART_COUNTRY_VAT_NUMBER')
-        except:
-            raise UnprocessableEntity('SELLER_DEPART_COUNTRY_VAT_NUMBER')
-
-        try:
-            arrival_seller_vat_country_code = InputService.get_str_or_None(df, i, column='SELLER_ARRIVAL_VAT_NUMBER_COUNTRY')
-        except:
-            raise UnprocessableEntity('SELLER_ARRIVAL_VAT_NUMBER_COUNTRY')
-        try:
-            arrival_seller_vat_number = InputService.get_str_or_None(df, i, column='SELLER_ARRIVAL_COUNTRY_VAT_NUMBER')
-        except:
-            raise UnprocessableEntity('SELLER_ARRIVAL_COUNTRY_VAT_NUMBER')
-
-        try:
-            seller_vat_country_code = InputService.get_str_or_None(df, i, column='TRANSACTION_SELLER_VAT_NUMBER_COUNTRY')
-        except:
-            raise UnprocessableEntity('TRANSACTION_SELLER_VAT_NUMBER_COUNTRY')
-        try:
-            seller_vat_number = InputService.get_str_or_None(df, i, column='TRANSACTION_SELLER_VAT_NUMBER')
-        except:
-            raise UnprocessableEntity('TRANSACTION_SELLER_VAT_NUMBER')
-
-
-        try:
-            tax_calculation_imputation_country = InputService.get_str_or_None(df, i, column='VAT_CALCULATION_IMPUTATION_COUNTRY')
-        except:
-            raise UnprocessableEntity('VAT_CALCULATION_IMPUTATION_COUNTRY')
-        try:
-            tax_jurisdiction = InputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION')
-        except:
-            raise UnprocessableEntity('TAXABLE_JURISDICTION')
-        try:
-            tax_jurisdiction_level = InputService.get_str_or_None(df, i, column='TAXABLE_JURISDICTION_LEVEL')
-        except:
-            raise UnprocessableEntity('TAXABLE_JURISDICTION_LEVEL')
-
-        try:
-            invoice_number = InputService.get_str_or_None(df, i, column='VAT_INV_NUMBER')
-        except:
-            raise UnprocessableEntity('VAT_INV_NUMBER')
-        try:
-            invoice_amount_vat = InputService.get_float_or_None(df, i, column='VAT_INV_CONVERTED_AMT')
-        except:
-            raise UnprocessableEntity('VAT_INV_CONVERTED_AMT')
-        try:
-            invoice_currency_code = InputService.get_str_or_None(df, i, column='VAT_INV_CURRENCY_CODE')
-        except:
-            raise UnprocessableEntity('VAT_INV_CURRENCY_CODE')
-        try:
-            invoice_exchange_rate = InputService.get_float_or_None(df, i, column='VAT_INV_EXCHANGE_RATE')
-        except:
-            raise UnprocessableEntity('VAT_INV_EXCHANGE_RATE')
-        try:
-            invoice_exchange_rate_date = InputService.get_date_or_None(df, i, column='VAT_INV_EXCHANGE_RATE_DATE')
-        except:
-            raise UnprocessableEntity('VAT_INV_EXCHANGE_RATE_DATE')
-        try:
-            invoice_url = InputService.get_str_or_None(df, i, column='INVOICE_URL')
-        except:
-            raise UnprocessableEntity('INVOICE_URL')
-
-
-        try:
-            export = InputService.get_bool(df, i, column='EXPORT_OUTSIDE_EU', value_true='YES')
-        except:
-            raise UnprocessableEntity('EXPORT_OUTSIDE_EU')
-
-        try:
-            customer_name = InputService.get_str_or_None(df, i, column='BUYER_NAME')
-        except:
-            raise UnprocessableEntity('BUYER_NAME')
-        try:
-            customer_vat_number = InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER')
-        except:
-            raise UnprocessableEntity('BUYER_VAT_NUMBER')
-        try:
-            customer_vat_number_country_code = InputService.get_str_or_None(df, i, column='BUYER_VAT_NUMBER_COUNTRY')
-        except:
-            raise UnprocessableEntity('BUYER_VAT_NUMBER_COUNTRY')
-
-        try:
-            supplier_vat_number = InputService.get_str_or_None(df, i, column='SUPPLIER_VAT_NUMBER')
-        except:
-            raise UnprocessableEntity('SUPPLIER_VAT_NUMBER')
-        try:
-            supplier_name = InputService.get_str_or_None(df, i, column='SUPPLIER_NAME')
-        except:
-            raise UnprocessableEntity('SUPPLIER_NAME')
-
-
-        #unprovided vars
-        item_brand_name = None
-
-        return (
-            account_given_id,
-            channel_code,
-            given_id,
-            activity_id,
-            item_sku,
-            item_name,
-            item_brand_name,
-            item_asin,
-            shipment_date,
-            arrival_date,
-            complete_date,
-            public_activity_period,
-            marketplace,
-            transaction_type_public_code,
-            tax_calculation_date,
-            item_manufacture_country,
-            item_quantity,
-            item_weight_kg,
-            item_weight_kg_total,
-            unit_cost_price_net,
-            item_price_discount_net,
-            item_price_discount_vat,
-            item_price_discount_gross,
-            item_price_net,
-            item_price_vat,
-            item_price_gross,
-            item_price_total_net,
-            item_price_total_vat,
-            item_price_total_gross,
-            item_price_vat_rate,
-            shipment_price_discount_net,
-            shipment_price_discount_vat,
-            shipment_price_discount_gross,
-            shipment_price_net,
-            shipment_price_vat,
-            shipment_price_gross,
-            shipment_price_total_net,
-            shipment_price_total_vat,
-            shipment_price_total_gross,
-            shipment_price_vat_rate,
-            sale_total_value_net,
-            sale_total_value_vat,
-            sale_total_value_gross,
-            gift_wrap_price_discount_net,
-            gift_wrap_price_discount_vat,
-            gift_wrap_price_discount_gross,
-            gift_wrap_price_net,
-            gift_wrap_price_vat,
-            gift_wrap_price_gross,
-            gift_wrap_price_total_net,
-            gift_wrap_price_total_vat,
-            gift_wrap_price_total_gross,
-            gift_wrap_price_tax_rate,
-            currency_code,
-            item_given_tax_code_code,
-            departure_country_code,
-            departure_postal_code,
-            departure_city,
-            arrival_country_code,
-            arrival_postal_code,
-            arrival_city,
-            arrival_address,
-            sale_departure_country_code,
-            sale_arrival_country_code,
-            shipment_mode,
-            shipment_conditions,
-            departure_seller_vat_country_code,
-            departure_seller_vat_number,
-            arrival_seller_vat_country_code,
-            arrival_seller_vat_number,
-            seller_vat_country_code,
-            seller_vat_number,
-            tax_calculation_imputation_country,
-            tax_jurisdiction,
-            tax_jurisdiction_level,
-            invoice_number,
-            invoice_amount_vat,
-            invoice_currency_code,
-            invoice_exchange_rate,
-            invoice_exchange_rate_date,
-            invoice_url,
-            export,
-            customer_name,
-            customer_vat_number,
-            customer_vat_number_country_code,
-            supplier_vat_number,
-            supplier_name
-        )
+            return AMZReader.get_df_vars(df, i, current, object_type, file_type)
 
 
     @staticmethod
@@ -1291,11 +760,10 @@ class TransactionInputVariableService:
 
         for i in range(len(df_accounts.index)):
             if platform_code == 'AMZ':
-                if file_type == 'transactions_amazon_2020':
-                    (
-                        account_given_id,
-                        channel_code
-                    ) = TransactionInputVariableService.get_account_vars_AMZ2020(df_accounts, i)
+                (
+                    account_given_id,
+                    channel_code
+                ) = AMZReader.get_account_vars(df_accounts, i, file_type)
 
 
             # platform independent
@@ -1325,8 +793,6 @@ class TransactionInputVariableService:
                 # Socket notification !!!!
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
 
-
-
     @staticmethod
     def update_items(df_items: pd.DataFrame, platform_code: str, file_type: str, seller_firm_id: int, user_id: int, original_filename: str, valid_from: date, unit_cost_price_net_est: float, unit_cost_price_currency_code: str):
         from app.namespaces.item import Item
@@ -1336,16 +802,14 @@ class TransactionInputVariableService:
 
         for i in range(len(df_items.index)):
             if platform_code == 'AMZ':
-                if file_type == 'transactions_amazon_2020':
-
-                    (
-                        item_sku,
-                        item_name,
-                        item_asin,
-                        item_weight_kg,
-                        item_given_tax_code_code
-                    ) = TransactionInputVariableService.get_item_vars_AMZ2020(df_items, i)
-                    item_brand_name = None
+                (
+                    item_sku,
+                    item_name,
+                    item_asin,
+                    item_weight_kg,
+                    item_given_tax_code_code
+                ) = AMZReader.get_item_vars(df_items, i, file_type)
+                item_brand_name = None
 
 
             # platform independent
@@ -1398,100 +862,6 @@ class TransactionInputVariableService:
                 # push item to vuex via socket
                 item_json = ItemSubSchema.get_item_sub(item)
                 SocketService.emit_update_object(item_json, 'item')
-
-
-
-    @staticmethod
-    def get_unique_item_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
-        # reduce to unique combinations of item id and channel
-        if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                df_unique = df.drop_duplicates(subset=['ASIN'])[['SELLER_SKU', 'ASIN', 'ITEM_DESCRIPTION', 'ITEM_WEIGHT', 'PRODUCT_TAX_CODE']]
-
-        return df_unique
-
-
-
-
-    @staticmethod
-    def get_item_unit_cost_price_est_from_transaction_inputs(df: pd.DataFrame, platform_code: str, target_currency_code: str, file_type: str) -> float:
-        from app.namespaces.exchange_rate.service import ExchangeRateService
-        # average of total value / qty * 0.6
-        # needs to be differentiated by platform because of platform specific column names
-        item_gross_prices = []
-        if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                for i in range(len(df.index)):
-                    sale_total_value_gross_raw = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL')
-                    base_currency_code = InputService.get_str(df, i, column='TRANSACTION_CURRENCY_CODE')
-                    if isinstance(sale_total_value_gross_raw, float) and isinstance(base_currency_code, str):
-                        item_quantity = InputService.get_float_or_None(df, i, column='QTY') #always provided
-                        exchange_rate_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE') #always provided
-
-                        #convert to target currency
-                        exchange_rate_rate = ExchangeRateService.get_by_base_target_date(base_currency_code, target_currency_code, exchange_rate_date).rate if base_currency_code != target_currency_code else 1
-                        sale_total_value_gross = sale_total_value_gross_raw * exchange_rate_rate
-
-                        item_gross_prices.append(sale_total_value_gross)
-
-
-        # general proceeding
-        avg_item_gross_price = mean(item_gross_prices)
-
-        item_unit_cost_price_est = avg_item_gross_price * 0.6
-        return item_unit_cost_price_est
-
-
-
-    @staticmethod
-    def get_unique_account_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
-        # reduce to unique combinations of account id and channel
-        if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                df_unique = df.drop_duplicates(subset=['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL'])[['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL']]
-
-        return df_unique
-
-    @staticmethod
-    def get_unique_vatins_from_transaction_inputs(df: pd.DataFrame, seller_firm_id: int, platform_code: str, file_type: str) -> List:
-
-        if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                column_values = df[["SELLER_DEPART_COUNTRY_VAT_NUMBER", "SELLER_ARRIVAL_COUNTRY_VAT_NUMBER", "TRANSACTION_SELLER_VAT_NUMBER"]].values.ravel('K')
-
-        # general/platform-independent proceeding
-        #unique values
-        unique_vatin_numbers_raw = pd.unique(column_values).tolist()
-        # drop nan
-        unique_vatin_numbers = [vatin_number for vatin_number in unique_vatin_numbers_raw if str(vatin_number) != 'nan']
-
-        return unique_vatin_numbers
-
-
-
-
-    @staticmethod
-    def get_valid_from_df(df: pd.DataFrame, platform_code: str) -> date:
-        if platform_code == 'AMZ':
-            if file_type == 'transactions_amazon_2020':
-                dates_all = df[[
-                    "TRANSACTION_DEPART_DATE",
-                    "TRANSACTION_ARRIVAL_DATE",
-                    "TRANSACTION_COMPLETE_DATE",
-                    "TAX_CALCULATION_DATE",
-                    "VAT_INV_EXCHANGE_RATE_DATE"
-                    ]].values.ravel('K')
-
-        dates_raw = pd.unique(dates_all).tolist()
-        #remove nan and transform to datetime.date object
-        dates = [datetime.strptime(d, '%d-%m-%Y').date() for d in dates_raw if str(d) != 'nan']
-
-        valid_from = min(dates)
-        return valid_from
-
-
-
-
 
     @staticmethod
     def update_vatin_data(vatin_numbers: List, valid_from: date, seller_firm_id: int, original_filename: str):
@@ -1563,3 +933,38 @@ class TransactionInputVariableService:
                  # push vatin to vuex via socket
                 vatin_json = VatinSchemaSocket.get_vatin_sub(vatin)
                 SocketService.emit_update_object(vatin_json, 'vat_number')
+
+
+    @staticmethod
+    def get_unique_item_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
+        # reduce to unique combinations of item id and channel
+        if platform_code == 'AMZ':
+            df_unique = AMZReader.get_unique_items(df, file_type)
+
+        return df_unique
+
+    @staticmethod
+    def get_unique_account_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
+        # reduce to unique combinations of account id and channel
+        if platform_code == 'AMZ':
+            df_unique = AMZReader.get_unique_accounts(df, file_type)
+
+        return df_unique
+
+    @staticmethod
+    def get_unique_vatins_from_transaction_inputs(df: pd.DataFrame, seller_firm_id: int, platform_code: str, file_type: str) -> List:
+
+        if platform_code == 'AMZ':
+            unique_vatin_numbers = AMZReader.get_unique_vatin_numbers(df, file_type)
+
+        return unique_vatin_numbers
+
+
+    @staticmethod
+    def get_valid_from_df(df: pd.DataFrame, platform_code: str, file_type: str) -> date:
+        if platform_code == 'AMZ':
+            dates: List[date] = AMZReader.get_all_dates_in_df(df, file_type)
+
+        # platform independent
+        valid_from = min(dates)
+        return valid_from

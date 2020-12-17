@@ -393,7 +393,7 @@ class InputService:
               and 'ACTIVITY_TRANSACTION_ID' in column_name_list
               and 'QTY' in column_name_list
               ):
-            return 'transactions_amazon_2020'
+            return 'TI_AMZ_2020'
 
         elif ('UNIQUE_ACCOUNT_IDENTIFIER' in column_name_list
               and 'ACTIVITY_PERIOD' in column_name_list
@@ -405,7 +405,7 @@ class InputService:
               and 'TAX_REPORTING_SCHEME' in column_name_list
               and 'TAX_COLLECTION_RESPONSIBILITY' in column_name_list
               ):
-            return 'transactions_amazon_2021'
+            return 'TI_AMZ_2021'
 
         elif ('seller_firm_name' in column_name_list
               and 'address' in column_name_list

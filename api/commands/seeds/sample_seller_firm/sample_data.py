@@ -75,7 +75,7 @@ class SampleFirmInformationSeedService:
         basepath = '/home/data/business_data'
 
         file_path_in_transaction_inputs = path.join(dir_path, 'transactions', 'transactions_bond.csv')
-        file_type = 'transactions_amazon_2020'
+        file_type = 'TI_AMZ_2020'
 
         # TransactionInputService.handle_transaction_input_data_upload(
         #     file_path_in=file_path_in_transaction_inputs,

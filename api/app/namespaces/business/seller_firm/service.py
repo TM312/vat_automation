@@ -290,7 +290,7 @@ class SellerFirmService:
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                 )
 
-        elif file_type == 'transactions_amazon_2020':
+        elif file_type == 'TI_AMZ_2020':
             from app.tasks.asyncr import async_handle_transaction_input_data_upload
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
@@ -298,7 +298,7 @@ class SellerFirmService:
                         user_id, seller_firm_id, seller_firm_notification_data, 'AMZ', data_retrieval]
             )
 
-        elif file_type == 'transactions_amazon_2021':
+        elif file_type == 'TI_AMZ_2021':
             from app.tasks.asyncr import async_handle_transaction_input_data_upload
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
