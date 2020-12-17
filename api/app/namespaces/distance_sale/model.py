@@ -101,9 +101,13 @@ class DistanceSaleHistory(db.Model):  # type: ignore
         if self.arrival_country_code != 'HU':
             return self._taxable_turnover_amount / 100 if self._taxable_turnover_amount is not None else None
         else:
+            print('HU!', flush=True)
             from app.namespaces.exchange_rate.service import ExchangeRateService
-            exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', self.last_tax_date).rate
-            return (self._taxable_turnover_amount / 100 * exchange_rate_HUN_EUR) if self._taxable_turnover_amount is not None else None
+            exchange_rate_date = self.last_tax_date if self.last_tax_date else self.valid_from #!!! could be could to verify this approach with an expert
+            exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', exchange_rate_date)
+            if exchange_rate_HUN_EUR is None: #!!! could be could to verify this approach with an expert
+                exchange_rate_HUN_EUR = ExchangeRateService.get_by_base_target_date('HUF', 'EUR', date.today())
+            return (self._taxable_turnover_amount / 100 * exchange_rate_HUN_EUR.rate) if self._taxable_turnover_amount is not None else None
 
     @taxable_turnover_amount.setter
     def taxable_turnover_amount(self, value):

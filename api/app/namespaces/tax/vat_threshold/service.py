@@ -20,6 +20,10 @@ class VatThresholdService:
         return VatThreshold.query.filter_by(id=vat_threshold_id).first()
 
     @staticmethod
+    def get_by_country_code(vat_threshold_country_code: str) -> VatThreshold:
+        return VatThreshold.query.filter_by(country_code=vat_threshold_country_code).first()
+
+    @staticmethod
     def get_by_public_id(vat_threshold_public_id: str) -> VatThreshold:
         return VatThreshold.query.filter_by(public_id=vat_threshold_public_id).first()
 
@@ -112,7 +116,7 @@ class VatThresholdHistoryService:
         return VatThresholdHistory.query.filter_by(vat_threshold_id=vat_threshold_id).order_by(VatThresholdHistory.valid_from.desc()).first()
 
     @staticmethod
-    def get_by_relationship_date(vat_threshold_id: int, date: date):
+    def get_by_relationship_date(vat_threshold_id: int, date: date) -> VatThresholdHistory:
         return VatThresholdHistory.query.filter(
             VatThresholdHistory.vat_threshold_id == vat_threshold_id,
             VatThresholdHistory.valid_from <= date,

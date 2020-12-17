@@ -41,11 +41,16 @@ class ItemService:
         return Item.query.filter_by(public_id = item_public_id).first()
 
     @staticmethod
-    def get_by_identifiers_seller_firm_id(item_sku: str, item_asin: str, seller_firm_id: int) -> Item:
-        if isinstance(item_sku, str):
-            item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
-        else:
+    def get_by_identifiers_seller_firm_id(item_sku: str, item_asin: str, seller_firm_id: int, platform_code: str = None) -> Item:
+        if platform_code == 'AMZ':
             item = ItemService.get_by_asin_seller_firm_id(item_asin, seller_firm_id)
+
+        else: #becomes elif for any other platform
+            item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+
+        if not isinstance(item, Item):
+            item = ItemService.get_by_sku_seller_firm_id(item_sku, seller_firm_id)
+
         return item
 
     @staticmethod
@@ -58,16 +63,10 @@ class ItemService:
     @staticmethod
     def get_by_asin_seller_firm_id(item_asin: str, seller_firm_id: int) -> Item:
         return Item.query.filter(
-            Item.sku == item_asin,
+            Item.asin == item_asin,
             Item.seller_firm_id == seller_firm_id
         ).first()
 
-    @staticmethod
-    def get_by_sku_seller_firm_id(sku: str, seller_firm_id: int) -> Item:
-        return Item.query.filter(
-            Item.sku == sku,
-            Item.seller_firm_id == seller_firm_id
-            ).first()
 
 
     @staticmethod
@@ -172,20 +171,7 @@ class ItemService:
         3.
 
         """
-        print('enter get_unit_cost_price_net_est', flush=True)
-        print('target_currency_code:', target_currency_code, flush=True)
 
-
-        if target_currency_code is None:
-            seller_firm = SellerFirmService.get_by_id(seller_firm_id)
-            if seller_firm and seller_firm.establishment_country_code:
-                print('in if condition', flush=True)
-                target_currency_code = seller_firm.establishment_country.currency_code
-                print('target_currency_code', target_currency_code, flush=True)
-            else:
-                target_currency_code = 'EUR'
-
-        print('enter get_unit_cost_price_net_est')
 
         seller_firm_items = ItemService.get_all_by_seller_firm_id(seller_firm_id)
         item_unit_cost_prices = [
@@ -205,7 +191,6 @@ class ItemService:
         #CASE 2
         # Unit Cost Price is being estimated based on Transaction Report
         elif df_transaction_inputs is not None and platform_code is not None:
-            print('case 2 -> target_currency_code', target_currency_code, flush=True)
             from app.namespaces.transaction_input.service import TransactionInputVariableService
             unit_cost_price_net_est = TransactionInputVariableService.get_item_unit_cost_price_est_from_transaction_inputs(df_transaction_inputs, platform_code, target_currency_code)
 

@@ -20,6 +20,7 @@
         <span v-if="Array.isArray(data.value) === true">
           <span>{{ data.value[0] }} </span>
           <b-popover
+            v-if="vatNumberByCountryCode"
             :target="`popover-vatin-${vatNumberByCountryCode.country_code}`"
             triggers="hover"
             placement="top"
@@ -29,6 +30,7 @@
             <div>
               Valid:
               <b-icon
+                v-if="vatNumberByCountryCode"
                 :variant="
                   vatNumberByCountryCode.valid
                     ? 'success'
@@ -41,12 +43,13 @@
                 "
               />
             </div>
-            <div>
+            <div v-if="vatNumberByCountryCode">
               Request Date:
               {{ vatNumberByCountryCode.request_date }}
             </div>
           </b-popover>
           <b-badge
+            v-if="vatNumberByCountryCode"
             :id="`popover-vatin-${vatNumberByCountryCode.country_code}`"
             variant="secondary"
             class="ml-2"
@@ -180,8 +183,8 @@ export default {
           category: "Tax Jurisdiction",
           value: [
             this.taxJurisdiction,
-            this.vatNumberByCountryCode.country_code,
-            this.vatNumberByCountryCode.number,
+            this.vatNumberByCountryCode ? this.vatNumberByCountryCode.country_code : null,
+            this.vatNumberByCountryCode ? this.vatNumberByCountryCode.number : null,
           ],
         },
       ]

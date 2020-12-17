@@ -1,7 +1,7 @@
 
 from os import path
 import pandas as pd
-import more_itertools as mit
+from itertools import permutations
 
 from datetime import date, datetime, timedelta
 from app.extensions import db
@@ -33,7 +33,7 @@ class ExchangeRatesSeedService:
     @staticmethod
     def create_historic_exchange_rates():
         file = 'hist_exchange_rates.csv'
-        SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN']#, 'HUF', 'DKK', 'SEK', 'CHF', 'NOK']
+        SUPPORTED_CURRENCIES = ['GBP', 'CZK', 'PLN', 'USD', 'HUF']#, 'DKK', 'SEK', 'CHF', 'NOK']
         SERVICE_START_DATE = datetime.strptime('01-05-2019', '%d-%m-%Y').date()
         timespan_as_days = (date.today()-SERVICE_START_DATE).days
 
@@ -103,7 +103,7 @@ class ExchangeRatesSeedService:
                 ExchangeRateService.create(exchange_rate_data)
                 counter += 1
 
-            currency_tuples = list(mit.distinct_combinations(SUPPORTED_CURRENCIES, 2))
+            currency_tuples = list(permutations(SUPPORTED_CURRENCIES, 2))
 
             for currency_tuple in currency_tuples:
                 ExchangeRateService.create_between_rate(exchange_rate_date, base=currency_tuple[0], target=currency_tuple[1])

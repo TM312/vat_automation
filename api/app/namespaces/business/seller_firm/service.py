@@ -290,12 +290,20 @@ class SellerFirmService:
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath, user_id, seller_firm_id, seller_firm_notification_data]
                 )
 
-        elif file_type == 'transactions_amazon':
+        elif file_type == 'transactions_amazon_2020':
             from app.tasks.asyncr import async_handle_transaction_input_data_upload
             response_object = async_handle_transaction_input_data_upload.apply_async(
                 retry=True,
                 args=[file_path_in, file_type, df_encoding, delimiter, basepath,
                         user_id, seller_firm_id, seller_firm_notification_data, 'AMZ', data_retrieval]
+            )
+
+        elif file_type == 'transactions_amazon_2021':
+            from app.tasks.asyncr import async_handle_transaction_input_data_upload
+            response_object = async_handle_transaction_input_data_upload.apply_async(
+                retry=True,
+                args=[file_path_in, file_type, df_encoding, delimiter, basepath,
+                      user_id, seller_firm_id, seller_firm_notification_data, 'AMZ', data_retrieval]
             )
 
         else:
@@ -514,3 +522,16 @@ class SellerFirmService:
 
 
         return True
+
+
+    @staticmethod
+    def get_item_unit_cost_price_currency_code(seller_firm_id: int) -> str:
+        seller_firm = SellerFirmService.get_by_id(seller_firm_id)
+
+        if seller_firm and seller_firm.establishment_country_code:
+            item_unit_cost_price_currency_code = seller_firm.establishment_country.currency_code
+
+        else:
+            item_unit_cost_price_currency_code = 'EUR'
+
+        return item_unit_cost_price_currency_code
