@@ -23,7 +23,7 @@ transaction_input_sub_dto = Model('transaction_input_sub', {
 transaction_input_dto = transaction_input_sub_dto.clone('transaction_input', {
     'activity_id': fields.String,
     'created_on': fields.DateTime,
-    'created_by': fields.String(attribute=lambda x: x.uploader.name),
+    'created_by': fields.String(attribute=lambda x: x.uploader.name if x.uploader else None),
     'original_filename': fields.String,
     'bundle_public_id': fields.String(attribute=lambda x: x.bundle.public_id, readonly=True),
     'processed_on': fields.DateTime,

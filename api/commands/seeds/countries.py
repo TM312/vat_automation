@@ -11,7 +11,7 @@ class CountrySeedService:
         from . import BASE_PATH_SEEDS
         from . import TAX_DEFAULT_VALIDITY
         from . import SERVICE_START_DATE
-        file = 'countries.csv'
+        file = 'countries_full.csv'
 
         dirpath = path.join(
             BASE_PATH_SEEDS,

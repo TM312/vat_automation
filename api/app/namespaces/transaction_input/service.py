@@ -96,17 +96,6 @@ class TransactionInputService:
 
 
     @staticmethod
-    def get_sale_transaction_input_by_bundle_id(bundle_id: int) -> TransactionInput:
-        return TransactionInput.query.filter(
-            TransactionInput.bundle_id==bundle_id,
-            or_(
-                TransactionInput.transaction_type_public_code=='SALE',
-                TransactionInput.transaction_type_public_code=='COMMINGLING_BUY'
-                )
-            ).first()
-
-
-    @staticmethod
     def update(transaction_input_id: int, data_changes: TransactionInputInterface) -> TransactionInput:
         transaction_input = TransactionInputService.get_by_id(transaction_input_id)
         if transaction_input:
@@ -193,10 +182,12 @@ class TransactionInputService:
         original_filename = os.path.basename(file_path_in)[:128]
         if data_retrieval:
             from app.namespaces.item.service import ItemService
-            item_unit_cost_price_est: float = ItemService.get_unit_cost_price_net_est(seller_firm_id, df, platform_code, target_currency_code)
-            print('item_unit_cost_price_est:', item_unit_cost_price_est, flush=True)
-            TransactionInputService.update_by_transaction_report_data(df, platform_code, seller_firm_id, user_id, original_filename, item_unit_cost_price_est)
-        response_object = TransactionInputService.create_transaction_inputs_and_transactions(df, original_filename, user_id, seller_firm_id, platform_code, item_unit_cost_price_est)
+            from app.namespaces.business.seller_firm.service import SellerFirmService
+            item_unit_cost_price_currency_code: str = SellerFirmService.get_item_unit_cost_price_currency_code(seller_firm_id) if target_currency_code is None else target_currency_code
+            item_unit_cost_price_est: float = ItemService.get_unit_cost_price_net_est(seller_firm_id, df, platform_code, item_unit_cost_price_currency_code)
+            TransactionInputService.update_by_transaction_report_data(df, platform_code, file_type, seller_firm_id, user_id, original_filename, item_unit_cost_price_est, item_unit_cost_price_currency_code)
+
+        response_object = TransactionInputService.create_transaction_inputs_and_transactions(df, original_filename, file_type, user_id, seller_firm_id, platform_code, item_unit_cost_price_est)
         tag = TagService.get_by_code('TRANSACTION')
         NotificationService.handle_seller_firm_notification_data_upload(seller_firm_id, user_id, tag, seller_firm_notification_data)
         InputService.move_file_to_out(file_path_in, basepath, file_type, business_id=seller_firm_id)
@@ -206,25 +197,24 @@ class TransactionInputService:
 
 
     @staticmethod
-    def update_by_transaction_report_data(df: pd.DataFrame, platform_code: str, seller_firm_id: int, user_id: int, original_filename: str, item_unit_cost_price_est: float):
+    def update_by_transaction_report_data(df: pd.DataFrame, platform_code: str, file_type: str, seller_firm_id: int, user_id: int, original_filename: str, item_unit_cost_price_est: float, item_unit_cost_price_currency_code: str):
 
-        valid_from: date = TransactionInputVariableService.get_valid_from_df(df, platform_code)
+        valid_from: date = TransactionInputVariableService.get_valid_from_df(df, platform_code, file_type)
 
         # create/update accounts
-        df_accounts = TransactionInputVariableService.get_unique_account_details_from_transaction_inputs_as_df(df, platform_code)
-        TransactionInputVariableService.update_accounts(df_accounts, platform_code, seller_firm_id, user_id, original_filename)
-        print('df_accounts.head(): ', df_accounts.head(), flush=True)
+        df_accounts = TransactionInputVariableService.get_unique_account_details_from_transaction_inputs_as_df(df, platform_code, file_type)
+        TransactionInputVariableService.update_accounts(df_accounts, platform_code, file_type, seller_firm_id, user_id, original_filename)
+
         #create/update items
-        df_items = TransactionInputVariableService.get_unique_item_details_from_transaction_inputs_as_df(df, platform_code)
-        TransactionInputVariableService.update_items(df_items, platform_code, seller_firm_id, user_id, original_filename, valid_from, item_unit_cost_price_est)
-        print('len(df_accounts.index): ', len(df_accounts.index), flush=True)
+        df_items = TransactionInputVariableService.get_unique_item_details_from_transaction_inputs_as_df(df, platform_code, file_type)
+        TransactionInputVariableService.update_items(df_items, platform_code, file_type, seller_firm_id, user_id, original_filename, valid_from, item_unit_cost_price_est, item_unit_cost_price_currency_code)
+
         #create/update vatins
-        unique_vatin_numbers = TransactionInputVariableService.get_unique_vatins_from_transaction_inputs(df, seller_firm_id, platform_code)
+        unique_vatin_numbers = TransactionInputVariableService.get_unique_vatins_from_transaction_inputs(df, seller_firm_id, platform_code, file_type)
         TransactionInputVariableService.update_vatin_data(unique_vatin_numbers, valid_from, seller_firm_id, original_filename)
-        print('unique_vatin_numbers:', unique_vatin_numbers, flush=True)
 
     @staticmethod
-    def create_transaction_inputs_and_transactions(df: pd.DataFrame, original_filename: str, user_id: int, seller_firm_id: int, platform_code: str, item_unit_cost_price_est: float = None) -> List[Dict]:
+    def create_transaction_inputs_and_transactions(df: pd.DataFrame, original_filename: str, file_type: str, user_id: int, seller_firm_id: int, platform_code: str, item_unit_cost_price_est: float = None) -> List[Dict]:
         #!!! make this general and add amazon specific function in file read columns
         from app.namespaces.distance_sale.service import DistanceSaleService
         from app.namespaces.tax.tax_code.service import TaxCodeService
@@ -232,23 +222,25 @@ class TransactionInputService:
         from app.namespaces.item.service import ItemService
         from app.namespaces.account import Account
         from app.namespaces.item import Item
+        # from app.namespaces.business.seller_firm.service import SellerFirmService
+
+        # seller_firm = SellerFirmService.get_by_id(seller_firm_id)
 
         error_counter = 0
         total = total_number_transaction_inputs = len(df.index)
         input_type = 'transaction' # only used for response objects
-        transaction_inputs = []
         object_type = 'transaction_input'
         object_type_human_read = 'transaction'
         duplicate_list = []
         duplicate_counter = 0
 
-        start, stop, step, desc = TransactionInputVariableService.verify_transaction_order(df, total_number_transaction_inputs-1, platform_code)
+        start, stop, step, desc = TransactionInputVariableService.verify_transaction_order(df, total, platform_code, file_type)
 
         # send status update via socket
         SocketService.emit_status_success(0, total_number_transaction_inputs, original_filename, object_type)
 
 
-
+        print('total: {}, start: {}, stop: {}, step: {}'.format(total, start, stop, step), flush=True)
         for i in range(start, stop, step):
             current = start - i + 1 if desc else i + 1
 
@@ -342,7 +334,7 @@ class TransactionInputService:
                     customer_vat_number_country_code,
                     supplier_vat_number,
                     supplier_name
-                ) = TransactionInputVariableService.get_df_vars(df, i, current, object_type, platform_code)
+                ) = TransactionInputVariableService.get_df_vars(df, i, current, object_type, platform_code, file_type)
 
             except Exception as e:
                 if e.code == 422:
@@ -360,8 +352,10 @@ class TransactionInputService:
                 return False
             account_id = account.id
 
-            item = ItemService.get_by_identifiers_seller_firm_id(item_sku, item_asin, seller_firm_id)
+            item = ItemService.get_by_identifiers_seller_firm_id(item_sku, item_asin, seller_firm_id, platform_code)
             if not isinstance(item, Item):
+                # print('!!! in TI Service: if not isinstance(item, Item) !!!', flush=True)
+                # print('item_sku: {}, item_asin: {}, seller_firm_id: {}'.format(item_sku, item_asin, seller_firm_id), flush=True)
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'item', current)
                 return False
             item_id = item.id
@@ -501,7 +495,6 @@ class TransactionInputService:
                     'invoice_exchange_rate_date': invoice_exchange_rate_date,
                     'invoice_url': invoice_url,
 
-
                     'export': export,
 
                     'customer_name': customer_name,
@@ -529,10 +522,11 @@ class TransactionInputService:
                             return False
 
                 else:
+                    # print('item_id: {} item_asin: {} item_sku: {}'.format(item_id, item_asin, item_sku), flush=True)
                     # create new transaction input
                     try:
                         transaction_input = TransactionInputService.create_transaction_input(transaction_input_data)
-                        transaction_inputs.append(transaction_input)
+
                     except Exception as e:
                         print(e, flush=True)
                         db.session.rollback()
@@ -712,11 +706,25 @@ class TransactionInputService:
 
 class TransactionInputVariableService:
 
+    @staticmethod
+    def get_sale_transaction_input_by_bundle_id(bundle_id: int, platform_code: str) -> TransactionInput:
+        if platform_code == 'AMZ':
+            sale_transaction_input = TransactionInput.query.filter(
+                TransactionInput.bundle_id == bundle_id,
+                or_(
+                    TransactionInput.transaction_type_public_code == 'SALE',
+                    TransactionInput.transaction_type_public_code == 'COMMINGLING_SELL'
+                )
+            ).first()
+
+        return sale_transaction_input
+
 
     @staticmethod
-    def verify_transaction_order(df: pd.DataFrame, total: int, platform_code: str) -> List[int]:
+    def verify_transaction_order(df: pd.DataFrame, total: int, platform_code: str, file_type: str) -> List[int]:
         if platform_code == 'AMZ':
-            desc = TransactionInputVariableService.verify_transaction_order_AMZ(df, total)
+            if file_type == 'transactions_amazon_2020':
+                desc = TransactionInputVariableService.verify_transaction_order_AMZ2020(df, total)
 
         # general/platform-independent
         if desc:
@@ -727,21 +735,22 @@ class TransactionInputVariableService:
         return start, stop, step, desc
 
     @staticmethod
-    def verify_transaction_order_AMZ(df, total) -> bool:
+    def verify_transaction_order_AMZ2020(df, total) -> bool:
         complete_date_top = InputService.get_date_or_None(df, 0, column='TRANSACTION_COMPLETE_DATE')
-        complete_date_bottom = InputService.get_date_or_None(df, total, column='TRANSACTION_COMPLETE_DATE')
+        complete_date_bottom = InputService.get_date_or_None(df, total-1, column='TRANSACTION_COMPLETE_DATE')
 
         return complete_date_top >= complete_date_bottom
 
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, platform_code: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, platform_code: str, file_type: str) -> List:
         if platform_code == 'AMZ':
-            return TransactionInputVariableService.get_df_vars_AMZ(df, i, current, object_type)
+            if file_type == 'transactions_amazon_2020':
+                return TransactionInputVariableService.get_df_vars_AMZ2020(df, i, current, object_type)
 
 
     @staticmethod
-    def get_item_vars_AMZ(df_items: pd.DataFrame, i: int) -> List:
+    def get_item_vars_AMZ2020(df_items: pd.DataFrame, i: int) -> List:
         try:
             item_sku = InputService.get_str(df_items, i, column='SELLER_SKU')
         except:
@@ -770,7 +779,7 @@ class TransactionInputVariableService:
         return item_sku, item_name, item_asin, item_weight_kg, item_given_tax_code_code
 
     @staticmethod
-    def get_account_vars_AMZ(df_accounts: pd.DataFrame, i: int) -> List:
+    def get_account_vars_AMZ20202020(df_accounts: pd.DataFrame, i: int) -> List:
         try:
             account_given_id = InputService.get_str(df_accounts, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
         except:
@@ -786,7 +795,7 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def get_df_vars_AMZ(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
+    def get_df_vars_AMZ2020(df: pd.DataFrame, i: int, current: int, object_type: str) -> List:
 
         try:
             account_given_id = InputService.get_str(df, i, column='UNIQUE_ACCOUNT_IDENTIFIER')
@@ -1275,17 +1284,18 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def update_accounts(df_accounts: pd.DataFrame, platform_code: str, seller_firm_id: int, user_id: int, original_filename: str):
+    def update_accounts(df_accounts: pd.DataFrame, platform_code: str, file_type: str, seller_firm_id: int, user_id: int, original_filename: str):
         from app.namespaces.account import Account
         from app.namespaces.account.service import AccountService
         from app.namespaces.account.schema import AccountSubSchema
 
         for i in range(len(df_accounts.index)):
             if platform_code == 'AMZ':
-                (
-                    account_given_id,
-                    channel_code
-                ) = TransactionInputVariableService.get_account_vars_AMZ(df_accounts, i)
+                if file_type == 'transactions_amazon_2020':
+                    (
+                        account_given_id,
+                        channel_code
+                    ) = TransactionInputVariableService.get_account_vars_AMZ2020(df_accounts, i)
 
 
             # platform independent
@@ -1318,7 +1328,7 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def update_items(df_items: pd.DataFrame, platform_code: str, seller_firm_id: int, user_id: int, original_filename: str, valid_from: date, unit_cost_price_net_est: float):
+    def update_items(df_items: pd.DataFrame, platform_code: str, file_type: str, seller_firm_id: int, user_id: int, original_filename: str, valid_from: date, unit_cost_price_net_est: float, unit_cost_price_currency_code: str):
         from app.namespaces.item import Item
         from app.namespaces.item.service import ItemService, ItemHistoryService
         from app.namespaces.item.schema import ItemSubSchema
@@ -1326,20 +1336,22 @@ class TransactionInputVariableService:
 
         for i in range(len(df_items.index)):
             if platform_code == 'AMZ':
-                (
-                    item_sku,
-                    item_name,
-                    item_asin,
-                    item_weight_kg,
-                    item_given_tax_code_code
-                ) = TransactionInputVariableService.get_item_vars_AMZ(df_items, i)
-                item_brand_name = None
+                if file_type == 'transactions_amazon_2020':
+
+                    (
+                        item_sku,
+                        item_name,
+                        item_asin,
+                        item_weight_kg,
+                        item_given_tax_code_code
+                    ) = TransactionInputVariableService.get_item_vars_AMZ2020(df_items, i)
+                    item_brand_name = None
 
 
             # platform independent
             item_tax_code_code = TaxCodeService.get_tax_code_code(item_given_tax_code_code, platform_code)
 
-            item = ItemService.get_by_identifiers_seller_firm_id(item_sku, item_asin, seller_firm_id)
+            item = ItemService.get_by_identifiers_seller_firm_id(item_sku, item_asin, seller_firm_id, platform_code)
             item_data_raw = {
                 'valid_from': valid_from,
                 'created_by': user_id,
@@ -1351,7 +1363,7 @@ class TransactionInputVariableService:
                 'name': item_name,
                 'weight_kg': item_weight_kg,
                 'tax_code_code': item_tax_code_code,
-                # 'unit_cost_price_currency_code': unit_cost_price_currency_code,
+                'unit_cost_price_currency_code': unit_cost_price_currency_code,
                 'unit_cost_price_net_est': unit_cost_price_net_est
             }
             item_data = {k: v for k, v in item_data_raw.items() if v is not None}
@@ -1390,10 +1402,11 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def get_unique_item_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str) -> pd.DataFrame:
+    def get_unique_item_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
         # reduce to unique combinations of item id and channel
         if platform_code == 'AMZ':
-            df_unique = df.drop_duplicates(subset=['ASIN'])[['SELLER_SKU','ASIN', 'ITEM_DESCRIPTION', 'ITEM_WEIGHT', 'PRODUCT_TAX_CODE']]
+            if file_type == 'transactions_amazon_2020':
+                df_unique = df.drop_duplicates(subset=['ASIN'])[['SELLER_SKU', 'ASIN', 'ITEM_DESCRIPTION', 'ITEM_WEIGHT', 'PRODUCT_TAX_CODE']]
 
         return df_unique
 
@@ -1401,49 +1414,50 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def get_item_unit_cost_price_est_from_transaction_inputs(df: pd.DataFrame, platform_code: str, target_currency_code: str = 'EUR') -> float:
+    def get_item_unit_cost_price_est_from_transaction_inputs(df: pd.DataFrame, platform_code: str, target_currency_code: str, file_type: str) -> float:
         from app.namespaces.exchange_rate.service import ExchangeRateService
         # average of total value / qty * 0.6
         # needs to be differentiated by platform because of platform specific column names
         item_gross_prices = []
         if platform_code == 'AMZ':
-            for i in range(len(df.index)):
-                sale_total_value_gross_raw = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL')
-                base_currency_code = InputService.get_str(df, i, column='TRANSACTION_CURRENCY_CODE')
-                if isinstance(sale_total_value_gross_raw, float) and isinstance(base_currency_code, str):
-                    item_quantity = InputService.get_float_or_None(df, i, column='QTY') #always provided
-                    exchange_rate_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE') #always provided
+            if file_type == 'transactions_amazon_2020':
+                for i in range(len(df.index)):
+                    sale_total_value_gross_raw = InputService.get_float_or_None(df, i, column='PRICE_OF_ITEMS_AMT_VAT_INCL')
+                    base_currency_code = InputService.get_str(df, i, column='TRANSACTION_CURRENCY_CODE')
+                    if isinstance(sale_total_value_gross_raw, float) and isinstance(base_currency_code, str):
+                        item_quantity = InputService.get_float_or_None(df, i, column='QTY') #always provided
+                        exchange_rate_date = InputService.get_date_or_None(df, i, column='TRANSACTION_COMPLETE_DATE') #always provided
 
-                    #convert to target currency
-                    exchange_rate = ExchangeRateService.get_by_base_target_date(base_currency_code, target_currency_code, exchange_rate_date).rate if base_currency_code != target_currency_code else 1
-                    sale_total_value_gross = sale_total_value_gross_raw * exchange_rate
+                        #convert to target currency
+                        exchange_rate_rate = ExchangeRateService.get_by_base_target_date(base_currency_code, target_currency_code, exchange_rate_date).rate if base_currency_code != target_currency_code else 1
+                        sale_total_value_gross = sale_total_value_gross_raw * exchange_rate_rate
 
-                    item_gross_prices.append(sale_total_value_gross)
+                        item_gross_prices.append(sale_total_value_gross)
 
-
-            avg_item_gross_price = mean(item_gross_prices)
-            print('in get_item_unit_cost_price_est_from_transaction_inputs', flush=True)
-            print('avg_item_gross_price:', avg_item_gross_price, flush=True)
 
         # general proceeding
+        avg_item_gross_price = mean(item_gross_prices)
+
         item_unit_cost_price_est = avg_item_gross_price * 0.6
         return item_unit_cost_price_est
 
 
 
     @staticmethod
-    def get_unique_account_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str) -> pd.DataFrame:
+    def get_unique_account_details_from_transaction_inputs_as_df(df: pd.DataFrame, platform_code: str, file_type: str) -> pd.DataFrame:
         # reduce to unique combinations of account id and channel
         if platform_code == 'AMZ':
-            df_unique = df.drop_duplicates(subset=['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL'])[['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL']]
+            if file_type == 'transactions_amazon_2020':
+                df_unique = df.drop_duplicates(subset=['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL'])[['UNIQUE_ACCOUNT_IDENTIFIER','SALES_CHANNEL']]
 
         return df_unique
 
     @staticmethod
-    def get_unique_vatins_from_transaction_inputs(df: pd.DataFrame, seller_firm_id: int, platform_code: str) -> List:
+    def get_unique_vatins_from_transaction_inputs(df: pd.DataFrame, seller_firm_id: int, platform_code: str, file_type: str) -> List:
 
         if platform_code == 'AMZ':
-            column_values = df[["SELLER_DEPART_COUNTRY_VAT_NUMBER", "SELLER_ARRIVAL_COUNTRY_VAT_NUMBER", "TRANSACTION_SELLER_VAT_NUMBER"]].values.ravel('K')
+            if file_type == 'transactions_amazon_2020':
+                column_values = df[["SELLER_DEPART_COUNTRY_VAT_NUMBER", "SELLER_ARRIVAL_COUNTRY_VAT_NUMBER", "TRANSACTION_SELLER_VAT_NUMBER"]].values.ravel('K')
 
         # general/platform-independent proceeding
         #unique values
@@ -1457,18 +1471,20 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def get_valid_from_df(df, platform_code):
+    def get_valid_from_df(df: pd.DataFrame, platform_code: str) -> date:
         if platform_code == 'AMZ':
-            dates_all = df[[
-                "TRANSACTION_DEPART_DATE",
-                "TRANSACTION_ARRIVAL_DATE",
-                "TRANSACTION_COMPLETE_DATE",
-                "TAX_CALCULATION_DATE",
-                "VAT_INV_EXCHANGE_RATE_DATE"
-                ]].values.ravel('K')
-            dates_raw = pd.unique(dates_all).tolist()
-            #remove nan and transform to datetime.date object
-            dates = [datetime.strptime(d, '%d-%m-%Y').date() for d in dates_raw if str(d) != 'nan']
+            if file_type == 'transactions_amazon_2020':
+                dates_all = df[[
+                    "TRANSACTION_DEPART_DATE",
+                    "TRANSACTION_ARRIVAL_DATE",
+                    "TRANSACTION_COMPLETE_DATE",
+                    "TAX_CALCULATION_DATE",
+                    "VAT_INV_EXCHANGE_RATE_DATE"
+                    ]].values.ravel('K')
+
+        dates_raw = pd.unique(dates_all).tolist()
+        #remove nan and transform to datetime.date object
+        dates = [datetime.strptime(d, '%d-%m-%Y').date() for d in dates_raw if str(d) != 'nan']
 
         valid_from = min(dates)
         return valid_from
@@ -1478,7 +1494,7 @@ class TransactionInputVariableService:
 
 
     @staticmethod
-    def update_vatin_data(vatin_numbers, valid_from: date, seller_firm_id: int, original_filename):
+    def update_vatin_data(vatin_numbers: List, valid_from: date, seller_firm_id: int, original_filename: str):
 
         from app.namespaces.tax.vatin.service import VATINService, VIESService
         from app.namespaces.tax.vatin import VATIN
@@ -1513,7 +1529,6 @@ class TransactionInputVariableService:
 
                 # push vatin to vuex via socket
                 vatin_json=VatinSchemaSocket.get_vatin_sub(vatin)
-                print('create vatin_json:', vatin_json, flush=True)
                 SocketService.emit_new_object(vatin_json, 'vat_number')
 
             # upgrade
@@ -1547,5 +1562,4 @@ class TransactionInputVariableService:
 
                  # push vatin to vuex via socket
                 vatin_json = VatinSchemaSocket.get_vatin_sub(vatin)
-                print('update vatin_json:', vatin_json, flush=True)
                 SocketService.emit_update_object(vatin_json, 'vat_number')

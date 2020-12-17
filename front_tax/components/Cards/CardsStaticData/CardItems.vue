@@ -53,8 +53,8 @@
                 {{ data.value }}
                 {{ data.item.unit_cost_price_currency_code }}
               </span>
-              <span v-else-if="data.unit_cost_price_net_est">
-                <i>{{ data.unit_cost_price_net_est }}
+              <span v-else-if="data.item.unit_cost_price_net_est">
+                <i>{{ data.item.unit_cost_price_net_est }}
                   {{ data.item.unit_cost_price_currency_code }} (est.)
                 </i>
               </span>
@@ -62,9 +62,9 @@
             </template>
 
             <template v-slot:cell(weight_kg)="data">
-              <span v-if="data.value !== 'NaN'">
-                <span v-if="data.value < 1">{{ Math.round(data.value) * 100 }}g</span>
-                <span v-else>{{ data.value }}kg</span>
+              <span v-if="data.value !== 'NaN' && data.value">
+                <span v-if="data.value < 1">{{ Math.round(data.value * 1000) }}g</span>
+                <span v-else>{{ Number.parseFloat(data.value).toFixed(1) }}kg</span>
               </span>
               <span v-else>-</span>
             </template>
@@ -123,9 +123,6 @@ export default {
         {
           key: "weight_kg",
           label: "Weight",
-          formatter: (value) => {
-            return Number.parseFloat(value).toFixed(3)
-          },
           sortable: false,
         },
         {

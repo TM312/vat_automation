@@ -17,8 +17,8 @@ class VatThreshold(db.Model):  # type: ignore
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
 
-    #attribuitess
-    country_code = db.Column(db.String(4), db.ForeignKey('country.code'))
+    #attributes
+    country_code = db.Column(db.String(4), db.ForeignKey('country.code'), unique=True)
     value = db.Column(db.Integer)
     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'))
 
@@ -27,7 +27,7 @@ class VatThreshold(db.Model):  # type: ignore
 
 
     def __repr__(self):
-        return '<Vat Threshold: valid: {}-{} – country_code: {} - value: {}>'.format(self.valid_from, self.valid_to, self.country_code, self.value)
+        return '<Vat Threshold {}: country_code: {} - value: {}{}>'.format(self.public_id, self.country_code, self.value, self.currency_code)
 
     def __init__(self, **kwargs):
 

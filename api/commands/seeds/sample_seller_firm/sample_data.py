@@ -75,6 +75,7 @@ class SampleFirmInformationSeedService:
         basepath = '/home/data/business_data'
 
         file_path_in_transaction_inputs = path.join(dir_path, 'transactions', 'transactions_bond.csv')
+        file_type = 'transactions_amazon_2020'
 
         # TransactionInputService.handle_transaction_input_data_upload(
         #     file_path_in=file_path_in_transaction_inputs,
@@ -88,7 +89,7 @@ class SampleFirmInformationSeedService:
         # )
 
         df_transaction_inputs = InputService.read_file_path_into_df(file_path_in_transaction_inputs, df_encoding, delimiter)
-        TransactionInputService.create_transaction_inputs_and_transactions(df_transaction_inputs, file_path_in_transaction_inputs, seller.id, seller_firm.id, 'AMZ')
+        TransactionInputService.create_transaction_inputs_and_transactions(df_transaction_inputs, file_path_in_transaction_inputs, file_type, seller.id, seller_firm.id, 'AMZ')
 
 
 

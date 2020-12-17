@@ -16,7 +16,6 @@ item_history_dto = Model('item_history', {
 
 item_sub_dto = Model('item_sub', {
     'public_id': fields.String(readonly=True),
-    'original_filename': fields.String,
     'sku': fields.String,
     'asin': fields.String,
     'brand_name': fields.String,
@@ -24,10 +23,12 @@ item_sub_dto = Model('item_sub', {
     'weight_kg': fields.Float,
     'tax_code_code': fields.String,
     'unit_cost_price_currency_code': fields.String,
-    'unit_cost_price_net': fields.Float
+    'unit_cost_price_net': fields.Float,
+    'unit_cost_price_net_est': fields.Float,
 })
 
 item_dto = item_sub_dto.clone('item', {
+    'original_filename': fields.String,
     'created_by': fields.String(attribute=lambda x: x.creator.name, readonly=True),
     'created_on': fields.Date,
     'seller_firm': fields.String(attribute=lambda x: x.seller_firm.name, readonly=True),
@@ -52,6 +53,7 @@ class ItemSubSchema:
             'public_id': str(item.public_id),
             'original_filename': item.original_filename,
             'sku': item.sku,
+            'asin': item.asin,
             'brand_name': item.brand_name,
             'name': item.name,
             'weight_kg': item.weight_kg,

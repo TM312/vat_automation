@@ -97,7 +97,7 @@ class ExchangeRateService:
 
     @staticmethod
     def process_ecb_rates(date, exchange_rate_dict: Dict, supported_currencies: List[str]) -> None:
-        import more_itertools as mit
+        from itertools import permutations
 
         for currency_code in supported_currencies:
             value = exchange_rate_dict[currency_code]
@@ -131,7 +131,7 @@ class ExchangeRateService:
             ExchangeRateService.create(exchange_rate_data)
 
 
-        currency_tuples = list(mit.distinct_combinations(supported_currencies, 2))
+        currency_tuples = list(permutations(supported_currencies, 2))
         for currency_tuple in currency_tuples:
             ExchangeRateService.create_between_rate(date, base=currency_tuple[0], target=currency_tuple[1])
 
