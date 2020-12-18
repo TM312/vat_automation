@@ -371,6 +371,53 @@ class VATINService:
             SocketService.emit_new_objects(socket_list, object_type)
 
 
+    @staticmethod
+    def update_vatins_by_transaction(
+            arrival_seller_vatin: VATIN,
+            departure_seller_vatin: VATIN,
+            seller_vatin: VATIN,
+            seller_firm_vat_numbers: List[str],
+            tax_date: date
+        ):
+        if arrival_seller_vatin in seller_firm_vat_numbers and (
+            arrival_seller_vatin.initial_tax_date is None or
+            tax_date < arrival_seller_vatin.initial_tax_date
+        ):
+            arrival_seller_vatin.initial_tax_date = tax_date
+            try:
+                db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(arrival_seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
+            except:
+                db.session.rollback()
+                raise
+
+        if departure_seller_vatin in seller_firm_vat_numbers and (
+            departure_seller_vatin.initial_tax_date is None or
+            tax_date < departure_seller_vatin.initial_tax_date
+        ):
+            departure_seller_vatin.initial_tax_date = tax_date
+            try:
+                db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(departure_seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
+            except:
+                db.session.rollback()
+                raise
+
+        if seller_vatin in seller_firm_vat_numbers and (
+            seller_vatin.initial_tax_date is None or
+            tax_date < seller_vatin.initial_tax_date
+        ):
+            seller_vatin.initial_tax_date = tax_date
+            try:
+                db.session.commit()
+                meta = VatinSchemaSocket.get_vatin_sub(seller_vatin)
+                SocketService.emit_update_object(meta, 'vat_number')
+            except:
+                db.session.rollback()
+                raise
+
 
 
     @staticmethod

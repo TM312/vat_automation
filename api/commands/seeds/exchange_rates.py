@@ -59,6 +59,18 @@ class ExchangeRatesSeedService:
 
             row = df.loc[df['Date'] == date_string]
 
+            #creating same rates, i.e. 'EUR' to 'EUR'
+            exchange_rate_data = {
+                'source': 'ECB',
+                'date': exchange_rate_date,
+                'base': 'EUR',
+                'target': 'EUR',
+                'rate': 1
+            }
+
+            ExchangeRateService.create(exchange_rate_data)
+            counter += 1
+
 
             for currency_code in SUPPORTED_CURRENCIES:
                 value = row[currency_code].values[0]

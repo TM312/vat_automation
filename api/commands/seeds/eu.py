@@ -35,6 +35,7 @@ class EUSeedService:
         eu_size = 0
 
         try:
+
             for row in range(len(df.index)):
                 if bool(df.iloc[row]['eu_1']):
                     country = Country.query.filter_by(code=df.iloc[row]['code']).first()

@@ -6,7 +6,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-
 class TransactionInput(db.Model):
     """ TransactionInput model """
     __tablename__ = "transaction_input"

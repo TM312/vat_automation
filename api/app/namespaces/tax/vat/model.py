@@ -36,7 +36,7 @@ class Vat(db.Model):  # type: ignore
         self._rate = int(round(value * 10_000)) if value is not None else None
 
     def __repr__(self):
-        return '<Vat: valid: {}-{} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.valid_from, self.valid_to, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
+        return '<Vat: ID: {} – country_code: {} - tax_code: {} – tax_rate_type_code: {} – rate {}>'.format(self.id, self.country_code, self.tax_code_code, self.tax_rate_type_code, self.rate)
 
     def update(self, data_changes):
 

@@ -119,7 +119,7 @@ class ExchangeRateService:
 
             ExchangeRateService.create(exchange_rate_data)
 
-            #creating same rates, i.e. 'EUR' to 'EUR'
+            #creating same rates, i.e. 'PLN' to 'PLN'
             exchange_rate_data = {
                 'source': 'ECB',
                 'date': date,
@@ -129,6 +129,17 @@ class ExchangeRateService:
             }
 
             ExchangeRateService.create(exchange_rate_data)
+
+        #creating EUR - EUR rate
+        exchange_rate_data = {
+            'source': 'ECB',
+            'date': date,
+            'base': 'EUR',
+            'target': 'EUR',
+            'rate': 1
+        }
+
+        ExchangeRateService.create(exchange_rate_data)
 
 
         currency_tuples = list(permutations(supported_currencies, 2))

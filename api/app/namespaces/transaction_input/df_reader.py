@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from datetime import date, datetime
 import pandas as pd
 
@@ -7,12 +7,9 @@ from werkzeug.exceptions import UnprocessableEntity
 from app.namespaces.utils.service import InputService
 from app.namespaces.exchange_rate.service import ExchangeRateService
 
-var_config = dict(
-    TI_AMZ_2020=AMZ2020,
-    TI_AMZ_2021=AMZ2021
-)
 
 class AMZ2020:
+    # INPUT VARS
     account_given_id = 'UNIQUE_ACCOUNT_IDENTIFIER'
     channel_code = 'SALES_CHANNEL'
     given_id = 'TRANSACTION_EVENT_ID'
@@ -25,11 +22,11 @@ class AMZ2020:
     complete_date = 'TRANSACTION_COMPLETE_DATE'
     public_activity_period = 'ACTIVITY_PERIOD'
     marketplace = 'MARKETPLACE'
-    transaction_type_public_code = 'TRANSACTION_TYPE
+    transaction_type_public_code = 'TRANSACTION_TYPE'
     tax_calculation_date = 'TAX_CALCULATION_DATE'
     item_manufacture_country = 'ITEM_MANUFACTURE_COUNTRY'
     item_quantity = 'QTY'
-    item_weight_kg = vc.item_weight_kg
+    item_weight_kg = 'ITEM_WEIGHT'
     item_weight_kg_total = 'TOTAL_ACTIVITY_WEIGHT'
     unit_cost_price_net = 'COST_PRICE_OF_ITEMS'
 
@@ -131,6 +128,8 @@ class AMZ2020:
     #unprovided vars
     item_brand_name = None
 
+
+
 class AMZ2021(AMZ2020):
     pass
 
@@ -141,7 +140,7 @@ class AMZ2021(AMZ2020):
 class AMZReader:
 
     @staticmethod
-    def get_item_gross_prices(df: pd.DataFrame, target_currency_code: str, file_type: str) -> List[float, int]:
+    def get_item_gross_prices(df: pd.DataFrame, target_currency_code: str, file_type: str) -> List[Union[float, int]]:
         vc = var_config[file_type]
         item_gross_prices = []
         for i in range(len(df.index)):
@@ -152,6 +151,7 @@ class AMZReader:
                 exchange_rate_date = InputService.get_date_or_None(df, i, column=vc.complete_date) #always provided
 
                 #convert to target currency
+                print('exchange_rate_date: {}, base_currency_code: {}, target_currency_code: {}'.format(exchange_rate_date, base_currency_code, target_currency_code), flush=True)
                 exchange_rate_rate = ExchangeRateService.get_by_base_target_date(base_currency_code, target_currency_code, exchange_rate_date).rate if base_currency_code != target_currency_code else 1
                 sale_total_value_gross = sale_total_value_gross_raw * exchange_rate_rate
 
@@ -188,6 +188,7 @@ class AMZReader:
         # drop nan
         unique_vatin_numbers = [vatin_number for vatin_number in unique_vatin_numbers_raw if str(vatin_number) != 'nan']
 
+        print('unique_vatin_numbers:', unique_vatin_numbers, flush=True)
         return unique_vatin_numbers
 
 
@@ -260,7 +261,7 @@ class AMZReader:
 
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, file_type: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, object_type: str, file_type: str) -> List:
         vc = var_config[file_type]
 
         try:
@@ -593,9 +594,9 @@ class AMZReader:
         except:
             raise UnprocessableEntity(vc.tax_jurisdiction)
         try:
-            tax_jurisdiction_level = InputService.get_str_or_None(df, i, column=vc.tax_jurisdiction)
+            tax_jurisdiction_level = InputService.get_str_or_None(df, i, column=vc.tax_jurisdiction_level)
         except:
-            raise UnprocessableEntity(vc.tax_jurisdiction)
+            raise UnprocessableEntity(vc.tax_jurisdiction_level)
 
         try:
             invoice_number = InputService.get_str_or_None(df, i, column=vc.invoice_number)
@@ -742,6 +743,10 @@ class AMZReader:
         )
 
 
+var_config = dict(
+    TI_AMZ_2020=AMZ2020,
+    TI_AMZ_2021=AMZ2021
+)
 
 ####BACKUP
 

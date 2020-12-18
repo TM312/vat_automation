@@ -47,7 +47,10 @@ class AccountService:
 
     @staticmethod
     def get_by_given_id_channel_code(account_given_id: str, channel_code: str) -> Account:
-        return Account.query.filter(Account.given_id==account_given_id, Account.channel_code==channel_code).first()
+        print('in get_by_given_id_channel_code', flush=True)
+        account = Account.query.filter(Account.given_id==account_given_id, Account.channel_code==channel_code).first()
+        print('account: ', account, flush=True)
+        return account
 
     @staticmethod
     def update(account_id: int, data_changes: AccountInterface) -> Account:

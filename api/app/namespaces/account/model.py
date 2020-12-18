@@ -23,6 +23,8 @@ class Account(db.Model):
     transaction_inputs = db.relationship('TransactionInput', backref='account', lazy='select', cascade='all, delete-orphan')
     # transactions = db.relationship('Transaction', backref='account', lazy='select', cascade='all, delete-orphan')
 
+    def __repr__(self):
+        return '<Account: ID: {} – original_filename: {} - given_id: {} – channel_code: {} – seller_firm_id {}>'.format(self.id, self.original_filename, self.given_id, self.channel_code, self.seller_firm_id)
 
     def update(self, data_changes):
         for key, val in data_changes.items():

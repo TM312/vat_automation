@@ -436,7 +436,7 @@ class SellerFirmService:
             current = i + 1
 
             try:
-                seller_firm_name = InputService.get_str_or_None(df, i, column='seller_firm_name')
+                seller_firm_name = InputService.get_str(df, i, column='seller_firm_name')
             except:
                 # send error status via socket
                 SocketService.emit_status_error_column_read(current, object_type, column_name='seller_firm_name')
@@ -491,8 +491,9 @@ class SellerFirmService:
                         seller_firm.accounting_firms.append(user.employer)
                     db.session.commit()
 
-                except:
+                except Exception as e:
                     db.session.rollback()
+                    current_app.logger.warning(e)
                     message = 'Error at seller firm in row {}. Please recheck or get in contact with one of the admins.'.format(current+1)
                     SocketService.emit_status_error(object_type, message)
                     return False
