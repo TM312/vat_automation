@@ -299,48 +299,40 @@ class AMZReader:
             raise UnprocessableEntity(vc.item_asin)
 
         try:
-            shipment_date = InputService.get_date_or_None(
-                df, i, column=vc.shipment_date)
+            shipment_date = InputService.get_date_or_None(df, i, column=vc.shipment_date)
         except:
             raise UnprocessableEntity(vc.shipment_date)
 
         try:
-            arrival_date = InputService.get_date_or_None(
-                df, i, column=vc.arrival_date)
+            arrival_date = InputService.get_date_or_None(df, i, column=vc.arrival_date)
         except:
             raise UnprocessableEntity(vc.arrival_date)
 
         try:
-            complete_date = InputService.get_date_or_None(
-                df, i, column=vc.complete_date)
+            complete_date = InputService.get_date_or_None(df, i, column=vc.complete_date)
         except:
             raise UnprocessableEntity(vc.complete_date)
 
         try:
-            public_activity_period = InputService.get_str(
-                df, i, column=vc.public_activity_period)
+            public_activity_period = InputService.get_str(df, i, column=vc.public_activity_period)
         except:
             raise UnprocessableEntity(vc.public_activity_period)
         try:
-            marketplace = InputService.get_str_or_None(
-                df, i, column=vc.marketplace)
+            marketplace = InputService.get_str_or_None(df, i, column=vc.marketplace)
         except:
             raise UnprocessableEntity(vc.marketplace)
         try:
-            transaction_type_public_code = InputService.get_str_or_None(
-                df, i, column=vc.transaction_type_public_code)
+            transaction_type_public_code = InputService.get_str_or_None(df, i, column=vc.transaction_type_public_code)
         except:
             raise UnprocessableEntity(vc.transaction_type_public_code)
 
         try:
-            tax_calculation_date = InputService.get_date_or_None(
-                df, i, column=vc.tax_calculation_date)
+            tax_calculation_date = InputService.get_date_or_None(df, i, column=vc.tax_calculation_date)
         except:
             raise UnprocessableEntity(vc.tax_calculation_date)
 
         try:
-            item_manufacture_country = InputService.get_str_or_None(
-                df, i, column=vc.item_manufacture_country)
+            item_manufacture_country = InputService.get_str_or_None(df, i, column=vc.item_manufacture_country)
         except:
             raise UnprocessableEntity(vc.item_manufacture_country)
         try:
@@ -393,11 +385,11 @@ class AMZReader:
         except:
             raise UnprocessableEntity(vc.item_price_total_net)
         try:
-            item_price_total_vat = InputService.get_float_or_None( df, i, column=vc.item_price_total_vat)
+            item_price_total_vat = InputService.get_float_or_None(df, i, column=vc.item_price_total_vat)
         except:
             raise UnprocessableEntity(vc.item_price_total_vat)
         try:
-            item_price_total_gross = InputService.get_float_or_None( df, i, column=vc.item_price_total_gross)
+            item_price_total_gross = InputService.get_float_or_None(df, i, column=vc.item_price_total_gross)
         except:
             raise UnprocessableEntity(vc.item_price_total_gross)
 
@@ -407,126 +399,103 @@ class AMZReader:
             raise UnprocessableEntity(vc.item_price_vat_rate)
 
         try:
-            shipment_price_discount_net = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_discount_net)
+            shipment_price_discount_net = InputService.get_float_or_None(df, i, column=vc.shipment_price_discount_net)
         except:
             raise UnprocessableEntity(vc.shipment_price_discount_net)
         try:
-            shipment_price_discount_vat = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_discount_vat)
+            shipment_price_discount_vat = InputService.get_float_or_None(df, i, column=vc.shipment_price_discount_vat)
         except:
             raise UnprocessableEntity(vc.shipment_price_discount_vat)
         try:
-            shipment_price_discount_gross = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_discount_gross)
+            shipment_price_discount_gross = InputService.get_float_or_None(df, i, column=vc.shipment_price_discount_gross)
         except:
             raise UnprocessableEntity(vc.shipment_price_discount_gross)
 
         try:
-            shipment_price_net = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_net)
+            shipment_price_net = InputService.get_float_or_None(df, i, column=vc.shipment_price_net)
         except:
             raise UnprocessableEntity(vc.shipment_price_net)
         try:
-            shipment_price_vat = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_vat)
+            shipment_price_vat = InputService.get_float_or_None(df, i, column=vc.shipment_price_vat)
         except:
             raise UnprocessableEntity(vc.shipment_price_vat)
         try:
-            shipment_price_gross = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_gross)
+            shipment_price_gross = InputService.get_float_or_None(df, i, column=vc.shipment_price_gross)
         except:
             raise UnprocessableEntity(vc.shipment_price_gross)
 
         try:
-            shipment_price_total_net = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_total_net)
+            shipment_price_total_net = InputService.get_float_or_None(df, i, column=vc.shipment_price_total_net)
         except:
             raise UnprocessableEntity(vc.shipment_price_total_net)
         try:
-            shipment_price_total_vat = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_total_vat)
+            shipment_price_total_vat = InputService.get_float_or_None(df, i, column=vc.shipment_price_total_vat)
         except:
             raise UnprocessableEntity(vc.shipment_price_total_vat)
         try:
-            shipment_price_total_gross = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_total_gross)
+            shipment_price_total_gross = InputService.get_float_or_None(df, i, column=vc.shipment_price_total_gross)
         except:
             raise UnprocessableEntity(vc.shipment_price_total_gross)
 
         try:
-            shipment_price_vat_rate = InputService.get_float_or_None(
-                df, i, column=vc.shipment_price_vat_rate)
+            shipment_price_vat_rate = InputService.get_float_or_None(df, i, column=vc.shipment_price_vat_rate)
         except:
             raise UnprocessableEntity(vc.shipment_price_vat_rate)
 
         try:
-            sale_total_value_net = InputService.get_float_or_None(
-                df, i, column=vc.sale_total_value_net)
+            sale_total_value_net = InputService.get_float_or_None(df, i, column=vc.sale_total_value_net)
         except:
             raise UnprocessableEntity(vc.sale_total_value_net)
         try:
-            sale_total_value_vat = InputService.get_float_or_None(
-                df, i, column=vc.sale_total_value_vat)
+            sale_total_value_vat = InputService.get_float_or_None(df, i, column=vc.sale_total_value_vat)
         except:
             raise UnprocessableEntity(vc.sale_total_value_vat)
         try:
-            sale_total_value_gross = InputService.get_float_or_None(
-                df, i, column=vc.sale_total_value_gross)
+            sale_total_value_gross = InputService.get_float_or_None(df, i, column=vc.sale_total_value_gross)
         except:
             raise UnprocessableEntity(vc.sale_total_value_gross)
 
         try:
-            gift_wrap_price_discount_net = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_discount_net)
+            gift_wrap_price_discount_net = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_discount_net)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_discount_net)
         try:
-            gift_wrap_price_discount_vat = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_discount_vat)
+            gift_wrap_price_discount_vat = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_discount_vat)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_discount_vat)
         try:
-            gift_wrap_price_discount_gross = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_discount_gross)
+            gift_wrap_price_discount_gross = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_discount_gross)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_discount_gross)
 
         try:
-            gift_wrap_price_net = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_net)
+            gift_wrap_price_net = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_net)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_net)
         try:
-            gift_wrap_price_vat = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_vat)
+            gift_wrap_price_vat = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_vat)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_vat)
         try:
-            gift_wrap_price_gross = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_gross)
+            gift_wrap_price_gross = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_gross)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_gross)
 
         try:
-            gift_wrap_price_total_net = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_total_net)
+            gift_wrap_price_total_net = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_total_net)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_total_net)
         try:
-            gift_wrap_price_total_vat = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_total_vat)
+            gift_wrap_price_total_vat = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_total_vat)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_total_vat)
         try:
-            gift_wrap_price_total_gross = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_total_gross)
+            gift_wrap_price_total_gross = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_total_gross)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_total_gross)
 
         try:
-            gift_wrap_price_tax_rate = InputService.get_float_or_None(
-                df, i, column=vc.gift_wrap_price_tax_rate)
+            gift_wrap_price_tax_rate = InputService.get_float_or_None(df, i, column=vc.gift_wrap_price_tax_rate)
         except:
             raise UnprocessableEntity(vc.gift_wrap_price_tax_rate)
 
@@ -536,180 +505,147 @@ class AMZReader:
             raise UnprocessableEntity(vc.currency_code)
 
         try:
-            item_given_tax_code_code = InputService.get_str_or_None(
-                df, i, column=vc.item_given_tax_code_code)
+            item_given_tax_code_code = InputService.get_str_or_None(df, i, column=vc.item_given_tax_code_code)
         except:
             raise UnprocessableEntity(vc.item_given_tax_code_code)
 
         try:
-            departure_country_code = InputService.get_str_or_None(
-                df, i, column=vc.departure_country_code)
+            departure_country_code = InputService.get_str_or_None(df, i, column=vc.departure_country_code)
         except:
             raise UnprocessableEntity(vc.departure_country_code)
         try:
-            departure_postal_code = InputService.get_single_str_compact(
-                df, i, column=vc.departure_postal_code)
+            departure_postal_code = InputService.get_single_str_compact(df, i, column=vc.departure_postal_code)
         except:
             raise UnprocessableEntity(vc.departure_postal_code)
         try:
-            departure_city = InputService.get_str_or_None(
-                df, i, column=vc.departure_city)
+            departure_city = InputService.get_str_or_None(df, i, column=vc.departure_city)
         except:
             raise UnprocessableEntity(vc.departure_city)
 
         try:
-            arrival_country_code = InputService.get_str_or_None(
-                df, i, column=vc.arrival_country_code)
+            arrival_country_code = InputService.get_str_or_None(df, i, column=vc.arrival_country_code)
         except:
             raise UnprocessableEntity(vc.arrival_country_code)
         try:
-            arrival_postal_code = InputService.get_single_str_compact(
-                df, i, column=vc.arrival_postal_code)
+            arrival_postal_code = InputService.get_single_str_compact(df, i, column=vc.arrival_postal_code)
         except:
             raise UnprocessableEntity(vc.arrival_postal_code)
         try:
-            arrival_city = InputService.get_str_or_None(
-                df, i, column=vc.arrival_city)
+            arrival_city = InputService.get_str_or_None(df, i, column=vc.arrival_city)
         except:
             raise UnprocessableEntity(vc.arrival_city)
         try:
-            arrival_address = InputService.get_str_or_None(
-                df, i, column=vc.arrival_address)
+            arrival_address = InputService.get_str_or_None(df, i, column=vc.arrival_address)
         except:
             raise UnprocessableEntity(vc.arrival_address)
 
         try:
-            sale_departure_country_code = InputService.get_str_or_None(
-                df, i, column=vc.sale_departure_country_code)
+            sale_departure_country_code = InputService.get_str_or_None(df, i, column=vc.sale_departure_country_code)
         except:
             raise UnprocessableEntity(vc.sale_departure_country_code)
         try:
-            sale_arrival_country_code = InputService.get_str_or_None(
-                df, i, column=vc.sale_arrival_country_code)
+            sale_arrival_country_code = InputService.get_str_or_None(df, i, column=vc.sale_arrival_country_code)
         except:
             raise UnprocessableEntity(vc.sale_arrival_country_code)
 
         try:
-            shipment_mode = InputService.get_str_or_None(
-                df, i, column=vc.shipment_mode)
+            shipment_mode = InputService.get_str_or_None(df, i, column=vc.shipment_mode)
         except:
             raise UnprocessableEntity(vc.shipment_mode)
         try:
-            shipment_conditions = InputService.get_str_or_None(
-                df, i, column=vc.shipment_conditions)
+            shipment_conditions = InputService.get_str_or_None(df, i, column=vc.shipment_conditions)
         except:
             raise UnprocessableEntity(vc.shipment_conditions)
 
         try:
-            departure_seller_vat_country_code = InputService.get_str_or_None(
-                df, i, column=vc.departure_seller_vat_country_code)
+            departure_seller_vat_country_code = InputService.get_str_or_None(df, i, column=vc.departure_seller_vat_country_code)
         except:
             raise UnprocessableEntity(vc.departure_seller_vat_country_code)
         try:
-            departure_seller_vat_number = InputService.get_str_or_None(
-                df, i, column=vc.departure_seller_vat_number)
+            departure_seller_vat_number = InputService.get_str_or_None(df, i, column=vc.departure_seller_vat_number)
         except:
             raise UnprocessableEntity(vc.departure_seller_vat_number)
 
         try:
-            arrival_seller_vat_country_code = InputService.get_str_or_None(
-                df, i, column=vc.arrival_seller_vat_country_code)
+            arrival_seller_vat_country_code = InputService.get_str_or_None(df, i, column=vc.arrival_seller_vat_country_code)
         except:
             raise UnprocessableEntity(vc.arrival_seller_vat_country_code)
         try:
-            arrival_seller_vat_number = InputService.get_str_or_None(
-                df, i, column=vc.arrival_seller_vat_number)
+            arrival_seller_vat_number = InputService.get_str_or_None(df, i, column=vc.arrival_seller_vat_number)
         except:
             raise UnprocessableEntity(vc.arrival_seller_vat_number)
 
         try:
-            seller_vat_country_code = InputService.get_str_or_None(
-                df, i, column=vc.seller_vat_country_code)
+            seller_vat_country_code = InputService.get_str_or_None(df, i, column=vc.seller_vat_country_code)
         except:
             raise UnprocessableEntity(vc.seller_vat_country_code)
         try:
-            seller_vat_number = InputService.get_str_or_None(
-                df, i, column=vc.seller_vat_number)
+            seller_vat_number = InputService.get_str_or_None(df, i, column=vc.seller_vat_number)
         except:
             raise UnprocessableEntity(vc.seller_vat_number)
 
         try:
-            tax_calculation_imputation_country = InputService.get_str_or_None(
-                df, i, column=vc.tax_calculation_imputation_country)
+            tax_calculation_imputation_country = InputService.get_str_or_None(df, i, column=vc.tax_calculation_imputation_country)
         except:
             raise UnprocessableEntity(vc.tax_calculation_imputation_country)
         try:
-            tax_jurisdiction = InputService.get_str_or_None(
-                df, i, column=vc.tax_jurisdiction)
+            tax_jurisdiction = InputService.get_str_or_None(df, i, column=vc.tax_jurisdiction)
         except:
             raise UnprocessableEntity(vc.tax_jurisdiction)
         try:
-            tax_jurisdiction_level = InputService.get_str_or_None(
-                df, i, column=vc.tax_jurisdiction)
+            tax_jurisdiction_level = InputService.get_str_or_None(df, i, column=vc.tax_jurisdiction)
         except:
             raise UnprocessableEntity(vc.tax_jurisdiction)
 
         try:
-            invoice_number = InputService.get_str_or_None(
-                df, i, column=vc.invoice_number)
+            invoice_number = InputService.get_str_or_None(df, i, column=vc.invoice_number)
         except:
             raise UnprocessableEntity(vc.invoice_number)
         try:
-            invoice_amount_vat = InputService.get_float_or_None(
-                df, i, column=vc.invoice_amount_vat)
+            invoice_amount_vat = InputService.get_float_or_None(df, i, column=vc.invoice_amount_vat)
         except:
             raise UnprocessableEntity(vc.invoice_amount_vat)
         try:
-            invoice_currency_code = InputService.get_str_or_None(
-                df, i, column=vc.invoice_currency_code)
+            invoice_currency_code = InputService.get_str_or_None(df, i, column=vc.invoice_currency_code)
         except:
             raise UnprocessableEntity(vc.invoice_currency_code)
         try:
-            invoice_exchange_rate = InputService.get_float_or_None(
-                df, i, column=vc.invoice_exchange_rate)
+            invoice_exchange_rate = InputService.get_float_or_None(df, i, column=vc.invoice_exchange_rate)
         except:
             raise UnprocessableEntity(vc.invoice_exchange_rate)
         try:
-            invoice_exchange_rate_date = InputService.get_date_or_None(
-                df, i, column=vc.invoice_exchange_rate_date)
+            invoice_exchange_rate_date = InputService.get_date_or_None(df, i, column=vc.invoice_exchange_rate_date)
         except:
             raise UnprocessableEntity(vc.invoice_exchange_rate_date)
         try:
-            invoice_url = InputService.get_str_or_None(
-                df, i, column=vc.invoice_url)
+            invoice_url = InputService.get_str_or_None(df, i, column=vc.invoice_url)
         except:
             raise UnprocessableEntity(vc.invoice_url)
 
         try:
-            export = InputService.get_bool(
-                df, i, column=vc.export, value_true='YES')
+            export = InputService.get_bool(df, i, column=vc.export, value_true='YES')
         except:
             raise UnprocessableEntity(vc.export)
 
         try:
-            customer_name = InputService.get_str_or_None(
-                df, i, column=vc.customer_name)
+            customer_name = InputService.get_str_or_None(df, i, column=vc.customer_name)
         except:
             raise UnprocessableEntity(vc.customer_name)
         try:
-            customer_vat_number = InputService.get_str_or_None(
-                df, i, column=vc.customer_vat_number)
+            customer_vat_number = InputService.get_str_or_None(df, i, column=vc.customer_vat_number)
         except:
             raise UnprocessableEntity(vc.customer_vat_number)
         try:
-            customer_vat_number_country_code = InputService.get_str_or_None(
-                df, i, column=vc.customer_vat_number_country_code)
+            customer_vat_number_country_code = InputService.get_str_or_None(df, i, column=vc.customer_vat_number_country_code)
         except:
             raise UnprocessableEntity(vc.customer_vat_number_country_code)
 
         try:
-            supplier_vat_number = InputService.get_str_or_None(
-                df, i, column=vc.supplier_vat_number)
+            supplier_vat_number = InputService.get_str_or_None(df, i, column=vc.supplier_vat_number)
         except:
             raise UnprocessableEntity(vc.supplier_vat_number)
         try:
-            supplier_name = InputService.get_str_or_None(
-                df, i, column=vc.supplier_name)
+            supplier_name = InputService.get_str_or_None(df, i, column=vc.supplier_name)
         except:
             raise UnprocessableEntity(vc.supplier_name)
 
