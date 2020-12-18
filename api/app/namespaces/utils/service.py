@@ -6,6 +6,7 @@ from datetime import datetime, date, timedelta
 
 from flask import g, current_app, send_from_directory
 from . import TransactionNotification, SellerFirmNotification
+from .decorators import allow_none_column
 from .interface import SellerFirmNotificationInterface
 
 from werkzeug.utils import secure_filename
@@ -262,8 +263,13 @@ class InputService:
         try:
             string = str(df.iloc[i][column])
         except:
-            raise UnsupportedMediaType('Can not read str format.')
+            raise UnsupportedMediaType('Can not read string format.')
         return string
+
+    @staticmethod
+    @allow_none_column
+    def get_str_or_None(df: pd.DataFrame, i: int, column: str) -> str:
+       return InputService.get_str(df, i, column)
 
     @staticmethod
     def get_single_str_compact(df: pd.DataFrame, i: int, column: str) -> str:
@@ -271,20 +277,9 @@ class InputService:
             string_unform = str(df.iloc[i][column])
             string = InputService.clean_str(string_unform)
         except:
-            raise UnsupportedMediaType('Can not read str format.')
+            raise UnsupportedMediaType('Can not read string format.')
         return string
 
-    @staticmethod
-    def get_str_or_None(df: pd.DataFrame, i: int, column: str) -> str:
-        if pd.isnull(df.iloc[i][column]):
-            return None
-        else:
-            try:
-                string = str(df.iloc[i][column])
-            except:
-                raise UnsupportedMediaType('Can not read date format.')
-
-        return string
 
     @staticmethod
     def clean_str(string: str) -> str:
