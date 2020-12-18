@@ -267,9 +267,12 @@ class InputService:
         return string
 
     @staticmethod
-    @allow_none_column
+    # @allow_none_column
     def get_str_or_None(df: pd.DataFrame, i: int, column: str) -> str:
-       return InputService.get_str(df, i, column)
+        if pd.isnull(df.iloc[i][column]):
+            return None
+        else:
+            return InputService.get_str(df, i, column=column)
 
     @staticmethod
     def get_single_str_compact(df: pd.DataFrame, i: int, column: str) -> str:

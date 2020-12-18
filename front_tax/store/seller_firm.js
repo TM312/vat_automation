@@ -84,11 +84,15 @@ export const mutations = {
   // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
   UPDATE_VAT_NUMBER(state, vat_number) {
     var index = state.seller_firm.vat_numbers.findIndex(el => (el.country_code === vat_number.country_code && el.number === vat_number.number))
-    state.seller_firm.vat_numbers = [
-      ...state.seller_firm.vat_numbers.slice(0, index),
-      vat_number,
-      ...state.seller_firm.vat_numbers.slice(index + 1)
-    ]
+    if (index === -1) {
+      state.seller_firm.vat_numbers.push(...vat_number)
+    } else {
+      state.seller_firm.vat_numbers = [
+        ...state.seller_firm.vat_numbers.slice(0, index),
+        vat_number,
+        ...state.seller_firm.vat_numbers.slice(index + 1)
+      ]
+    }
   },
   // https://stackoverflow.com/questions/55781792/how-to-update-object-in-vuex-store-array
   UPDATE_ACCOUNT_IN_LIST(state, account) {

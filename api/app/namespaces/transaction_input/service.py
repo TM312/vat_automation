@@ -16,7 +16,6 @@ from . import TransactionInput
 from .interface import TransactionInputInterface
 from .schema import TransactionInputSubSchema
 from .df_reader import AMZReader
-from .platform_handler import AMZHandler
 
 from app.namespaces.utils.service import InputService, NotificationService, HelperService
 from app.namespaces.tag.service import TagService
@@ -186,7 +185,7 @@ class TransactionInputService:
             from app.namespaces.item.service import ItemService
             from app.namespaces.business.seller_firm.service import SellerFirmService
             item_unit_cost_price_currency_code: str = SellerFirmService.get_item_unit_cost_price_currency_code(seller_firm_id) if target_currency_code is None else target_currency_code
-            item_unit_cost_price_est: float = ItemService.get_unit_cost_price_net_est(seller_firm_id, df, platform_code, item_unit_cost_price_currency_code)
+            item_unit_cost_price_est: float = ItemService.get_unit_cost_price_net_est(seller_firm_id, df, platform_code, item_unit_cost_price_currency_code, file_type)
             TransactionInputService.update_by_transaction_report_data(df, platform_code, file_type, seller_firm_id, user_id, original_filename, item_unit_cost_price_est, item_unit_cost_price_currency_code)
 
         response_object = TransactionInputService.create_transaction_inputs_and_transactions(df, original_filename, file_type, user_id, seller_firm_id, platform_code, item_unit_cost_price_est)
@@ -217,7 +216,6 @@ class TransactionInputService:
 
     @staticmethod
     def create_transaction_inputs_and_transactions(df: pd.DataFrame, original_filename: str, file_type: str, user_id: int, seller_firm_id: int, platform_code: str, item_unit_cost_price_est: float = None) -> List[Dict]:
-        #!!! make this general and add amazon specific function in file read columns
         from app.namespaces.distance_sale.service import DistanceSaleService
         from app.namespaces.tax.tax_code.service import TaxCodeService
         from app.namespaces.account.service import AccountService
@@ -242,10 +240,10 @@ class TransactionInputService:
         SocketService.emit_status_success(0, total_number_transaction_inputs, original_filename, object_type)
 
 
-        print('total: {}, start: {}, stop: {}, step: {}'.format(total, start, stop, step), flush=True)
         for i in range(start, stop, step):
-            current = start - i + 1 if desc else i + 1
-
+            status = start - i + 1 if desc else i + 1
+            current = i + 1 #start - i + 1 if desc else i + 1
+            print('current: {}'.format(current), flush=True)
             try:
                 #retrieve all relevant vars
                 (
@@ -336,9 +334,10 @@ class TransactionInputService:
                     customer_vat_number_country_code,
                     supplier_vat_number,
                     supplier_name
-                ) = TransactionInputVariableService.get_df_vars(df, i, current, object_type, platform_code, file_type)
+                ) = TransactionInputVariableService.get_df_vars(df, i, object_type, platform_code, file_type)
 
             except Exception as e:
+                print(e, flush=True)
                 if e.code == 422:
                     SocketService.emit_status_error_column_read(current, object_type, column_name=e.description)
                 elif e.code == 417:
@@ -347,7 +346,6 @@ class TransactionInputService:
 
             item_tax_code = TaxCodeService.get_tax_code_code(item_given_tax_code_code, platform_code)
             valid_from = HelperService.get_earliest_date(shipment_date, arrival_date, complete_date, tax_calculation_date, invoice_exchange_rate_date)
-
             account = AccountService.get_by_given_id_channel_code(account_given_id, channel_code)
             if not isinstance(account, Account):
                 SocketService.emit_status_error_unidentifiable_object(object_type, 'account', current)
@@ -541,7 +539,7 @@ class TransactionInputService:
 
                 try:
                     # transactions are being created
-                    TransactionInputService.process(transaction_input)
+                    TransactionInputService.process(transaction_input, object_type, current)
                 except:
                     # send error status via socket
                     message = 'Error while processing {} with id: {} in row {} (file: {}). Please get in touch with one of the admins.'.format(object_type_human_read, given_id, current+1, original_filename)
@@ -550,7 +548,7 @@ class TransactionInputService:
 
 
                 # send status update via socket
-                SocketService.emit_status_success(current, total_number_transaction_inputs,  original_filename, object_type)
+                SocketService.emit_status_success(status, total_number_transaction_inputs,  original_filename, object_type)
 
         # update distance sale history
         last_transaction = TransactionService.get_latest_by_seller_firm_id(seller_firm_id)
@@ -569,12 +567,12 @@ class TransactionInputService:
         return True
 
     @staticmethod
-    def process(transaction_input: TransactionInput):
+    def process(transaction_input: TransactionInput, object_type: str, current: int):
         # transactions are being created
         if not transaction_input.processed:
             try:
                 # create transactions
-                TransactionService.create_transaction_s(transaction_input)
+                TransactionService.create_transaction_s(transaction_input, object_type, current)
                 transaction_input.update_processed()
                 db.session.commit()
 
@@ -726,9 +724,17 @@ class TransactionInputVariableService:
     @staticmethod
     def get_sale_transaction_input_by_bundle_id(bundle_id: int, platform_code: str) -> TransactionInput:
         if platform_code == 'AMZ':
-            sale_transaction_input = AMZHandler.get_sale_transaction_input_by_bundle_id(bundle_id)
-
+            sale_transaction_input = TransactionInput.query.filter(
+                TransactionInput.bundle_id == bundle_id,
+                or_(
+                    TransactionInput.transaction_type_public_code == 'SALE',
+                    TransactionInput.transaction_type_public_code == 'COMMINGLING_SELL'
+                )
+            ).first()
         return sale_transaction_input
+
+
+
 
     @staticmethod
     def verify_transaction_order(df: pd.DataFrame, total: int, platform_code: str, file_type: str) -> List[int]:
@@ -743,13 +749,11 @@ class TransactionInputVariableService:
 
         return start, stop, step, desc
 
-     @staticmethod
-
 
     @staticmethod
-    def get_df_vars(df: pd.DataFrame, i: int, current: int, object_type: str, platform_code: str, file_type: str) -> List:
+    def get_df_vars(df: pd.DataFrame, i: int, object_type: str, platform_code: str, file_type: str) -> List:
         if platform_code == 'AMZ':
-            return AMZReader.get_df_vars(df, i, current, object_type, file_type)
+            return AMZReader.get_df_vars(df, i, object_type, file_type)
 
 
     @staticmethod

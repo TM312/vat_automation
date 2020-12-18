@@ -17,7 +17,7 @@ transaction_types_public = [
     },
     {
         'code': 'RETURN',
-        'description': 'Physical return of goods sent back to an Amazon fulfilment centre.',
+        'description': 'Physical return of goods sent back to an Amazon Fulfillment Centre.',
         'platform_code': 'AMZ',
         'transaction_type_code': 'RETURN',
     },
@@ -35,13 +35,13 @@ transaction_types_public = [
     },
     {
         'code': 'FC_TRANSFER',
-        'description': 'Seller’s inventory is transferred between Amazon’s EU cross border Fulfilment Centres.',
+        'description': 'Seller’s inventory is transferred between Amazon’s EU cross border Fulfillment Centers.',
         'platform_code': 'AMZ',
         'transaction_type_code': 'MOVEMENT',
     },
     {
         'code': 'INBOUND',
-        'description': 'Seller sends inventory to an Amazon Fulfilment Centre.',
+        'description': 'Seller sends inventory to an Amazon Fulfillment Center.',
         'platform_code': 'AMZ',
         'transaction_type_code': 'INBOUND',
     },
@@ -49,13 +49,13 @@ transaction_types_public = [
         'code': 'LIQUIDATION_SALE',
         'description': 'Selling excess inventory in bulk at a significant discount.',
         'platform_code': 'AMZ',
-        'transaction_type_code': 'LIQUIDATION_SALE',
+        'transaction_type_code': 'SALE',
     },
     {
         'code': 'LIQUIDATION_REFUND',
         'description': 'A reversal/refund of a liquidation sale transaction. In case of disputes, a partial or full refund will be issued to the liquidator.',
         'platform_code': 'AMZ',
-        'transaction_type_code': 'LIQUIDATION_REFUND',
+        'transaction_type_code': 'REFUND',
     },
     {
         'code': 'DONATION',

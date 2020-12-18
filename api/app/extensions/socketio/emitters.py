@@ -48,7 +48,7 @@ class SocketService:
     @staticmethod
     def emit_status_success(current: int, total: int, target: str, object_type: str):
 
-        if current == 1 or current % 25 == 0 or current == total:
+        if current == 1 or current % 50 == 0 or current == total:
 
             status = {
                 'current': current,

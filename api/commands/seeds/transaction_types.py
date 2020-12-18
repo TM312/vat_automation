@@ -25,5 +25,9 @@ transaction_types = [
     {
         'code': 'INBOUND',
         'description': 'Seller sends inventory to a fulfillment center.'
+    },
+    {
+        'code': 'DONATION',
+        'description': 'Giving away excess inventory to a charitable organisation.',
     }
 ]

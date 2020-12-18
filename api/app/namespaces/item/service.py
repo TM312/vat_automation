@@ -158,7 +158,7 @@ class ItemService:
 
 
     @staticmethod
-    def get_unit_cost_price_net_est(seller_firm_id: int, df_transaction_inputs: pd.DataFrame = None, platform_code: str = None, target_currency_code: str = None) -> float:
+    def get_unit_cost_price_net_est(seller_firm_id: int, df_transaction_inputs: pd.DataFrame = None, platform_code: str = None, target_currency_code: str = None, file_type: str = None) -> float:
         from app.namespaces.exchange_rate.service import ExchangeRateService
         from app.namespaces.business.seller_firm.service import SellerFirmService
 
@@ -174,6 +174,7 @@ class ItemService:
 
 
         seller_firm_items = ItemService.get_all_by_seller_firm_id(seller_firm_id)
+
         item_unit_cost_prices = [
             item.unit_cost_price_net * ExchangeRateService.get_by_base_target_date(
                 base = item.unit_cost_price_currency_code,
@@ -184,15 +185,16 @@ class ItemService:
             if item.unit_cost_price_net is not None and item.unit_cost_price_currency_code is not None
             ]
 
+
         # CASE 1
         if seller_firm_items is not None and len(item_unit_cost_prices) > 5 and stdev(item_unit_cost_prices) < mean(item_unit_cost_prices)/2: # the standard deviation of item prices needs to be smaller than half their mean
             unit_cost_price_net_est = mean(item_unit_cost_prices)
 
         #CASE 2
         # Unit Cost Price is being estimated based on Transaction Report
-        elif df_transaction_inputs is not None and platform_code is not None:
+        elif df_transaction_inputs is not None and platform_code is not None and file_type is not None:
             from app.namespaces.transaction_input.service import TransactionInputVariableService
-            unit_cost_price_net_est = TransactionInputVariableService.get_item_unit_cost_price_est_from_transaction_inputs(df_transaction_inputs, platform_code, target_currency_code)
+            unit_cost_price_net_est = TransactionInputVariableService.get_item_unit_cost_price_est_from_transaction_inputs(df_transaction_inputs, platform_code, target_currency_code, file_type)
 
         #CASE 3
         else:
