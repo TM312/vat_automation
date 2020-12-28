@@ -24,7 +24,7 @@
                 platform.
               </template>
 
-              <button-enter-arrow-right to="/vat-compliance" content="Product Details" />
+              <button-enter-arrow-right to="/vat-compliance" content="Learn More" />
             </b-jumbotron>
           </b-col>
           <b-col cols="auto">

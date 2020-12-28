@@ -2,15 +2,15 @@ version: '3'
 
 services:
 
-    # front:
-    #     build:
-    #         context: ./front
-    #         dockerfile: Dockerfile.dev
-    #         args:
-    #             - NODE_VERSION=${NODE_VERSION}
-    #     volumes:
-    #           - ./front/:/home/app
-    #     command: "npm run dev"
+    front:
+        build:
+            context: ./front
+            dockerfile: Dockerfile.dev
+            args:
+                - NODE_VERSION=${NODE_VERSION}
+        volumes:
+              - ./front/:/home/app
+        command: "npm run dev"
 
     # front_admin:
     #     build:
@@ -22,15 +22,15 @@ services:
     #           - ./front_admin/:/home/app
     #     command: "npm run dev"
 
-    front_tax:
-        build:
-            context: ./front_tax
-            dockerfile: Dockerfile.dev
-            args:
-                - NODE_VERSION=${NODE_VERSION}
-        volumes:
-              - ./front_tax/:/home/app
-        command: "npm run dev"
+    # front_tax:
+    #     build:
+    #         context: ./front_tax
+    #         dockerfile: Dockerfile.dev
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     volumes:
+    #           - ./front_tax/:/home/app
+    #     command: "npm run dev"
 
     proxy:
         container_name: proxy
