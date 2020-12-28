@@ -18,40 +18,40 @@ version: '3'
 
 services:
 
-    # front:
-    #     container_name: front
-    #     build:
-    #         context: ./front
-    #         dockerfile: Dockerfile
-    #         args:
-    #             - NODE_VERSION=${NODE_VERSION}
-    #     image: ${OWNER_NAME}/front:${VERSION_NUMBER}
-    #     restart: always
-    #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-    #         - "14000"
-    #     # depends_on:
-    #     #     - api
-    #     networks:
-    #         - web
-    #     command: "npm run start"
-
-
-    front_tax:
-        container_name: front_tax
+    front:
+        container_name: front
         build:
-            context: ./front_tax
+            context: ./front
             dockerfile: Dockerfile
             args:
                 - NODE_VERSION=${NODE_VERSION}
-        image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
+        image: ${OWNER_NAME}/front:${VERSION_NUMBER}
         restart: always
         expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
-            - "22406"
+            - "14000"
         # depends_on:
         #     - api
         networks:
             - web
         command: "npm run start"
+
+
+    # front_tax:
+    #     container_name: front_tax
+    #     build:
+    #         context: ./front_tax
+    #         dockerfile: Dockerfile
+    #         args:
+    #             - NODE_VERSION=${NODE_VERSION}
+    #     image: ${OWNER_NAME}/front_tax:${VERSION_NUMBER}
+    #     restart: always
+    #     expose: # EXPOSE only opens up a port within a docker network, while PORTS allows access from the outside world (the internet)
+    #         - "22406"
+    #     # depends_on:
+    #     #     - api
+    #     networks:
+    #         - web
+    #     command: "npm run start"
 
 
     # front_admin:

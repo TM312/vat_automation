@@ -18,9 +18,9 @@
         <b-nav-item to="/pricing">
           Pricing
         </b-nav-item>
-        <!-- <b-nav-item to="/register">
+        <b-nav-item to="/register">
           Sign Up
-        </b-nav-item> -->
+        </b-nav-item>
         <!-- Using 'button-content' slot -->
         <!-- <b-button variant="outline-success" to="/login">
           Sign In
