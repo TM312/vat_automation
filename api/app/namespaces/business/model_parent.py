@@ -20,7 +20,7 @@ class Business(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(128), unique=True) #UUID(as_uuid=True), unique=True, default=uuid4)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_business_created_by_user'))
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_business_created_by_user'), default=1)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime)
     times_modified = db.Column(db.Integer, default=0)

@@ -15,9 +15,9 @@
             </b-col>
             <b-col>
               <h6>Company</h6><br />
-              <nuxt-link to="/about">
+              <!-- <nuxt-link to="/about">
                 About
-              </nuxt-link><br />
+              </nuxt-link><br /> -->
               <nuxt-link to="/pricing">
                 Pricing
               </nuxt-link><br />

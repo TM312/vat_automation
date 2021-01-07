@@ -20,7 +20,7 @@
                 v-if="!showcase && transactionInputPublicId !== transactionInput.public_id"
                 size="sm"
                 variant="outline-primary"
-                :to="`/clients/${clientPublicId}/transactions/${transactionInput.public_id}`"
+                :to="`/${sellerFirmPublicId}/transactions/${transactionInput.public_id}`"
               >
                 Details
               </b-button>
@@ -93,7 +93,7 @@ export default {
   name: "CardTransactionInputBundle",
 
   props: {
-    clientPublicId: {
+    sellerFirmPublicId: {
       type: String,
       required: true,
     },

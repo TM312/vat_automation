@@ -80,7 +80,7 @@ export default {
   name: "TableTransactionInputs",
 
   props: {
-    clientPublicId: {
+    sellerFirmPublicId: {
       type: String,
       required: true,
     },

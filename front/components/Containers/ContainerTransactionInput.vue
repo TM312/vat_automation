@@ -1,6 +1,6 @@
 <template>
-  <div v-if="clientPublicId.length > 0 && transactionInputPublicId.length > 0">
-    <card-transaction-input-bundle :transaction-input-public-id="transactionInputPublicId" :client-public-id="clientPublicId" />
+  <div v-if="sellerFirmPublicId.length > 0 && transactionInputPublicId.length > 0">
+    <card-transaction-input-bundle :transaction-input-public-id="transactionInputPublicId" :client-public-id="sellerFirmPublicId" />
     <b-alert :show="!transactionInput.processed && !$fetchState.pending" variant="danger">
       <p>The transaction has not been processed yet due to network errors. Click here to retry: <button-validate-transaction-input :transaction-input-public-id="transactionInputPublicId" /> </p>
     </b-alert>
@@ -10,7 +10,7 @@
         <card-transaction-input v-else id="file" />
       </b-tab>
 
-      <b-tab title="Tax Processes" lazy :disabled="$fetchState.pending && sellerFirm.public_id != clientPublicId || transactionInput.length === 0">
+      <b-tab title="Tax Processes" lazy :disabled="$fetchState.pending && sellerFirm.public_id != sellerFirmPublicId || transactionInput.length === 0">
         <span v-if="$fetchState.pending || transactionInput.length === 0"></span>
         <view-transactions v-else :transactions="transactionInput.transactions" />
       </b-tab>
@@ -24,7 +24,7 @@ import { mapState } from 'vuex'
 export default {
   name: 'ContainerTransactionInput',
   props: {
-    clientPublicId: {
+    sellerFirmPublicId: {
       type: String,
       required: false,
       default: ''

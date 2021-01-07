@@ -30,18 +30,19 @@ class SellerFirmResource(Resource):
     # decorators = [limiter.limit("10/second")]
     '''Get all SellerFirm Firms'''
     @login_required
-    #@accepted_u_types('admin')
-    @ns.marshal_list_with(seller_firm_dto, envelope='data')
+    @accepted_u_types('admin')
+    @ns.marshal_list_with(seller_firm_sub_dto, envelope='data')
     def get(self) -> List[SellerFirm]:
         '''List Of Registered SellerFirm Firms'''
         return SellerFirmService.get_all()
 
     @ns.expect(seller_firm_dto, validate=True)
     @ns.marshal_with(seller_firm_dto)
-    def post(self):
+    def post(self) -> SellerFirm:
         """Create A Single Seller Firm"""
         seller_firm_data: SellerFirmInterface = request.json
-        return SellerFirmService.create(seller_firm_data)
+        current_app.logger.info(seller_firm_data)
+        return SellerFirmService.register_seller_firm(seller_firm_data)
 
 
 @ns.route('/<string:seller_firm_public_id>')

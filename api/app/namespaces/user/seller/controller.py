@@ -35,14 +35,14 @@ class SellerResource(Resource):
         '''List Of Registered Seller Firms'''
         return SellerService.get_all()
 
-    @login_required
-    @accepted_u_types('admin', 'seller')
+    #@login_required
+    #@accepted_u_types('admin', 'seller')
     @ns.expect(seller_dto, validate=True)
     @ns.marshal_with(seller_dto)
-    def post(self):
+    def post(self) -> Seller:
         """Create A Single Seller Firm"""
         seller_data: SellerInterface = request.json
-        return SellerService.create(seller_data)
+        return SellerService.register_seller(seller_data)
 
 
 @ns.route('/self')
