@@ -3,14 +3,14 @@
     <b-nav vertical pills>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${sellerFirmPublicId}`"
+        :to="`/${sellerFirmPublicId}`"
         exact
       >
         Company
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${sellerFirmPublicId}/items`"
+        :to="`/${sellerFirmPublicId}/items`"
         exact
         prefetch
         :disabled="!sellerFirmPublicId"
@@ -19,7 +19,7 @@
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${sellerFirmPublicId}/transactions`"
+        :to="`/${sellerFirmPublicId}/transactions`"
         exact
         prefetch
         :disabled="!sellerFirmPublicId"
@@ -28,7 +28,7 @@
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${sellerFirmPublicId}/tax-records`"
+        :to="`/${sellerFirmPublicId}/tax-records`"
         exact
         prefetch
         :disabled="!sellerFirmPublicId"
@@ -37,7 +37,7 @@
       </b-nav-item>
       <b-nav-item
         exact-active-class="active"
-        :to="`/clients/${sellerFirmPublicId}/upload`"
+        :to="`/${sellerFirmPublicId}/upload`"
         exact
         :link-class="linkClass(4)"
         :disabled="!sellerFirmPublicId"
