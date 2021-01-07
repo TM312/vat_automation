@@ -1,5 +1,10 @@
 <template>
-  <b-card title="Vat Compliance" sub-title="VAT Registrations &amp; Filings">
+  <b-card>
+    <b-card-title>
+      Vat Compliance
+      <badge-coming-soon class="ml-1" />
+    </b-card-title>
+    <b-card-sub-title>VAT Registrations &amp; Filings</b-card-sub-title>
     <b-card-text class="py-3">
       <b-tabs>
         <b-tab title="Standard" active class="pt-3 h-100">
@@ -54,7 +59,7 @@
             </b-form-checkbox>
           </div>
         </b-tab>
-        <b-tab title="Enterprise" class="py-3 h-100">
+        <b-tab title="Enterprise" class="py-3 h-100" disabled>
           <b-card
             bg-variant="dark"
             text-variant="light"

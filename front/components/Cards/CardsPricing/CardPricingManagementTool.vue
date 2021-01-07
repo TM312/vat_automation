@@ -33,8 +33,9 @@
         Transparent overview of tax implications for each transactions
       </p>
       <p class="text-muted">
-        <b-icon icon="check" variant="success" class="mr-1" />
+        <b-icon icon="wrench" variant="info" class="mr-1" />
         Export as to CSV, Excel and PDF.
+        <badge-coming-soon class="ml-1" />
       </p>
       <p class="text-muted">
         <b-icon
@@ -43,13 +44,7 @@
           class="mr-1"
         />
         DATEV export
-        <b-badge
-          variant="info"
-          pill
-          class="ml-1"
-        >
-          Coming Soon
-        </b-badge>
+        <badge-coming-soon class="ml-1" />
       </p>
     </b-card-text>
   </b-card>

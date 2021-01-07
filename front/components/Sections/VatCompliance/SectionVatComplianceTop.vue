@@ -13,7 +13,7 @@
       </p>
       <span class="mt-2">
         <button-enter-arrow-right
-          to="/experience"
+          to="/register"
           content="Get Started"
         />
         <button-enter-arrow-right

@@ -16,7 +16,7 @@
                 style="max-width: 40rem"
                 class="mt-5 text-muted"
               >
-                Tax-Automation provides Amazon sellers with
+                We provide Amazon sellers with
                 tools to meet VAT requirements across
                 Europe. We assist with VAT registration and
                 preliminary turnover tax returns. Keep track of sales and all

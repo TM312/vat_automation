@@ -31,7 +31,7 @@
       <b-card-text class="mt-3">
         <nuxt-link
           v-if="!showcase"
-          :to="`/clients/${clientPublicId}/tax-records/${taxRecord.public_id}`"
+          :to="`/clients/${sellerFirmPublicId}/tax-records/${taxRecord.public_id}`"
           exact
         >
           Details
@@ -69,7 +69,7 @@ export default {
       type: [Array, Object],
       required: true,
     },
-    clientPublicId: {
+    sellerFirmPublicId: {
       type: String,
       required: true,
     },

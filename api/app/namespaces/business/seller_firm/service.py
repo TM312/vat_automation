@@ -146,9 +146,9 @@ class SellerFirmService:
         new_seller_firm = SellerFirm(
             claimed = seller_firm_data.get('claimed'),
             created_by = seller_firm_data.get('created_by'),
-            name = seller_firm_data.get('name'),
+            name=seller_firm_data.get('name'),
             address = seller_firm_data.get('address'),
-            establishment_country_code = seller_firm_data.get('establishment_country_code')
+            establishment_country_code=seller_firm_data.get('establishment_country_code')
         )
 
         #add seller firm to db
@@ -536,3 +536,51 @@ class SellerFirmService:
             item_unit_cost_price_currency_code = 'EUR'
 
         return item_unit_cost_price_currency_code
+
+
+    @staticmethod
+    def register_seller_firm(seller_firm_data_raw: SellerFirmInterface) -> SellerFirm:
+        print('enter register_seller_firm', flush=True)
+        from app.namespaces.user.service_parent import UserService
+        from app.namespaces.user import User
+
+        name = str(seller_firm_data_raw.get('name'))
+        print('name: {}'.format(seller_firm_data_raw.get('name')), flush=True)
+        establishment_country_code = str(seller_firm_data_raw.get('establishment_country_code'))
+        print('establishment_country_code: {}'.format(seller_firm_data_raw.get('establishment_country_code')), flush=True)
+        user_public_id = seller_firm_data_raw.get('user_public_id')
+        print('user_public_id: {}'.format(seller_firm_data_raw.get('user_public_id')), flush=True)
+        user = UserService.get_by_public_id(user_public_id) if isinstance(user_public_id, str) else None
+        print('user: ', user, flush=True)
+
+        log = "user_public_id: {} | user_id: {}".format(user_public_id, user.id)
+        current_app.logger.info(log)
+
+        seller_firm_data = {
+            'claimed': True,
+            'name': name,
+            'establishment_country_code': establishment_country_code,
+            'created_by': user.id if isinstance(user, User) else None
+        }
+
+        print('seller_firm_data', seller_firm_data, flush=True)
+
+        seller_firm = SellerFirmService.get_by_identifiers(name, establishment_country_code)
+        if not isinstance(seller_firm, SellerFirm):
+            try:
+                new_seller_firm = SellerFirmService.create(seller_firm_data)
+            except Exception as e:
+                current_app.logger.warning(e)
+                raise e
+
+            if isinstance(new_seller_firm, SellerFirm):
+                print('sent back new seller firm', flush=True)
+                return new_seller_firm
+
+            else:
+                current_app.logger.info('Seller Firm can not be found in database.')
+                raise InternalServerError('Oops, something went wrong.')
+
+        else:
+            current_app.logger.info('Double Entry.')
+            raise Conflict('A seller firm with the this email address already exists. Try logging in instead.')

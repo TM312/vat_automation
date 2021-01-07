@@ -15,10 +15,10 @@
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
-        <b-nav-item to="/pricing">
+        <b-nav-item to="/pricing" :active="currentRouteName == 'pricing'">
           Pricing
         </b-nav-item>
-        <b-nav-item to="/register">
+        <b-nav-item to="/register" :active="currentRouteName == 'register' ">
           Sign Up
         </b-nav-item>
         <!-- Using 'button-content' slot -->
@@ -33,6 +33,12 @@
 <script>
 export default {
   name: 'NavbarUnauth',
+  computed: {
+    currentRouteName() {
+      return this.$route.name
+    }
+  }
+
 }
 </script>
 

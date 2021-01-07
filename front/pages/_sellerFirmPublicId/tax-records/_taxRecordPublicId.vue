@@ -3,7 +3,7 @@
     <b-row>
       <b-col v-if="detailsOn" cols="auto">
         <b-button variant="outline-info" @click="toggleView">
-          <!-- #//:to="`/clients/${clientPublicId}/tax-records`" exact -->
+          <!-- #//:to="`/${sellerFirmPublicId}/tax-records`" exact -->
           <b-icon icon="arrow-left" /> Back
         </b-button>
       </b-col>
@@ -32,7 +32,7 @@
       </b-tab>
 
       <!-- <b-tab v-for="(transactionInput, i) in transactionInputs" :key="i" :title="transactionInput.">
-        <container-transaction-input :client-public-id="clientPublicId" :transaction-input-public-id="transactionInput.public_id" /> -->
+        <container-transaction-input :client-public-id="sellerFirmPublicId" :transaction-input-public-id="transactionInput.public_id" /> -->
       <!-- <b-button size="sm" variant="danger" class="float-right" @click="closeTab(i)"  >
           Close tab
         </b-button> -->
@@ -64,9 +64,9 @@ export default {
     }
   },
   async asyncData({ params }) {
-    const clientPublicId = params.clientPublicId
+    const sellerFirmPublicId = params.sellerFirmPublicId
     const taxRecordPublicId = params.taxRecordPublicId
-    return { taxRecordPublicId, clientPublicId }
+    return { taxRecordPublicId, sellerFirmPublicId }
   },
   data() {
     return {

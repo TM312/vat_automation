@@ -1,5 +1,5 @@
 <template>
-  <container-transaction-input :client-public-id="clientPublicId" :transaction-input-public-id="transactionInputPublicId" />
+  <container-transaction-input :client-public-id="sellerFirmPublicId" :transaction-input-public-id="transactionInputPublicId" />
 </template>
 
 <script>
@@ -9,9 +9,9 @@ export default {
   layout: 'tax-client',
 
   async asyncData({ params }) {
-    const clientPublicId = params.clientPublicId
+    const sellerFirmPublicId = params.sellerFirmPublicId
     const transactionInputPublicId = params.transactionInputPublicId
-    return { transactionInputPublicId, clientPublicId }
+    return { transactionInputPublicId, sellerFirmPublicId }
   },
 
 

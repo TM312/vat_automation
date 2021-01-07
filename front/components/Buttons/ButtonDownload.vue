@@ -1,5 +1,5 @@
 <template>
-  <b-button variant="primary" disabled @click="downloadFile()">
+  <b-button :size="small ? 'sm' : 'md'" variant="primary" disabled @click="downloadFile()">
     <b-icon icon="download" /> Download
   </b-button>
 </template>
@@ -13,6 +13,11 @@ export default {
     urlEndpointTemplate: {
       type: String,
       required: true
+    },
+    small: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 

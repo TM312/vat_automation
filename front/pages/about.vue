@@ -1,7 +1,7 @@
 <template>
   <b-container class="py-5">
     <b-jumbotron bg-variant="transparent" text-variant="dark" header="Building with Sellers' in Mind">
-      <template #lead class="mt-5">
+      <!-- <template #lead class="mt-5">
         Hi! I'm Thomas Moellers, the founder of Tax-Automation.
         Our mission is to provide Amazon sellers from single entrepreneurs to large merchants with the best tools to manage their operations and stay VAT compliant.
 
@@ -23,7 +23,7 @@
         <p class="lead">
           We deploy product improvements on a daily basis. Our internal technology capabilities further facilitate fast innovation cycles for new products and features.
         </p>
-      </template>
+      </template> -->
     </b-jumbotron>
   </b-container>
 </template>
