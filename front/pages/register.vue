@@ -14,7 +14,8 @@ export default {
   async fetch() {
     const { store } = this.$nuxt.context
     if (this.countries.length === 0) {
-      await store.dispatch("country/get_all")
+      const y = await store.dispatch("country/get_all")
+      console.log(y)
     }
   },
 

@@ -565,8 +565,9 @@ class SellerFirmService:
 
         print('seller_firm_data', seller_firm_data, flush=True)
 
-        seller_firm = SellerFirmService.get_by_identifiers(name, establishment_country_code)
+        seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
         if not isinstance(seller_firm, SellerFirm):
+            current_app.logger.info('Double Entry.')
             try:
                 new_seller_firm = SellerFirmService.create(seller_firm_data)
             except Exception as e:

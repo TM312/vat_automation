@@ -46,8 +46,8 @@ services:
         #       - media_data:/var/lib/media_data:ro
         ports:
             - 5000:5000
-            - 22406:22406
-            - 31729:31729
+            # - 22406:22406
+            # - 31729:31729
             - 80:80
         networks:
             - web
