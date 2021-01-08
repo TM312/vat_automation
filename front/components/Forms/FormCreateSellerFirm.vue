@@ -137,7 +137,7 @@ export default {
         )
         this.buttonBusy = false
 
-        this.$router.push(`/${ this.sellerFirm.public_id }`)
+        this.$router.push('/dashboard')
 
 
       } catch (error) {

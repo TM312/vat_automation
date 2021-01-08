@@ -38,12 +38,18 @@
             </p>
           </b-col>
         </b-row>
+        <div class="mt-4">
+          <button-enter-arrow-right
+            to="/register"
+            content="Get Started"
+          />
 
-        <button-enter-arrow-right
-          to="/vat-compliance"
-          content="Product Details"
-          class="mt-4"
-        />
+          <button-enter-arrow-right
+            to="/vat-compliance"
+            content="Product Details"
+            variant="link"
+          />
+        </div>
       </b-col>
       <b-col cols="12" lg="6">
         <!-- <b-embed type="video" aspect="4by3">
