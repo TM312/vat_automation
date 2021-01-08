@@ -30,6 +30,13 @@
                 Continue
               </b-button>
             </b-form>
+            <div class="mt-2">
+              <small class="text-muted">
+                You don't have an account yet? <nuxt-link to="/register">
+                  Sign up
+                </nuxt-link> here.
+              </small>
+            </div>
           </b-card-body>
         </b-card>
       </b-col>

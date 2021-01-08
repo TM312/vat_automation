@@ -18,8 +18,8 @@
         <b-nav-item to="/pricing" :active="currentRouteName == 'pricing'">
           Pricing
         </b-nav-item>
-        <b-nav-item to="/register" :active="currentRouteName == 'register' ">
-          Sign Up
+        <b-nav-item to="/login" :active="currentRouteName == 'login' ">
+          Sign In
         </b-nav-item>
         <!-- Using 'button-content' slot -->
         <!-- <b-button variant="outline-success" to="/login">

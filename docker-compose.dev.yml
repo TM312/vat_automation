@@ -32,32 +32,6 @@ services:
     #           - ./front_tax/:/home/app
     #     command: "npm run dev"
 
-    proxy:
-        container_name: proxy
-        build:
-            context: ./nginx
-            dockerfile: Dockerfile
-            args:
-                - NGINX_VERSION=${NGINX_VERSION}
-                - ENVIRONMENT=dev
-        image: ${OWNER_NAME}/proxy:${VERSION_NUMBER}
-        restart: unless-stopped
-        # volumes:
-        #       - media_data:/var/lib/media_data:ro
-        ports:
-            - 5000:5000
-            # - 22406:22406
-            # - 31729:31729
-            - 80:80
-        networks:
-            - web
-        depends_on:
-            - api
-
-        command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
-        # improved version based on: https://stackoverflow.com/questions/57554703/why-use-nginx-with-daemon-off-in-background-with-docker
-        #command: '/bin/sh -c ''while :; do sleep 6h; nginx -s reload; done & exec nginx -g "daemon off;"'''
-
 
     rabbitmq:
         env_file:
