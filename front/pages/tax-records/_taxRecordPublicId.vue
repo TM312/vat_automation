@@ -3,7 +3,6 @@
     <b-row>
       <b-col v-if="detailsOn" cols="auto">
         <b-button variant="outline-info" @click="toggleView">
-          <!-- #//:to="`/${sellerFirmPublicId}/tax-records`" exact -->
           <b-icon icon="arrow-left" /> Back
         </b-button>
       </b-col>
@@ -45,7 +44,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: "tax-client",
+  layout: "auth-seller",
 
   async fetch() {
     const { store } = this.$nuxt.context

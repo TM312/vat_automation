@@ -40,15 +40,14 @@ export const actions = {
 
 
   async create({ commit }, seller_data) {
-    console.log('in store create')
     commit('SET_SELLER', seller_data)
-    // const res = await this.$repositories.seller.create(seller_data)
-    // const { status, data } = res
-    // if (status === 200 && data.data) {
-    //   commit('SET_SELLER', data.data)
-    // } else {
-    //   // Handle error here
-    // }
+    const res = await this.$repositories.seller.create(seller_data)
+    const { status, data } = res
+    if (status === 200 && data.data) {
+      commit('SET_SELLER', data.data)
+    } else {
+      // Handle error here
+    }
   },
 
 

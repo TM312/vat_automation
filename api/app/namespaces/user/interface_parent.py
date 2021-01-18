@@ -6,6 +6,7 @@ class UserInterface(TypedDict, total=False):
     name: str
     email: str
     employer_id: int
+    employer_public_id: str
     role: str
     password: str
     location: str

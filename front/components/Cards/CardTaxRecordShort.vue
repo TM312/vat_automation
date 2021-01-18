@@ -31,7 +31,7 @@
       <b-card-text class="mt-3">
         <nuxt-link
           v-if="!showcase"
-          :to="`/${sellerFirmPublicId}/tax-records/${taxRecord.public_id}`"
+          :to="`/tax-records/${taxRecord.public_id}`"
           exact
         >
           Details

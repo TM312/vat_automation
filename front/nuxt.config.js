@@ -52,7 +52,8 @@ export default {
         // '~/plugins/file-system'
         '~/plugins/repositories',
         '~/plugins/sleep',
-        '~/plugins/capitalize'
+        '~/plugins/capitalize',
+        '~/plugins/formatDate',
     ],
 
     /*
@@ -154,7 +155,8 @@ export default {
 
     axios: {
         // proxy: true,
-        baseURL: 'http://127.0.0.1:5000',
+       //baseURL: 'http://127.0.0.1:5000',
+        baseURL: 'http://localhost:5000',
         /* "94.237.95.140:5000", */
         /* "http://api.tax-automation.com", */
         /*  "http://127.0.0.1:5000"  */
@@ -208,7 +210,7 @@ export default {
     io: {
         sockets: [{
             name: 'home',
-            url: 'http://127.0.0.1', // nginx reroutes to api
+            url: 'http://localhost', //'http://dev.loc', //'http://127.0.0.1', // nginx reroutes to api
             default: true,
             vuex: {
                 mutations: [

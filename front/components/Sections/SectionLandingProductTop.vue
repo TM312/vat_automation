@@ -4,28 +4,41 @@
       <div class="content">
         <b-row cols="1" cols-lg="2">
           <b-col>
-            <b-jumbotron
-              header="VAT Compliance For Your Amazon Business"
+            <div>
+              <div class="ml-auto" style="max-width: 60rem">
+                <p class="hero-text text-dark text-right">
+                  VAT Calculations For Your <span style="color: #cfd9de">Amazon Business </span>
+                </p>
+              </div>
+              <!-- <b-jumbotron
+              header="VAT Calculations For Your Amazon Business Across Europe"
               class="text-right ml-auto"
               style="max-width: 60rem"
               bg-variant="transparent"
               text-variant="dark"
-            >
-              <template
+            > -->
+              <!-- <template
                 #lead
                 style="max-width: 40rem"
                 class="mt-5 text-muted"
               >
                 We provide Amazon sellers with
                 tools to meet VAT requirements across
-                Europe. We assist with VAT registration and
-                preliminary turnover tax returns. Keep track of sales and all
-                relevant distance selling thresholds through our advanced
-                platform.
-              </template>
+                Europe. We assist with the calculation of preliminary turnover tax returns, keeping track of sales and all
+                relevant distance selling thresholds.
+              </template> -->
+              <div style="float: right; max-width: 40rem">
+                <p class="lead mt-5 text-dark text-right">
+                  We provide Amazon sellers with
+                  tools to meet VAT requirements across
+                  Europe. Our platform facilitates the easy calculation of preliminary turnover tax returns and to keep track of sales and all
+                  relevant distance selling thresholds.
+                </p>
 
-              <button-enter-arrow-right to="/vat-compliance" content="Learn More" />
-            </b-jumbotron>
+                <button-enter-arrow-right to="/vat-compliance" style="float: right" content="Learn More" />
+              </div>
+            <!-- </b-jumbotron> -->
+            </div>
           </b-col>
           <b-col cols="auto">
             <b-img
@@ -47,6 +60,16 @@ export default {
 </script>
 
 <style scoped>
+
+    mark.red {
+            color: #ff0000;
+            background: none;
+    }
+
+    .hero-text {
+        font-size: 4.5rem;
+        text-align: end;
+    }
 
 
     .product-container {
@@ -70,16 +93,21 @@ export default {
     .diagonal-box {
         width: 100%;
         height: 100%;
-        background: linear-gradient(
+        background: linear-gradient(-45deg, rgb(253, 200, 48), rgb(243, 115, 53));
+        /* linear-gradient(-45deg, rgb(167, 112, 239), rgb(207, 139, 243), rgb(253, 185, 155)); */
+        /* linear-gradient(-45deg, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125)); */
+        /* linear-gradient(
             -45deg,
             #eecf8e,
             #c26c52,
             #eb6095,
             rgb(69, 149, 180),
             #a166b3
-        );
-        background-size: 300% 300%;
-        animation: change 120s ease-in-out infinite;
+        ); */
+
+
+        background-size: 100% 100%;
+        /* animation: change 60s ease-in-out infinite; */
         transform: skewY(-11deg);
     }
 

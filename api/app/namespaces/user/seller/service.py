@@ -10,10 +10,14 @@ from .model import Seller
 from .interface import SellerInterface
 
 
-from ...email.service import EmailService
+from app.namespaces.email.service import EmailService
 
 
 class SellerService:
+
+    @staticmethod
+    def get_by_id(seller_id: int) -> Seller:
+        return Seller.query.filter_by(id=seller_id).first()
 
     @staticmethod
     def get_by_public_id(seller_public_id: str) -> Seller:
@@ -28,9 +32,11 @@ class SellerService:
     @staticmethod
     def create(seller_data: SellerInterface) -> Seller:
         new_seller = Seller(
+            name=seller_data.get('name'),
             email=str(seller_data.get('email')),
             password=str(seller_data.get('password')),
-            role='admin'
+            role=str(seller_data.get('role')),
+            employer_id = seller_data.get('employer_id')
         )
         #add seller to db
         db.session.add(new_seller)
@@ -71,17 +77,24 @@ class SellerService:
 
     @staticmethod
     def register_seller(seller_data: SellerInterface) -> Seller:
+        print('enter register_seller', flush=True)
         email = str(seller_data.get('email'))
         password = str(seller_data.get('password'))
+        name = str(seller_data.get('name'))
 
-        if not isinstance(seller_data.get('email'), str) and isinstance(seller_data.get('password'), str):
+        if not isinstance(seller_data.get('email'), str) or not isinstance(seller_data.get('password'), str) or not isinstance(seller_data.get('name'), str):
             raise BadRequest('The provided data is invalid.')
 
+        if isinstance(seller_data.get('employer_public_id'), str):
+            from app.namespaces.business.seller_firm.service import SellerFirmService
+            employer_id = SellerFirmService.get_seller_firm_id(seller_firm_public_id = seller_data.get('employer_public_id', str))
+
+            if isinstance(employer_id, int):
+                seller_data['employer_id'] = employer_id
 
         seller = SellerService.get_by_email(email)
         if not isinstance(seller, Seller):
             try:
-                current_app.logger.info(seller_data)
                 new_seller = SellerService.create(seller_data)
             except Exception as e:
                 current_app.logger.warning(e)
@@ -98,7 +111,6 @@ class SellerService:
                 #     template='email_confirmation.html',
                 #     confirmation_link=confirmation_link,
                 # )
-
                 return new_seller
             else:
                 current_app.logger.info('Seller can not be found in database.')

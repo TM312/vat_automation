@@ -4,7 +4,7 @@
             <b-card-text>
                 <b>Email:</b> {{ taxAuditor.email }} <br>
                 <b>Employer:</b> {{ taxAuditor.employer_name }} <br>
-                <b>Registered On:</b> {{ taxAuditor.registered_on }} <br>
+                <b>Registered On:</b> {{ formatDate(taxAuditor.registered_on) }} <br>
             </b-card-text>
         </b-card>
     </b-col>

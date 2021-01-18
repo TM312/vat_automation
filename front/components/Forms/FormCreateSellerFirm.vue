@@ -5,7 +5,7 @@
         <h6>Company Details</h6>
       </b-col>
       <b-col lg="6">
-        Step 2 of 2
+        Step 1 of 2
       </b-col>
     </b-row>
     <b-row class="mt-3">
@@ -24,6 +24,10 @@
             />
           </b-form-group>
         </div>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col lg="6">
         <div>
           <b-form-group
             id="input-group-input-establishment-country"
@@ -37,7 +41,26 @@
             />
           </b-form-group>
         </div>
-
+      </b-col>
+      <b-col lg="6">
+        <p class="text-muted">
+          Country Suggestions
+        </p>
+        <b-button
+          v-for="(code, index) in countryShortList"
+          :key="index"
+          size="sm"
+          variant="outline-primary"
+          class="mr-1"
+          @click="form.establishment_country_code = code"
+          @pressed="form.establishment_country_code === code"
+        >
+          {{ code }}
+        </b-button>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
         <b-button
           variant="primary"
           :disabled="validationSubmit"
@@ -52,10 +75,6 @@
         </b-button>
       </b-col>
     </b-row>
-    <b-form-input v-model="publicId" />
-    <b-button variant="dark" to="/publicId">
-      Dashboard Test
-    </b-button>
   </div>
 </template>
 
@@ -75,6 +94,7 @@ export default {
 
   data() {
     return {
+      countryShortList: ['AT', 'BE', 'CH', 'CZ', 'DE', 'ES', 'FR', 'IT', 'PL', 'US'],
       publicId: null,
       buttonBusy: false,
       form: {
@@ -126,24 +146,29 @@ export default {
       }
       try {
 
-        await this.create_seller_firm(payload)
+        await this.createSellerFirm(payload)
 
-        await this.$bvToast.toast(
-          "Alright, let's get started!.",
+        this.$bvToast.toast(
+
+          'Great! Already half the way!',
           {
+            title: 'Seller Account Created',
             autoHideDelay: 5000,
-            variant: "success",
+            variant: 'success'
           }
         )
+
         this.buttonBusy = false
 
-        this.$router.push('/dashboard')
+        this.$emit('next')
+
 
 
       } catch (error) {
-        this.$toast.error(
+        this.$bvToast.toast(
           error,
           {
+            title: 'Oops and error',
             autoHideDelay: 5000,
             variant: "danger",
           }
@@ -152,7 +177,7 @@ export default {
       }
     },
 
-    async create_seller_firm(payload) {
+    async createSellerFirm(payload) {
       await this.$store.dispatch(
         "seller_firm/create",
         payload

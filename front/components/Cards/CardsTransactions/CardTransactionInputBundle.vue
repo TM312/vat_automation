@@ -20,7 +20,7 @@
                 v-if="!showcase && transactionInputPublicId !== transactionInput.public_id"
                 size="sm"
                 variant="outline-primary"
-                :to="`/${sellerFirmPublicId}/transactions/${transactionInput.public_id}`"
+                :to="`/transactions/${transactionInput.public_id}`"
               >
                 Details
               </b-button>

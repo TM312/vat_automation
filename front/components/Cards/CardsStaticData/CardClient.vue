@@ -20,8 +20,10 @@
       </b-row>
     </b-card-title>
     <b-card-sub-title class="mb-3">
-      {{ sellerFirm.address }} | Establishment:
-      {{ sellerFirmEstablishmentCountry }}
+      <span v-if="!!sellerFirm.address">{{ sellerFirm.address }}</span>
+      <span v-if="!!sellerFirm.address && !!sellerFirm.sellerFirmEstablishmentCountry" class="mx-1">|</span>
+      <span>Establishment: {{ sellerFirmEstablishmentCountry }}
+      </span>
     </b-card-sub-title>
 
     <b-card-text>
@@ -78,7 +80,7 @@
           <b>Created On:</b>
         </b-col>
         <b-col cols="auto" class="mr-auto">
-          {{ sellerFirm.created_on }}
+          {{ formatDate(sellerFirm.created_on) }}
         </b-col>
       </b-row>
       <b-row>

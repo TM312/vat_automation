@@ -139,8 +139,11 @@ export const actions = {
     }
   },
 
-  async update({ commit }, seller_firm_id, data_changes) {
-    const res = await this.$repositories.seller_firm.update(seller_firm_id, data_changes)
+  async update({ commit }, payload ) {
+    const seller_firm_public_id = payload.shift()
+    const data_changes = payload[0]
+
+    const res = await this.$repositories.seller_firm.update(seller_firm_public_id, data_changes)
     const { status, data } = res
     if (status === 200 && data.data) {
       commit('SET_SELLER_FIRM', data.data)

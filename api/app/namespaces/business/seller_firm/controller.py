@@ -37,11 +37,10 @@ class SellerFirmResource(Resource):
         return SellerFirmService.get_all()
 
     @ns.expect(seller_firm_dto, validate=True)
-    @ns.marshal_with(seller_firm_dto)
+    @ns.marshal_with(seller_firm_dto, envelope='data')
     def post(self) -> SellerFirm:
         """Create A Single Seller Firm"""
         seller_firm_data: SellerFirmInterface = request.json
-        current_app.logger.info(seller_firm_data)
         return SellerFirmService.register_seller_firm(seller_firm_data)
 
 
@@ -54,7 +53,7 @@ class SellerFirmIdResource(Resource):
     @ns.marshal_with(seller_firm_dto, envelope='data')
     def get(self, seller_firm_public_id: str) -> SellerFirm:
         '''Get One SellerFirm'''
-        return SellerFirmService.get_by_public_id(seller_firm_public_id)
+        return SellerFirmService.get_w_creator_by_public_id(seller_firm_public_id)
 
     @login_required
     @accepted_roles('admin')
@@ -62,6 +61,14 @@ class SellerFirmIdResource(Resource):
         '''Delete A Single SellerFirm'''
         return SellerFirmService.delete_by_public_id(seller_firm_public_id)
 
+
+    @login_required
+    @accepted_roles('admin')
+    @ns.marshal_with(seller_firm_dto, envelope='data')
+    def put(self, seller_firm_public_id: str) -> SellerFirm:
+        '''Delete A Single SellerFirm'''
+        data_changes: SellerFirmInterface = request.json
+        return SellerFirmService.update_by_public_id(seller_firm_public_id, data_changes)
 
 
 @ns.route("/<string:seller_firm_public_id>/upload")
@@ -72,7 +79,6 @@ class SellerFirmInformationResource(Resource):
         """Upload data for the indicated seller firm"""
         seller_firm_file: BinaryIO = request.files["file"]
         data_retrieval: bool = request.json
-        print('data_retrieval:', data_retrieval, flush=True)
         return SellerFirmService.process_data_upload(seller_firm_public_id, seller_firm_file)
 
 

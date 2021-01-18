@@ -25,7 +25,7 @@ class CountryResource(Resource):
     """Countrys"""
     # @login_required
     @ns.marshal_list_with(country_dto, envelope='data')
-    @cache.cached(timeout=60)
+    #@cache.cached(timeout=60)
     def get(self) -> List[Country]:
         """Get all Countrys"""
         return CountryService.get_all()

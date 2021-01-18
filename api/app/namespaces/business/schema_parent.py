@@ -12,7 +12,7 @@ business_sub_dto = Model('business_sub', {
 
 
 business_dto = business_sub_dto.clone('business', {
-    'created_by': fields.String(attribute=lambda x: x.creator.name),
+    'created_by': fields.String(attribute=lambda x: x.creator.name if x.created_by else None),
     'created_on': fields.Date(readonly=True),
 })
 

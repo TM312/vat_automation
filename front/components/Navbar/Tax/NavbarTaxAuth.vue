@@ -1,6 +1,6 @@
 <template>
   <b-navbar toggleable="lg" type="light" variant="light">
-    <b-navbar-brand to="/">
+    <b-navbar-brand to="/dashboard">
       Tax-Automation
     </b-navbar-brand>
 
@@ -11,11 +11,6 @@
         <b-nav-item to="/dashboard">
           Dashboard
         </b-nav-item>
-        <!-- ^integrate v-if for multiple user roles -->
-        <b-nav-item to="/clients">
-          Clients
-        </b-nav-item>
-        <!-- <b-nav-item to="/tax_records" :disabled="accounting_firm.length === 0">Tax Records</b-nav-item> -->
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
@@ -27,15 +22,9 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex'
 export default {
   name: "NavbarTaxAuth",
-  // computed: {
-  //     ...mapState({
-  //         accounting_firm: state => state.accounting_firm.accounting_firm
-  //     })
 
-  // }
 }
 
 </script>

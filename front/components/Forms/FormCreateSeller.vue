@@ -5,12 +5,21 @@
         <h6>Account Details</h6>
       </b-col>
       <b-col lg="6">
-        Step 1 of 2
+        Step 2 of 2
       </b-col>
     </b-row>
     <b-row class="mt-3">
       <b-col lg="6">
         <b-form @submit.prevent="register">
+          <b-form-group id="input-group-name" label="Display Name" label-for="input-name" class="mb-4">
+            <b-form-input
+              id="input-name"
+              v-model="form.name"
+              required
+              @input="inputField = 'name'"
+            />
+          </b-form-group>
+
           <b-form-group id="input-group-email" label="Email" label-for="input-email" class="mb-4">
             <b-form-input
               id="input-email"
@@ -82,6 +91,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   middleware: 'guest',
@@ -90,13 +100,18 @@ export default {
       showPassword: false,
       inputField: '',
       form: {
+        name: '',
         email: '',
         password: '',
-        password2: '',
+        password2: ''
       },
     }
   },
   computed: {
+    ...mapState({
+      sellerFirm: (state) => state.seller_firm.seller_firm
+    }),
+
     validationEmail() {
       if (this.form.email.length > 3) {
         /* eslint-disable */
@@ -106,6 +121,7 @@ export default {
         return null
       }
     },
+
     validationPw() {
       if (this.form.password.length > 3) {
         return this.form.password.length >= 8
@@ -131,37 +147,53 @@ export default {
   methods: {
     async createSeller(payload) {
         const { store } = this.$nuxt.context
-        console.log('createSeller')
-        console.log('payload: ', payload)
         await store.dispatch('seller/create', payload)
+    },
+
+    async updateSellerFirm() {
+        const { store } = this.$nuxt.context
+        const payload = [this.sellerFirm.public_id, {}]
+        await store.dispatch('seller_firm/update', payload)
     },
 
     async register() {
       const payload = {
+        name: this.form.name,
         email: this.form.email,
-        password: this.form.password
+        password: this.form.password,
+        role: 'admin',
+        employer_public_id: this.sellerFirm.public_id,
       }
+
       try {
-        await createSeller(payload)
-
-        // await this.$auth.loginWith('local', {
-        //   data: payload
-        // })
+        await this.createSeller(payload)
 
 
-        // this.$router.push('/dashboard')
+
+        await this.$bvToast.toast(
+                "Alright, let's get started!.",
+                {
+                    title: 'Seller Firm Registered',
+                    autoHideDelay: 5000,
+                    variant: "success",
+                }
+                )
 
 
-        // this.$bvToast.toast(
 
-        //     'Great! That was already half the way!',
-        //     {
-        //     autoHideDelay: 5000,
-        //     variant: 'success'
-        //     }
-        // )
+        const loginPayload = {
+            email: this.form.email,
+            password: this.form.password,
+            u_type: 'seller'
+        }
 
-        // this.$emit('next')
+        await this.$auth.loginWith('local', { data: loginPayload })
+
+        await this.updateSellerFirm()
+
+        this.$router.push('/dashboard')
+
+
 
       } catch (err) {
         const status = err.response.status

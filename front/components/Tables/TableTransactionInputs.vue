@@ -11,7 +11,7 @@
       <div v-if="!showcase">
         <nuxt-link
           v-if="data.item.public_id != $route.params.public_id"
-          :to="`/${sellerFirmPublicId}/transactions/${data.item.public_id}`"
+          :to="`/transactions/${data.item.public_id}`"
           exact
         >
           {{ data.value }}

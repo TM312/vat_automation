@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  layout: "tax-client",
+  layout: "auth-seller",
 }
 </script>
 
