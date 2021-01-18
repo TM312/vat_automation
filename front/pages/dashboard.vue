@@ -8,13 +8,13 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  layout: "tax-client",
+  layout: "auth-seller",
 
 
   async fetch() {
     const { store } = this.$nuxt.context
-    if (this.sellerFirm.length == 0 || this.sellerFirm.public_id !== this.sellerFirmPublicId) {
-      await store.dispatch('seller_firm/get_by_public_id', this.sellerFirmPublicId)
+    if (this.sellerFirm.length == 0) {
+      await store.dispatch('seller_firm/get_by_public_id', this.$auth.user.employer_public_id)
     }
 
     if (this.countries.length === 0) {
@@ -46,7 +46,7 @@ export default {
       await store.dispatch("vat_threshold/get_all")
     }
 
-    // await store.dispatch("utils/get_all_key_account_notifications")
+  //     // await store.dispatch("utils/get_all_key_account_notifications")
   },
 
   async asyncData({ params }) {

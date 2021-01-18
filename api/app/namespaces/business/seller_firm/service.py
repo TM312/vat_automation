@@ -66,6 +66,18 @@ class SellerFirmService:
         return seller_firm
 
     @staticmethod
+    def update_by_public_id(seller_firm_public_id: str, data_changes_raw: SellerFirmInterface = None) -> SellerFirm:
+        data_changes = {} if data_changes_raw is None else data_changes_raw
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if isinstance(seller_firm, SellerFirm):
+            if seller_firm.created_by is None:
+                data_changes['created_by'] = g.user.id
+            seller_firm.update(data_changes)
+            db.session.commit()
+        return seller_firm
+
+
+    @staticmethod
     def delete_by_public_id(seller_firm_public_id: str) -> Dict:
         seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
         if seller_firm:
@@ -540,21 +552,13 @@ class SellerFirmService:
 
     @staticmethod
     def register_seller_firm(seller_firm_data_raw: SellerFirmInterface) -> SellerFirm:
-        print('enter register_seller_firm', flush=True)
         from app.namespaces.user.service_parent import UserService
         from app.namespaces.user import User
 
         name = str(seller_firm_data_raw.get('name'))
-        print('name: {}'.format(seller_firm_data_raw.get('name')), flush=True)
         establishment_country_code = str(seller_firm_data_raw.get('establishment_country_code'))
-        print('establishment_country_code: {}'.format(seller_firm_data_raw.get('establishment_country_code')), flush=True)
         user_public_id = seller_firm_data_raw.get('user_public_id')
-        print('user_public_id: {}'.format(seller_firm_data_raw.get('user_public_id')), flush=True)
         user = UserService.get_by_public_id(user_public_id) if isinstance(user_public_id, str) else None
-        print('user: ', user, flush=True)
-
-        log = "user_public_id: {} | user_id: {}".format(user_public_id, user.id)
-        current_app.logger.info(log)
 
         seller_firm_data = {
             'claimed': True,
@@ -563,11 +567,9 @@ class SellerFirmService:
             'created_by': user.id if isinstance(user, User) else None
         }
 
-        print('seller_firm_data', seller_firm_data, flush=True)
 
         seller_firm = SellerFirmService.get_by_name_establishment_country(name, establishment_country_code)
         if not isinstance(seller_firm, SellerFirm):
-            current_app.logger.info('Double Entry.')
             try:
                 new_seller_firm = SellerFirmService.create(seller_firm_data)
             except Exception as e:
@@ -575,7 +577,6 @@ class SellerFirmService:
                 raise e
 
             if isinstance(new_seller_firm, SellerFirm):
-                print('sent back new seller firm', flush=True)
                 return new_seller_firm
 
             else:
@@ -585,3 +586,14 @@ class SellerFirmService:
         else:
             current_app.logger.info('Double Entry.')
             raise Conflict('A seller firm with the this email address already exists. Try logging in instead.')
+
+
+    @staticmethod
+    def get_w_creator_by_public_id(seller_firm_public_id: str) -> SellerFirm:
+        #Requires g.user / login
+
+        seller_firm = SellerFirmService.get_by_public_id(seller_firm_public_id)
+        if isinstance(seller_firm, SellerFirm) and seller_firm.created_by == None:
+            data_changes = { 'created_by': g.user }
+            seller_firm = SellerFirmService.update(seller_firm.id, data_changes)
+        return seller_firm

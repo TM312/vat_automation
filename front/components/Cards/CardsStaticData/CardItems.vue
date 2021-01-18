@@ -141,7 +141,7 @@ export default {
   computed: {
     ...mapState({
       items: (state) => state.seller_firm.seller_firm.items,
-      seller_firm: (state) => state.seller_firm.seller_firm,
+      sellerFirm: (state) => state.seller_firm.seller_firm,
     }),
 
     cardBorder() {

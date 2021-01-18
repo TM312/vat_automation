@@ -14,8 +14,7 @@ export default {
   async fetch() {
     const { store } = this.$nuxt.context
     if (this.countries.length === 0) {
-      const y = await store.dispatch("country/get_all")
-      console.log(y)
+      await store.dispatch("country/get_all")
     }
   },
 
@@ -23,7 +22,7 @@ export default {
     ...mapState({
       countries: state => state.country.countries
     })
-  }
+  },
 }
 </script>
 

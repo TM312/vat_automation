@@ -9,7 +9,7 @@
         {{ user.employer_name }}
         <br />
         <b>Registered On:</b>
-        {{ user.registered_on }}
+        {{ formatDate(user.registered_on) }}
         <br />
       </b-tab>
     </b-tabs>

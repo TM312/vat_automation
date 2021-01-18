@@ -21,8 +21,8 @@ export default ($axios) => ({
     // return $axios.get(`/business/seller_firm/${seller_firm_public_id}`)
   },
 
-  update(seller_firm_id, payload) {
-    return $axios.put(`${resource}/${seller_firm_id}`, payload)
+  update(seller_firm_public_id, payload) {
+    return $axios.put(`${resource}/${seller_firm_public_id}`, payload)
   },
 
   delete_by_public_id(seller_firm_public_id) {

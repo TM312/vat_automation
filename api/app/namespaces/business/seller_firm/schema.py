@@ -32,7 +32,7 @@ seller_firm_sub_dto = business_sub_dto.clone('seller_firm_sub', {
     'transaction_ready': fields.Boolean(readonly=True),
 })
 seller_firm_dto = seller_firm_sub_dto.clone('seller_firm', {
-    'created_by': fields.String(attribute=lambda x: x.creator.name),
+    'created_by': fields.String(attribute=lambda x: x.creator.name if isinstance(x.created_by, int) else None),
     'created_on': fields.Date(readonly=True),
     'tax_auditors': fields.List(fields.Nested(tax_auditor_sub_dto)),
     'accounting_firms': fields.List(fields.Nested(accounting_firm_sub_dto)),

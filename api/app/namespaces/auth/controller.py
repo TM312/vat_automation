@@ -57,7 +57,6 @@ class UserLogout(Resource):
     User Logout Resource
     """
     @login_required
-    @accepted_u_types('admin')
     def post(self):
         # get auth token from request header
         auth_token: TokenInterface = request.headers.get('Authorization')

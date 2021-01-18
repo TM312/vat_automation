@@ -37,11 +37,10 @@ class SellerResource(Resource):
 
     #@login_required
     #@accepted_u_types('admin', 'seller')
-    @ns.marshal_with(seller_dto)
+    @ns.marshal_with(seller_dto, envelope='data')
     def post(self) -> Seller:
         """Create A Single Seller Firm"""
         seller_data: SellerInterface = request.json
-        print('seller_data: ', seller_data, flush=True)
         return SellerService.register_seller(seller_data)
 
 
@@ -51,7 +50,7 @@ class SellerSelfResource(Resource):
     @login_required
     @accepted_u_types('admin', 'seller')
     @ns.marshal_with(seller_dto, envelope='data')
-    def get(self) -> List[Seller]:
+    def get(self) -> Seller:
         return SellerService.get_by_id(g.user.id)
 
 

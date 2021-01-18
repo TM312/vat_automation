@@ -43,7 +43,7 @@ def create_app(env):
     def teardown_request(exception):
         if exception:
             db.session.rollback()
-            current_app.logger.debug(e)
+            current_app.logger.debug(exception)
 
         db.session.remove()
 

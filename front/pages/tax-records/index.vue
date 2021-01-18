@@ -20,7 +20,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: 'tax-client',
+  layout: 'auth-seller',
 
   async fetch() {
     const { store } = this.$nuxt.context

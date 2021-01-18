@@ -65,7 +65,7 @@
 import { mapState } from "vuex"
 
 export default {
-  layout: "tax-client",
+  layout: "auth-seller",
 
   async fetch() {
     if (this.transactionInputs.length === 0) {
