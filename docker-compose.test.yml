@@ -23,7 +23,7 @@ services:
         # volumes:
         #       - media_data:/var/lib/media_data:ro
         ports:
-            - 5000:5000
+            - 5005:5005
             - 80:80
         networks:
             - web
@@ -67,7 +67,7 @@ services:
               - ./api/migrations/:/home/api/migrations
         env_file:
             - .test.env
-        #command: bash -c "./wait-for-it.sh postgres:5432 --timeout=2 && flask run --host 0.0.0.0 --port 5000"
+        #command: bash -c "./wait-for-it.sh postgres:5433 --timeout=2 && flask run --host 0.0.0.0 --port 5005"
 
 
     # front:
@@ -86,7 +86,7 @@ services:
         environment:
             - DATABASE=postgres
         ports:
-            - 5432:5432
+            - 5433:5433
         env_file:
             - .test.env
 
