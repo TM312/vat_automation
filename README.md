@@ -32,7 +32,7 @@
 
 
 ## About
-This is the main repo a VAT calculation application of Amazon sellers. This was a project I worked on for a major part of 2020 in collaboration with an Amazon seller and multiple tax auditing companies. 
+This is the main repo of a VAT calculation application for Amazon sellers. This was a project I worked on for a major part of 2020 in collaboration with an Amazon seller and multiple tax auditing companies.
 
 ## Development Architecture
 
