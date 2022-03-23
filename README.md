@@ -43,7 +43,7 @@ This is the main repo of a VAT calculation application for Amazon sellers. This 
 </ol>
 
 ### Design Schema
-<img align="center" src="assets/img/tax-automation-architecture.png" alt="Tax Automation Architecture" width="1152" height="720">
+<img align="center" src="assets/img/tax-automation-architecture.png" alt="Tax Automation Architecture" width="1080" height="675">
 
 ### Tree High Level
 
