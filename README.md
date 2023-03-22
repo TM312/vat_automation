@@ -242,7 +242,9 @@ Below is the same structure as above but including lower directory levels.
 
 ### Landing Page
 I used product screens for a sample company for the landing page 
-![](assets/gif/vat-automation-landing.gif)
+
+https://user-images.githubusercontent.com/47108756/226808900-d81ce195-449b-4d7b-93d7-918c156a4768.mp4
+
 
 ### Product Page
 For this sample company I created all documents Amazon sellers typically submit to Amazon and tax auditors, such as an item overview an transaction sheets. This was then used to calculate the vat for each transaction and the corresponding tax reports. In the demo users could select arbitrary reporting periods and countries, which has a direct effect on the tax report. So this was actually live calculated, but once a combination had been requested once it was added to the database and from then on would be returned without further processing for later visitors.  
@@ -252,4 +254,5 @@ https://user-images.githubusercontent.com/47108756/226807974-b104262d-51d3-48ab-
 
 ### Interface Tax Auditors
 Tax auditors in larger firms are typically responsible for a portfolio of clients which was considered by allowing them to follow specific clients and view but also calculate tax reports on their behalf.
-![](assets/gif/vat-automation-ui-tax-auditor.gif)
+
+https://user-images.githubusercontent.com/47108756/226809641-e8c0d8fe-ef5f-486d-9ddb-01ae773d21c8.mp4
