@@ -246,7 +246,8 @@ I used product screens for a sample company for the landing page
 
 ### Product Page
 For this sample company I created all documents Amazon sellers typically submit to Amazon and tax auditors, such as an item overview an transaction sheets. This was then used to calculate the vat for each transaction and the corresponding tax reports. In the demo users could select arbitrary reporting periods and countries, which has a direct effect on the tax report. So this was actually live calculated, but once a combination had been requested once it was added to the database and from then on would be returned without further processing for later visitors.  
-![](assets/gif/vat-automation-product-page.mp4)
+
+https://user-images.githubusercontent.com/47108756/226807974-b104262d-51d3-48ab-a7c8-586c54171ea0.mp4
 
 
 ### Interface Tax Auditors
