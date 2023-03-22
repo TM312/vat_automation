@@ -1,20 +1,11 @@
-
 # Tax-Automation
 
-<!-- PROJECT LOGO -->
-<br />
 <p align="center">
-    <img src="assets/img/tax-automation-logo.png" alt="Tax Automation Logo" width="294" height="118">
-
-  <h3 align="center">Tax Automation</h3>
-
-  <p align="center">
     Automated VAT calculations for Amazon Sellers
-    <br />
-    <a href="https://github.com/TM312/vat_automation/issues"><strong>Report Bug/Request feature »</strong></a>
-  </p>
 </p>
 
+<!-- PRODUCT VIDEO -->
+https://user-images.githubusercontent.com/47108756/226807974-b104262d-51d3-48ab-a7c8-586c54171ea0.mp4
 
 
 <!-- TABLE OF CONTENTS -->
@@ -26,13 +17,12 @@
     </li>
     <li><a href="#development-architecture">Development Architecture</a></li>
     <li><a href="#local-deployment">Local Deployment</a></li>
-    <li><a href="#screen-preview">Screen Preview</a></li>
   </ol>
 </details>
 
 
 ## About
-This is the main repo of a VAT calculation application for Amazon sellers. This was a project I worked on for a major part of 2020 in collaboration with an Amazon seller and multiple tax auditing companies.
+VAT calculation is a web tool for Amazon sellers that manages their transactions, calculates distance sales, and allows them to create time- and country-specific tax records. The UI and calculations originate from discussions with Amazon sellers and tax auditing companies. The tool provides interfaces for both sellers and tax auditors.
 
 ## Development Architecture
 
@@ -230,29 +220,3 @@ Below is the same structure as above but including lower directory levels.
 2. Rename `env.template` to `.env` and `dev.env.template` to `.dev.env`
 3. Install the deps in the front* containers via `cd front && npm install`, etc.
 4. The Makefile contains the commands to start the containers and seed the db. For instance run `make run-dev-local` to run the app locally. The db needs to be seeded in order for the app to work since it static data such as exchange rates and currencies information are needed.
-
-
-## Screen Preview
-
-<ol>
-    <li><a href="#landing-page">Landing Page</a></li>
-    <li><a href="##interface-sellers">Interface Sellers</a></li>
-    <li><a href="#interface-tax-auditors">Interface Tax Auditors</a></li>
-</ol>
-
-### Landing Page
-I used product screens for a sample company for the landing page 
-
-https://user-images.githubusercontent.com/47108756/226808900-d81ce195-449b-4d7b-93d7-918c156a4768.mp4
-
-
-### Product Page
-For this sample company I created all documents Amazon sellers typically submit to Amazon and tax auditors, such as an item overview an transaction sheets. This was then used to calculate the vat for each transaction and the corresponding tax reports. In the demo users could select arbitrary reporting periods and countries, which has a direct effect on the tax report. So this was actually live calculated, but once a combination had been requested once it was added to the database and from then on would be returned without further processing for later visitors.  
-
-https://user-images.githubusercontent.com/47108756/226807974-b104262d-51d3-48ab-a7c8-586c54171ea0.mp4
-
-
-### Interface Tax Auditors
-Tax auditors in larger firms are typically responsible for a portfolio of clients which was considered by allowing them to follow specific clients and view but also calculate tax reports on their behalf.
-
-https://user-images.githubusercontent.com/47108756/226809641-e8c0d8fe-ef5f-486d-9ddb-01ae773d21c8.mp4
