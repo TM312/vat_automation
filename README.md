@@ -1,13 +1,9 @@
 # Tax-Automation
-
-<p align="center">
-    Automated VAT calculations for Amazon Sellers
-</p>
-
+<br>
 <!-- PRODUCT VIDEO -->
 https://user-images.githubusercontent.com/47108756/226807974-b104262d-51d3-48ab-a7c8-586c54171ea0.mp4
 
-
+<br>
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
